@@ -1,24 +1,46 @@
-# The Driving Center SaaS — OPERATIONS MANUAL
-## Agentic Business Blueprint v1.0
-
+# OPERATIONS MANUAL — The Driving Center SaaS
+**Version:** 2.0 (Refined)
 **Date:** 2026-04-22
-**Inspired by:** Jack Roberts Protocol + Alex Finn Agentic Business Model + Dan Martell SaaS
-**Architecture:** OpenClaw-first, no n8n, no manual orchestration
-**Stack:** OpenClaw (MiniMax) + Codex/Kimi K2.6 (Ollama) + Supabase + Stripe + Twilio
+**Stack:** OpenClaw + Kimi K2.6 (Ollama) + Supabase + Stripe + Twilio + Resend
+**Inspired by:** Jack Roberts B.L.A.S.T. + Alex Finn Agentic Business Model + Dan Martell SaaS
 
 ---
 
 ## The Core Principle
 
-**You are the CEO. You do not do the work. You approve the work.**
+**You are the CEO. I am the operator that never sleeps.**
 
-Every task that runs repeatedly = an agent. Every agent has one job. OpenClaw is the COO that never sleeps.
+Every repeatable task = an agent. Every agent has one job. OpenClaw is the operating system that runs 24/7.
 
 Jack Roberts says: agents are employees.
 Alex Finn says: one agent = one company function.
 Dan Martell says: one person can run a complete SaaS business with AI.
 
-**This document:** Combines all three into one operational reality.
+**What this means for you:** You approve strategy. I execute. You talk to customers. I handle everything else.
+
+---
+
+## What Actually Works Here (Honest Assessment)
+
+After a full day building with this framework:
+
+**What works:**
+- Agent org chart — clear roles, clear responsibilities
+- Flywheel — mental model that compounds
+- CEO/conductor mindset — you decide, I build
+- Daily standup loop — keeps the business alive between sessions
+- Discovery questions for *new projects* — prevents wasted work
+
+**What doesn't work here:**
+- Spawning coding agents for every task — Codex/Kimi startup issues mean I build directly 80% of the time
+- Formal task_plan/findings/progress files per session — duplicates OPERATIONS_LOG
+- Discovery questions for every feature — overkill, slows down fixes
+
+**The real model:**
+- I (Everest) handle 80% of building directly
+- Kimi K2.6 via Ollama handles complex features when needed
+- OpenClaw subagents handle marketing, sales, CS outreach
+- You (Cayden) approve the SPEC and talk to customers
 
 ---
 
@@ -27,393 +49,253 @@ Dan Martell says: one person can run a complete SaaS business with AI.
 ```
 CAYDEN WILSON (Founder / CEO)
 │
-└── OPENCLAW (Chief of Staff — MiniMax, always on)
+└── EVEREST / OPENCLAW (Chief of Staff — MiniMax, always on)
     │
-    ├── DAILY OPS AGENT (OpenClaw cron — every morning 7 AM)
-    │   ├── Checks: payments, leads, support tickets, churn risk
+    ├── OPS AGENT (OpenClaw cron — every morning)
+    │   ├── Checks: payments, leads, churn risk
     │   ├── Writes standup to OPERATIONS_LOG.md
-    │   └── Flags anything that needs Cayden's attention
+    │   └── Flags only what needs Cayden's attention
     │
-    ├── PRODUCT AGENT (Kimi K2.6 — Ollama)
-    │   └── Reads research → writes SPEC.md → hands to Coder
+    ├── CODER (Everest — direct build)
+    │   └── Reads SPEC.md → builds → commits → tests
+    │   └── Kimi K2.6 (Ollama) for complex features only
     │
-    ├── CODER AGENT (Kimi K2.6 + Codex — Ollama)
-    │   └── Builds per SPEC.md → commits to blast-phase-* branches
+    ├── PRODUCT (Everest — reads research + writes SPEC)
+    │   └── Discovery questions → SPEC.md → Approved → Build
     │
-    ├── MARKETING AGENT (OpenClaw subagent — MiniMax cloud)
-    │   ├── Content Writer → blog posts, emails, outreach
-    │   ├── SEO Researcher → finds leads, builds list
-    │   └── Cold Outreach → sends emails, follows up
+    ├── MARKETING (OpenClaw subagent — outbound)
+    │   ├── Cold outreach to TN/KY/GA schools
+    │   ├── Content: blog, email templates
+    │   └── Updates lead list with status
     │
-    ├── SALES AGENT (OpenClaw subagent — MiniMax cloud)
-    │   ├── Lead Qualifier → "Are they serious? Do they have budget?"
-    │   └── Demo Scheduler → books calls, sends demo links
+    ├── SALES (OpenClaw subagent — lead response)
+    │   ├── Responds within 2 hours of inbound
+    │   ├── Scores leads 1-3
+    │   └── Sends demo video or nurture sequence
     │
-    └── CS AGENT (OpenClaw subagent — MiniMax cloud)
-        ├── Onboarding → welcomes new schools, sends guide
-        ├── Follow-up → day 3, day 7, day 30 check-ins
-        └── Renewal → 5 days before billing → retention message
+    └── CS AGENT (OpenClaw subagent — retention)
+        ├── Day 0: Welcome email + guide
+        ├── Day 3/7/14/30: Check-in sequence
+        ├── Day before renewal: Retention message
+        └── Churn预警: 14 days inactive → escalate to Cayden
 ```
 
 ---
 
-## Role Definitions
+## Your Role (Founder / CEO)
 
-### YOU (Founder / Conductor)
 **What you do:**
-- Approve the SPEC.md before any code is written
-- Review OpenClaw's daily standup report each morning
-- Make decisions that require human judgment (pricing changes, contract terms, partnership deals)
-- Talk to real customers — the relationship stuff AI can't do
+- Approve SPEC.md before any major feature is built
+- Review OPERATIONS_LOG every morning
+- Make decisions that need human judgment (pricing, contracts, partnerships)
+- Talk to real customers — the relationship work AI can't do
 - Celebrate when things ship
 
 **What you never do:**
-- Write code yourself (that's what Kimi K2.6 is for)
-- Send cold emails (that's the Marketing Agent)
-- Follow up with leads manually (that's the Sales Agent)
-- Check whether payments processed (that's the Ops Agent)
+- Write code yourself
+- Send cold outreach emails
+- Manually follow up with leads
+- Check whether payments processed (I do this)
 
-**Your only metrics:**
+**Your only 4 metrics:**
 1. Number of paying schools
-2. Monthly recurring revenue
+2. Monthly recurring revenue (MRR)
 3. Churn rate
-4. Net promoter score
+4. Lead response time
 
 ---
 
-### OPENCLAW (Chief of Staff / COO)
-**What it does:**
-- Orchestrates all other agents
-- Runs the daily standup loop
-- Reads SPEC.md, spawns agents, reviews output
-- Manages cron jobs (replaces n8n)
-- Handles inbound Discord messages and triages
-- Escalates only when a decision is needed
+## My Role (Everest / OpenClaw)
 
-**How it runs:**
-- Powered by MiniMax M2 (your $10/mo)
-- Runs continuously in the background
-- Spawns subagents for parallel tasks
-- Writes daily standup to OPERATIONS_LOG.md
-- Sends Cayden a morning summary
+**What I do:**
+- Execute the daily ops loop every morning
+- Read research → write SPEC.md → build → test → commit
+- Spawn subagents for marketing, sales, CS tasks
+- Manage cron jobs (replaces what n8n used to do)
+- Handle inbound Discord messages, triage, respond
+- Escalate only when a real decision is needed
 
-**It is NOT:**
-- A chatbot — it's an autonomous operating system
-- A code writer — that's the Coder Agent (Kimi K2.6)
-- A marketing dept — that's the Marketing Agent (OpenClaw subagent)
+**How I run:**
+- MiniMax M2 model, runs continuously
+- Spawns subagents for parallel work
+- Writes every session to OPERATIONS_LOG.md
+- Reads PROJECT_CONSTITUTION.md at the start of every session
 
----
-
-### PRODUCT AGENT (Kimi K2.6 via Ollama)
-**Trigger:** Research documents land in the project directory
-**Input:** RESEARCH_TRACK_A_*.md files from OpenClaw's research agents
-**Output:** SPEC.md — numbered tasks, ranked by revenue impact
-**Session:** `sessions_spawn runtime=subagent model=kimi-k2.6`
-
-**Loop:**
-1. OpenClaw spawns Product Agent with research docs
-2. Product Agent reads all research files
-3. Product Agent writes SPEC.md with prioritized task list
-4. OpenClaw reviews SPEC.md
-5. If approved → spawns Coder Agent
-6. If rejected → Product Agent revises
+**I am NOT:**
+- A chatbot — I'm an autonomous operator
+- A rubber stamp — I push back when something is a bad idea
+- A magic wand — I need real credentials (Supabase, Stripe) to make things work
 
 ---
 
-### CODER AGENT (Kimi K2.6 + Codex via Ollama)
-**Trigger:** SPEC.md has unbuilt tasks
-**Input:** SPEC.md + all existing source files
-**Output:** Working code, committed to blast-phase-* branch
-**Session:** `ollama launch codex --model kimi-k2.6:cloud`
+## The Flywheel (How We Compound)
 
-**Loop:**
-1. OpenClaw spawns Codex with SPEC.md
-2. Codex reads SPEC.md and project files
-3. Codex builds one file at a time, commits after each
-4. OpenClaw reviews the git diff
-5. If good → next task. If broken → Codex goes back and fixes.
-6. When all tasks done → notify OpenClaw
+```
+MARKETING finds leads
+    ↓
+SALES converts leads to schools
+    ↓
+SCHOOL pays $99/mo
+    ↓
+CS keeps schools happy
+    ↓
+Schools refer other schools
+    ↓
+MORE LEADS (cheaper, faster)
+    ↓
+More schools = more revenue = more to reinvest
+```
 
-**Rules for the Coder Agent:**
-- Commit after every file, not one big commit at the end
-- Write descriptive commit messages: "B.L.A.S.T. login: magic link auth flow"
-- Never touch env files or secrets
-- Keep it simple — no overengineering
-- If unsure → ask OpenClaw, don't guess
+Every new school increases the probability of the next one (referrals). The wheel gets faster every month.
 
 ---
 
-### MARKETING AGENT (OpenClaw subagent — MiniMax cloud)
-**Trigger:** Weekly cron every Monday 9 AM + on-demand
-**Input:** Lead list + content calendar + competitor research
-**Output:**
-- 2 blog posts/month (driving school pain point content)
-- 5 personalized cold emails/week to TN/KY/GA schools
-- Updated lead list every Friday
-- Demo page conversion report
+## The Discovery Questions (For New Projects Only)
 
-**How it works:**
-- OpenClaw spawns it Monday morning
-- It reads the lead list (RESEARCH_TRACK_A_LEADS.md)
-- It generates personalized outreach emails using the templates
-- It updates the lead list with status (contacted / warm / cold / booked call)
-- It writes a weekly marketing report
+Before starting anything new — a new feature, a new integration, a new page:
 
-**For cold email — always personalize:**
-```
-Subject: Quick question about [School Name]
-
-Hi [Owner Name],
-
-I noticed [specific thing about their school — location, reviews, website].
-I'm building The Driving Center SaaS — software that handles scheduling,
-billing, and automated reminders for driving schools.
-
-Curious if you're currently paying for any software for this?
-
-[link to demo]
-
-Thanks,
-Cayden
-```
+1. **North Star** — What does success look like in one sentence?
+2. **Integrations** — What external services are involved? Are keys ready?
+3. **Source of Truth** — Where does the data live?
+4. **Delivery Payload** — Where does the result end up?
+5. **What it must NOT do** — The non-negotiables (leak data, allow cross-tenant access, accept invalid input)
 
 ---
 
-### SALES AGENT (OpenClaw subagent — MiniMax cloud)
-**Trigger:** New lead from inbound form OR marketing outreach response
-**Response time:** Within 2 hours of new lead
-**Output:**
-- Lead scored 1-3 (Tier 1 = serious buyer, Tier 2 = interested, Tier 3 = window shopping)
-- Personalized reply within 2 hours
-- Demo link sent to Tier 1 leads
-- Follow-up sequence active for 14 days
+## The Daily Loop
 
-**Lead scoring rubric:**
-| Signal | Score |
-|---|---|
-| Has 2+ instructors | +1 |
-| Currently paying for software | +1 |
-| Responded to cold email within 24h | +1 |
-| Visited pricing page | +1 |
-| Booked a demo call | = Tier 1 |
-
-**Response templates (Sales Agent uses these, personalized):**
-
-*Tier 1 — Book a demo:*
+### Every Morning (OpenClaw runs automatically)
 ```
-Subject: RE: [their message]
+OPS AGENT wakes up:
+├── Stripe: any new payments? → update MRR tracker
+├── Stripe: any failed payments? → flag for CS follow-up
+├── Leads: any new inbound? → spawn Sales Agent within 2h
+├── Support: any flagged emails?
+└── Write standup to OPERATIONS_LOG.md
 
-[Owner Name],
-
-Yes — let's talk. I've got 15 minutes Thursday at 2 PM or Friday at 10 AM.
-
-Here's a 2-minute walkthrough of what we'd build for [their use case]:
-[link to loom demo]
-
-Or just reply with what time works and I'll send a calendar link.
-
-Cayden
+IF Monday → spawn Marketing Agent (weekly campaign)
+IF new lead → spawn Sales Agent
+IF churn risk → flag for Cayden
 ```
 
-*Tier 2 — Nurture:*
-```
-Subject: RE: [their message]
-
-[Owner Name],
-
-Thanks for getting back. A few quick questions:
-
-1. How are you currently handling lesson bookings?
-2. How many hours a week does admin work take you?
-3. What software are you using right now, if any?
-
-Happy to send a quick overview — just want to make sure it's actually relevant first.
-
-Cayden
-```
-
----
-
-### CUSTOMER SUCCESS AGENT (OpenClaw subagent — MiniMax cloud)
-**Trigger:** New Stripe payment (webhook fires → CS Agent activated)
-**Output:** Timed onboarding sequence for each new school
-
-**The sequence:**
-| Day | Action | Channel |
-|---|---|---|
-| Day 0 | Welcome email + onboarding guide PDF | Email |
-| Day 3 | "How's setup going? Need help with anything?" | Email |
-| Day 7 | "Which feature are you using most? What needs to be easier?" | Email |
-| Day 14 | "Have you connected your first student yet?" | Email |
-| Day 30 | NPS: "What do you love? What frustrates you?" | Email |
-| Day 60 | "What should we build next? You're our customer." | Email |
-| 5 days before renewal | "Your subscription renews on [date]. Nothing changes unless you cancel." | Email |
-| Day of renewal | Receipt + "Thanks for being a customer." | Email |
-
-**Churn prevention triggers:**
-- If CS Agent detects a school hasn't logged in for 14 days → early warning to OpenClaw
-- OpenClaw escalates to Cayden: "School [name] inactive for 14 days — worth a personal check-in call?"
-
----
-
-## Daily Loop — How the Business Runs
-
-### Every Morning (7 AM — while you sleep) 🌅
-
-```
-OPENCLAW wakes up
-├── OPS Agent checks:
-│   ├── Did any new Stripe payments come in? → Update revenue tracker
-│   ├── Did any payments fail? → Flag for CS Agent follow-up
-│   ├── New inbound leads? → Spawn Sales Agent
-│   ├── New support emails? → Triage and respond or escalate
-│   └── Write standup to OPERATIONS_LOG.md
-│
-├── IF Monday → Spawn Marketing Agent (weekly campaign)
-├── IF new leads → Spawn Sales Agent (within 2 hours)
-└── IF any schools flagged churn-risk → Escalate to Cayden
-
-OPENCLAW sends Cayden a morning message:
-"Good morning Cayden. Here's your daily standup:
-- Revenue: $[amount] this month | [n] schools paying
-- New leads: [n] | Pending response: [n]
-- Churn risk: [n] schools haven't logged in 14+ days
-- Today's focus: [top 3 tasks]
-- Nothing needs your attention right now."
-```
-
-### Every Evening (while you work 4-9 PM) 🌆
-
+### Your Morning (4-5 PM after school)
 ```
 YOU open OPERATIONS_LOG.md
-├── Review what OpenClaw built today
-├── Check git commits from Coder Agent
-├── Approve SPEC.md changes if needed
-└── Start tomorrow's priorities
-
-OPENCLAW running in background:
-├── If you message OpenClaw → responds immediately
-├── If Coder Agent commits → OpenClaw reviews and flags issues
-└── If Sales Agent gets a response → OpenClaw notifies you with summary
+├── Read what was built today
+├── Check git commits
+├── Review anything flagged
+├── Approve SPEC.md changes
+└── Tell me what to prioritize tomorrow
 ```
 
-### Every Week (Monday morning) 📅
-
+### Your Evening Window (5-9 PM — deep work)
 ```
-OPENCLAW runs weekly review:
-├── Marketing Agent: generates this week's content + outreach
-├── Sales Agent: reviews all leads, scores them, sends follow-ups
-├── CS Agent: reviews all active schools for churn risk
-├── Product Agent: reviews backlog, updates SPEC.md priorities
-└── Writes WEEKLY_REVIEW.md with metrics +下周 plan
+I run in background:
+├── If you message me → I respond immediately
+├── If build finishes → I commit and notify you
+├── If Sales Agent gets a response → I notify you
+└── If a lead goes cold → I flag it
+```
+
+### Every Week (Monday morning)
+```
+WEEKLY REVIEW (I write this):
+├── Marketing: outreach sent, responses received, pipeline updated
+├── Sales: leads scored, demos booked, closes expected
+├── CS: active schools reviewed, churn risk flagged
+├── Product: what's shipping this week
+└── Metrics: MRR, schools, pipeline, churn
 ```
 
 ---
 
-## The Agentic Flywheel
+## How We Build (B.L.A.S.T. Applied)
 
-This is the self-reinforcing loop that compounds over time:
+**For every feature or fix:**
 
 ```
-MARKETING AGENT finds leads
-    ↓
-SALES AGENT converts leads to schools
-    ↓
-SCHOOL pays $99/mo (Stripe)
-    ↓
-CS AGENT keeps schools happy
-    ↓
-Schools refer other schools (word of mouth)
-    ↓
-MORE LEADS from existing schools
-    ↓
-More schools = more revenue = more to reinvest in agents
-```
+B — Blueprint
+  → SPEC.md entry written
+  → PII fields identified
+  → External services identified
+  → Test case defined before code
 
-Every school that joins increases the odds of the next school joining (referrals). The flywheel gets faster every month.
+L — Link
+  → Env vars verified present
+  → SQL migrations ready
+  → External services accessible
+
+A — Architect
+  → Auth check (getUser())
+  → Ownership check (school_id)
+  → Input validation
+  → Audit log on writes
+  → npm run build → must pass
+
+S — Stylize
+  → UI updated if changed
+  → Error states + loading states
+  → Mobile check
+
+T — Trigger
+  → git commit (descriptive message)
+  → Push to remote
+  → New env vars documented
+  → New cron job set up if needed
+```
 
 ---
 
-## What Gets Built Next (Priority Order)
+## What Gets Built Next (Current Priority Order)
 
-After Phase 1 (MVP core — auth, Stripe, dashboard):
-
-| Phase | What | Agent | Why |
+| Priority | What | Why | Status |
 |---|---|---|---|
-| **Phase 2** | Booking calendar | Coder Agent | Core product — schools can't sell without it |
-| **Phase 2** | School admin panel | Coder Agent | School owner needs to see their own data |
-| **Phase 3** | Twilio SMS reminders | CS Agent config | Automated 72h/24h reminders = fewer no-shows |
-| **Phase 3** | Demo video (Loom) | Marketing Agent | Close sales faster — show before you sell |
-| **Phase 4** | Multi-state support | Coder Agent | Expand to KY then GA |
-| **Phase 4** | Instructor management | Coder Agent | Unlock medium-size school tier ($149/mo) |
-| **Phase 5** | Referral program | CS Agent | Flywheel activation — schools refer schools |
+| P0 | Fill .env.local with real credentials | Everything is blocked on this | Waiting on Cayden |
+| P0 | Run SQL migrations 001, 002, 003 | Database schema not live yet | Waiting on Cayden |
+| P1 | Test full checkout flow end-to-end | Verify the whole chain works | Blocked on P0 |
+| P1 | Record demo video (Loom) | Need this to close first customers | After P1 |
+| P2 | Start outreach to 5 schools | First revenue | After P1 |
+| P2 | Set up OpenClaw cron for reminders | /api/reminders fires every hour | After P1 |
+| P3 | Booking calendar polish | Already built, needs real data | After P2 |
+| P3 | Email sequences (Resend) | CS onboarding automation | After P2 |
+| P4 | Referral program | Flywheel activation | Future |
 
 ---
 
-## How to Launch a New Agent
+## Security Rules (Non-Negotiable)
 
-**Rule: Never build without a SPEC. Never SPEC without research.**
+Every endpoint must pass this before commit:
+- [ ] `getUser()` called — not `getSession()`
+- [ ] `school_id` ownership verified on every PUT/DELETE
+- [ ] PII encrypted at write, stripped at read
+- [ ] Input validated (DOB age, email format, phone format)
+- [ ] Audit log on every POST/PUT/DELETE
+- [ ] No secrets in `NEXT_PUBLIC_` namespace
 
-The correct order:
-1. OpenClaw research agent identifies a need
-2. OpenClaw writes SPEC.md with the task
-3. OpenClaw spawns Coder Agent to build it
-4. OpenClaw reviews the output
-5. If it works → merge to main. If not → back to step 3.
-
-Example — launching the Marketing Agent:
-```
-OPENCLAW spawns marketing-agent subagent with task:
-"Design and launch the cold outreach campaign for Phase 3 launch.
-
-Use the lead list in RESEARCH_TRACK_A_LEADS.md.
-Send 5 emails/week to Tier 1 schools.
-Personalize each email using the school name and any public info about them.
-Track responses in lead list.
-Report back when done."
-
-When agent finishes → OpenClaw reviews output → approves or revises
-```
+PII never in responses: `dob`, `permit_number`, `legal_name` (returns `[encrypted]`), `emergency_contact_phone`
 
 ---
 
-## The OPERATIONS_LOG.md
+## Key Contacts
 
-OpenClaw writes this every morning. It's the heartbeat of the business.
-
-```markdown
-# Operations Log — [DATE]
-
-## Revenue
-- MRR: $[amount] | Schools paying: [n] | Churned: [n]
-
-## Pipeline
-- Leads this week: [n] | Converted: [n] | Lost: [n]
-- Pipeline value: $[estimated ARR if all closed]
-
-## What We Built
-- [SPEC.md task] → DONE / IN PROGRESS / BLOCKED
-- [Git commit] → [description]
-
-## What's Blocked
-- [Issue] → [What's needed to fix it]
-
-## Tomorrow
-1. [ ] [Task]
-2. [ ] [Task]
-3. [ ] [Task]
-
-## Cayden's Attention Needed
-- [ ] [Decision to make with context]
-```
+| Role | Name | Notes |
+|---|---|---|
+| Technical mentor | Mark Martin | CS teacher, ORNL security, Full Stack Open |
+| Industry mentor | Matt Reedy | Driving instructor |
+| First call target | Oak Ridge Driving School | First outreach candidate |
 
 ---
 
-## The One Rule That Runs Everything
+## Success Targets
 
-**If it's repeatable, it's an agent's job. If it requires judgment, it's OpenClaw's job to escalate to you.**
+| Target | Timeline | What it means |
+|---|---|---|
+| First paying school | Month 3 | Proof the product works |
+| 5 schools paying | Month 6 | $495/mo — model validated |
+| 20 schools paying | Month 12 | $1,980/mo — real part-time income |
+| 50 schools paying | Month 15 (18th birthday) | $4,950/mo — $60k ARR business |
 
-Never let yourself fall into doing the repeatable work. That's a trap. The moment you catch yourself sending the same email twice → build an agent for it and hand it off.
+**By your 18th birthday: a $60k ARR SaaS that runs 24/7.**
 
 ---
 
@@ -421,37 +303,24 @@ Never let yourself fall into doing the repeatable work. That's a trap. The momen
 
 ```
 the-driving-center-website/
-├── SPEC.md                      ← Work order (Product Agent writes, you approve)
-├── OPERATIONS_LOG.md           ← Daily standup (OpenClaw writes every morning)
-├── WEEKLY_REVIEW.md            ← Every Monday (OpenClaw writes)
-├── RESEARCH_TRACK_A_*.md       ← Research from OpenClaw agents
-├── blast-phase-1/             ← Git branch for current build
-└── src/                        ← Code (Coder Agent builds here)
+├── PROJECT_CONSTITUTION.md   ← The law: our protocol, security rules, stack
+├── DISCOVERIES.md           ← What we know: constraints, lessons, findings
+├── PROGRESS.md              ← Session log: built, errors, fixes
+├── OPERATIONS_LOG.md        ← Daily standup: revenue, pipeline, blockers
+├── SPEC.md                  ← Current phase work orders
+├── SPEC_PHASE_3.md         ← Phase 3 work order
+├── SECURITY_TESTING_PLAN.md ← Pre-launch security checklist
+├── RESEARCH_TRACK_A_*.md   ← Research files from OpenClaw agents
+└── src/
+    ├── app/                 ← All pages + API routes
+    ├── lib/
+    │   ├── security.ts      ← Encryption, validation, audit helpers
+    │   ├── email.ts         ← Resend client (stub mode)
+    │   ├── twilio.ts        ← Twilio client (stub mode)
+    │   └── migrations/      ← SQL to run in Supabase SQL Editor
+    └── components/
 ```
 
 ---
 
-## Key Contacts (Real Humans)
-
-| Role | Name | Context |
-|---|---|---|
-| **Mentor — Technical** | Mark Martin | CS teacher, ORNL security analyst, Full Stack Open instructor |
-| **Mentor — Industry** | Matt Reedy | Driving instructor, industry insider |
-| **Customer archetype** | Oak Ridge Driving School | First call target |
-
----
-
-## Success Metrics
-
-| Goal | Timeline | What it looks like |
-|---|---|---|
-| First paying school | Month 3 | 1 school = $99/mo |
-| 5 schools paying | Month 6 | $495/mo — proof the model works |
-| 20 schools paying | Month 12 | $1,980/mo — replaces part-time job |
-| 50 schools paying | Month 15 (18th birthday) | $4,950/mo — real business |
-
-**By the time you're 18, you have a $60k ARR SaaS company that runs 24/7 while you sleep.**
-
----
-
-*This document is Cayden Wilson's business blueprint. Agents execute. OpenClaw orchestrates. You approve.*
+*This document is the business blueprint. I execute. I escalate. You decide.*
