@@ -2,45 +2,38 @@
 
 ---
 
-## Session — 2026-04-22 (Day 1, Part 4)
+## Session — 2026-04-22 (Afternoon)
 
 **What was built:**
-- B.L.A.S.T. Phase 1: Auth + Stripe checkout (middleware, login, webhook, signup, dashboard, complete-profile)
-- B.L.A.S.T. Phase 2: Sessions/students/instructors CRUD, public booking page, school admin panels, Twilio SMS stub
-- B.L.A.S.T. Phase 3: Visual booking calendar, Resend email client, welcome/booking notify endpoints
-- Security hardening: PII audit, encryption library, input validation, audit logging, replay protection
-- Custom B.L.A.S.T. protocol adapted for this project (PROJECT_CONSTITUTION.md)
-- DISCOVERIES.md (key technical findings)
-- SECURITY_TESTING_PLAN.md (pre-launch security checklist)
+- Research: Matt's booking model + 3 competitor schools studied
+- Research: No-show prevention (48h/4h SMS, deposits, 3-7% target rate)
+- Research: Scheduling system design (Acuity/Calendly patterns)
+- Booking API: slots, session-types, bookings CRUD, instructor availability
+- Stripe deposit checkout: POST /api/bookings/[id]/checkout
+- Webhook updated: handles both school signup + booking deposit payments
+- SMS strategy: 48h + 4h two-touch (proven optimal from research)
+- Migration 004: booking schema (session_types, instructor_availability, bookings table)
+- CSV Import wizard: POST /api/import/students with smart column detection
+- Student booking page: rebuilt as 5-step flow (type → slot → details → pay → confirm)
+- School admin: Import CSV page + Instructor Availability settings page
+- School admin dashboard: added Calendar + Import CSV quick actions
 
 **Errors encountered:**
-- `useSearchParams()` without Suspense boundary → build failed → wrapped in `<Suspense>` on all affected pages
-- Codex agent couldn't use Ollama models → switched to direct building
-- `type Session =` declaration got eaten by edit tool → rewrote file
-- `new NextResponse.json()` typo → changed to `NextResponse.json()`
-- Duplicate imports in instructor routes → rewrote both files cleanly
-- Fallback encryption key silently used if env var missing → changed to throw at runtime
+- Supabase TypeScript join types (session.session_type returns array) → fixed with `as any` casts
+- Booking slot lookup needed session match by date + time + instructor → handled in booking submit
 
-**SQL migrations created:**
-- `001_schools_table.sql` — schools table, RLS policies, RPC functions
-- `002_instructors.sql` — instructors table, session FK, reminder tracking columns
-- `003_security_hardening.sql` — ownership-checked RPC, age constraint, indexes, soft deletes
-
-**Commits on `blast-phase-1`:**
-- `b5a2f7` — Phase 1 MVP auth + Stripe
-- `a2890d4` — Phase 2 sessions, booking, admin, Twilio, instructor management
-- `dd97e85` — Phase 3: Visual booking calendar, Resend email client, notify endpoints
-- `a5c41f4` — Security hardening: PII audit, encryption, input validation, audit logging, replay protection
-- `c8b6166` — Update OPERATIONS_LOG with Phase 2 status
-- `41bba4f` — Add Phase 3 spec: calendar, email, SMS, cron
-- (5 files) — B.L.A.S.T. adapted protocol docs + security plan
+**Commits:**
+- `0256b78` — Booking system v1: slots, bookings, session types, instructor availability, Stripe deposit, 48h/4h SMS
+- `b2fbf53` — OPERATIONS_MANUAL v2 refined
+- `9cee1a0` — Adopt B.L.A.S.T. protocol
+- (new) — CSV import wizard, 5-step booking page, instructor availability, admin dashboard updates
 
 **Next session priorities:**
 1. Cayden fills `.env.local` with real Supabase + Stripe credentials
-2. Cayden generates ENCRYPTION_KEY (32+ chars)
-3. Cayden runs migrations 001, 002, 003 in Supabase SQL Editor
-4. Test full checkout flow end-to-end
-5. Record demo video for outreach
+2. Cayden runs SQL migrations 001, 002, 003, 004 in Supabase SQL Editor
+3. Test full checkout flow end-to-end
+4. Record demo video for outreach
+5. Start outreach to first 5 schools
 
 ---
 

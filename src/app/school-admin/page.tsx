@@ -53,13 +53,20 @@ export default async function SchoolAdminPage() {
         <QuickStatsRow schoolId={schoolId} />
 
         {/* Quick actions */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
           <Link
             href="/school-admin/sessions"
             className="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 transition-colors"
           >
             <div className="text-2xl mb-1">📅</div>
             <div className="text-sm font-medium">Sessions</div>
+          </Link>
+          <Link
+            href="/school-admin/calendar"
+            className="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 transition-colors"
+          >
+            <div className="text-2xl mb-1">🗓️</div>
+            <div className="text-sm font-medium">Calendar</div>
           </Link>
           <Link
             href="/school-admin/students"
@@ -69,12 +76,35 @@ export default async function SchoolAdminPage() {
             <div className="text-sm font-medium">Students</div>
           </Link>
           <Link
+            href="/school-admin/import"
+            className="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 transition-colors"
+          >
+            <div className="text-2xl mb-1">📥</div>
+            <div className="text-sm font-medium">Import CSV</div>
+          </Link>
+          <Link
             href="/school-admin/instructors"
             className="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 transition-colors"
           >
             <div className="text-2xl mb-1">👨‍🏫</div>
             <div className="text-sm font-medium">Instructors</div>
           </Link>
+        </div>
+
+        {/* Instructor availability shortcut */}
+        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm font-medium">Instructor Availability</div>
+              <div className="text-xs text-gray-500">Set weekly working hours per instructor</div>
+            </div>
+            <Link
+              href="/school-admin/availability"
+              className="text-sm text-cyan-400 hover:text-cyan-300"
+            >
+              Configure →
+            </Link>
+          </div>
         </div>
 
         {/* Recent students */}
