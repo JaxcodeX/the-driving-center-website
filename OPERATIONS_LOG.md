@@ -71,14 +71,16 @@
 ---
 
 ## Agent Activity
-- Phase 1 + 2 built directly (Codex agent had startup issues, moved fast without it)
+- Phase 1 + 2 + 3 + Security built directly (Codex agent had startup issues, moved fast without it)
 - OpenClaw runs 24/7 — no manual intervention needed between sessions
 - Kimi K2.6 via Ollama available for complex feature builds when needed
+- Security audit completed: 5 P0/P1 issues fixed, 2 more (replay attack + rate limiting) marked P2
 
 ## Next Session
-1. Confirm build passes locally
-2. Cayden sets up Supabase + Stripe accounts
-3. Run migrations
+1. Cayden fills `.env.local` with real Supabase + Stripe credentials
+2. Cayden runs SQL migrations 001, 002, 003 in Supabase SQL Editor
+3. Cayden generates ENCRYPTION_KEY (32+ bytes) and adds to `.env.local`
 4. Test checkout flow end-to-end
-5. Record demo video
-6. Start outreach to first 5 schools
+5. Run security tests per `SECURITY_TESTING_PLAN.md`
+6. Record demo video
+7. Start outreach to first 5 schools
