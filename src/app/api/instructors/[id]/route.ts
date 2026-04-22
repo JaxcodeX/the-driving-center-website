@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { auditLog } from '@/lib/security'
 
 export async function GET(
   _request: Request,
@@ -56,6 +57,14 @@ export async function PUT(
     return NextResponse.json({ error: error?.message ?? 'Update failed' }, { status: 500 })
   }
 
+  await supabaseAdmin.from('audit_logs').insert(
+    auditLog('INSTRUCTOR_UPDATED', user.id, {
+      instructor_id: id,
+      school_id: schoolId,
+      updated_fields: Object.keys(body),
+    })
+  )
+
   return NextResponse.json(updated)
 }
 
@@ -81,8 +90,12 @@ export async function DELETE(
     .eq('school_id', schoolId)
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: error?.message ?? String(error) }, { status: 500 })
   }
+
+  await supabaseAdmin.from('audit_logs').insert(
+    auditLog('INSTRUCTOR_DEACTIVATED', user.id, { instructor_id: id, school_id: schoolId })
+  )
 
   return new NextResponse('OK')
 }

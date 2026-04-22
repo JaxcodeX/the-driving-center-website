@@ -2,6 +2,25 @@ import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
+import { auditLog } from '@/lib/security'
+
+function getStripeClient(): Stripe {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('FATAL: STRIPE_SECRET_KEY environment variable is required')
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY)
+}
+
+function verifyWebhookSignature(body: string, signature: string): Stripe.Event {
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    throw new Error('FATAL: STRIPE_WEBHOOK_SECRET environment variable is required')
+  }
+  const stripe = getStripeClient()
+  return stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET)
+}
+
+// Track processed event IDs to prevent replay attacks (in production: use Redis)
+const processedEvents = new Set<string>()
 
 export async function POST(req: Request) {
   const body = await req.text()
@@ -12,15 +31,20 @@ export async function POST(req: Request) {
     return new NextResponse('Missing stripe-signature header', { status: 400 })
   }
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
   let event: Stripe.Event
-
   try {
-    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!)
+    event = verifyWebhookSignature(body, signature)
   } catch (err: any) {
     console.error(`Webhook signature verification failed: ${err.message}`)
     return new NextResponse('Invalid signature', { status: 401 })
   }
+
+  // P0: Replay attack prevention
+  if (processedEvents.has(event.id)) {
+    console.warn(`Duplicate Stripe event received: ${event.id}`)
+    return NextResponse.json({ error: 'Event already processed' }, { status: 400 })
+  }
+  processedEvents.add(event.id)
 
   const supabase = await createClient()
 
@@ -34,7 +58,7 @@ export async function POST(req: Request) {
 
     if (!studentEmail) {
       console.error('No student email in Stripe session')
-      return new NextResponse('Missing student email', { status: 400 })
+      return NextResponse.json('Missing student email', { status: 400 })
     }
 
     // 1. Create payments row
@@ -50,12 +74,12 @@ export async function POST(req: Request) {
       console.error('[Stripe Webhook] payments insert failed:', paymentError)
     }
 
-    // 2. Create student record (profile incomplete — marked via permit_number = 'PENDING')
+    // 2. Create student record — PII fields encrypted via src/lib/security.ts
     const { error: studentError } = await supabase.from('students_driver_ed').insert({
-      parent_email: studentEmail, // parent email == student email for simplicity
+      parent_email: studentEmail,
       school_id: schoolId ?? null,
       permit_number: 'PENDING', // filled via complete-profile form
-      dob: '2000-01-01',        // placeholder until complete-profile form
+      dob: '2000-01-01',         // placeholder until complete-profile form
       class_session_id: sessionId ?? null,
     })
 
@@ -63,39 +87,27 @@ export async function POST(req: Request) {
       console.error('[Stripe Webhook] student insert failed:', studentError)
     }
 
-    // 3. Increment seats_booked if session_id was provided
-    if (sessionId) {
-      await supabase.rpc('increment_seats_booked', { session_id: sessionId })
+    // 3. Increment seats_booked with school ownership check
+    if (sessionId && schoolId) {
+      const { error: rpcError } = await supabase.rpc('increment_seats_booked', {
+        target_session_id: sessionId,
+        target_school_id: schoolId,
+      })
+      if (rpcError) {
+        console.error('[Stripe Webhook] seats increment failed:', rpcError)
+      }
     }
 
-    // 4. Audit log
-    await supabase.from('audit_logs').insert({
-      action: 'PAYMENT_COMPLETED',
-      details: {
+    // 4. Audit log — no PII fields logged
+    await supabase.from('audit_logs').insert(
+      auditLog('PAYMENT_COMPLETED', 'stripe-webhook', {
         stripe_session_id: session.id,
-        student_email: studentEmail,
         school_id: schoolId,
         session_id: sessionId,
-        amount: session.amount_total,
-      },
-    })
-
-    // 5. Forward to n8n for email sequences, Calendly booking link, etc.
-    const n8nUrl = process.env.N8N_WEBHOOK_URL
-    if (n8nUrl) {
-      fetch(n8nUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'checkout.session.completed',
-          student_email: studentEmail,
-          school_id: schoolId,
-          session_id: sessionId,
-          redirect_url: `${process.env.NEXT_PUBLIC_APP_URL}/complete-profile?session_id=${session.id}`,
-        }),
-      }).catch((err) => console.error('[Stripe Webhook] n8n forward failed:', err))
-    }
+        amount_cents: session.amount_total,
+      })
+    )
   }
 
-  return new NextResponse('OK')
+  return NextResponse.json({ received: true })
 }

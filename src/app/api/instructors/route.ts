@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { auditLog } from '@/lib/security'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -18,7 +19,7 @@ export async function GET(request: Request) {
     .order('created_at', { ascending: true })
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: error?.message ?? String(error) }, { status: 500 })
   }
 
   return NextResponse.json(instructors ?? [])
@@ -55,7 +56,16 @@ export async function POST(request: Request) {
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: error?.message ?? String(error) }, { status: 500 })
+
+  await supabaseAdmin.from('audit_logs').insert(
+    auditLog('INSTRUCTOR_CREATED', user.id, {
+      instructor_id: instructor.id,
+      school_id: schoolId,
+      name,
+      license_expiry,
+    })
+  )
 
   return NextResponse.json(instructor, { status: 201 })
 }

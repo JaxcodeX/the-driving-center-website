@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { auditLog } from '@/lib/security'
 
 export async function GET(
   _request: Request,
@@ -50,13 +51,20 @@ export async function PUT(
       cancelled: body.cancelled ?? false,
     })
     .eq('id', id)
-    .eq('school_id', schoolId)
+    .eq('school_id', schoolId) // Ownership check
     .select()
     .single()
 
   if (error || !updated) {
     return NextResponse.json({ error: error?.message ?? 'Update failed' }, { status: 500 })
   }
+
+  await supabaseAdmin.from('audit_logs').insert(
+    auditLog(body.cancelled ? 'SESSION_CANCELLED' : 'SESSION_UPDATED', user.id, {
+      session_id: id,
+      school_id: schoolId,
+    })
+  )
 
   return NextResponse.json(updated)
 }
@@ -76,6 +84,7 @@ export async function DELETE(
   const schoolId = _request.headers.get('x-school-id')
   const supabaseAdmin = await createClient()
 
+  // Soft cancel — don't hard delete (retention)
   const { error } = await supabaseAdmin
     .from('sessions')
     .update({ cancelled: true })
@@ -83,8 +92,12 @@ export async function DELETE(
     .eq('school_id', schoolId)
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: error?.message ?? String(error) }, { status: 500 })
   }
+
+  await supabaseAdmin.from('audit_logs').insert(
+    auditLog('SESSION_CANCELLED', user.id, { session_id: id, school_id: schoolId })
+  )
 
   return new NextResponse('OK')
 }
