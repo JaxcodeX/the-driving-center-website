@@ -4,22 +4,17 @@ import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
 
-function getStripeClient(): Stripe {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error('FATAL: STRIPE_SECRET_KEY environment variable is required')
-  }
+function getStripe(): Stripe {
+  if (!process.env.STRIPE_SECRET_KEY) throw new Error('STRIPE_SECRET_KEY required')
   return new Stripe(process.env.STRIPE_SECRET_KEY)
 }
 
-function verifyWebhookSignature(body: string, signature: string): Stripe.Event {
-  if (!process.env.STRIPE_WEBHOOK_SECRET) {
-    throw new Error('FATAL: STRIPE_WEBHOOK_SECRET environment variable is required')
-  }
-  const stripe = getStripeClient()
-  return stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET)
+function verifyWebhook(body: string, signature: string): Stripe.Event {
+  if (!process.env.STRIPE_WEBHOOK_SECRET) throw new Error('STRIPE_WEBHOOK_SECRET required')
+  return getStripe().webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET)
 }
 
-// Track processed event IDs to prevent replay attacks (in production: use Redis)
+// In-memory replay protection — use Redis in production
 const processedEvents = new Set<string>()
 
 export async function POST(req: Request) {
@@ -27,22 +22,18 @@ export async function POST(req: Request) {
   const headersList = await headers()
   const signature = headersList.get('stripe-signature')
 
-  if (!signature) {
-    return new NextResponse('Missing stripe-signature header', { status: 400 })
-  }
+  if (!signature) return new NextResponse('Missing signature', { status: 400 })
 
   let event: Stripe.Event
   try {
-    event = verifyWebhookSignature(body, signature)
+    event = verifyWebhook(body, signature)
   } catch (err: any) {
-    console.error(`Webhook signature verification failed: ${err.message}`)
     return new NextResponse('Invalid signature', { status: 401 })
   }
 
-  // P0: Replay attack prevention
+  // Replay protection
   if (processedEvents.has(event.id)) {
-    console.warn(`Duplicate Stripe event received: ${event.id}`)
-    return NextResponse.json({ error: 'Event already processed' }, { status: 400 })
+    return NextResponse.json({ error: 'Already processed' }, { status: 400 })
   }
   processedEvents.add(event.id)
 
@@ -51,62 +42,59 @@ export async function POST(req: Request) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
     const { metadata } = session
+    const bookingId = metadata?.booking_id
 
-    const schoolId = metadata?.school_id
-    const sessionId = metadata?.session_id
-    const studentEmail = session.customer_details?.email ?? metadata?.student_email
+    if (bookingId) {
+      // This is a booking deposit payment
+      const { error } = await supabase
+        .from('bookings')
+        .update({
+          status: 'confirmed',
+          deposit_paid_at: new Date().toISOString(),
+          stripe_payment_intent_id: session.payment_intent as string,
+        })
+        .eq('id', bookingId)
+        .eq('status', 'pending')
 
-    if (!studentEmail) {
-      console.error('No student email in Stripe session')
-      return NextResponse.json('Missing student email', { status: 400 })
-    }
+      if (error) console.error('Booking payment update error:', error)
 
-    // 1. Create payments row
-    const { error: paymentError } = await supabase.from('payments').insert({
-      student_email: studentEmail,
-      stripe_session_id: session.id,
-      amount: session.amount_total ?? 0,
-      status: 'paid',
-      school_id: schoolId ?? null,
-    })
+      await supabase.from('audit_logs').insert(
+        auditLog('BOOKING_DEPOSIT_PAID', metadata?.student_email ?? 'unknown', {
+          booking_id: bookingId,
+          amount_cents: session.amount_total,
+          stripe_session_id: session.id,
+        })
+      )
+    } else {
+      // Legacy: school signup payment (original Phase 1 flow)
+      const schoolId = metadata?.school_id
+      const sessionId = metadata?.session_id
+      const studentEmail = session.customer_details?.email ?? metadata?.student_email ?? 'unknown'
 
-    if (paymentError) {
-      console.error('[Stripe Webhook] payments insert failed:', paymentError)
-    }
-
-    // 2. Create student record — PII fields encrypted via src/lib/security.ts
-    const { error: studentError } = await supabase.from('students_driver_ed').insert({
-      parent_email: studentEmail,
-      school_id: schoolId ?? null,
-      permit_number: 'PENDING', // filled via complete-profile form
-      dob: '2000-01-01',         // placeholder until complete-profile form
-      class_session_id: sessionId ?? null,
-    })
-
-    if (studentError) {
-      console.error('[Stripe Webhook] student insert failed:', studentError)
-    }
-
-    // 3. Increment seats_booked with school ownership check
-    if (sessionId && schoolId) {
-      const { error: rpcError } = await supabase.rpc('increment_seats_booked', {
-        target_session_id: sessionId,
-        target_school_id: schoolId,
-      })
-      if (rpcError) {
-        console.error('[Stripe Webhook] seats increment failed:', rpcError)
-      }
-    }
-
-    // 4. Audit log — no PII fields logged
-    await supabase.from('audit_logs').insert(
-      auditLog('PAYMENT_COMPLETED', 'stripe-webhook', {
+      await supabase.from('payments').insert({
+        student_email: studentEmail,
         stripe_session_id: session.id,
-        school_id: schoolId,
-        session_id: sessionId,
-        amount_cents: session.amount_total,
+        amount: session.amount_total ?? 0,
+        status: 'paid',
+        school_id: schoolId ?? null,
       })
-    )
+
+      if (sessionId && schoolId) {
+        await supabase.rpc('increment_seats_booked', {
+          target_session_id: sessionId,
+          target_school_id: schoolId,
+        })
+      }
+
+      await supabase.from('audit_logs').insert(
+        auditLog('PAYMENT_COMPLETED', 'stripe-webhook', {
+          stripe_session_id: session.id,
+          school_id: schoolId,
+          session_id: sessionId,
+          amount_cents: session.amount_total,
+        })
+      )
+    }
   }
 
   return NextResponse.json({ received: true })

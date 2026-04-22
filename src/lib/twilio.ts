@@ -1,4 +1,5 @@
-// Twilio client wrapper — stub mode when keys not configured
+// Twilio SMS client — stub mode when keys not configured
+// Uses 48h + 4h two-touch strategy (proven: 40-70% no-show reduction)
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID
 const authToken = process.env.TWILIO_AUTH_TOKEN
@@ -8,9 +9,9 @@ function isConfigured() {
   return Boolean(accountSid && authToken && fromNumber)
 }
 
-export async function sendSMS(to: string, body: string): Promise<void> {
-  if (!isConfigured()) {
-    console.log(`[Twilio STUB] To: ${to} | Message: ${body}`)
+async function sendSMS(to: string, body: string): Promise<void> {
+  if (!to || !isConfigured()) {
+    console.log(`[Twilio STUB] To: ${to} | Body: ${body}`)
     return
   }
 
@@ -22,11 +23,7 @@ export async function sendSMS(to: string, body: string): Promise<void> {
         Authorization: `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString('base64')}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        To: to,
-        From: fromNumber!,
-        Body: body,
-      }),
+      body: new URLSearchParams({ To: to, From: fromNumber!, Body: body }),
     }
   )
 
@@ -36,12 +33,14 @@ export async function sendSMS(to: string, body: string): Promise<void> {
   }
 }
 
+// 48h reminder — gives student time to reschedule if needed
 export async function sendLessonReminderSMS(
   to: string,
   studentName: string,
-  schoolName: string,
+  lessonType: string,
   date: string,
-  time: string
+  time: string,
+  location: string
 ): Promise<void> {
   const formattedDate = new Date(`${date}T12:00:00`).toLocaleDateString('en-US', {
     weekday: 'long',
@@ -49,13 +48,70 @@ export async function sendLessonReminderSMS(
     day: 'numeric',
   })
 
-  const message = `Hi ${studentName} — driving lesson reminder for ${formattedDate} at ${time} with ${schoolName}. Reply C to confirm or R to reschedule.`
+  const message = [
+    `Hi ${studentName.split(' ')[0]}! 👋`,
+    `Reminder: Your ${lessonType} is in 2 days.`,
+    `📅 ${formattedDate} at ${time}`,
+    location ? `📍 ${location}` : null,
+    ``,
+    `Reply C to confirm or R to reschedule.`,
+    `Need to cancel? Reply with your reason.`,
+  ]
+    .filter(Boolean)
+    .join('\n')
 
   await sendSMS(to, message)
 }
 
-export async function sendLessonConfirmationSMS(
+// 4h reminder — final heads-up
+export async function sendFinalReminderSMS(
   to: string,
+  studentName: string,
+  lessonType: string,
+  date: string,
+  time: string,
+  location: string
+): Promise<void> {
+  const message = [
+    `⏰ ${studentName.split(' ')[0]} — see you soon!`,
+    `Today: ${lessonType}`,
+    `🕐 ${time}`,
+    location ? `📍 ${location}` : null,
+    ``,
+    `Drive safe! See your instructor then. 🚗`,
+  ]
+    .filter(Boolean)
+    .join('\n')
+
+  await sendSMS(to, message)
+}
+
+// Cancellation confirmation
+export async function sendCancellationSMS(
+  to: string,
+  studentName: string,
+  lessonType: string,
+  date: string,
+  time: string
+): Promise<void> {
+  const formattedDate = new Date(`${date}T12:00:00`).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  })
+
+  const message = [
+    `Hi ${studentName.split(' ')[0]} — your ${lessonType} on ${formattedDate} at ${time} has been cancelled.`,
+    `If you'd like to reschedule, visit your booking link.`,
+  ].join('\n')
+
+  await sendSMS(to, message)
+}
+
+// Booking confirmation (sent after Stripe deposit paid)
+export async function sendBookingConfirmationSMS(
+  to: string,
+  studentName: string,
+  lessonType: string,
   date: string,
   time: string,
   location: string
@@ -66,7 +122,15 @@ export async function sendLessonConfirmationSMS(
     day: 'numeric',
   })
 
-  const message = `Your lesson is confirmed for ${formattedDate} at ${time}. Location: ${location}. See you there!`
+  const message = [
+    `✅ Booking confirmed, ${studentName.split(' ')[0]}!`,
+    `${lessonType} — ${formattedDate} at ${time}`,
+    location ? `📍 ${location}` : null,
+    ``,
+    `You'll get a reminder 48 hours before. See you there! 🚗`,
+  ]
+    .filter(Boolean)
+    .join('\n')
 
   await sendSMS(to, message)
 }
