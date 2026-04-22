@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-export default function CompleteProfilePage() {
-  const router = useRouter()
+function CompleteProfileForm() {
   const params = useSearchParams()
   const sessionId = params.get('session_id')
   const supabase = createClient()
@@ -29,9 +28,10 @@ export default function CompleteProfilePage() {
 
     // Encrypt sensitive fields before INSERT (AES-256 via Web Crypto API)
     const encoder = new TextEncoder()
+    const rawKey = (process.env.NEXT_PUBLIC_ENCRYPTION_KEY ?? 'default-key-32-chars-here-xxxxx').slice(0, 32)
     const keyData = await crypto.subtle.importKey(
       'raw',
-      encoder.encode(process.env.NEXT_PUBLIC_ENCRYPTION_KEY ?? 'default-key-32-chars-here-xxxxx'),
+      encoder.encode(rawKey.padEnd(32, '0')),
       { name: 'AES-GCM' },
       false,
       ['encrypt']
@@ -55,8 +55,6 @@ export default function CompleteProfilePage() {
       const encryptedName = await encryptField(student.legal_name)
       const encryptedPermit = await encryptField(student.permit_number)
 
-      // Find the student record by the most recent unpaid → paid transition
-      // We use the session_id from Stripe to look up the student
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         setError('Not authenticated. Please sign in first.')
@@ -64,7 +62,6 @@ export default function CompleteProfilePage() {
         return
       }
 
-      // Update the most recent PENDING student record for this user
       const { error: updateError } = await supabase
         .from('students_driver_ed')
         .update({
@@ -82,13 +79,12 @@ export default function CompleteProfilePage() {
 
       if (updateError) {
         setError(updateError.message)
-        setLoading(false)
       } else {
         setStep('done')
-        setLoading(false)
       }
     } catch (err: any) {
       setError(err.message)
+    } finally {
       setLoading(false)
     }
   }
@@ -100,7 +96,7 @@ export default function CompleteProfilePage() {
           <div className="text-4xl mb-4">✅</div>
           <h1 className="text-2xl font-bold text-white mb-2">You&apos;re all set!</h1>
           <p className="text-gray-400 mb-6">
-            Your profile is complete. You&apos;re ready to book your first lesson.
+            Profile complete. Book your first lesson at the dashboard.
           </p>
           <a
             href="/dashboard"
@@ -126,12 +122,14 @@ export default function CompleteProfilePage() {
         <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
           <h1 className="text-2xl font-bold text-white mb-2">Complete your profile</h1>
           <p className="text-gray-400 mb-6">
-            One more step before you can book lessons. We need a few details from you.
+            One more step before booking. We need your permit and contact details.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Legal Name (as it appears on your permit)</label>
+              <label className="block text-sm text-gray-400 mb-1">
+                Legal Name (as it appears on your permit)
+              </label>
               <input
                 type="text"
                 value={student.legal_name}
@@ -150,7 +148,6 @@ export default function CompleteProfilePage() {
                   value={student.dob}
                   onChange={(e) => setStudent({ ...student, dob: e.target.value })}
                   required
-                  max={new Date().toISOString().split('T')[0]}
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-colors"
                 />
               </div>
@@ -196,7 +193,9 @@ export default function CompleteProfilePage() {
             </div>
 
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Parent or Guardian Email (if under 18)</label>
+              <label className="block text-sm text-gray-400 mb-1">
+                Parent or Guardian Email (if under 18)
+              </label>
               <input
                 type="email"
                 value={student.parent_email}
@@ -212,7 +211,7 @@ export default function CompleteProfilePage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="w-full bg-gradient-to-r from cyan-500 to-blue-600 text-white font-semibold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {loading ? 'Saving...' : 'Complete Profile →'}
             </button>
@@ -220,5 +219,13 @@ export default function CompleteProfilePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CompleteProfilePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0a0a0f]" />}>
+      <CompleteProfileForm />
+    </Suspense>
   )
 }
