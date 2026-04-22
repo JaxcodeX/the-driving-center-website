@@ -28,23 +28,31 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-8">
-          <a href="#features" className="text-gray-400 hover:text-white transition-colors">
+          <a href="#how-it-works" className="text-gray-400 hover:text-white transition-colors text-sm">
+            How It Works
+          </a>
+          <a href="#features" className="text-gray-400 hover:text-white transition-colors text-sm">
             Features
           </a>
-          <a href="#stats" className="text-gray-400 hover:text-white transition-colors">
-            Results
-          </a>
-          <a href="#" className="text-gray-400 hover:text-white transition-colors">
+          <a href="#pricing" className="text-gray-400 hover:text-white transition-colors text-sm">
             Pricing
           </a>
-          <a href="#" className="text-gray-400 hover:text-white transition-colors">
-            Contact
+          <a href="#faq" className="text-gray-400 hover:text-white transition-colors text-sm">
+            FAQ
           </a>
         </div>
 
-        <button className="px-5 py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-500/50 transition-all text-sm font-medium">
-          Get Started
-        </button>
+        <div className="flex items-center gap-3">
+          <a href="/login" className="px-4 py-2 text-gray-400 hover:text-white transition-colors text-sm font-medium">
+            Sign In
+          </a>
+          <a
+            href="/signup"
+            className="px-5 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+          >
+            Get Started Free
+          </a>
+        </div>
       </div>
     </nav>
   );

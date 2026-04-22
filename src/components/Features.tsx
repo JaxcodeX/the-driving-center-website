@@ -4,34 +4,40 @@ import { motion } from "framer-motion";
 
 const features = [
   {
-    title: "Smart Scheduling",
-    description: "AI-powered scheduling that automatically matches instructors with students based on availability, location, and preferences.",
+    title: "Online Student Booking",
+    description:
+      "Students pick their lesson type and time slot online — no phone calls, no Google Forms. Bookings go straight into your calendar.",
     icon: "📅",
   },
   {
-    title: "Student Portal",
-    description: "Students book lessons, track progress, and pay invoices — all from their phone. Reduce admin work by 80%.",
-    icon: "🎓",
-  },
-  {
-    title: "Automated Reminders",
-    description: "SMS and email reminders sent automatically. Never miss a lesson or lose a student to no-shows again.",
+    title: "Automated SMS Reminders",
+    description:
+      "48-hour and 4-hour reminders fire automatically. Students confirm or reschedule with one reply. No-shows drop 40–70%.",
     icon: "📱",
   },
   {
-    title: "Billing & Invoicing",
-    description: "Generate invoices, process payments, and track revenue. Stripe integration for seamless payouts.",
+    title: "Student Progress Tracking",
+    description:
+      "Track classroom hours, driving hours, and permit status for every student. Know exactly where each student stands.",
+    icon: "🎓",
+  },
+  {
+    title: "TCA Compliance Built In",
+    description:
+      "Automatically tracks the 6hr classroom + 6hr driving requirement. Issue certificates when students complete the program.",
+    icon: "✅",
+  },
+  {
+    title: "Deposit Collection",
+    description:
+      "Collect a deposit when students book. If they no-show, you keep the money. If they cancel 24h out, it refunds automatically.",
     icon: "💳",
   },
   {
-    title: "Instructor Management",
-    description: "Manage schedules, track hours, and monitor performance across your entire instructor team.",
-    icon: "👨‍🏫",
-  },
-  {
-    title: "Compliance Made Easy",
-    description: "Built-in DMV compliance tracking. Know when licenses expire, when evaluations are due, and stay audit-ready.",
-    icon: "✅",
+    title: "CSV Student Import",
+    description:
+      "Have an Excel sheet of existing students? Drag it in and import 200 records in 30 seconds. PII is encrypted immediately.",
+    icon: "📁",
   },
 ];
 

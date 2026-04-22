@@ -29,10 +29,10 @@ function Counter({ target, suffix = "", duration = 2000 }: { target: number; suf
 
 export default function Stats() {
   const stats = [
-    { value: 1200, suffix: "+", label: "Driving Schools" },
-    { value: 50000, suffix: "+", label: "Lessons Booked" },
-    { value: 99.9, suffix: "%", label: "Uptime" },
-    { value: 4.9, suffix: "/5", label: "Customer Rating" },
+    { value: 25, suffix: "%+", label: "Avg. no-show rate without reminders" },
+    { value: 5, suffix: "%", label: "No-show rate with our system" },
+    { value: 48, suffix: "h", label: "Optimal first reminder window" },
+    { value: 12, suffix: "min", label: "Average time to set up a school" },
   ];
 
   return (
@@ -46,7 +46,7 @@ export default function Stats() {
         >
           <span className="text-cyan-400 text-sm font-medium tracking-wider uppercase">Results</span>
           <h2 className="text-4xl md:text-5xl font-bold text-white mt-4 mb-6">
-            Numbers that speak for themselves
+            Why automated reminders change everything
           </h2>
         </motion.div>
 
