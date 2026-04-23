@@ -2,38 +2,36 @@
 
 ---
 
-## Session — 2026-04-22 (Afternoon)
+## Session — 2026-04-22 (Afternoon continued)
 
-**What was built:**
-- Research: Matt's booking model + 3 competitor schools studied
-- Research: No-show prevention (48h/4h SMS, deposits, 3-7% target rate)
-- Research: Scheduling system design (Acuity/Calendly patterns)
-- Booking API: slots, session-types, bookings CRUD, instructor availability
-- Stripe deposit checkout: POST /api/bookings/[id]/checkout
-- Webhook updated: handles both school signup + booking deposit payments
-- SMS strategy: 48h + 4h two-touch (proven optimal from research)
-- Migration 004: booking schema (session_types, instructor_availability, bookings table)
-- CSV Import wizard: POST /api/import/students with smart column detection
-- Student booking page: rebuilt as 5-step flow (type → slot → details → pay → confirm)
-- School admin: Import CSV page + Instructor Availability settings page
-- School admin dashboard: added Calendar + Import CSV quick actions
+**What was built (all PRE-credentials tasks):**
+- PRE-1: Landing page — fully rewritten for driving schools (hero, how-it-works, features, pricing, FAQ)
+- PRE-2: Demo video script — 2-min Loom script with screen-by-screen walkthrough
+- PRE-3: Email HTML templates — welcome, booking-confirmed, reminder-48h, reminder-4h (Resend-compatible)
+- PRE-4: Legal pages — Terms of Service + Privacy Policy (FERPA, TCA, Stripe)
+- PRE-5: SEO — sitemap.xml, robots.txt, Next.js metadata, OG tags, canonical URLs
+- PRE-6: Instructor schedule view — read-only upcoming lessons grouped by date
+- PRE-7: OpenClaw cron setup guide — hourly reminders + Monday ops update (CRON_SETUP.md)
+- PRE-8: Onboarding wizard — 5-step flow (welcome → profile → import → availability → first session → live)
 
-**Errors encountered:**
-- Supabase TypeScript join types (session.session_type returns array) → fixed with `as any` casts
-- Booking slot lookup needed session match by date + time + instructor → handled in booking submit
+**Commits this session:**
+- (morning) CSV import wizard, 5-step booking page, instructor availability, admin dashboard
+- (mid-day) School public pages, TCA compliance, certificate generation, migration 005
+- (afternoon) PRE-1 through PRE-8 all complete — 21 commits total on blast-phase-1
 
-**Commits:**
-- `0256b78` — Booking system v1: slots, bookings, session types, instructor availability, Stripe deposit, 48h/4h SMS
-- `b2fbf53` — OPERATIONS_MANUAL v2 refined
-- `9cee1a0` — Adopt B.L.A.S.T. protocol
-- (new) — CSV import wizard, 5-step booking page, instructor availability, admin dashboard updates
+**All 8 pre-credentials tasks DONE.** Nothing is blocked by missing credentials anymore.
 
-**Next session priorities:**
-1. Cayden fills `.env.local` with real Supabase + Stripe credentials
-2. Cayden runs SQL migrations 001, 002, 003, 004 in Supabase SQL Editor
-3. Test full checkout flow end-to-end
-4. Record demo video for outreach
-5. Start outreach to first 5 schools
+**Next session priorities (P0 — Cayden must do):**
+1. Fill `.env.local` with real Supabase + Stripe keys
+2. Run SQL migrations 001, 002, 003, 004, 005 in Supabase SQL Editor
+3. Generate ENCRYPTION_KEY: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+4. Deploy to Vercel
+5. Run `openclaw cron add` commands from CRON_SETUP.md
+
+**Then (P1 — after credentials):**
+1. Test full booking flow end-to-end (public page → Stripe → confirmation email)
+2. Record demo video using DEMO_SCRIPT.md
+3. Send first outreach emails to 5 schools
 
 ---
 
