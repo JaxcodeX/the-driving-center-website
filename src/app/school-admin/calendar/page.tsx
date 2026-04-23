@@ -58,7 +58,7 @@ const INSTRUCTOR_COLORS = [
 
 export default function CalendarPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-950" />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ background: '#0a0a0f' }} />}>
       <CalendarContent />
     </Suspense>
   )
@@ -175,13 +175,13 @@ function CalendarContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50">
+    <div className="min-h-screen" style={{ background: '#0a0a0f' }}>
       {/* Header */}
-      <div className="border-b border-white/10 px-6 py-4">
+      <div className="border-b border-white/[0.06] px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center text-sm font-bold">DC</div>
-            <span className="font-semibold">Session Calendar</span>
+            <span className="font-semibold text-white">Session Calendar</span>
           </div>
           <Link href="/school-admin" className="text-sm text-gray-400 hover:text-white">← Back</Link>
         </div>
@@ -218,12 +218,12 @@ function CalendarContent() {
         </div>
 
         {/* Calendar grid */}
-        <div className="border border-white/10 rounded-xl overflow-hidden">
+        <div className="glass rounded-xl overflow-hidden border border-white/[0.06]">
           {/* Day headers */}
-          <div className="grid grid-cols-8 border-b border-white/10">
+          <div className="grid grid-cols-8 border-b border-white/[0.06]">
             <div className="p-2 text-xs text-gray-600" />
             {DAYS.map((day, i) => (
-              <div key={day} className="p-2 text-center text-xs font-medium text-gray-400 border-l border-white/5">
+              <div key={day} className="p-2 text-center text-xs font-medium text-gray-400 border-l border-white/[0.04]">
                 <div>{day}</div>
                 <div className="text-white text-sm mt-0.5">{new Date(`${weekDates[i]}T12:00:00`).getDate()}</div>
               </div>
@@ -232,7 +232,7 @@ function CalendarContent() {
 
           {/* Time rows */}
           {HOURS.map(hour => (
-            <div key={hour} className="grid grid-cols-8 border-b border-white/5 min-h-[60px]">
+            <div key={hour} className="grid grid-cols-8 border-b border-white/[0.04] min-h-[60px]">
               <div className="p-2 text-xs text-gray-600 text-right pr-3 pt-1">
                 {hour > 12 ? `${hour - 12}pm` : hour === 12 ? '12pm' : `${hour}am`}
               </div>
@@ -245,7 +245,7 @@ function CalendarContent() {
                   <div
                     key={date}
                     onClick={() => handleCellClick(date, hour)}
-                    className="border-l border-white/5 p-0.5 cursor-pointer hover:bg-white/5 transition-colors relative"
+                    className="border-l border-white/[0.04] p-0.5 cursor-pointer hover:bg-white/[0.04] transition-colors relative"
                   >
                     {daySessions.map(session => (
                       <div
@@ -281,8 +281,8 @@ function CalendarContent() {
 
       {/* Popover */}
       {popover && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-white/10 rounded-xl w-full max-w-md p-6">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="glass-card rounded-xl w-full max-w-md border border-white/[0.08]" style={{ background: '#13131a' }}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-semibold">
                 {popover.type === 'create' ? 'New Session' : 'Edit Session'}
