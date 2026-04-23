@@ -1,6 +1,7 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const faqs = [
   {
@@ -27,50 +28,80 @@ const faqs = [
     q: "Do I need to sign a contract?",
     a: "No. Month-to-month at $99/mo. Cancel any time from your dashboard. No setup fee, no cancellation fee.",
   },
-]
+];
 
 export default function FAQ() {
-  const [open, setOpen] = useState<number | null>(null)
+  const [open, setOpen] = useState<number | null>(null);
 
   return (
     <section id="faq" className="py-24 px-6">
       <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12"
+        >
           <span className="text-cyan-400 text-sm font-medium tracking-wider uppercase">FAQ</span>
           <h2 className="text-4xl font-bold text-white mt-4">
             Questions you probably have
           </h2>
-        </div>
+        </motion.div>
 
         <div className="space-y-3">
-          {faqs.map((faq, i) => (
-            <div
-              key={i}
-              className="border border-white/10 rounded-xl overflow-hidden"
-            >
-              <button
-                onClick={() => setOpen(open === i ? null : i)}
-                className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-white/5 transition-colors"
+          {faqs.map((faq, i) => {
+            const isOpen = open === i;
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06, duration: 0.4 }}
+                className="glass-card rounded-xl overflow-hidden"
               >
-                <span className="font-medium text-white pr-4">{faq.q}</span>
-                <svg
-                  className={`w-5 h-5 text-gray-400 shrink-0 transition-transform ${open === i ? 'rotate-180' : ''}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                <button
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  className="w-full flex items-center justify-between px-6 py-5 text-left hover:bg-white/[0.04] transition-colors"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {open === i && (
-                <div className="px-6 pb-5 text-gray-400 text-sm leading-relaxed border-t border-white/5 pt-4">
-                  {faq.a}
-                </div>
-              )}
-            </div>
-          ))}
+                  <span className="font-medium text-white pr-4 text-[15px] leading-snug">{faq.q}</span>
+                  <motion.div
+                    animate={{ rotate: isOpen ? 180 : 0 }}
+                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                    className="shrink-0"
+                  >
+                    <svg
+                      className="w-5 h-5 text-cyan-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </motion.div>
+                </button>
+
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-6 pb-5 text-gray-400 text-sm leading-relaxed border-t border-white/[0.06] pt-4">
+                        {faq.a}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>
-  )
+  );
 }

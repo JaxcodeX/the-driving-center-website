@@ -41,6 +41,24 @@ const features = [
   },
 ];
 
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const },
+  },
+};
+
 export default function Features() {
   return (
     <section id="features" className="py-24 px-6">
@@ -50,6 +68,7 @@ export default function Features() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
           <span className="text-cyan-400 text-sm font-medium tracking-wider uppercase">Features</span>
@@ -62,25 +81,31 @@ export default function Features() {
         </motion.div>
 
         {/* Feature grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {features.map((feature) => (
             <motion.div
               key={feature.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ y: -8, transition: { duration: 0.3 } }}
-              className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-cyan-500/30 hover:bg-white/10 transition-all group cursor-pointer"
+              variants={cardVariants}
+              whileHover={{
+                scale: 1.03,
+                transition: { duration: 0.25, ease: "easeOut" },
+              }}
+              className="glass-card rounded-2xl p-8 cursor-pointer group"
             >
-              <div className="text-4xl mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-cyan-400 transition-colors">
+              <div className="text-4xl mb-5">{feature.icon}</div>
+              <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-cyan-400 transition-colors duration-300">
                 {feature.title}
               </h3>
               <p className="text-gray-400 leading-relaxed">{feature.description}</p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

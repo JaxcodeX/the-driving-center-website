@@ -3,10 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 
-function Counter({ target, suffix = "", duration = 2000 }: { target: number; suffix?: string; duration?: number }) {
+function Counter({ target, suffix = "", prefix = "", duration = 2200 }: {
+  target: number;
+  suffix?: string;
+  prefix?: string;
+  duration?: number;
+}) {
   const [count, setCount] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true });
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-60px" });
 
   useEffect(() => {
     if (!isInView) return;
@@ -14,25 +19,36 @@ function Counter({ target, suffix = "", duration = 2000 }: { target: number; suf
     const animate = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
-      setCount(Math.floor(progress * target));
+      // Ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(eased * target));
       if (progress < 1) requestAnimationFrame(animate);
     };
     requestAnimationFrame(animate);
   }, [isInView, target, duration]);
 
   return (
-    <span ref={ref}>
-      {count.toLocaleString()}{suffix}
-    </span>
+    <div ref={ref}>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.7 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="text-5xl md:text-6xl font-black gradient-text counter-stat mb-3"
+        style={{ fontVariantNumeric: "tabular-nums" }}
+      >
+        {prefix}{count.toLocaleString()}{suffix}
+      </motion.div>
+    </div>
   );
 }
 
 export default function Stats() {
   const stats = [
-    { value: 23, suffix: "%", label: "Avg. no-show rate without reminders" },
-    { value: 3, suffix: "%", label: "No-show rate with our 48h+4h reminders" },
-    { value: 48, suffix: "h", label: "Optimal first reminder window" },
-    { value: 2, suffix: " min", label: "Average time to set up a school" },
+    { value: 23, suffix: "%", label: "Avg. no-show rate without reminders", prefix: "" },
+    { value: 3, suffix: "%", label: "No-show rate with our 48h+4h reminders", prefix: "" },
+    { value: 48, suffix: "h", label: "Optimal first reminder window", prefix: "" },
+    { value: 2, suffix: " min", label: "Average time to set up a school", prefix: "" },
   ];
 
   return (
@@ -42,6 +58,7 @@ export default function Stats() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
           <span className="text-cyan-400 text-sm font-medium tracking-wider uppercase">Results</span>
@@ -50,20 +67,27 @@ export default function Stats() {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
           {stats.map((stat, index) => (
             <motion.div
               key={stat.label}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 text-center hover:border-cyan-500/30 transition-colors"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ delay: index * 0.12, duration: 0.6, ease: "easeOut" }}
+              whileHover={{
+                scale: 1.04,
+                transition: { duration: 0.2 },
+                boxShadow: "0 0 30px rgba(6,182,212,0.2)",
+              }}
+              className="glass-card rounded-2xl p-8 text-center"
             >
-              <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
-                <Counter target={stat.value} suffix={stat.suffix} />
-              </div>
-              <div className="text-gray-400">{stat.label}</div>
+              <Counter
+                target={stat.value}
+                suffix={stat.suffix}
+                prefix={stat.prefix}
+              />
+              <div className="text-gray-400 text-sm leading-snug">{stat.label}</div>
             </motion.div>
           ))}
         </div>

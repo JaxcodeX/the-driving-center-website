@@ -15,9 +15,108 @@ body {
   color: #ffffff;
 }
 
-/* Custom scrollbar */
+/* ─────────────────────────────────────────────
+   CSS Variables — Glassmorphism / Neumorphism
+───────────────────────────────────────────── */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-bg-hover: rgba(255, 255, 255, 0.09);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-hover: rgba(6, 182, 212, 0.35);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --glass-blur: 16px;
+  --glow-cyan: rgba(6, 182, 212, 0.5);
+  --glow-cyan-strong: rgba(6, 182, 212, 0.7);
+
+  /* Neumorphism */
+  --neu-shadow-light: rgba(255, 255, 255, 0.05);
+  --neu-shadow-dark: rgba(0, 0, 0, 0.6);
+  --neu-blur: 32px;
+}
+
+/* ─────────────────────────────────────────────
+   Mesh Gradient — particle fallback
+───────────────────────────────────────────── */
+.mesh-gradient-bg {
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(6, 82, 102, 0.25) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(29, 42, 88, 0.3) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+    linear-gradient(135deg, #0a0a0f 0%, #0f1117 50%, #0a0a0f 100%);
+}
+
+/* ─────────────────────────────────────────────
+   Glassmorphism Utility Classes
+───────────────────────────────────────────── */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.glass-card:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px var(--glow-cyan);
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* ─────────────────────────────────────────────
+   Glow Button
+───────────────────────────────────────────── */
+.btn-glow {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #06b6d4, #2563eb);
+  box-shadow: 0 0 20px var(--glow-cyan), 0 0 40px rgba(6, 182, 212, 0.2);
+  animation: glow-pulse 2.5s ease-in-out infinite;
+}
+
+.btn-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #06b6d4, #3b82f6, #06b6d4);
+  background-size: 200% 200%;
+  animation: gradient-shimmer 3s ease infinite;
+  z-index: -1;
+  opacity: 0.6;
+  filter: blur(8px);
+}
+
+.btn-glow-secondary {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-hover);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.15);
+  transition: all 0.3s ease;
+}
+
+.btn-glow-secondary:hover {
+  background: var(--glass-bg-hover);
+  border-color: rgba(6, 182, 212, 0.6);
+  box-shadow: 0 0 24px rgba(6, 182, 212, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ─────────────────────────────────────────────
+   Custom Scrollbar
+───────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -25,10 +124,83 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e1e2e;
-  border-radius: 4px;
+  background: linear-gradient(180deg, #06b6d4, #2563eb);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2e2e3e;
+  background: linear-gradient(180deg, #22d3ee, #3b82f6);
+}
+
+/* ─────────────────────────────────────────────
+   Custom Keyframes
+───────────────────────────────────────────── */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px var(--glow-cyan), 0 0 40px rgba(6, 182, 212, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px var(--glow-cyan-strong), 0 0 60px rgba(6, 182, 212, 0.35);
+  }
+}
+
+@keyframes gradient-shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes typewriter-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes counter-glow {
+  0%, 100% { text-shadow: 0 0 20px rgba(6, 182, 212, 0.3); }
+  50% { text-shadow: 0 0 40px rgba(6, 182, 212, 0.6); }
+}
+
+/* Counter glow effect */
+.counter-stat {
+  animation: counter-glow 2s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────
+   Gradient Text
+───────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(90deg, #06b6d4 0%, #3b82f6 50%, #06b6d4 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shimmer 4s ease infinite;
+}
+
+/* ─────────────────────────────────────────────
+   Neumorphism utilities (inset style)
+───────────────────────────────────────────── */
+.neu-inset {
+  box-shadow:
+    inset 4px 4px 8px var(--neu-shadow-dark),
+    inset -4px -4px 8px var(--neu-shadow-light);
+}
+
+/* ─────────────────────────────────────────────
+   Pricing Popular Badge Glow
+───────────────────────────────────────────── */
+.pricing-popular-card {
+  border-color: rgba(6, 182, 212, 0.45) !important;
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.2), 0 8px 32px rgba(0, 0, 0, 0.4);
 }

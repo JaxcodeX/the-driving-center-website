@@ -14,7 +14,7 @@ export default function ParticleBackground() {
 
     let animationId: number;
     const particles: Particle[] = [];
-    const particleCount = 80;
+    const particleCount = 50;
 
     class Particle {
       x: number;
@@ -30,7 +30,7 @@ export default function ParticleBackground() {
         this.vx = (Math.random() - 0.5) * 0.3;
         this.vy = (Math.random() - 0.5) * 0.3;
         this.size = Math.random() * 2 + 1;
-        this.opacity = Math.random() * 0.5 + 0.1;
+        this.opacity = Math.random() * 0.25 + 0.05;
       }
 
       update() {
@@ -83,7 +83,7 @@ export default function ParticleBackground() {
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `rgba(0, 212, 255, ${0.1 * (1 - dist / 120)})`;
+            ctx.strokeStyle = `rgba(0, 212, 255, ${0.05 * (1 - dist / 120)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }

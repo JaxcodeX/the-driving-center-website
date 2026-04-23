@@ -1,8 +1,18 @@
+"use client";
+
+import { motion } from "framer-motion";
+
 export default function Pricing() {
   return (
     <section id="pricing" className="py-24 px-6">
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
           <span className="text-cyan-400 text-sm font-medium tracking-wider uppercase">Pricing</span>
           <h2 className="text-4xl md:text-5xl font-bold text-white mt-4 mb-4">
             Simple pricing. No surprises.
@@ -10,11 +20,18 @@ export default function Pricing() {
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
             One plan covers everything. Import your students, start taking bookings, and reduce no-shows — all for $99/month.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Starter */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0, duration: 0.5 }}
+            whileHover={{ y: -6, transition: { duration: 0.25 } }}
+            className="glass-card rounded-2xl p-8"
+          >
             <div className="text-gray-400 font-medium mb-2">Starter</div>
             <div className="flex items-baseline gap-1 mb-1">
               <span className="text-4xl font-bold text-white">$99</span>
@@ -42,18 +59,25 @@ export default function Pricing() {
             </ul>
             <a
               href="/signup"
-              className="block text-center py-3 bg-white/5 border border-white/10 rounded-xl text-white font-medium hover:bg-white/10 transition-colors"
+              className="block text-center py-3 rounded-xl text-white font-medium btn-glow-secondary hover:text-white transition-colors"
             >
               Start Free Trial
             </a>
-          </div>
+          </motion.div>
 
           {/* Growth — highlighted */}
-          <div className="bg-white/5 border-2 border-cyan-500/40 rounded-2xl p-8 relative">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-cyan-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.12, duration: 0.5 }}
+            whileHover={{ y: -6, transition: { duration: 0.25 } }}
+            className="glass-card rounded-2xl p-8 relative pricing-popular-card"
+          >
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-[0_0_16px_rgba(6,182,212,0.5)]">
               Most Popular
             </div>
-            <div className="text-cyan-400 font-medium mb-2">Growth</div>
+            <div className="text-cyan-400 font-medium mb-2 mt-1">Growth</div>
             <div className="flex items-baseline gap-1 mb-1">
               <span className="text-4xl font-bold text-white">$199</span>
               <span className="text-gray-500">/month</span>
@@ -79,14 +103,21 @@ export default function Pricing() {
             </ul>
             <a
               href="/signup"
-              className="block text-center py-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl text-white font-semibold hover:opacity-90 transition-opacity"
+              className="block text-center py-3 rounded-xl text-white font-semibold btn-glow hover:opacity-90 transition-opacity"
             >
               Start Free Trial
             </a>
-          </div>
+          </motion.div>
 
           {/* Enterprise */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.24, duration: 0.5 }}
+            whileHover={{ y: -6, transition: { duration: 0.25 } }}
+            className="glass-card rounded-2xl p-8"
+          >
             <div className="text-gray-400 font-medium mb-2">Enterprise</div>
             <div className="flex items-baseline gap-1 mb-1">
               <span className="text-4xl font-bold text-white">$399</span>
@@ -113,17 +144,23 @@ export default function Pricing() {
             </ul>
             <a
               href="/signup"
-              className="block text-center py-3 bg-white/5 border border-white/10 rounded-xl text-white font-medium hover:bg-white/10 transition-colors"
+              className="block text-center py-3 rounded-xl text-white font-medium btn-glow-secondary hover:text-white transition-colors"
             >
               Contact Us
             </a>
-          </div>
+          </motion.div>
         </div>
 
-        <p className="text-center text-gray-500 text-sm mt-8">
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.4 }}
+          className="text-center text-gray-500 text-sm mt-10"
+        >
           All plans include a 14-day free trial. No credit card required to start.
-        </p>
+        </motion.p>
       </div>
     </section>
-  )
+  );
 }
