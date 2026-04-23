@@ -29,10 +29,10 @@ function Counter({ target, suffix = "", duration = 2000 }: { target: number; suf
 
 export default function Stats() {
   const stats = [
-    { value: 25, suffix: "%+", label: "Avg. no-show rate without reminders" },
-    { value: 5, suffix: "%", label: "No-show rate with our system" },
+    { value: 23, suffix: "%", label: "Avg. no-show rate without reminders" },
+    { value: 3, suffix: "%", label: "No-show rate with our 48h+4h reminders" },
     { value: 48, suffix: "h", label: "Optimal first reminder window" },
-    { value: 12, suffix: "min", label: "Average time to set up a school" },
+    { value: 2, suffix: " min", label: "Average time to set up a school" },
   ];
 
   return (

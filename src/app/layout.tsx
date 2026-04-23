@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const BASE_URL = 'https://thedrivingcentersaas.com'
+const BASE_URL = 'https://the-driving-center-website.vercel.app'
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),

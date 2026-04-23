@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function Hero() {
   const [typedText, setTypedText] = useState("");
-  const fullText = "Stop Answering the Phone to Schedule Lessons";
+  const fullText = "Stop Losing $400/Month to Student No-Shows";
 
   useEffect(() => {
     let i = 0;
@@ -51,7 +51,7 @@ export default function Hero() {
             Start Free — No Credit Card
           </Link>
           <Link
-            href="/demo"
+            href="/book"
             className="px-8 py-4 bg-white/5 border border-white/20 rounded-xl text-white font-medium text-lg hover:bg-white/10 transition-colors"
           >
             Watch 2-Min Demo
