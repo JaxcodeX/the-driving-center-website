@@ -45,59 +45,53 @@ export async function GET(request: Request) {
   }
 
   // ── FIX: Link school to auth user after magic link click ──
+  // schools table: no 'owner_id' column — use 'stripe_customer_id' as owner claim token
+  // (stripe_customer_id is null for unpaid schools; set to user.id when claimed)
   try {
     const supabaseAdmin = getSupabaseAdmin()
-
-    // Get the authenticated user from the session
     const { data: { user } } = await supabase.auth.getUser()
 
     if (user?.email) {
-      // Find the school this user owns (by owner_email, unclaimed)
-      // schools table has 'owner_email' column — match on that
+      // Find school by owner_email (set during /api/schools signup)
+      // stripe_customer_id IS NULL = unclaimed (no user.id written yet)
       const { data: school } = await supabaseAdmin
         .from('schools')
-        .select('id, name')
+        .select('id, name, stripe_customer_id')
         .eq('owner_email', user.email)
-        .is('owner_id', null)
-        .order('created_at', { ascending: false })
+        .is('stripe_customer_id', null)  // only link if not already claimed
         .limit(1)
         .single()
 
       if (school) {
-        // 1. Link school → owner
+        // Claim: write user.id into stripe_customer_id as owner claim token
         await supabaseAdmin
           .from('schools')
-          .update({ owner_id: user.id })
+          .update({ stripe_customer_id: user.id })
           .eq('id', school.id)
 
-        // 2. Set school_id on the auth user so RLS works
+        // Set school_id on the auth user so RLS can use it via user_metadata
         await supabaseAdmin.auth.admin.updateUserById(user.id, {
-          user_metadata: {
-            ...(user.user_metadata ?? {}),
-            school_id: school.id,
-          },
+          data: { school_id: school.id },
         })
 
         console.log(`[Auth Callback] Linked user ${user.id} → school ${school.id} (${school.name})`)
       } else {
-        // School already claimed or email doesn't match — check if this user already has a school
-        const { data: existingSchool } = await supabaseAdmin
+        // School not found unclaimed — either already linked or never created
+        const { data: linkedSchool } = await supabaseAdmin
           .from('schools')
           .select('id')
-          .eq('owner_id', user.id)
+          .eq('stripe_customer_id', user.id)
           .limit(1)
           .single()
 
-        if (!existingSchool) {
-          console.log(`[Auth Callback] No unclaimed school found for email ${user.email} — user may already be linked`)
+        if (!linkedSchool) {
+          console.log(`[Auth Callback] No unclaimed school for ${user.email} — may already be linked or never created`)
         }
       }
     }
   } catch (err) {
-    // Non-fatal: don't break the auth flow if DB link fails
     console.error('[Auth Callback] School linking error:', err)
   }
-  // ── End FIX ──
 
   return NextResponse.redirect(next)
 }

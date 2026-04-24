@@ -42,21 +42,21 @@ export default function QuickStatsRow({ schoolId }: { schoolId?: string }) {
 
         revenue = (paymentData ?? []).reduce((sum, p) => sum + (p.amount ?? 0), 0) / 100
 
-        // Drives: students with at least some TCA driving hours logged
+        // Drives: students with at least some driving hours logged
         const { count: driveCount } = await supabase
-          .from('students')
+          .from('students_driver_ed')
           .select('id', { count: 'exact' })
           .eq('school_id', schoolId)
-          .gt('tca_driving_hours', 0)
+          .gt('driving_hours', 0)
 
         drives = driveCount ?? 0
 
-        // Certs: students who have been issued a TCA certificate
+        // Certs: students who have been issued a certificate (certificate_issued_at IS NOT NULL)
         const { count: certCount } = await supabase
-          .from('students')
+          .from('students_driver_ed')
           .select('id', { count: 'exact' })
           .eq('school_id', schoolId)
-          .eq('tca_certificate_issued', true)
+          .not('certificate_issued_at', 'is', null)
 
         certs = certCount ?? 0
       } else {
@@ -70,16 +70,16 @@ export default function QuickStatsRow({ schoolId }: { schoolId?: string }) {
         revenue = (paymentData ?? []).reduce((sum, p) => sum + (p.amount ?? 0), 0) / 100
 
         const { count: driveCount } = await supabase
-          .from('students')
+          .from('students_driver_ed')
           .select('id', { count: 'exact' })
-          .gt('tca_driving_hours', 0)
+          .gt('driving_hours', 0)
 
         drives = driveCount ?? 0
 
         const { count: certCount } = await supabase
-          .from('students')
+          .from('students_driver_ed')
           .select('id', { count: 'exact' })
-          .eq('tca_certificate_issued', true)
+          .not('certificate_issued_at', 'is', null)
 
         certs = certCount ?? 0
       }
