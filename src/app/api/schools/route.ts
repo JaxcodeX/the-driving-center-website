@@ -35,12 +35,14 @@ export async function POST(request: Request) {
   const supabaseAdmin = getSupabaseAdmin()
 
   // Create school record
+  // FIX: schools table has column 'owner_email' NOT 'email'
   const { data: school, error: schoolError } = await supabaseAdmin
     .from('schools')
     .insert({
       name: schoolName,
       slug,
-      email,
+      owner_email: email,     // was: email (wrong column name)
+      owner_name: ownerName ?? null,
       phone: phone ?? null,
       state: state ?? 'TN',
       plan_tier: 'starter',
@@ -73,6 +75,14 @@ export async function POST(request: Request) {
     success_url: `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://the-driving-center-website.vercel.app'}/onboarding?school_id=${school.id}&step=profile`,
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://the-driving-center-website.vercel.app'}/signup?error=checkout_cancelled`,
   })
+
+  // FIX: Write stripe_customer_id back to school after checkout session created
+  if (checkoutSession.customer) {
+    await supabaseAdmin
+      .from('schools')
+      .update({ stripe_customer_id: checkoutSession.customer as string })
+      .eq('id', school.id)
+  }
 
   return NextResponse.json({
     schoolId: school.id,

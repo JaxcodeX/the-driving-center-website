@@ -52,11 +52,12 @@ export async function GET(request: Request) {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (user?.email) {
-      // Find the school this user owns (by email, unclaimed)
+      // Find the school this user owns (by owner_email, unclaimed)
+      // schools table has 'owner_email' column — match on that
       const { data: school } = await supabaseAdmin
         .from('schools')
         .select('id, name')
-        .eq('email', user.email)
+        .eq('owner_email', user.email)
         .is('owner_id', null)
         .order('created_at', { ascending: false })
         .limit(1)
