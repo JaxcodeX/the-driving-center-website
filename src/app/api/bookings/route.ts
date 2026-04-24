@@ -6,12 +6,7 @@ import crypto from 'crypto'
 
 export async function POST(request: Request) {
   const body = await request.json()
-  const {
-    session_id,
-    student_name,
-    student_email,
-    student_phone,
-  } = body
+  const { session_id, student_name, student_email, student_phone } = body
 
   if (!session_id || !student_name || !student_email) {
     return NextResponse.json(
@@ -20,7 +15,6 @@ export async function POST(request: Request) {
     )
   }
 
-  // Validate inputs
   const emailCheck = validateEmail(student_email)
   if (!emailCheck.valid) {
     return NextResponse.json({ error: emailCheck.error }, { status: 400 })
@@ -53,7 +47,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'This session is fully booked' }, { status: 409 })
   }
 
-  // Check for duplicate booking (same session + email)
+  // Check for duplicate booking
   const { data: existing } = await supabase
     .from('bookings')
     .select('id')
@@ -75,10 +69,9 @@ export async function POST(request: Request) {
 
   const depositCents = sessionType?.deposit_cents ?? 2500
 
-  // Generate secure confirmation token
   const confirmationToken = crypto.randomBytes(32).toString('hex')
 
-  // Create booking
+  // Create booking — seats_booked is NOT incremented here (only on confirmed payment)
   const { data: booking, error: bookingError } = await supabaseAdmin
     .from('bookings')
     .insert({
@@ -97,12 +90,6 @@ export async function POST(request: Request) {
     console.error('Booking insert error:', bookingError)
     return NextResponse.json({ error: bookingError.message }, { status: 500 })
   }
-
-  // Increment seats_booked
-  await supabaseAdmin
-    .from('sessions')
-    .update({ seats_booked: session.seats_booked + 1 })
-    .eq('id', session_id)
 
   // Audit log
   await supabaseAdmin.from('audit_logs').insert(
