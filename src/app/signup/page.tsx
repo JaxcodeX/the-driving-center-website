@@ -24,26 +24,43 @@ function SignupForm() {
     setLoading(true)
     setError('')
 
-    // 1. Create auth user
-    const { data: authUser, error: authError } = await supabase.auth.signInWithOtp({
-      email: form.email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback?redirect=/signup/onboarding`,
-      },
+    // 1. Create school record + start Stripe checkout (API uses service role key)
+    const res = await fetch('/api/schools', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        schoolName: form.schoolName,
+        ownerName: form.ownerName,
+        email: form.email,
+        phone: form.phone,
+        state: form.state,
+      }),
     })
 
-    if (authError) {
-      setError(authError.message)
+    if (!res.ok) {
+      const data = await res.json()
+      setError(data.error ?? 'Something went wrong')
       setLoading(false)
       return
     }
 
-    // 2. Create school record in schools table (deferred — requires service role)
-    // For now redirect to Stripe checkout; schools record created via admin API
-    router.push(
-      `/api/stripe/checkout?school_name=${encodeURIComponent(form.schoolName)}&email=${encodeURIComponent(form.email)}&state=${form.state}`
-    )
-    setLoading(false)
+    const { checkoutUrl } = await res.json()
+
+    // 2. Also send magic link for auth
+    await supabase.auth.signInWithOtp({
+      email: form.email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback?redirect=/onboarding`,
+      },
+    })
+
+    // 3. Redirect to Stripe checkout
+    if (checkoutUrl) {
+      window.location.href = checkoutUrl
+    } else {
+      setError('Could not start checkout. Please try again.')
+      setLoading(false)
+    }
   }
 
   const states = ['TN', 'KY', 'GA']
