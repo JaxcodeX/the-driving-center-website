@@ -2,6 +2,7 @@ import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
 import { auditLog } from '@/lib/security'
 
 function getStripe(): Stripe {
@@ -12,6 +13,14 @@ function getStripe(): Stripe {
 function verifyWebhook(body: string, signature: string): Stripe.Event {
   if (!process.env.STRIPE_WEBHOOK_SECRET) throw new Error('STRIPE_WEBHOOK_SECRET required')
   return getStripe().webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET)
+}
+
+// Service role client — bypasses RLS for webhook operations
+function getSupabaseAdmin() {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY required')
+  }
+  return createSupabaseAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY)
 }
 
 // In-memory replay protection — use Redis in production
@@ -37,7 +46,7 @@ export async function POST(req: Request) {
   }
   processedEvents.add(event.id)
 
-  const supabase = await createClient()
+  const supabaseAdmin = getSupabaseAdmin()
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
@@ -45,20 +54,42 @@ export async function POST(req: Request) {
     const bookingId = metadata?.booking_id
 
     if (bookingId) {
-      // This is a booking deposit payment
-      const { error } = await supabase
+      // Booking deposit payment
+      const { data: booking } = await supabaseAdmin
         .from('bookings')
-        .update({
-          status: 'confirmed',
-          deposit_paid_at: new Date().toISOString(),
-          stripe_payment_intent_id: session.payment_intent as string,
-        })
+        .select('id, status, session_id')
         .eq('id', bookingId)
         .eq('status', 'pending')
+        .single()
 
-      if (error) console.error('Booking payment update error:', error)
+      if (booking) {
+        await supabaseAdmin
+          .from('bookings')
+          .update({
+            status: 'confirmed',
+            deposit_paid_at: new Date().toISOString(),
+            stripe_payment_intent_id: session.payment_intent as string,
+          })
+          .eq('id', bookingId)
 
-      await supabase.from('audit_logs').insert(
+        // Increment seats_booked on confirmed payment (Fix B)
+        if (booking.session_id) {
+          const { data: sess } = await supabaseAdmin
+            .from('sessions')
+            .select('seats_booked')
+            .eq('id', booking.session_id)
+            .single()
+
+          if (sess) {
+            await supabaseAdmin
+              .from('sessions')
+              .update({ seats_booked: (sess.seats_booked ?? 0) + 1 })
+              .eq('id', booking.session_id)
+          }
+        }
+      }
+
+      await supabaseAdmin.from('audit_logs').insert(
         auditLog('BOOKING_DEPOSIT_PAID', metadata?.student_email ?? 'unknown', {
           booking_id: bookingId,
           amount_cents: session.amount_total,
@@ -66,12 +97,12 @@ export async function POST(req: Request) {
         })
       )
     } else {
-      // Legacy: school signup payment (original Phase 1 flow)
+      // Legacy: school signup payment
       const schoolId = metadata?.school_id
       const sessionId = metadata?.session_id
       const studentEmail = session.customer_details?.email ?? metadata?.student_email ?? 'unknown'
 
-      await supabase.from('payments').insert({
+      await supabaseAdmin.from('payments').insert({
         student_email: studentEmail,
         stripe_session_id: session.id,
         amount: session.amount_total ?? 0,
@@ -80,13 +111,20 @@ export async function POST(req: Request) {
       })
 
       if (sessionId && schoolId) {
-        await supabase.rpc('increment_seats_booked', {
-          target_session_id: sessionId,
-          target_school_id: schoolId,
-        })
+        const { data: sess } = await supabaseAdmin
+          .from('sessions')
+          .select('seats_booked')
+          .eq('id', sessionId)
+          .single()
+        if (sess) {
+          await supabaseAdmin
+            .from('sessions')
+            .update({ seats_booked: (sess.seats_booked ?? 0) + 1 })
+            .eq('id', sessionId)
+        }
       }
 
-      await supabase.from('audit_logs').insert(
+      await supabaseAdmin.from('audit_logs').insert(
         auditLog('PAYMENT_COMPLETED', 'stripe-webhook', {
           stripe_session_id: session.id,
           school_id: schoolId,
@@ -94,6 +132,52 @@ export async function POST(req: Request) {
           amount_cents: session.amount_total,
         })
       )
+    }
+  }
+
+  // Handle abandoned checkout — decrement seats if they were reserved (Fix C)
+  if (event.type === 'checkout.session.expired') {
+    const session = event.data.object as Stripe.Checkout.Session
+    const { metadata } = session
+    const bookingId = metadata?.booking_id
+
+    if (bookingId) {
+      const { data: booking } = await supabaseAdmin
+        .from('bookings')
+        .select('id, status, session_id')
+        .eq('id', bookingId)
+        .eq('status', 'pending')
+        .single()
+
+      if (booking) {
+        // Set booking to expired (not confirmed)
+        await supabaseAdmin
+          .from('bookings')
+          .update({ status: 'expired' })
+          .eq('id', bookingId)
+
+        // Decrement seats_booked since this booking never consumed the seat
+        if (booking.session_id) {
+          const { data: sess } = await supabaseAdmin
+            .from('sessions')
+            .select('seats_booked')
+            .eq('id', booking.session_id)
+            .single()
+
+          if (sess && sess.seats_booked > 0) {
+            await supabaseAdmin
+              .from('sessions')
+              .update({ seats_booked: sess.seats_booked - 1 })
+              .eq('id', booking.session_id)
+          }
+        }
+
+        await supabaseAdmin.from('audit_logs').insert(
+          auditLog('BOOKING_EXPIRED', metadata?.student_email ?? 'unknown', {
+            booking_id: bookingId,
+          })
+        )
+      }
     }
   }
 

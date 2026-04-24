@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
 import { auditLog } from '@/lib/security'
+
+function getSupabaseAdmin() {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY required')
+  }
+  return createSupabaseAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY)
+}
 
 export async function GET(
   _request: Request,
@@ -36,7 +44,20 @@ export async function PUT(
   if (!user) return new NextResponse('Unauthorized', { status: 401 })
 
   const schoolId = request.headers.get('x-school-id')
-  const supabaseAdmin = await createClient()
+  if (!schoolId) return new NextResponse('Missing x-school-id header', { status: 400 })
+
+  // Fix E: Verify session belongs to this school before update
+  const { data: existing } = await supabase
+    .from('sessions')
+    .select('id, school_id')
+    .eq('id', id)
+    .single()
+
+  if (!existing || existing.school_id !== schoolId) {
+    return new NextResponse('Session not found', { status: 404 })
+  }
+
+  const supabaseAdmin = getSupabaseAdmin()
 
   const { data: updated, error } = await supabaseAdmin
     .from('sessions')
@@ -51,7 +72,6 @@ export async function PUT(
       cancelled: body.cancelled ?? false,
     })
     .eq('id', id)
-    .eq('school_id', schoolId) // Ownership check
     .select()
     .single()
 
@@ -82,14 +102,25 @@ export async function DELETE(
   if (!user) return new NextResponse('Unauthorized', { status: 401 })
 
   const schoolId = _request.headers.get('x-school-id')
-  const supabaseAdmin = await createClient()
+  if (!schoolId) return new NextResponse('Missing x-school-id header', { status: 400 })
 
-  // Soft cancel — don't hard delete (retention)
+  // Fix E: Verify session belongs to this school before delete
+  const { data: existing } = await supabase
+    .from('sessions')
+    .select('id, school_id')
+    .eq('id', id)
+    .single()
+
+  if (!existing || existing.school_id !== schoolId) {
+    return new NextResponse('Session not found', { status: 404 })
+  }
+
+  const supabaseAdmin = getSupabaseAdmin()
+
   const { error } = await supabaseAdmin
     .from('sessions')
     .update({ cancelled: true })
     .eq('id', id)
-    .eq('school_id', schoolId)
 
   if (error) {
     return NextResponse.json({ error: error?.message ?? String(error) }, { status: 500 })
