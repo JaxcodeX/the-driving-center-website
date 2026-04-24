@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 const STEPS = [
   { id: 1, label: 'Welcome', icon: '👋' },
@@ -23,9 +24,25 @@ export default function OnboardingPage() {
 
 function OnboardingFlow() {
   const params = useSearchParams()
-  const schoolId = params.get('school_id')
+  const schoolIdFromUrl = params.get('school_id')
   const [step, setStep] = useState(1)
   const [schoolSlug, setSchoolSlug] = useState('')
+  const [schoolId, setSchoolId] = useState<string | null>(schoolIdFromUrl)
+
+  // ── FIX: Fall back to user metadata if school_id not in URL ──
+  useEffect(() => {
+    if (schoolIdFromUrl) {
+      setSchoolId(schoolIdFromUrl)
+      return
+    }
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user?.user_metadata?.school_id) {
+        setSchoolId(user.user_metadata.school_id)
+      }
+    })
+  }, [schoolIdFromUrl])
+  // ── End FIX ──
 
   function advance() {
     setStep(s => Math.min(s + 1, 6))
