@@ -71,7 +71,7 @@ export async function GET(request: Request) {
 
         // Set school_id on the auth user so RLS can use it via user_metadata
         await supabaseAdmin.auth.admin.updateUserById(user.id, {
-          data: { school_id: school.id },
+          user_metadata: { school_id: school.id },
         })
 
         console.log(`[Auth Callback] Linked user ${user.id} → school ${school.id} (${school.name})`)
