@@ -96,6 +96,30 @@ export async function POST(req: Request) {
           stripe_session_id: session.id,
         })
       )
+
+      // Send booking confirmation email to student (Fix 7)
+      if (booking?.session_id) {
+        const { data: bookingFull } = await supabaseAdmin
+          .from('bookings')
+          .select('student_email, student_name, session:session_id(start_date, start_time, location, session_type:session_type_id(name), school:school_id(name))')
+          .eq('id', bookingId)
+          .single()
+
+        if (bookingFull) {
+          const s = bookingFull.session as any
+          const sessionDate = new Date(`${s.start_date}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+          fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notify/booking`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              studentEmail: bookingFull.student_email,
+              studentName: bookingFull.student_name,
+              sessionId: booking.session_id,
+              schoolId: s?.school?.id,
+            }),
+          }).catch(console.error)
+        }
+      }
     } else {
       // Legacy: school signup payment
       const schoolId = metadata?.school_id
