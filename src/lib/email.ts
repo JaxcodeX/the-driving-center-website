@@ -69,35 +69,33 @@ export async function sendWelcomeEmail(
 export async function sendBookingConfirmationEmail(
   to: string,
   studentName: string,
+  lessonType: string,
   schoolName: string,
-  sessionDate: string,
-  sessionTime: string,
-  location: string
+  schoolPhone: string,
+  date: string,
+  time: string,
+  location: string,
+  rescheduleUrl: string,
+  cancelUrl: string
 ): Promise<void> {
-  const formattedDate = new Date(`${sessionDate}T12:00:00`).toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric',
+  // Lazy import the beautiful template — only used when email is actually sent
+  const { bookingConfirmationEmail } = await import('./email-templates/booking-confirmed')
+
+  const email = bookingConfirmationEmail({
+    studentName,
+    lessonType,
+    schoolName,
+    schoolPhone,
+    date,
+    time,
+    location,
+    rescheduleUrl,
+    cancelUrl,
   })
 
   await sendEmail({
     to,
-    subject: `Your lesson is booked — ${formattedDate} at ${sessionTime}`,
-    html: `
-      <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; padding: 32px;">
-        <h1 style="color: #0a0a0f;">Lesson Confirmed ✅</h1>
-        <p style="color: #374151; line-height: 1.6;">
-          Hi ${studentName}, your driving lesson is booked!
-        </p>
-        <div style="background: #f3f4f6; border-radius: 12px; padding: 20px; margin: 24px 0;">
-          <div style="font-size: 18px; font-weight: 600; color: #0a0a0f;">${formattedDate}</div>
-          <div style="color: #6b7280; margin-top: 4px;">${sessionTime}</div>
-          <div style="color: #6b7280; margin-top: 4px;">📍 ${location}</div>
-          <div style="color: #6b7280; margin-top: 4px;">with ${schoolName}</div>
-        </div>
-        <p style="color: #9ca3af; font-size: 14px;">
-          You'll receive an SMS reminder 72 hours before your lesson.
-          Reply C to confirm or R to reschedule.
-        </p>
-      </div>
-    `,
+    subject: email.subject,
+    html: email.html,
   })
 }
