@@ -1,39 +1,41 @@
 # STATUS.md — The Driving Center SaaS
 
 **Last updated:** 2026-04-25
-**Current phase:** Phase 1 (Core Product) — near complete
-**Next: Phase 2 (Stripe Subscriptions)**
+**Current phase:** Phase 2 (Stripe Subscriptions)
+**Next: Phase 3 (First Paying Customers)**
 
 ---
 
-## Phase 1 Progress
+## What's Happening Right Now
 
-| # | Feature | Status |
-|---|---|---|
-| P1-A | Student profile edit + TCA tracking + certificate | ✅ Deployed |
-| P1-B | Session management (create/edit/cancel/duplicate) | ✅ Deployed |
-| P1-C | Email + SMS reminders wired to OpenClaw cron | ✅ Deployed |
-
-**What P1-C does:**
-- `/api/reminders` fires 48h + 4h reminders (SMS + email) for upcoming bookings
-- Cron job registered: `tdc-reminders` — every hour
-- Second cron job: `tdc-monday-ops` — every Monday 9 AM ET
-- Stub mode: logs what would be sent when Twilio/Resend keys not configured
-- Email templates: beautiful HTML (reminder-48h, reminder-4h)
-
-**Keys needed for production:**
-- `RESEND_API_KEY` → resend.com
-- `TWILIO_ACCOUNT_SID` + `TWILIO_AUTH_TOKEN` + `TWILIO_PHONE_NUMBER` → twilio.com
+Phase 2 is partially done — webhook handlers + dashboard banner deployed. SQL migration needs to be run manually in Supabase SQL Editor.
 
 ---
 
-## Phase 0 Complete ✅
+## Phase 1 Complete ✅
 
-- [x] P0-1: `owner_user_id` column
-- [x] P0-2: `DEMO_OWNER_EMAIL` in Vercel
-- [x] P0-3: Booking confirmation email wired
-- [x] P0-4: CSV import — service role client, ownership check, deduplication
-- [x] P0-5: Instructor schedule API — `decryptField` confirmed correct
+- [x] P1-A: Student profile edit + TCA + certificate issuance
+- [x] P1-B: Session management (create/edit/cancel/duplicate)
+- [x] P1-C: Email + SMS reminders wired to OpenClaw cron
+
+---
+
+## Phase 2 Progress
+
+**Done (deployed):**
+- Webhook: `checkout.session.completed` → activates school (sets `subscription_status = 'active'`)
+- Webhook: `customer.subscription.updated/deleted` → updates status
+- Webhook: `invoice.payment_failed` → sets `past_due`
+- Dashboard: amber banner when `subscription_status !== 'active'`
+- Migration: `006_subscription_status.sql`
+
+**Needs Zax to run SQL in Supabase SQL Editor:**
+```sql
+ALTER TABLE schools ADD COLUMN subscription_status TEXT DEFAULT 'trial';
+ALTER TABLE schools ADD COLUMN subscription_id TEXT;
+ALTER TABLE schools ADD COLUMN trial_ends_at TIMESTAMPTZ;
+UPDATE schools SET subscription_status = 'trial' WHERE subscription_status IS NULL;
+```
 
 ---
 
@@ -41,32 +43,24 @@
 
 | Cycle | Feature | Result |
 |---|---|---|
-| 1 | P0-3: Booking confirmation email | ✅ Passed — deployed |
-| 2 | P0-4: CSV import (service role, ownership, deduplication) | ✅ Passed — deployed |
-| 3 | P1-A: Student profile edit + TCA + certificate | ✅ Passed — deployed |
-| 4 | P1-B: Session management (create/edit/cancel/duplicate) | ✅ Passed — deployed |
-| 5 | P1-C: Email + SMS reminders wired to cron | ✅ Passed — deployed |
+| 1 | P0-3: Booking confirmation email | ✅ Deployed |
+| 2 | P0-4: CSV import | ✅ Deployed |
+| 3 | P1-A: Student profile edit + TCA | ✅ Deployed |
+| 4 | P1-B: Session management | ✅ Deployed |
+| 5 | P1-C: Email + SMS reminders | ✅ Deployed |
+| 6 | Phase 2: Subscription flow (webhook + banner) | ✅ Deployed |
 
 ---
 
 ## What's Blocked
 
-None. Phase 1 complete. Ready for Phase 2.
-
----
-
-## Phase 2 Preview: Stripe Subscriptions
-
-- Verify Stripe checkout flow works end-to-end
-- Handle `checkout.session.expired`
-- Handle `invoice.payment_failed`
-- Validate school before granting access (check Stripe customer ID matches)
-- Discuss: $25 setup fee vs $99/mo only?
+- **SQL migration** — Zax needs to run the SQL in Supabase SQL Editor
+- **Stripe keys not configured** — `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_STARTER_PRICE_ID` not in Vercel
 
 ---
 
 ## Next Actions
 
-1. Add Twilio + Resend API keys to Vercel (enables real SMS + email)
-2. Register cron jobs: `openclaw cron add ...` (see CRON_SETUP.md)
-3. Phase 2: Stripe subscription flow — validate customers, gate school admin behind payment
+1. Run SQL migration in Supabase (Zax — 2 min)
+2. Add Stripe keys to Vercel (Zax — 5 min)
+3. Phase 3: First paying customer outreach — cold email to 10 TN driving schools
