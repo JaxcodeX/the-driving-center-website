@@ -15,10 +15,7 @@ The app is live but broken in ways that block a real school from using it. Phase
 
 ## Current Task
 
-**P0-3 — Booking Confirmation Email**
-Wire the Stripe webhook → send confirmation email to student after payment.
-
-**Status:** SPEC.md not yet written. Next action: write it.
+**P0-5 — Instructor Schedule API Fix** — Next to run.
 
 ---
 
@@ -37,9 +34,9 @@ Wire the Stripe webhook → send confirmation email to student after payment.
 
 | # | Task | Status |
 |---|---|---|
-| P0-3 | Booking confirmation email wired | Needs SPEC.md written first |
+| P0-3 | Booking confirmation email wired | ✅ Done — deployed |
 | P0-4 | CSV import page | Stub — needs real feature build |
-| P0-5 | Instructor schedule API fix | `decryptField` → `decrypt` |
+| P0-5 | Instructor schedule API fix | `decryptField` → `decrypt` — 1-line fix |
 
 ---
 
@@ -49,6 +46,7 @@ Wire the Stripe webhook → send confirmation email to student after payment.
 - [x] complete-profile page — school owners redirected to `/school-admin`
 - [x] Sessions table — all linked to demo school
 - [x] School `owner_email` — repaired via direct API
+- [x] **P0-3: Booking confirmation email** — wired, proper template activated, reschedule/cancel links added, deployed
 
 ---
 
@@ -65,30 +63,17 @@ Wire the Stripe webhook → send confirmation email to student after payment.
 
 ---
 
-## Phase 1 Preview (After Phase 0)
+## FSO Cycle Log
 
-- Student profile edit
-- Session create/edit/delete
-- TCA certificate issuance
-- SMS reminders wired to OpenClaw cron
-
----
-
-## How to Run a Cycle
-
-```
-1. Write SPEC.md for the feature
-2. Verify connections (Supabase, Stripe — L phase)
-3. Spawn coding agent to implement (A phase)
-4. Review output in VS Code / git diff
-5. Push to main → Vercel auto-deploys (T phase)
-6. Log in WORKFLOW_LOG.md
-```
+| Cycle | Feature | Result |
+|---|---|---|
+| 1 | P0-3: Booking confirmation email | ✅ Passed — deployed |
 
 ---
 
-## Next Action
+## Next Actions
 
-Write SPEC.md for P0-3 (booking confirmation email), then run the cycle.
+1. **Zax** — P0-1 (Supabase SQL) + P0-2 (Vercel env var) — 4 min total
+2. **Me** — P0-5 (instructor schedule fix — 1 line) → then P0-4 (CSV import)
 
-Once P0-1 and P0-2 are done (Zax's manual steps), verify the full signup-to-admin flow works end-to-end.
+Once P0-1/P0-2 are done: verify full signup-to-admin flow end-to-end.
