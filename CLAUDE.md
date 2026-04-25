@@ -1,231 +1,134 @@
 # CLAUDE.md — The Driving Center SaaS
 **Multi-tenant SaaS for driving schools. Not Matt's project — a product.**
+**Mode: FSO Workflow (Full Stack Open)**
 
 ---
 
-> **Conductor:** Everest (OpenClaw) — writes specs, reviews diffs, approves merges
-> **Coder:** Coding agent — implements exactly what this file specifies
-> **Tester:** Zax — clicks through the result and reports bugs
+## The FSO Workflow — How This Project Runs
 
-**When working on this project, read this file first. It is the source of truth.**
-
----
-
-## What This Project Is
-
-**The Driving Center** — a multi-tenant SaaS where driving school operators pay $99/mo for an all-in-one platform (scheduling, student management, payments, compliance, SMS reminders).
-
-Target customers: OTHER driving schools in Tennessee and beyond — not Matt Reedy's school.
-
-Matt Reedy is a **reference customer** — his site (`thedrivingcenter.org`) informed the product requirements. He is not currently a client.
-
-**Current stage:** MVP. Landing page deployed, core auth flow built, Stripe wired, no paying customers yet.
-
----
-
-## Key Context I Must Not Forget
-
-1. **Multi-tenant SaaS** — any school can sign up and get their own isolated data
-2. **Every table has `school_id`** — RLS policies isolate each school from others
-3. **Matt is a reference, not a client** — do not build for Matt specifically
-4. **Auth users get `user_metadata.school_id`** — this is how RLS knows which school owns which data
-
----
-
-## Tech Stack
-
-- **Frontend:** Next.js 16 (App Router), React 19, TailwindCSS 4, Framer Motion
-- **Database/Auth:** Supabase (Postgres + Auth + RLS)
-- **Payments:** Stripe Checkout (subscriptions + webhooks)
-- **Deploy:** Vercel (auto-deploys on push to `main`)
-- **Automation:** OpenClaw sub-agents (coding, research, marketing)
-- **Project path:** `~/projects/the-driving-center-website/`
-- **Live URL:** https://the-driving-center-website.vercel.app/
-- **GitHub:** github.com/JaxcodeX/the-driving-center-website
-
----
-
-## Multi-Tenant Data Model
+**Every feature request follows this exact sequence:**
 
 ```
-auth.users (Supabase Auth)
-  └── user_metadata.school_id ──→ schools.id
-                                        │
-  sessions, students_driver_ed, payments, instructors, session_types
-    └── school_id ──→ schools.id
+Zax: "Build [feature]"
+        ↓
+Everest (conductor): Write SPEC.md first
+        ↓
+Everest: Verify connections (L — Link)
+        ↓
+Everest: Spawn coding agent → implements from spec (A — Architect)
+        ↓
+Everest: Review diffs, test in browser, approve or send back (S — Stylize)
+        ↓
+Push to main → Vercel auto-deploys (T — Trigger)
+        ↓
+Log failures in WORKFLOW_LOG.md
+        ↓
+Next feature
 ```
 
-Every row in every table is scoped to a `school_id`. RLS policies enforce this — a school admin can only see their own school's data.
+**No exceptions.** If there's no SPEC.md, there's no implementation. Ever.
 
 ---
 
-## Auth Flow (How a school owner gets linked to their school)
+## Role Rules (Enforced)
 
-```
-1. School owner fills /signup form
-   → POST /api/schools { schoolName, ownerName, email, phone, state }
-   → schools record created with owner_email = email
-   → Magic link sent to owner's email
+| Who | What they do |
+|-----|-------------|
+| **Zax** | Directs, tests, approves or rejects output |
+| **Everest** | Writes SPEC.md, spawns agents, reviews output, makes architecture decisions |
+| **Coding Agent** | Implements exactly what SPEC.md says. Reports what was done. Never writes SPEC.md |
 
-2. Owner clicks magic link
-   → GET /auth/callback?code=XXX
-   → supabase.auth.exchangeCodeForSession(code)
-   → Find schools WHERE owner_email = user.email
-   → UPDATE schools SET owner_user_id = user.id (claim token)
-   → UPDATE auth.users SET user_metadata.school_id = school.id
-   → Redirect to /dashboard or /school-admin
+**Everest's job is not to write code — it's to write specs and review code.**
+
+---
+
+## The SPEC.md Template (for every feature)
+
+```markdown
+# SPEC.md — [Feature Name]
+
+## What it does (one sentence)
+## How it works (data flow)
+## API shapes (request/response)
+## Edge cases
+## Success criteria
+## Files to change
+## Out of scope
 ```
 
 ---
 
-## Database Schema (source of truth — live schema from Supabase)
+## The WORKFLOW_LOG.md (tracks every cycle)
 
-### schools
+Format per entry:
 ```
-id              UUID PK default uuid_generate_v4()
-name            TEXT NOT NULL
-slug            TEXT UNIQUE
-owner_email     TEXT NOT NULL  ← user sets this at signup
-owner_name      TEXT
-owner_user_id   UUID           ← set by auth callback after magic link click
-phone           TEXT
-state           TEXT NOT NULL DEFAULT 'TN'
-license_number  TEXT
-plan_tier       TEXT DEFAULT 'starter'
-stripe_customer_id TEXT        ← real Stripe customer ID (cus_xxx) written after checkout
-service_zips    TEXT[]
-created_at      TIMESTAMPTZ DEFAULT NOW()
-```
-
-### students_driver_ed
-```
-id              UUID PK
-school_id       UUID FK → schools.id
-legal_name      TEXT  ← encrypted
-permit_number   TEXT  ← encrypted
-dob             DATE NOT NULL
-parent_email    TEXT NOT NULL
-emergency_contact_name  TEXT
-emergency_contact_phone TEXT
-classroom_hours INTEGER DEFAULT 0
-driving_hours   INTEGER DEFAULT 0
-certificate_issued_at TIMESTAMPTZ
-class_session_id UUID
-created_at      TIMESTAMPTZ DEFAULT NOW()
-```
-
-### sessions
-```
-id              UUID PK
-school_id       UUID FK → schools.id
-instructor_id   UUID FK → instructors.id (nullable)
-session_type_id UUID FK → session_types.id (nullable)
-start_date      DATE NOT NULL
-end_date        DATE NOT NULL
-max_seats       INTEGER DEFAULT 30
-seats_booked    INTEGER DEFAULT 0
-status          TEXT DEFAULT 'scheduled'
-location        TEXT
-created_at      TIMESTAMPTZ DEFAULT NOW()
-```
-
-### instructors
-```
-id              UUID PK
-school_id       UUID FK → schools.id
-name            TEXT
-email           TEXT
-phone           TEXT
-license_number  TEXT
-active          BOOLEAN DEFAULT true
-```
-
-### session_types
-```
-id              UUID PK
-school_id       UUID FK → schools.id
-name            TEXT
-description     TEXT
-duration_minutes INT
-price_cents     INT
-deposit_cents   INT
-color           TEXT
-tca_hours_credit FLOAT
-active          BOOLEAN DEFAULT true
-```
-
-### payments
-```
-id              UUID PK
-student_id      UUID FK → students_driver_ed.id
-stripe_session_id TEXT UNIQUE
-amount          INTEGER NOT NULL
-status          TEXT DEFAULT 'pending'
-created_at      TIMESTAMPTZ DEFAULT NOW()
+## Cycle N — [Feature]
+Date:
+SPEC.md: [linked]
+Implemented by: [agent]
+Result: [passed / failed / partial]
+Failures: [what went wrong]
+Next action: [what we do about it]
 ```
 
 ---
 
-## Key Files
+## What Changes When FSO is Enforced
 
-```
-src/app/api/schools/route.ts          — school signup (creates school + triggers Stripe)
-src/app/auth/callback/route.ts        — magic link callback (links school → auth user)
-src/app/webhooks/stripe/route.ts      — Stripe events (payment confirmed, seat booked)
-src/app/school-admin/                 — protected by middleware, school owner only
-src/lib/supabase/server.ts            — server-side Supabase client
-src/lib/supabase/client.ts            — browser Supabase client
-src/middleware.ts                     — protects /school-admin/* routes
-```
+1. **Less drift** — every message is either advancing the spec, reviewing output, or logging
+2. **Better failure tracking** — when something breaks, we know exactly which cycle and why
+3. **Faster builds** — coding agent does the implementation, I'm reviewing not typing
+4. **Clearer accountability** — each change has a spec, a diff, and a log entry
 
 ---
 
-## Environment Variables
+## Current Project State
 
-```
-NEXT_PUBLIC_SUPABASE_URL       — https://evswdlsqlaztvajibgta.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY  — anon key
-NEXT_PUBLIC_APP_URL            — https://the-driving-center-website.vercel.app
-NEXT_PUBLIC_ENCRYPTION_KEY      — AES-256-GCM key
-STRIPE_SECRET_KEY              — sk_live_...
-STRIPE_WEBHOOK_SECRET          — whsec_...
-STRIPE_STARTER_PRICE_ID         — price_1TPVQ4CAzTRp2T1Gud8V0Z1I
-SUPABASE_SERVICE_ROLE_KEY      — service role key (never exposed to browser)
-DEMO_OWNER_EMAIL               — ops panel access (operator email)
-```
+**Live URL:** https://the-driving-center-website.vercel.app/
+**GitHub:** github.com/JaxcodeX/the-driving-center-website
+**Project path:** `~/projects/the-driving-center-website/`
 
----
+### What Works
+- School signup → Stripe checkout → magic link → school admin dashboard
+- Student booking wizard → Stripe payment → seat incremented
+- Landing page, pricing, FAQ, legal pages
 
-## Rules
-
-1. **Never touch auth without a spec.** Auth routes are the most fragile part. SPEC.md first, then code.
-2. **Always use service role client for admin writes.** Regular client respects RLS. Service role bypasses it for webhook/API use.
-3. **Small commits.** One logical change per commit with clear message.
-4. **If confused, stop and ask.** Don't guess at data model or auth flow.
-5. **Multi-tenant reminder.** Every query to a data table must include school_id scoping.
+### P0 Fixes Needed (before any school can actually use it)
+1. Run SQL: `ALTER TABLE schools ADD COLUMN owner_user_id UUID;`
+2. Add `DEMO_OWNER_EMAIL` to Vercel dashboard
+3. Wire booking confirmation email (webhook → notify API)
+4. Build CSV import (stub → real feature)
 
 ---
 
-## Active Bugs (B.L.A.S.T. Cycle 1)
+## FSO Workflow Log
 
-| # | Bug | Status |
-|---|-----|--------|
-| 1 | schools.owner_email NULL after signup | ✅ Code fixed, existing records repaired |
-| 2 | stripe_customer_id collision (owner claim vs Stripe ID) | 🔴 Partially fixed — auth callback writes owner_user_id too |
-| 3 | sessions.school_id = NULL | ✅ Repaired via direct API |
-| 4 | owner_user_id column missing in DB | ❌ Needs SQL migration |
-| 5 | complete-profile page dead-ends school owners | ✅ Fixed — redirects to /school-admin |
-| 6 | DEMO_OWNER_EMAIL not in Vercel | ❌ Manual add needed |
+## Cycle 1 — School Owner Auth Link Fix
+Date: 2026-04-24
+SPEC: SPEC_BLAST_01_SCHOOL_OWNER_FIX.md
+Implemented by: Everest (manual — should have been sub-agent)
+Result: Partial — code fixed, DB migration still pending
+Fixes applied: auth callback dual write, complete-profile redirect, school sessions linked
+DB migration needed: `ALTER TABLE schools ADD COLUMN owner_user_id UUID;`
+Vercel env needed: DEMO_OWNER_EMAIL
 
 ---
 
-## Workflow: B.L.A.S.T.
+## Build Plan (Priority Order)
 
-Every feature follows this sequence:
-1. **B** — Write SPEC.md (conductor writes, saves to project)
-2. **L** — Link check (verify connections work)
-3. **A** — Architect (sub-agent implements from spec)
-4. **S** — Stylize (conductor reviews and polishes)
-5. **T** — Trigger (deploy to Vercel, mark complete)
+### Phase 0 — Foundation (right now)
+- P0-1: owner_user_id column + DEMO_OWNER_EMAIL (5 min SQL + 2 min Vercel)
+- P0-2: Wire booking confirmation email (webhook → /api/notify/booking)
+- P0-3: Build CSV import feature
 
-**The one rule:** No sub-agent runs without a written SPEC.md first.
+### Phase 1 — Core Product
+- P1-A: Student profile edit + TCA hours tracking
+- P1-B: Session create/edit/delete + series duplication
+- P1-C: Email/SMS reminders wired to OpenClaw cron
+
+### Phase 2 — Payments
+- Handle failed Stripe payments gracefully
+- Referral program
+
+### Phase 3 — Launch
+- First 5 paying schools via B.L.A.S.T. outreach protocol
