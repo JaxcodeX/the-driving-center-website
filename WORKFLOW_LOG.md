@@ -22,4 +22,33 @@ Built full student management UI:
 - TypeScript error: `SUPABASE_SERVICE_ROLE_KEY` typed as `string | undefined` — fixed with `!` assertion
 
 ### Next action
-P1-B: Session management (create/edit/cancel/duplicate sessions)
+P1-C: Email/SMS reminders wired to OpenClaw cron
+
+## Cycle 4 — P1-B: Session Management
+
+**Date:** 2026-04-25
+**SPEC.md:** `SPEC_P1_B_SESSION_MANAGEMENT.md`
+**Result:** ✅ Passed — deployed
+
+### What was done
+Built full session CRUD UI:
+- **GET /api/sessions** — school ownership check added (was open to any authenticated user)
+- **POST /api/sessions** — ownership check + service role client for writes
+- **New POST /api/sessions/duplicate/[id]** — duplicates session N weeks forward (1-12), same day/time/instructor
+- **Sessions page** — school_id now from `/api/auth/session` (not URL params — same fix as P0-4)
+- **Instructor dropdown** — fetched from `/api/instructors?school_id=X`
+- **Edit slide-over** — all fields editable, past sessions locked
+- **Duplicate modal** — 1-12 weeks, creates sessions at 7-day intervals
+- **Cancel** — soft-delete with confirmation
+- **Visual separation** — upcoming vs past/cancelled sessions
+
+### TypeScript fixes
+1. `typeof form` in SessionModal onChange type — defined `CreateForm` type explicitly
+2. `formatDate` used before defined — moved to module scope
+3. `form as Partial<Session>` type mismatch (string vs number) — cast through `unknown`
+
+### Failures
+- None — build passed after type fixes
+
+### Next action
+P1-C: Email/SMS reminders wired to OpenClaw cron (Twilio + Resend)
