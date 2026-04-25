@@ -77,6 +77,8 @@ export default function SchoolAdminDashboard() {
   const [sessions, setSessions] = useState<any[]>([])
   const [recentBookings, setRecentBookings] = useState<any[]>([])
   const [schoolId, setSchoolId] = useState<string>('')
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string>('trial')
+  const [stripeCustomerId, setStripeCustomerId] = useState<string>('')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -89,7 +91,7 @@ export default function SchoolAdminDashboard() {
 
       const today = new Date().toISOString().split('T')[0]
 
-      const [{ data: studentsData }, { data: sessionsData }, { data: bookingsData }] = await Promise.all([
+      const [{ data: studentsData }, { data: sessionsData }, { data: bookingsData }, { data: schoolData }] = await Promise.all([
         supabase
           .from('students_driver_ed')
           .select('id, legal_name, created_at, driving_hours, certificate_issued_at')
@@ -110,11 +112,18 @@ export default function SchoolAdminDashboard() {
           .eq('school_id', sid)
           .order('created_at', { ascending: false })
           .limit(5),
+        supabase
+          .from('schools')
+          .select('subscription_status, stripe_customer_id')
+          .eq('id', sid)
+          .single(),
       ])
 
       setStudents(studentsData ?? [])
       setSessions(sessionsData ?? [])
       setRecentBookings(bookingsData ?? [])
+      setSubscriptionStatus(schoolData?.subscription_status ?? 'trial')
+      setStripeCustomerId(schoolData?.stripe_customer_id ?? '')
       setLoading(false)
     }
     load()
@@ -132,6 +141,33 @@ export default function SchoolAdminDashboard() {
 
   return (
     <div className="p-6 max-w-4xl">
+      {/* Subscription status banner */}
+      {subscriptionStatus !== 'active' && (
+        <div className="mb-5 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-amber-400 text-lg">⚠️</span>
+            <div>
+              <div className="text-sm font-medium text-amber-300">
+                {subscriptionStatus === 'cancelled'
+                  ? 'Subscription cancelled'
+                  : subscriptionStatus === 'past_due'
+                    ? 'Payment past due — update billing'
+                    : 'Free trial active — subscribe to unlock all features'}
+              </div>
+              <div className="text-xs text-amber-400/60 mt-0.5">
+                {subscriptionStatus === 'trial' ? '3 months free, then $99/mo' : 'Contact support to restore access'}
+              </div>
+            </div>
+          </div>
+          <a
+            href={`https://billing.stripe.com/p/login/test_${stripeCustomerId}`}
+            className="text-xs bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 px-3 py-1.5 rounded-lg font-medium whitespace-nowrap"
+          >
+            {subscriptionStatus === 'trial' ? 'Subscribe now' : 'Update billing'}
+          </a>
+        </div>
+      )}
+
       {/* Page title */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-white mb-1">Dashboard</h1>
