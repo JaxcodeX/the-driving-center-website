@@ -50,5 +50,28 @@ Built full session CRUD UI:
 ### Failures
 - None — build passed after type fixes
 
+## Cycle 5 — P1-C: Email + SMS Reminders Wired to Cron
+
+**Date:** 2026-04-25
+**SPEC.md:** `SPEC_P1_C_REMINDERS.md`
+**Result:** ✅ Passed — deployed
+
+### What was done
+Wired 48h and 4h email reminders alongside existing SMS in `/api/reminders`:
+- **48h channel:** `sendLessonReminderSMS` + `reminder48hEmail` (beautiful HTML template with confirm/reschedule links)
+- **4h channel:** `sendFinalReminderSMS` + `reminder4hEmail` (beautiful HTML template with school phone)
+- **Stub mode:** logs what would be sent when Resend/Twilio not configured — never crashes
+- **CRON_SETUP.md** updated with real Vercel URL (`the-driving-center-website.vercel.app`), job descriptions, key requirements table
+- **Second cron job** added: `tdc-monday-ops` (every Monday 9 AM ET → posts pipeline update to Discord)
+
+### API change
+`GET /api/reminders` (and POST for cron) now sends both SMS + email per reminder. Response includes `{ sent_48h: { sms, email }, sent_4h: { sms, email }, email_configured }`.
+
+### Keys still needed (in Vercel)
+- `RESEND_API_KEY` (resend.com)
+- `TWILIO_ACCOUNT_SID` + `TWILIO_AUTH_TOKEN` + `TWILIO_PHONE_NUMBER` (twilio.com)
+
+Until keys are added: stub mode logs `[Twilio STUB]` / `[Resend STUB]` — works fine in demo mode.
+
 ### Next action
-P1-C: Email/SMS reminders wired to OpenClaw cron (Twilio + Resend)
+Phase 2: Stripe subscription flow — gate school admin behind payment, validate Stripe customer ID, handle expired/failed payments.
