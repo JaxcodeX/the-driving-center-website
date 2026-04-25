@@ -27,12 +27,10 @@ All Phase 0 items done:
 ## Phase 1 Progress
 
 - [x] **P1-A: Student profile edit + TCA tracking + certificate issuance** — deployed
-  - Real decrypted names in list view (not `[encrypted]`)
-  - Click row → slide-over edit panel
-  - TCA hours with progress bars (30h classroom + 6h driving TN minimums)
-  - Certificate button active only when eligible
-- [ ] P1-B: Session management (create/edit/cancel/duplicate)
-- [ ] P1-C: Notifications & reminders (email/SMS wired to OpenClaw cron)
+- [x] **P1-B: Session management** — deployed
+  - Create, edit, cancel, duplicate sessions
+  - School ownership on all session endpoints
+  - Instructor dropdown, seats fill indicator, upcoming/past separation
 
 ---
 
