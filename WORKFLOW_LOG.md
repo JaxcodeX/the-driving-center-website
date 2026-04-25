@@ -31,3 +31,8 @@ Fix school→auth link — the #1 blocker for demo flow:
 - GitHub connected ✅  
 - STRIPE_STARTER_PRICE_ID ❌ (Zax adding manually)
 - Coding agent: TBD (Gemini CLI free tier as primary)
+
+### Zax's Rule (non-negotiable)
+"You are never allowed to proceed if something's broken I don't know about. Uneven knowledge = uneven building."
+→ Every message to Zax must list all known broken things before proposing next steps
+→ Never proceed without Zax knowing the full state

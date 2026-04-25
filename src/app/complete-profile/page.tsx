@@ -1,17 +1,48 @@
 'use client'
 
-import { Suspense, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { Suspense, useState, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 function CompleteProfileForm() {
   const params = useSearchParams()
+  const router = useRouter()
   const sessionId = params.get('session_id')
   const supabase = createClient()
 
   const [step, setStep] = useState<'form' | 'done'>('form')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [isSchoolOwner, setIsSchoolOwner] = useState(false)
+
+  // Detect school owner vs student: school owners have school_id in metadata
+  // but no student record — redirect them to their school admin
+  useEffect(() => {
+    async function detectRole() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user?.user_metadata?.school_id) {
+        // User has a school_id — they are a school owner, not a student
+        setIsSchoolOwner(true)
+        // Redirect to school admin
+        router.replace('/school-admin')
+      }
+    }
+    detectRole()
+  }, [supabase.auth, router])
+
+  if (isSchoolOwner) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-6">
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-8 max-w-md w-full text-center">
+          <div className="text-4xl mb-4">🏫</div>
+          <h1 className="text-2xl font-bold text-white mb-2">School Admin Dashboard</h1>
+          <p className="text-gray-400 mb-6">
+            Redirecting you to your school admin panel...
+          </p>
+        </div>
+      </div>
+    )
+  }
   const [student, setStudent] = useState({
     legal_name: '',
     dob: '',

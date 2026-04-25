@@ -63,7 +63,14 @@ export async function GET(request: Request) {
         .single()
 
       if (school) {
-        // Claim: write user.id into stripe_customer_id as owner claim token
+        // Claim: write user.id into owner_user_id as owner claim token
+        // (stripe_customer_id is reserved for real Stripe customer IDs)
+        await supabaseAdmin
+          .from('schools')
+          .update({ owner_user_id: user.id })
+          .eq('id', school.id)
+
+        // Also keep stripe_customer_id as fallback claim for backward compat
         await supabaseAdmin
           .from('schools')
           .update({ stripe_customer_id: user.id })

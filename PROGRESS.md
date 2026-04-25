@@ -95,6 +95,7 @@ Phase 2: Live Version
 3. Demo infrastructure does NOT touch live Stripe keys
 4. No new features until Phase 1A foundation is verified working
 5. Zax tests each feature the same day it's built
+6. **Zax's rule (non-negotiable):** Never proceed if something is broken that Zax doesn't know about. Always report all known issues before moving forward. Unequal knowledge = uneven building.
 
 ---
 
