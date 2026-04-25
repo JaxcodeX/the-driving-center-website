@@ -1,29 +1,33 @@
 'use client'
 
-import { useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 export default function ImportStudentsPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-950" />}>
-      <ImportContent />
-    </Suspense>
-  )
-}
-
-function ImportContent() {
-  const params = useSearchParams()
-  const schoolId = params.get('school_id')
   const [csvText, setCsvText] = useState('')
   const [result, setResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [schoolId, setSchoolId] = useState<string | null>(null)
+
+  // Get school_id from session on mount
+  useEffect(() => {
+    fetch('/api/auth/session')
+      .then(r => r.json())
+      .then(data => {
+        if (data?.school_id) setSchoolId(data.school_id)
+      })
+      .catch(console.error)
+  }, [])
 
   async function handleImport(e: React.FormEvent) {
     e.preventDefault()
     if (!csvText.trim()) {
       setError('Please paste your CSV data first')
+      return
+    }
+    if (!schoolId) {
+      setError('School not found — are you logged in?')
       return
     }
     setLoading(true)
@@ -32,7 +36,10 @@ function ImportContent() {
 
     const res = await fetch('/api/import/students', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-school-id': schoolId! },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-school-id': schoolId,
+      },
       body: JSON.stringify({ csv_content: csvText }),
     })
 
@@ -40,6 +47,8 @@ function ImportContent() {
     setResult(data)
     setLoading(false)
   }
+
+  const rowCount = csvText.trim() ? csvText.trim().split('\n').length - 1 : 0
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-50">
@@ -66,12 +75,12 @@ function ImportContent() {
         <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-4 mb-6">
           <div className="text-sm font-medium text-cyan-400 mb-2">Accepted CSV columns:</div>
           <div className="grid grid-cols-2 gap-1 text-xs text-gray-400 font-mono">
-            <div><span className="text-white">legal_name</span> (required) — student full name</div>
-            <div><span className="text-white">dob</span> (required) — date of birth YYYY-MM-DD</div>
-            <div><span className="text-white">permit_number</span> — learner's permit</div>
-            <div><span className="text-white">parent_email</span> — parent/guardian email</div>
-            <div><span className="text-white">emergency_contact_phone</span> — emergency phone</div>
-            <div><span className="text-white">driving_hours</span> — hours completed</div>
+            <div><span className="text-white">legal_name</span> (required)</div>
+            <div><span className="text-white">dob</span> (required — YYYY-MM-DD)</div>
+            <div><span className="text-white">permit_number</span></div>
+            <div><span className="text-white">parent_email</span></div>
+            <div><span className="text-white">emergency_contact_phone</span></div>
+            <div><span className="text-white">driving_hours</span></div>
           </div>
           <div className="text-xs text-gray-500 mt-2">
             Export from Excel/Google Sheets as CSV. Headers must be in the first row.
@@ -104,9 +113,9 @@ John Doe,2009-11-22,LM-789012,john@parent.com,12"
                 ? 'bg-green-500/10 border-green-500/20'
                 : 'bg-yellow-500/10 border-yellow-500/20'
             }`}>
-              <div className="text-sm font-medium mb-2">
+              <div className="text-sm font-medium mb-1">
                 {result.failed === 0
-                  ? `✅ All ${result.imported} students imported successfully`
+                  ? `✅ All ${result.imported} students imported`
                   : `Imported ${result.imported} of ${result.total} rows`}
                 {result.failed > 0 && ` — ${result.failed} failed`}
               </div>
@@ -128,7 +137,7 @@ John Doe,2009-11-22,LM-789012,john@parent.com,12"
             disabled={loading || !csvText.trim()}
             className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
           >
-            {loading ? 'Importing...' : `Import ${csvText ? csvText.split('\n').length - 1 : 0} Students`}
+            {loading ? 'Importing...' : `Import ${rowCount} Student${rowCount !== 1 ? 's' : ''}`}
           </button>
         </form>
       </div>
