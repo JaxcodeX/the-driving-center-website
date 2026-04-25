@@ -46,15 +46,17 @@ function SignupForm() {
 
     const { checkoutUrl } = await res.json()
 
-    // 2. Also send magic link for auth
-    await supabase.auth.signInWithOtp({
-      email: form.email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback?redirect=/onboarding`,
-      },
-    })
+    // 2. Also send magic link for auth (skip in demo mode)
+    if (!checkoutUrl?.includes('demo=true')) {
+      await supabase.auth.signInWithOtp({
+        email: form.email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback?redirect=/onboarding`,
+        },
+      })
+    }
 
-    // 3. Redirect to Stripe checkout
+    // 3. Redirect
     if (checkoutUrl) {
       window.location.href = checkoutUrl
     } else {

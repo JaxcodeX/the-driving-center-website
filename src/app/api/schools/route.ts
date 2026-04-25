@@ -1,15 +1,5 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-
-export async function GET() {
-  return NextResponse.json({
-    DEMO_MODE: process.env.DEMO_MODE,
-    hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
-    hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-  })
-}
-import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 
 function getSupabaseAdmin() {
@@ -21,6 +11,14 @@ function getSupabaseAdmin() {
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!)
+}
+
+export async function GET() {
+  return NextResponse.json({
+    DEMO_MODE: process.env.DEMO_MODE,
+    hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
+    hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+  })
 }
 
 export async function POST(request: Request) {
@@ -36,7 +34,6 @@ export async function POST(request: Request) {
 
   // DEMO MODE: skip all external calls, go straight to onboarding
   if (process.env.DEMO_MODE === 'true') {
-    // Still create the school in Supabase so it's real
     try {
       const { data: school, error: schoolError } = await supabaseAdmin
         .from('schools')
@@ -69,7 +66,7 @@ export async function POST(request: Request) {
     }
   }
 
-  // NON-DEMO: full Stripe flow
+  // NON-DEMO: full flow
   const { data: school, error: schoolError } = await supabaseAdmin
     .from('schools')
     .insert({
