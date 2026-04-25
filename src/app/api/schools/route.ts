@@ -55,6 +55,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: schoolError?.message ?? 'Failed to create school' }, { status: 500 })
   }
 
+  // Demo mode: skip Stripe, redirect straight to onboarding
+  if (process.env.DEMO_MODE === 'true') {
+    const origin = process.env.NEXT_PUBLIC_APP_URL ?? 'https://the-driving-center-website.vercel.app'
+    return NextResponse.json({
+      schoolId: school.id,
+      slug: school.slug,
+      checkoutUrl: `${origin}/onboarding?school_id=${school.id}&step=profile`,
+      demoMode: true,
+    })
+  }
+
   // Start Stripe checkout for $99/mo subscription
   const stripe = getStripe()
   const checkoutSession = await stripe.checkout.sessions.create({
