@@ -49,6 +49,8 @@ export async function POST(request: Request) {
   const slug = `${baseSlug}-${Date.now().toString(36)}`
   const supabaseAdmin = getSupabaseAdmin()
 
+  return NextResponse.json({ ok: true, demoMode, source: 'direct return before supabase' })
+
   const { data: school, error: schoolError } = await supabaseAdmin
     .from('schools')
     .insert({
