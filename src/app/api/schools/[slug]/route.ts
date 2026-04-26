@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
 
 export async function GET(
@@ -65,7 +65,7 @@ export async function PUT(
 
   const body = await request.json()
 
-  const supabaseAdmin = await createClient()
+  const supabaseAdmin = getSupabaseAdmin()
 
   // Get school
   const { data: school } = await supabaseAdmin
