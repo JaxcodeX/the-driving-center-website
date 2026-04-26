@@ -63,11 +63,24 @@ export async function PUT(
   const body = await request.json()
   const supabaseAdmin = getSupabaseAdmin()
 
-  const { data: school } = await (supabaseAdmin
-    .from('schools') as any)
-    .select('id')
-    .eq('slug', slug)
-    .single()
+  // Resolve school: if slug looks like a UUID, find by id; otherwise by slug
+  const isUuid = slug && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug)
+
+  let school: { id: string } | null = null
+
+  if (isUuid) {
+    const result = await (supabaseAdmin.from('schools') as any)
+      .select('id')
+      .eq('id', slug)
+      .single()
+    school = result.data
+  } else {
+    const result = await (supabaseAdmin.from('schools') as any)
+      .select('id')
+      .eq('slug', slug)
+      .single()
+    school = result.data
+  }
 
   if (!school) return new NextResponse('School not found', { status: 404 })
 
