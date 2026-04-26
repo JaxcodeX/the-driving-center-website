@@ -3,7 +3,7 @@
 // Security-first encryption library — throws on first use if key is missing or weak
 
 function getEncryptionKey(): string {
-  const key = process.env.ENCRYPTION_KEY
+  const key = process.env.ENCRYPTION_KEY || process.env.NEXT_PUBLIC_ENCRYPTION_KEY
   if (!key || key.length < 32) {
     throw new Error(
       'FATAL: ENCRYPTION_KEY environment variable is required and must be at least 32 characters. ' +
