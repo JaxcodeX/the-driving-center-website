@@ -1,189 +1,188 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { ArrowRight, AlertCircle } from 'lucide-react'
 
-function SignupForm() {
+const T = {
+  bg:        '#050505',
+  surface:   '#0D0D0D',
+  elevated:  '#18181b',
+  border:    '#1A1A1A',
+  borderLt:  '#27272a',
+  text:      '#ffffff',
+  secondary: '#94A3B8',
+  muted:     '#52525b',
+  cyan:      '#38BDF8',
+  grad:      'linear-gradient(135deg, #38BDF8 0%, #818CF8 100%)',
+}
+
+export default function SignupPage() {
   const router = useRouter()
-  const supabase = createClient()
-
-  const [form, setForm] = useState({
-    schoolName: '',
-    ownerName: '',
-    email: '',
-    phone: '',
-    state: 'TN',
-    instructorCount: '1',
-  })
+  const [form, setForm] = useState({ schoolName: '', ownerName: '', email: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  function set(key: string, val: string) {
+    setForm(f => ({ ...f, [key]: val }))
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    // 1. Create school record + start Stripe checkout (API uses service role key)
-    const res = await fetch('/api/schools', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        schoolName: form.schoolName,
-        ownerName: form.ownerName,
-        email: form.email,
-        phone: form.phone,
-        state: form.state,
-      }),
-    })
-
-    if (!res.ok) {
-      const data = await res.json()
-      setError(data.error ?? 'Something went wrong')
-      setLoading(false)
-      return
-    }
-
-    const { checkoutUrl } = await res.json()
-
-    // 2. Also send magic link for auth (skip in demo mode)
-    if (!checkoutUrl?.includes('demo=true')) {
-      await supabase.auth.signInWithOtp({
-        email: form.email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?redirect=/onboarding`,
-        },
+    try {
+      const res = await fetch('/api/schools', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
       })
-    }
+      const data = await res.json()
 
-    // 3. Redirect
-    if (checkoutUrl) {
-      window.location.href = checkoutUrl
-    } else {
-      setError('Could not start checkout. Please try again.')
+      if (!res.ok) {
+        setError(data.error || 'Something went wrong')
+        setLoading(false)
+        return
+      }
+
+      // Redirect to onboarding with school slug
+      router.push(`/onboarding?school=${data.slug}`)
+    } catch {
+      setError('Network error — try again')
       setLoading(false)
     }
   }
 
-  const states = ['TN', 'KY', 'GA']
+  const inputStyle = {
+    background: T.elevated,
+    border: `1px solid ${T.borderLt}`,
+    color: T.text,
+    outline: 'none' as const,
+  }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-6">
-      <div className="max-w-lg w-full">
-        <div className="flex items-center gap-2 justify-center mb-8">
-          <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">DC</span>
-          </div>
-          <span className="text-white font-semibold">The Driving Center</span>
+    <div
+      className="min-h-screen flex flex-col items-center justify-center p-6"
+      style={{ background: T.bg }}
+    >
+      {/* Logo */}
+      <Link href="/" className="flex items-center gap-2.5 mb-10">
+        <div
+          className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold"
+          style={{ background: T.grad }}
+        >
+          DC
         </div>
+        <span className="text-sm font-semibold tracking-tight" style={{ color: T.text }}>
+          The Driving Center
+        </span>
+      </Link>
 
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
-          <h1 className="text-2xl font-bold text-white mb-2">Start your free trial</h1>
-          <p className="text-gray-400 mb-6">
-            3 months free. Then $99/mo. Cancel anytime.
+      {/* Card */}
+      <div className="w-full max-w-sm">
+        <div
+          className="rounded-2xl p-8"
+          style={{ background: T.surface, border: `1px solid ${T.border}` }}
+        >
+          <h1 className="text-xl font-semibold mb-1" style={{ color: T.text }}>
+            Start your free trial
+          </h1>
+          <p className="text-sm mb-6" style={{ color: T.secondary }}>
+            No credit card required. Set up in under an hour.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Driving School Name</label>
+              <label
+                className="block text-xs font-medium mb-1.5 uppercase tracking-wide"
+                style={{ color: T.muted }}
+              >
+                School name
+              </label>
               <input
                 type="text"
                 value={form.schoolName}
-                onChange={(e) => setForm({ ...form, schoolName: e.target.value })}
-                placeholder="Oak Ridge Driving Academy"
+                onChange={e => set('schoolName', e.target.value)}
+                placeholder="Oneida Driving Academy"
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                className="w-full rounded-xl px-4 py-3 text-sm transition-all"
+                style={inputStyle}
+                onFocus={e => ((e.target as HTMLInputElement).style.borderColor = `${T.cyan}60`)}
+                onBlur={e => ((e.target as HTMLInputElement).style.borderColor = T.borderLt)}
               />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Owner Name</label>
-                <input
-                  type="text"
-                  value={form.ownerName}
-                  onChange={(e) => setForm({ ...form, ownerName: e.target.value })}
-                  placeholder="Jane Smith"
-                  required
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Phone</label>
-                <input
-                  type="tel"
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  placeholder="(555) 867-5309"
-                  required
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-              </div>
             </div>
 
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Work Email</label>
+              <label
+                className="block text-xs font-medium mb-1.5 uppercase tracking-wide"
+                style={{ color: T.muted }}
+              >
+                Your name
+              </label>
               <input
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="jane@oakridgedriving.com"
+                type="text"
+                value={form.ownerName}
+                onChange={e => set('ownerName', e.target.value)}
+                placeholder="Mark Reedy"
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                className="w-full rounded-xl px-4 py-3 text-sm transition-all"
+                style={inputStyle}
+                onFocus={e => ((e.target as HTMLInputElement).style.borderColor = `${T.cyan}60`)}
+                onBlur={e => ((e.target as HTMLInputElement).style.borderColor = T.borderLt)}
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">State</label>
-                <select
-                  value={form.state}
-                  onChange={(e) => setForm({ ...form, state: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                >
-                  {states.map((s) => (
-                    <option key={s} value={s} style={{ background: '#0a0a0f' }}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Instructors</label>
-                <select
-                  value={form.instructorCount}
-                  onChange={(e) => setForm({ ...form, instructorCount: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                >
-                  {[1, 2, 3, 4, 5, 6].map((n) => (
-                    <option key={n} value={String(n)} style={{ background: '#0a0a0f' }}>
-                      {n} instructor{n > 1 ? 's' : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div>
+              <label
+                className="block text-xs font-medium mb-1.5 uppercase tracking-wide"
+                style={{ color: T.muted }}
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                value={form.email}
+                onChange={e => set('email', e.target.value)}
+                placeholder="mark@yourdrivingschool.com"
+                required
+                className="w-full rounded-xl px-4 py-3 text-sm transition-all"
+                style={inputStyle}
+                onFocus={e => ((e.target as HTMLInputElement).style.borderColor = `${T.cyan}60`)}
+                onBlur={e => ((e.target as HTMLInputElement).style.borderColor = T.borderLt)}
+              />
             </div>
 
-            {error && <p className="text-red-400 text-sm">{error}</p>}
+            {error && (
+              <div className="flex items-start gap-2 text-xs" style={{ color: '#ef4444' }}>
+                <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                {error}
+              </div>
+            )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="w-full py-3.5 rounded-xl text-sm font-semibold text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              style={{
+                background: T.grad,
+                boxShadow: `0 0 20px rgba(56,189,248,0.2)`,
+              }}
             >
-              {loading ? 'Setting up your school...' : 'Start free trial →'}
+              {loading ? 'Creating school...' : 'Create school'}
+              {!loading && <ArrowRight className="w-4 h-4" />}
             </button>
           </form>
-
-          <p className="text-gray-600 text-xs text-center mt-4">
-            3 months free. Then $99/mo. No credit card required to start.
-          </p>
         </div>
+
+        <p className="text-xs text-center mt-4" style={{ color: T.muted }}>
+          Already have an account?{' '}
+          <Link href="/login" className="font-medium" style={{ color: T.cyan }}>
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
   )
-}
-
-export default function SignupPage() {
-  return <SignupForm />
 }

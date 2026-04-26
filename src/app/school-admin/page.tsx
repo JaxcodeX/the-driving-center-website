@@ -2,349 +2,208 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import {
-  CalendarCheck, Users, TrendingUp, Bell, ArrowRight,
-  Clock, GraduationCap, CheckCircle
-} from 'lucide-react'
+import { Calendar, Users, Clock, TrendingUp, ArrowRight, Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import QuickStatsRow from '@/components/dashboard/QuickStatsRow'
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.08, duration: 0.4, ease: 'easeOut' } as const,
-  }),
+const T = {
+  bg:        '#050505',
+  surface:   '#0D0D0D',
+  elevated:  '#18181b',
+  border:    '#1A1A1A',
+  borderLt:  '#27272a',
+  text:      '#ffffff',
+  secondary: '#94A3B8',
+  muted:     '#52525b',
+  cyan:      '#38BDF8',
+  purple:    '#818CF8',
+  green:     '#10B981',
+  amber:     '#f59e0b',
+  grad:      'linear-gradient(135deg, #38BDF8 0%, #818CF8 100%)',
 }
 
 function StatCard({
-  icon: Icon,
-  label,
-  value,
-  sub,
-  color,
-  index,
+  label, value, icon: Icon, color, href
 }: {
-  icon: React.ElementType
-  label: string
-  value: string | number
-  sub?: string
-  color: string
-  index: number
+  label: string; value: string | number; icon: any; color: string; href: string
 }) {
   return (
-    <motion.div
-      custom={index}
-      variants={cardVariants}
-      initial="hidden"
-      animate="visible"
-      className="glass-card rounded-xl p-5 relative overflow-hidden"
+    <Link
+      href={href}
+      className="flex items-center justify-between p-6 rounded-2xl transition-all group"
+      style={{ background: T.surface, border: `1px solid ${T.border}` }}
+      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.borderColor = `${color}50`)}
+      onMouseLeave={e => ((e.currentTarget as HTMLElement).style.borderColor = T.border)}
     >
-      <div className={`absolute top-0 right-0 w-24 h-24 rounded-full opacity-10 -translate-y-4 translate-x-4`} style={{ background: color }} />
-      <div className="relative">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${color}22` }}>
-            <Icon className="w-4 h-4" style={{ color }} />
-          </div>
-          <span className="text-xs text-gray-400 uppercase tracking-wider">{label}</span>
-        </div>
-        <div className="text-2xl font-bold text-white">{value}</div>
-        {sub && <div className="text-xs text-gray-500 mt-1">{sub}</div>}
+      <div>
+        <div className="text-3xl font-bold mb-1" style={{ color: T.text }}>{value}</div>
+        <div className="text-sm" style={{ color: T.muted }}>{label}</div>
       </div>
-    </motion.div>
+      <div
+        className="w-12 h-12 rounded-xl flex items-center justify-center"
+        style={{ background: `${color}15` }}
+      >
+        <Icon className="w-6 h-6" style={{ color }} />
+      </div>
+    </Link>
   )
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    confirmed: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
-    pending: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20',
-    completed: 'bg-gray-500/15 text-gray-400 border-gray-500/20',
-    cancelled: 'bg-red-500/15 text-red-400 border-red-500/20',
-  }
-  const cls = styles[status?.toLowerCase()] ?? styles.pending
-  return (
-    <span className={`text-xs px-2 py-0.5 rounded-full border ${cls}`}>
-      {status}
-    </span>
-  )
-}
-
-export default function SchoolAdminDashboard() {
-  const [students, setStudents] = useState<any[]>([])
+function RecentSessions({ schoolId }: { schoolId: string }) {
   const [sessions, setSessions] = useState<any[]>([])
-  const [recentBookings, setRecentBookings] = useState<any[]>([])
-  const [schoolId, setSchoolId] = useState<string>('')
-  const [subscriptionStatus, setSubscriptionStatus] = useState<string>('trial')
-  const [stripeCustomerId, setStripeCustomerId] = useState<string>('')
-  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function load() {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('sessions')
+        .select('*, students(name), instructors(name)')
+        .eq('school_id', schoolId)
+        .order('starts_at', { ascending: true })
+        .limit(5)
+      setSessions(data || [])
+    }
+    load()
+  }, [schoolId])
+
+  if (!sessions.length) {
+    return (
+      <div className="text-center py-10" style={{ color: T.muted }}>
+        <Clock className="w-8 h-8 mx-auto mb-2 opacity-40" />
+        <p className="text-sm">No sessions yet</p>
+        <Link
+          href="/school-admin/sessions"
+          className="text-xs font-medium mt-2 inline-block"
+          style={{ color: T.cyan }}
+        >
+          Create your first session →
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-2">
+      {sessions.map(session => (
+        <div
+          key={session.id}
+          className="flex items-center justify-between p-4 rounded-xl"
+          style={{ background: T.elevated }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className="w-9 h-9 rounded-lg flex items-center justify-center"
+              style={{ background: `${T.cyan}15` }}
+            >
+              <Calendar className="w-4 h-4" style={{ color: T.cyan }} />
+            </div>
+            <div>
+              <div className="text-sm font-medium" style={{ color: T.text }}>
+                {session.student?.name || 'Student'}
+              </div>
+              <div className="text-xs" style={{ color: T.muted }}>
+                {session.instructor?.name || 'Instructor'} · {new Date(session.starts_at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+              </div>
+            </div>
+          </div>
+          <span
+            className="text-xs px-2 py-1 rounded-full font-medium"
+            style={{
+              background: session.status === 'confirmed' ? `${T.green}15` : `${T.amber}15`,
+              color: session.status === 'confirmed' ? T.green : T.amber,
+            }}
+          >
+            {session.status}
+          </span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export default function DashboardPage() {
+  const [stats, setStats] = useState({ students: 0, sessions: 0, pending: 0, instructors: 0 })
+  const [schoolId, setSchoolId] = useState('')
 
   useEffect(() => {
     async function load() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const sid = user.user_metadata?.school_id ?? user.id
-      setSchoolId(sid)
 
-      const today = new Date().toISOString().split('T')[0]
+      const { data: school } = await supabase
+        .from('schools')
+        .select('id')
+        .eq('owner_id', user.id)
+        .single()
 
-      const [{ data: studentsData }, { data: sessionsData }, { data: bookingsData }, { data: schoolData }] = await Promise.all([
-        supabase
-          .from('students_driver_ed')
-          .select('id, legal_name, created_at, driving_hours, certificate_issued_at')
-          .eq('school_id', sid)
-          .order('created_at', { ascending: false })
-          .limit(5),
-        supabase
-          .from('sessions')
-          .select('id, start_date, start_time, seats_booked, max_seats')
-          .eq('school_id', sid)
-          .eq('cancelled', false)
-          .gte('start_date', today)
-          .order('start_date', { ascending: true })
-          .limit(5),
-        supabase
-          .from('bookings')
-          .select('id, student_name, session_date, start_time, status')
-          .eq('school_id', sid)
-          .order('created_at', { ascending: false })
-          .limit(5),
-        supabase
-          .from('schools')
-          .select('subscription_status, stripe_customer_id')
-          .eq('id', sid)
-          .single(),
+      if (!school) return
+      setSchoolId(school.id)
+
+      const [{ count: students }, { count: sessions }, { count: instructors }] = await Promise.all([
+        supabase.from('students').select('*', { count: 'exact', head: true }).eq('school_id', school.id),
+        supabase.from('sessions').select('*', { count: 'exact', head: true }).eq('school_id', school.id),
+        supabase.from('instructors').select('*', { count: 'exact', head: true }).eq('school_id', school.id),
       ])
 
-      setStudents(studentsData ?? [])
-      setSessions(sessionsData ?? [])
-      setRecentBookings(bookingsData ?? [])
-      setSubscriptionStatus(schoolData?.subscription_status ?? 'trial')
-      setStripeCustomerId(schoolData?.stripe_customer_id ?? '')
-      setLoading(false)
+      setStats({
+        students: students || 0,
+        sessions: sessions || 0,
+        instructors: instructors || 0,
+        pending: 0,
+      })
     }
     load()
   }, [])
 
-  // Quick stats from sub-component
-  const quickActions = [
-    { href: '/school-admin/sessions', emoji: '📅', label: 'Sessions' },
-    { href: '/school-admin/calendar', emoji: '🗓️', label: 'Calendar' },
-    { href: '/school-admin/students', emoji: '🎓', label: 'Students' },
-    { href: '/school-admin/import', emoji: '📥', label: 'Import CSV' },
-    { href: '/school-admin/instructors', emoji: '👨‍🏫', label: 'Instructors' },
-    { href: '/school-admin/availability', emoji: '⏰', label: 'Availability' },
-  ]
-
   return (
-    <div className="p-6 max-w-4xl">
-      {/* Subscription status banner */}
-      {subscriptionStatus !== 'active' && (
-        <div className="mb-5 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-amber-400 text-lg">⚠️</span>
-            <div>
-              <div className="text-sm font-medium text-amber-300">
-                {subscriptionStatus === 'cancelled'
-                  ? 'Subscription cancelled'
-                  : subscriptionStatus === 'past_due'
-                    ? 'Payment past due — update billing'
-                    : 'Free trial active — subscribe to unlock all features'}
-              </div>
-              <div className="text-xs text-amber-400/60 mt-0.5">
-                {subscriptionStatus === 'trial' ? '3 months free, then $99/mo' : 'Contact support to restore access'}
-              </div>
-            </div>
-          </div>
-          <a
-            href={`/api/schools/billing-portal`}
-            className="text-xs bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 px-3 py-1.5 rounded-lg font-medium whitespace-nowrap"
-          >
-            {subscriptionStatus === 'trial' ? 'Subscribe now' : 'Update billing'}
-          </a>
+    <div className="max-w-5xl">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold mb-1" style={{ color: T.text }}>
+            Dashboard
+          </h1>
+          <p className="text-sm" style={{ color: T.muted }}>
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+          </p>
         </div>
-      )}
-
-      {/* Page title */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white mb-1">Dashboard</h1>
-        <p className="text-gray-400 text-sm">Welcome back — here's what's happening today.</p>
+        <Link
+          href="/school-admin/students"
+          className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl text-white"
+          style={{ background: T.grad }}
+        >
+          <Plus className="w-4 h-4" />
+          Add Student
+        </Link>
       </div>
 
-      {/* Stats row */}
-      <QuickStatsRow schoolId={schoolId} />
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatCard label="Active Students" value={stats.students} icon={Users} color={T.cyan} href="/school-admin/students" />
+        <StatCard label="Sessions" value={stats.sessions} icon={Calendar} color={T.green} href="/school-admin/sessions" />
+        <StatCard label="Instructors" value={stats.instructors} icon={TrendingUp} color={T.purple} href="/school-admin/instructors" />
+        <StatCard label="Pending TCA" value={stats.pending} icon={Clock} color={T.amber} href="/school-admin/students" />
+      </div>
 
-      {/* Quick actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.4 }}
-        className="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-5"
-      >
-        {quickActions.map(({ href, emoji, label }, i) => (
+      {/* Recent sessions */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-base font-semibold" style={{ color: T.text }}>Upcoming Sessions</h2>
           <Link
-            key={href}
-            href={href}
-            className="glass flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl hover:bg-white/[0.08] transition-all text-center group"
+            href="/school-admin/sessions"
+            className="text-xs font-medium flex items-center gap-1"
+            style={{ color: T.cyan }}
           >
-            <span className="text-lg">{emoji}</span>
-            <span className="text-xs text-gray-400 group-hover:text-white transition-colors">{label}</span>
-          </Link>
-        ))}
-      </motion.div>
-
-      {/* Recent activity */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.4 }}
-        className="mt-5"
-      >
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-semibold text-white text-sm">Recent Bookings</h2>
-          <Link href="/school-admin/sessions" className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1">
             View all <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
-
-        {loading ? (
-          <div className="glass rounded-xl p-5 space-y-3">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-10 bg-white/[0.04] rounded-lg animate-pulse" />
-            ))}
-          </div>
-        ) : recentBookings.length === 0 ? (
-          <div className="glass rounded-xl p-8 text-center">
-            <CalendarCheck className="w-8 h-8 text-gray-600 mx-auto mb-2" />
-            <p className="text-gray-500 text-sm">No recent bookings.</p>
-          </div>
+        {schoolId ? (
+          <RecentSessions schoolId={schoolId} />
         ) : (
-          <div className="glass rounded-xl overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-white/[0.06]">
-                  <th className="text-left text-xs text-gray-500 font-medium px-4 py-3">Student</th>
-                  <th className="text-left text-xs text-gray-500 font-medium px-4 py-3 hidden sm:table-cell">Date</th>
-                  <th className="text-left text-xs text-gray-500 font-medium px-4 py-3 hidden md:table-cell">Time</th>
-                  <th className="text-left text-xs text-gray-500 font-medium px-4 py-3">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/[0.04]">
-                {recentBookings.map((b) => (
-                  <tr key={b.id} className="hover:bg-white/[0.03] transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="text-white font-medium">{b.student_name}</div>
-                    </td>
-                    <td className="px-4 py-3 hidden sm:table-cell">
-                      <span className="text-gray-400">
-                        {b.session_date
-                          ? new Date(`${b.session_date}T12:00:00`).toLocaleDateString('en-US', {
-                              month: 'short', day: 'numeric',
-                            })
-                          : '—'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 hidden md:table-cell">
-                      <span className="text-gray-400">{b.start_time ?? '—'}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={b.status ?? 'pending'} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="text-center py-10" style={{ color: T.muted }}>
+            <p className="text-sm">Loading sessions...</p>
           </div>
         )}
-      </motion.div>
-
-      {/* Upcoming sessions + recent students side by side on larger screens */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
-        {/* Upcoming sessions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.4 }}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-white text-sm">Upcoming Sessions</h2>
-            <Link href="/school-admin/sessions" className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1">
-              Manage <ArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
-          {loading ? (
-            <div className="glass rounded-xl p-4 space-y-2">
-              {[1, 2].map(i => <div key={i} className="h-10 bg-white/[0.04] rounded-lg animate-pulse" />)}
-            </div>
-          ) : sessions.length === 0 ? (
-            <div className="glass rounded-xl p-6 text-center">
-              <Clock className="w-6 h-6 text-gray-600 mx-auto mb-1" />
-              <p className="text-gray-500 text-xs">No upcoming sessions.</p>
-            </div>
-          ) : (
-            <div className="glass rounded-xl overflow-hidden divide-y divide-white/[0.04]">
-              {sessions.map(s => (
-                <div key={s.id} className="px-4 py-3 flex items-center justify-between">
-                  <div>
-                    <div className="text-sm text-white font-medium">
-                      {new Date(`${s.start_date}T12:00:00`).toLocaleDateString('en-US', {
-                        weekday: 'short', month: 'short', day: 'numeric',
-                      })}{' '}
-                      at {s.start_time}
-                    </div>
-                    <div className="text-xs text-gray-500">{s.seats_booked}/{s.max_seats} seats booked</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </motion.div>
-
-        {/* Recent students */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.4 }}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-white text-sm">Recent Students</h2>
-            <Link href="/school-admin/students" className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1">
-              View all <ArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
-          {loading ? (
-            <div className="glass rounded-xl p-4 space-y-2">
-              {[1, 2].map(i => <div key={i} className="h-10 bg-white/[0.04] rounded-lg animate-pulse" />)}
-            </div>
-          ) : students.length === 0 ? (
-            <div className="glass rounded-xl p-6 text-center">
-              <GraduationCap className="w-6 h-6 text-gray-600 mx-auto mb-1" />
-              <p className="text-gray-500 text-xs">No students yet.</p>
-            </div>
-          ) : (
-            <div className="glass rounded-xl overflow-hidden divide-y divide-white/[0.04]">
-              {students.map(s => (
-                <div key={s.id} className="px-4 py-3 flex items-center justify-between">
-                  <div>
-                    <div className="text-sm text-white font-medium">{s.legal_name ?? 'Student'}</div>
-                    <div className="text-xs text-gray-500">
-                      {s.driving_hours ?? 0}h driven ·{' '}
-                      {s.certificate_issued_at
-                        ? <span className="text-emerald-400 flex items-center gap-0.5 inline"><CheckCircle className="w-3 h-3" /> Certified</span>
-                        : 'In progress'}
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-600">
-                    {new Date(s.created_at).toLocaleDateString()}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </motion.div>
       </div>
     </div>
   )
