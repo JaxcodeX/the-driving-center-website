@@ -160,7 +160,7 @@ export default function SchoolAdminDashboard() {
             </div>
           </div>
           <a
-            href={`https://billing.stripe.com/p/login/test_${stripeCustomerId}`}
+            href={`/api/schools/billing-portal`}
             className="text-xs bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 px-3 py-1.5 rounded-lg font-medium whitespace-nowrap"
           >
             {subscriptionStatus === 'trial' ? 'Subscribe now' : 'Update billing'}

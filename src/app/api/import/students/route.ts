@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
-import { encryptField, auditLog, validateDOB, validatePermitNumber } from '@/lib/security'
+import { encryptField, validateDOB, validatePermitNumber } from '@/lib/security'
 
 interface StudentRow {
   legal_name: string
@@ -71,9 +72,9 @@ function parseCSVLine(line: string): string[] {
   return result
 }
 
-// ── Auth: Session cookie (browser) OR Bearer token (API client) ─────────────
+// ── Auth: session cookie (browser) ──────────────────────────────────────────
 
-async function getSessionUser(request: Request) {
+async function getSessionUser(request: NextRequest) {
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -90,7 +91,7 @@ async function getSessionUser(request: Request) {
 
 // ── Import Handler ─────────────────────────────────────────────────────────
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const demoMode = process.env.DEMO_MODE === 'true'
 
   let schoolId = request.headers.get('x-school-id')
@@ -218,18 +219,6 @@ export async function POST(request: Request) {
     } catch (err: any) {
       results.errors.push(`Row ${i + 2}: ${err.message}`); results.failed++
     }
-  }
-
-  // Audit log — only in prod mode
-  if (!demoMode && userId && results.imported > 0) {
-    supabaseAdmin.from('audit_logs').insert(
-      auditLog('STUDENT_CSV_IMPORT', userId, {
-        school_id: schoolId,
-        total_rows: results.total,
-        imported: results.imported,
-        failed: results.failed,
-      })
-    ).then(() => {}).catch(() => {})
   }
 
   return NextResponse.json(results)
