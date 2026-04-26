@@ -25,7 +25,8 @@ export default function OnboardingPage() {
 function OnboardingFlow() {
   const params = useSearchParams()
   const schoolIdFromUrl = params.get('school_id')
-  const [step, setStep] = useState(1)
+  const stepFromUrl = parseInt(params.get('step') ?? '1', 10)
+  const [step, setStep] = useState(stepFromUrl)
   const [schoolSlug, setSchoolSlug] = useState('')
   const [schoolId, setSchoolId] = useState<string | null>(schoolIdFromUrl)
 
