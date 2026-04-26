@@ -23,6 +23,23 @@ Log result in WORKFLOW_LOG.md
 ```
 
 **If there's no SPEC.md, there's no implementation.**
+**Plans live in project files. Discord is for coordination only.**
+
+---
+
+## Sprint — Mark Martin Demo (7 Days)
+
+**Active spec:** `SPEC_ONE_WEEK_SPRINT.md`
+
+| Day | Goal |
+|---|---|
+| 1 | Critical infrastructure: migrations, RLS test, subscription middleware |
+| 2 | End-to-end flow: Zax clicks everything, document/fix failures |
+| 3 | UI polish: one-shot coding agent, consistent design tokens |
+| 4 | CSV import + school profile editor |
+| 5 | Demo script + 5 dry runs |
+| 6 | Buffer — fix anything from dry runs |
+| 7 | **DEMO TO MARK** |
 
 ---
 
@@ -36,7 +53,7 @@ Log result in WORKFLOW_LOG.md
 | **Mark** | Reviews architecture decisions, not code implementation |
 
 **Everest's job is not to write code — it's to write specs and review code.**
-DeepSeek generates the implementation. I review it. You approve it.
+DeepSeek generates the implementation. You approve it.
 
 ---
 
@@ -48,13 +65,11 @@ DeepSeek generates the implementation. I review it. You approve it.
 | Code generation | DeepSeek V4 Flash (deepseek-v4-flash) |
 | Web app | Next.js 16 + React 19 + TailwindCSS 4 |
 | Database | Supabase (PostgreSQL + RLS + Magic Links) |
-| Payments | Stripe ($99/mo subscription) |
-| Email | Resend (stub — needs key) |
-| SMS | Twilio (stub — needs key) |
+| Payments | Stripe ($99/mo subscription, DEMO_MODE bypass for demo) |
+| Email | Resend (live — `re_ZwCTERGk_8eesZtYHGkR32GPv6YAgEs2P`) |
+| SMS | Twilio (stub — not needed for MVP demo) |
 | Hosting | Vercel |
 | Automation | OpenClaw cron (no n8n) |
-
-**Coding agents: DeepSeek V4 Flash only.** Codex/Claude/pi are retired for this project.
 
 ---
 
@@ -62,55 +77,63 @@ DeepSeek generates the implementation. I review it. You approve it.
 
 ```
 the-driving-center-website/
-├── CLAUDE.md          ← THIS FILE — how we work
-├── STATUS.md         ← current state: what works, what's broken, what's next
-├── SPEC.md           ← current feature spec (one active spec at a time)
-├── WORKFLOW_LOG.md   ← every build cycle logged
-│
-├── src/app/          ← all routes + pages
+├── CLAUDE.md              ← THIS FILE — how we work
+├── STATUS.md             ← current state: what works, what's broken, what's next
+├── SPEC_ONE_WEEK_SPRINT  ← active sprint spec
+├── WORKFLOW_LOG.md       ← every build cycle logged
+├── src/app/              ← all routes + pages
 ├── src/lib/
 │   ├── supabase/
-│   ├── migrations/   ← SQL (run in Supabase SQL Editor)
+│   ├── migrations/       ← SQL (run in Supabase SQL Editor)
 │   ├── email-templates/
 │   └── security.ts
-│
-├── SPEC_P1_A_*.md    ← past feature specs (archived after cycle complete)
-├── SPEC_P1_B_*.md
-├── SPEC_P1_C_*.md
-├── SPEC_PHASE_2.md    ← Phase 2 spec
-└── SPEC_PHASE_3.md    ← Phase 3 spec
+├── tests/e2e/           ← automated tests
+└── SPEC_*.md            ← all specs (one active, rest archived)
 ```
 
-**Delete other .md files after reading:**
-`BUILD_PLAN.md`, `PROGRESS.md`, `DISCOVERIES.md`, `PROJECT_CONSTITUTION.md`, `OPERATIONS_LOG.md`, `OPERATIONS_MANUAL.md` — these are redundant, contradictory, and maintained nowhere. They are the Legos that spilled.
+**Delete these — redundant Legos that spilled:**
+`BUILD_PLAN.md`, `PROGRESS.md`, `DISCOVERIES.md`, `PROJECT_CONSTITUTION.md`, `OPERATIONS_LOG.md`, `OPERATIONS_MANUAL.md`, `SPEC_WEBSITE_OVERHAUL.md`
 
 ---
 
-## SPEC.md Template
+## Design Tokens (Locked — Every Page Uses These)
 
-```markdown
-# SPEC.md — [Feature Name]
+| Token | Hex | Usage |
+|---|---|---|
+| bg | `#050505` | Page background |
+| surface | `#0D0D0D` | Cards, panels |
+| elevated | `#18181b` | Inputs, hover |
+| border | `#1A1A1A` | Card borders |
+| borderLt | `#27272a` | Hover borders |
+| text | `#FFFFFF` | Primary text |
+| secondary | `#94A3B8` | Secondary text |
+| muted | `#52525b` | Placeholders |
+| body | `#5C6370` | Body text |
+| blue | `#006FFF` | Primary accent |
+| cyan | `#38BDF8` | Secondary accent |
+| purple | `#818CF8` | Gradient |
+| green | `#10B981` | Success |
+| amber | `#f59e0b` | Warnings |
 
-## What it does (one sentence)
-## How it works (data flow)
-## API shapes (request/response)
-## Edge cases
-## Success criteria
-## Files to change
-## Out of scope
-```
+**Buttons:**
+- Primary: `background: #006FFF`, `border-radius: 12px`, `box-shadow: 0 4px 30px rgba(0,111,255,0.25)`
+- Secondary: `background: #18181b`, `border: 1px solid #1A1A1A`, `border-radius: 12px`
+- Hover: `transform: scale(1.02)`, `150ms ease`
+
+**Typography:** Inter via `next/font/google`, H1 60-72px bold -0.02em tracking, body 16-18px 1.6 line-height
 
 ---
 
-## Test Framework (Automated, One Command)
+## Security Rules (Non-Negotiable)
 
-Run all tests:
-```bash
-cd ~/projects/the-driving-center-website
-npm run test:e2e
-```
+Every API route must have:
+- [ ] Auth check (`getUser()`)
+- [ ] Ownership check (does this school own this data?)
+- [ ] PII encrypted at write, stripped at read
+- [ ] Input validation
+- [ ] `school_id` in every WHERE clause
 
-All tests live in `tests/e2e/`. Each test hits a real API endpoint with dummy data and verifies the response.
+**Never:** skip ownership check, log PII, allow cross-tenant access, pass real keys to client.
 
 ---
 
@@ -125,17 +148,3 @@ Result: passed / failed / partial
 Failures: [what went wrong]
 Next action: [what we do next]
 ```
-
----
-
-## Security Rules (Non-Negotiable)
-
-Every API route must have:
-- [ ] Auth check (`getUser()`)
-- [ ] Ownership check (does this school own this data?)
-- [ ] PII encrypted at write, stripped at read
-- [ ] Input validation
-- [ ] Audit log on all writes
-- [ ] `school_id` in every WHERE clause
-
-Never: skip ownership check, log PII, allow cross-tenant access, pass real keys to client.

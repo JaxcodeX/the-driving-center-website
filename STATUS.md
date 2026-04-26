@@ -1,89 +1,96 @@
 # STATUS.md — The Driving Center SaaS
-**Updated: 2026-04-26** (honest audit)
+**Updated: 2026-04-26**
 
 ---
 
-## What Works Right Now
+## Demo Site
 
-**Signup → Dashboard (DEMO_MODE):**
-- ✅ School signup → creates real school in Supabase → redirect to onboarding
-- ✅ Onboarding flow steps 1-4 working end-to-end
-- ✅ Step 5 (First Session) creates session via DEMO_MODE bypass
-- ✅ Student booking wizard (5-step, Stripe checkout)
-- ✅ School admin dashboard (overview, students, sessions, calendar, instructors, availability)
-- ✅ TCA certificate issuance (students with ≥30h classroom + ≥6h driving)
-- ✅ 48h + 4h email/SMS reminders (stub mode)
-- ✅ Magic link auth (Supabase)
-
-**Demo site live:** `the-driving-center-website-nbohurmrb-jaxcodexs-projects.vercel.app`
+**Live:** `the-driving-center-website.vercel.app`
+**GitHub:** `github.com/JaxcodeX/the-driving-center-website`
+**Branch:** `main` (auto-deploys to Vercel on push)
 
 ---
 
-## What's Broken
+## What Works
 
-| Issue | Impact | Fix |
+### Auth & Multi-Tenancy
+- ✅ Supabase Magic Links (no password auth)
+- ✅ RLS policies — school_id injected on every query
+- ✅ Session cookies via `@supabase/ssr`
+- ✅ DEMO_MODE bypasses Stripe (demo keeps working without real payments)
+
+### Core Flow (verified end-to-end)
+- ✅ School signup → creates real record in Supabase
+- ✅ Redirect to `/onboarding?school=<slug>`
+- ✅ Onboarding 4-step wizard: school info → instructor → session type → done
+- ✅ School admin dashboard
+- ✅ Student CRUD (add, edit, search)
+- ✅ Session CRUD (schedule, confirm/cancel)
+- ✅ TCA compliance tracking (≥30h classroom + ≥6h driving → certificate)
+- ✅ Email confirmations via Resend (live, real emails send)
+
+### UI Pages
+- ✅ `/` — Marketing homepage (dark, blue glow CTA, bento grid)
+- ✅ `/login` — Magic link auth
+- ✅ `/signup` — School registration
+- ✅ `/onboarding` — 4-step setup wizard
+- ✅ `/school-admin` — Dashboard home
+- ✅ `/school-admin/students` — Table + add modal
+- ✅ `/school-admin/instructors` — Card grid + invite modal
+- ✅ `/school-admin/sessions` — List with date blocks + status toggle
+- ✅ `/school-admin/calendar` — Monthly grid view
+- ✅ `/school-admin/billing` — Status banner + Stripe portal link
+
+### Infrastructure
+- ✅ Subscription status middleware (redirects canceled/past_due to billing)
+- ✅ Webhook idempotency (`processed_stripe_events` table)
+- ✅ `safe_increment_seats()` (migration 007)
+
+---
+
+## What Needs Fixing
+
+| Item | Impact | Fix |
 |---|---|---|
-| RLS cross-school access never tested | School A could read School B data | Manual SQL test in Supabase SQL Editor |
-| `processed_stripe_events` table doesn't exist yet | Webhook idempotency not active in prod | Run migration 008 |
-| `safe_increment_seats()` migration not run | Seats double-booking possible | Run migration 007 |
-| Subscription status not enforced | Canceled schools still access dashboard | Build + deploy middleware |
-| CSV import is a stub | Schools can't bulk-import students | Build it (Phase 2) |
-| Email/SMS stubs only | Reminders don't actually send | Add Resend/Twilio keys |
+| `/api/reminders` Prisma error | Cron sends 0 reminders | Fix raw SQL JOIN in reminders route |
+| Zax hasn't tested full flow | Unknown broken paths | Day 2: full end-to-end test |
+| Migrations 007+008 | Not confirmed run by Zax | Verify in Supabase SQL Editor |
 
 ---
 
-## What's Pending (Phase 1D — Criticals)
+## What Needs Building
 
-Remaining fixes before the product is demo-ready for a real prospect:
-
-1. **Run SQL migrations** (you, in Supabase SQL Editor):
-   - `008_processed_stripe_events.sql` — webhook idempotency
-   - `007_safe_seats_increment.sql` — seats race condition protection
-
-2. **Build subscription status middleware** — redirect canceled/past_due schools to billing
-
-3. **Test RLS** — create two test schools, try cross-school query with wrong school_id
-
-4. **Wire email/SMS** — add RESEND_API_KEY + Twilio keys to Vercel, enable real reminders
-
-5. **CSV import** — real file parsing + student creation
+| Item | Priority | Day |
+|---|---|---|
+| CSV import (`/school-admin/import`) | High | 4 |
+| School profile editor (`/school-admin/profile`) | Medium | 4 |
+| Instructor availability UI | Low | After demo |
+| SMS reminders | Low | After demo (email MVP fine) |
 
 ---
 
-## Phase Roadmap
+## Sprint: Mark Martin Demo (7 Days)
+
+See `SPEC_ONE_WEEK_SPRINT.md` for full day-by-day plan.
 
 ```
-Phase 0     ✅  Core MVP built + DEMO_MODE working
-Phase 1D    ⏳  Critical security/infrastructure fixes (we are here)
-Phase 2     ⏳  Student intake + CSV import + instructor flows
-Phase 3     ⏳  Real Stripe wiring + first paying school
-Phase 4     ⏳  Outreach (B.L.A.S.T. cold email)
+Day 1: Critical infrastructure (Everest)
+Day 2: End-to-end test + fix (Zax + Everest)
+Day 3: UI polish — one-shot coding agent build
+Day 4: CSV import + profile editor
+Day 5: Demo script + 5 dry runs
+Day 6: Buffer
+Day 7: DEMO TO MARK
 ```
 
 ---
 
-## What Needs To Happen Before First Customer
+## Stack (Locked)
 
-**You (Zax) must do:**
-- Run migration 007 + 008 in Supabase SQL Editor (5 min)
-- Complete Stripe test account onboarding (`charges_enabled: true`)
-- Get Resend API key for real email reminders (free tier: 100/day)
-- Get Twilio account for real SMS (optional, email-only MVP fine)
-
-**Everest must build:**
-- Subscription status middleware
-- CSV import (real parsing)
-- RLS test + fix if broken
-- Ops panel hardening
-
----
-
-## Who Approves What
-
-| Decision | Who |
+| Component | Value |
 |---|---|
-| Architecture (stack, schema) | Mark or Everest |
-| Feature spec | Everest → Zax reviews |
-| Code review | Everest |
-| Go/no-go on first customer | Zax |
-| Marketing message | Zax |
+| Supabase project | `evswdlsqlaztvajibgta` |
+| Resend API key | `re_ZwCTERGk_8eesZtYHGkR32GPv6YAgEs2P` (live) |
+| DeepSeek API key | `sk-7c4c86239406412ba3385f32db8b959d` ($5 credit) |
+| Stripe account | `jaxcodewe@protonmail.com` (test mode) |
+| Vercel project ID | `prj_V4Pu15pN58SyW7t86wwPkJUORizI` |
