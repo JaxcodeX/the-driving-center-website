@@ -1,65 +1,92 @@
 'use client'
 
 import Link from 'next/link'
+import { motion } from 'framer-motion'
+import {
+  Calendar, Users, Shield, Bell, Clock, CheckCircle, ArrowRight,
+  Menu, X, CreditCard, TrendingUp, BarChart3, Star, ChevronDown, Zap
+} from 'lucide-react'
 import { useState } from 'react'
-import { CheckCircle, ArrowRight, Menu, X } from 'lucide-react'
+
+// ── Design Tokens (from PREMIUM_DESIGN_SYSTEM.md) ──────────────────────────────
+const TOKEN = {
+  bg:         '#09090b',
+  surface:    '#18181b',
+  surface2:   '#27272a',
+  border:     '#3f3f46',
+  text:       '#fafafa',
+  muted:      '#a1a1aa',
+  subtle:     '#52525b',
+  accent:     '#3b82f6',
+  accent2:    '#8b5cf6',
+  success:    '#22c55e',
+}
 
 const FEATURES = [
   {
-    title: 'Automated SMS Reminders',
-    description: 'Students get 48h and 4h reminders so they never miss a lesson. No-shows drop to zero.',
-    color: 'text-cyan-600',
-    bg: 'bg-cyan-50',
-    border: 'border-cyan-100',
-    iconBg: 'bg-cyan-100',
-    icon: '📱',
-  },
-  {
+    icon: Calendar,
     title: 'Online Booking & Scheduling',
-    description: 'Students book 24/7 from your custom page. Instructors set their own availability.',
-    color: 'text-blue-600',
-    bg: 'bg-blue-50',
-    border: 'border-blue-100',
-    iconBg: 'bg-blue-100',
-    icon: '📅',
+    description: 'Students book 24/7 from your custom page. Instructors set their own availability — no back-and-forth texts.',
+    color: TOKEN.accent,
   },
   {
-    title: 'TCA Compliance Tracking',
-    description: 'Classroom and driving hours tracked automatically. Certificates issue when requirements are met.',
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-100',
-    iconBg: 'bg-emerald-100',
-    icon: '🛡️',
+    icon: Bell,
+    title: 'Automated Reminders',
+    description: '48h and 4h SMS + email reminders fire automatically. No-shows drop to near zero.',
+    color: '#f59e0b',
+  },
+  {
+    icon: Shield,
+    title: 'TCA Compliance',
+    description: 'Classroom and driving hours tracked in real time. Certificates issue the moment Tennessee requirements are met.',
+    color: TOKEN.success,
+  },
+  {
+    icon: Users,
+    title: 'Student Management',
+    description: 'Import your entire roster in one CSV. Track every student\'s progress from enrollment to certification.',
+    color: TOKEN.accent2,
+  },
+  {
+    icon: CreditCard,
+    title: 'Stripe Payments',
+    description: 'Students pay when they book. Funds go direct to your bank — we never hold money.',
+    color: '#f59e0b',
+  },
+  {
+    icon: BarChart3,
+    title: 'Progress Dashboard',
+    description: 'Real-time view of every student. Hours, status, and upcoming sessions — all in one place.',
+    color: TOKEN.accent,
   },
 ]
 
-const HOW_IT_WORKS = [
+const HOW_STEPS = [
   {
-    step: '1',
+    num: '01',
     title: 'Import your students',
-    description: 'Upload your existing list in one CSV. Name, email, phone — all in.',
+    description: 'Upload a CSV or add them manually. Everything — name, email, phone — in under a minute.',
   },
   {
-    step: '2',
-    title: 'Set your schedule',
-    description: 'Instructors add their availability. Students pick a time that works for them.',
+    num: '02',
+    title: 'Set instructor availability',
+    description: 'Each instructor logs in and blocks out the times they\'re available. Students see only open slots.',
   },
   {
-    step: '3',
+    num: '03',
     title: 'Get paid automatically',
-    description: 'Students pay via Stripe when they book. Funds go straight to your bank.',
+    description: 'Students book and pay in advance. Sessions are confirmed instantly. You focus on teaching.',
   },
 ]
 
-const PRICING_TIERS = [
+const PRICING = [
   {
     name: 'Starter',
     price: '99',
     description: 'Up to 3 instructors, 50 students',
     features: [
       'Unlimited bookings',
-      'Automated SMS + email reminders',
+      'SMS + email reminders',
       'TCA compliance tracking',
       'Certificate issuance',
       'CSV student import',
@@ -67,7 +94,7 @@ const PRICING_TIERS = [
       'Email support',
     ],
     cta: 'Start free trial',
-    highlight: false,
+    popular: false,
   },
   {
     name: 'Growth',
@@ -82,7 +109,7 @@ const PRICING_TIERS = [
       'API access',
     ],
     cta: 'Start free trial',
-    highlight: true,
+    popular: true,
   },
   {
     name: 'Enterprise',
@@ -97,341 +124,676 @@ const PRICING_TIERS = [
       'SLA guarantee',
     ],
     cta: 'Contact sales',
-    highlight: false,
+    popular: false,
   },
 ]
 
 const FAQS = [
-  { q: 'What happens if a student is a no-show?', a: 'Students are reminded twice (48h and 4h) before their lesson. You can mark a session as no-show and optionally configure a no-show policy. The reminder system dramatically reduces no-shows.' },
-  { q: 'Does this handle Tennessee TCA compliance?', a: 'Yes. The TCA (Traffic Safety Education) compliance module tracks classroom hours and behind-the-wheel hours. Certificates issue automatically when Tennessee state requirements are met.' },
-  { q: 'Are SMS reminders included? What do they cost?', a: 'SMS reminders are included in all plans. Standard messaging rates from Twilio apply (about 1–2 cents per message). We pass through actual costs with no markup.' },
-  { q: 'Is our student data secure?', a: 'Yes. All student data is encrypted at rest. We use row-level security in Supabase so each school only sees their own data. We are SOC 2 compliant.' },
-  { q: 'Can I cancel anytime?', a: 'Yes. Month-to-month, no contracts. Cancel from your dashboard in two clicks. No fees, no questions.' },
+  { q: 'What if a student is a no-show?', a: 'Students receive two reminders (48h and 4h before) to drastically cut no-shows. You can mark a session as no-show from the dashboard and optionally configure a policy.' },
+  { q: 'Does this handle Tennessee TCA compliance?', a: 'Yes. The TCA module tracks classroom hours and behind-the-wheel hours. Certificates generate automatically when state requirements are met.' },
+  { q: 'What do SMS messages cost?', a: 'SMS reminders are included. Twilio messaging rates apply (~$0.01–0.02 per message) — we pass actual costs through with zero markup.' },
+  { q: 'Is our student data secure?', a: 'Yes. Data is encrypted at rest and in transit. Row-level security in Supabase ensures each school only sees their own data. We are SOC 2 compliant.' },
+  { q: 'Can I cancel anytime?', a: 'Yes. Month-to-month, no contracts. Cancel from your dashboard in two clicks — no fees, no calls required.' },
 ]
 
+// ── Animation Variants ────────────────────────────────────────────────────────
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  show:   { opacity: 1, y: 0 },
+}
+const container = {
+  hidden: {},
+  show:   { transition: { staggerChildren: 0.075 } },
+}
+
+// ── Product Mockup (Right side of hero) ───────────────────────────────────────
+function ProductMockup() {
+  return (
+    <div className="relative">
+      <div
+        className="rounded-2xl overflow-hidden border"
+        style={{
+          borderColor: TOKEN.border,
+          boxShadow: `0 25px 60px rgba(0,0,0,0.6), 0 0 0 1px ${TOKEN.border}`,
+          transform: 'perspective(1200px) rotateY(-6deg) rotateX(3deg)',
+        }}
+      >
+        {/* Browser chrome */}
+        <div className="flex items-center gap-1.5 px-4 py-3" style={{ background: TOKEN.surface2 }}>
+          <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#ef4444' }} />
+          <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#f59e0b' }} />
+          <div className="w-2.5 h-2.5 rounded-full" style={{ background: TOKEN.success }} />
+          <div className="flex-1 mx-3 h-5 rounded-md" style={{ background: TOKEN.surface }} />
+        </div>
+        {/* App UI */}
+        <div style={{ background: TOKEN.bg }}>
+          {/* Sidebar */}
+          <div className="flex">
+            <div className="w-40 py-5 px-3 border-r" style={{ borderColor: TOKEN.border, background: TOKEN.surface }}>
+              <div className="w-7 h-7 rounded-lg mb-5" style={{ background: `linear-gradient(135deg,${TOKEN.accent},${TOKEN.accent2})` }} />
+              {[
+                { icon: '▣', label: 'Dashboard', active: true },
+                { icon: '◉', label: 'Students' },
+                { icon: '⊕', label: 'Sessions' },
+                { icon: '◎', label: 'Calendar' },
+                { icon: '⚙', label: 'Settings' },
+              ].map(({ label, active }) => (
+                <div
+                  key={label}
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg mb-0.5 text-xs"
+                  style={{
+                    color: active ? TOKEN.text : TOKEN.subtle,
+                    background: active ? `${TOKEN.accent}18` : 'transparent',
+                    fontWeight: active ? 600 : 400,
+                  }}
+                >
+                  <div className="w-4 h-4 rounded" style={{ background: active ? TOKEN.accent : TOKEN.subtle, opacity: 0.5 }} />
+                  {label}
+                </div>
+              ))}
+            </div>
+            {/* Main content */}
+            <div className="flex-1 p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <div className="text-sm font-semibold" style={{ color: TOKEN.text }}>Good morning, Mark</div>
+                  <div className="text-xs" style={{ color: TOKEN.subtle }}>Monday, April 26</div>
+                </div>
+                <div className="w-7 h-7 rounded-full" style={{ background: TOKEN.accent }} />
+              </div>
+              {/* Stats row */}
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                {[
+                  { label: 'Active Students', val: '24', color: TOKEN.accent },
+                  { label: 'Sessions Today', val: '6', color: TOKEN.success },
+                  { label: 'Pending TCA', val: '3', color: '#f59e0b' },
+                ].map(({ label, val, color }) => (
+                  <div key={label} className="rounded-xl p-2.5" style={{ background: TOKEN.surface }}>
+                    <div className="text-lg font-bold" style={{ color }}>{val}</div>
+                    <div className="text-xs" style={{ color: TOKEN.subtle }}>{label}</div>
+                  </div>
+                ))}
+              </div>
+              {/* Recent sessions */}
+              <div className="space-y-1.5">
+                <div className="text-xs font-semibold" style={{ color: TOKEN.muted }}>Upcoming Sessions</div>
+                {[
+                  { student: 'Alex M.', time: '9:00 AM', status: 'Confirmed', color: TOKEN.success },
+                  { student: 'Jordan K.', time: '11:00 AM', status: 'Confirmed', color: TOKEN.success },
+                  { student: 'Taylor R.', time: '2:00 PM', status: 'Pending', color: '#f59e0b' },
+                ].map(({ student, time, status, color }) => (
+                  <div key={student} className="flex items-center justify-between rounded-lg px-3 py-2" style={{ background: TOKEN.surface }}>
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full" style={{ background: TOKEN.surface2 }} />
+                      <span className="text-xs font-medium" style={{ color: TOKEN.text }}>{student}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs" style={{ color: TOKEN.subtle }}>{time}</span>
+                      <span className="text-xs px-1.5 py-0.5 rounded-full font-medium" style={{ background: `${color}18`, color }}>{status}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Floating badge */}
+      <div
+        className="absolute -bottom-4 -left-6 flex items-center gap-2 px-3 py-2 rounded-xl"
+        style={{ background: TOKEN.surface2, border: `1px solid ${TOKEN.border}`, boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}
+      >
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${TOKEN.success}20` }}>
+          <CheckCircle className="w-4 h-4" style={{ color: TOKEN.success }} />
+        </div>
+        <div>
+          <div className="text-xs font-semibold" style={{ color: TOKEN.text }}>Certificate issued</div>
+          <div className="text-xs" style={{ color: TOKEN.subtle }}>Jordan K. — just now</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans">
-      {/* ── NAV ───────────────────────────────────── */}
-      <header className="sticky top-0 z-50 bg-white/95 border-b border-gray-100 backdrop-blur-sm">
+    <div className="min-h-screen text-white font-sans" style={{ background: TOKEN.bg }}>
+      {/* ── NAV ────────────────────────────────────────────────────── */}
+      <header
+        className="sticky top-0 z-50 border-b"
+        style={{
+          background: 'rgba(9,9,11,0.85)',
+          backdropFilter: 'blur(20px)',
+          borderColor: TOKEN.border,
+        }}
+      >
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold" style={{ background: 'linear-gradient(135deg,#06b6d4,#2563eb)' }}>DC</div>
-            <span className="text-sm font-semibold text-gray-900 tracking-tight">The Driving Center</span>
+            <div
+              className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold"
+              style={{ background: `linear-gradient(135deg,${TOKEN.accent},${TOKEN.accent2})` }}
+            >
+              DC
+            </div>
+            <span className="text-sm font-semibold tracking-tight">The Driving Center</span>
           </Link>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Features</a>
-            <a href="#how-it-works" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">How it works</a>
-            <a href="#pricing" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Pricing</a>
-            <a href="#faq" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">FAQ</a>
+            {[
+              { label: 'Features', href: '#features' },
+              { label: 'How it works', href: '#how' },
+              { label: 'Pricing', href: '#pricing' },
+              { label: 'FAQ', href: '#faq' },
+            ].map(({ label, href }) => (
+              <a
+                key={href}
+                href={href}
+                className="text-sm font-medium transition-colors"
+                style={{ color: TOKEN.muted }}
+                onMouseEnter={e => (e.currentTarget.style.color = TOKEN.text)}
+                onMouseLeave={e => (e.currentTarget.style.color = TOKEN.muted)}
+              >
+                {label}
+              </a>
+            ))}
           </nav>
 
           {/* CTA */}
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/login" className="text-sm text-gray-500 hover:text-gray-900 transition-colors px-3 py-1.5">
+            <Link
+              href="/login"
+              className="text-sm font-medium px-3 py-1.5 transition-colors"
+              style={{ color: TOKEN.muted }}
+            >
               Log in
             </Link>
             <Link
               href="/signup"
-              className="text-sm font-semibold text-white px-5 py-2.5 rounded-xl transition-all shadow-sm"
-              style={{ background: 'linear-gradient(135deg,#06b6d4,#2563eb)' }}
+              className="text-sm font-semibold text-white px-5 py-2.5 rounded-xl transition-all"
+              style={{
+                background: `linear-gradient(135deg,${TOKEN.accent},${TOKEN.accent2})`,
+                boxShadow: `0 0 24px rgba(59,130,246,0.3)`,
+              }}
             >
               Start free trial
             </Link>
           </div>
 
-          {/* Mobile menu button */}
-          <button className="md:hidden p-2 text-gray-500" onClick={() => setMobileOpen(v => !v)}>
+          {/* Mobile toggle */}
+          <button
+            className="md:hidden p-2"
+            style={{ color: TOKEN.muted }}
+            onClick={() => setMobileOpen(v => !v)}
+          >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
 
         {/* Mobile nav */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-gray-100 bg-white px-6 py-4 space-y-3">
-            <a href="#features" className="block text-sm text-gray-600 py-1" onClick={() => setMobileOpen(false)}>Features</a>
-            <a href="#how-it-works" className="block text-sm text-gray-600 py-1" onClick={() => setMobileOpen(false)}>How it works</a>
-            <a href="#pricing" className="block text-sm text-gray-600 py-1" onClick={() => setMobileOpen(false)}>Pricing</a>
-            <a href="#faq" className="block text-sm text-gray-600 py-1" onClick={() => setMobileOpen(false)}>FAQ</a>
-            <Link href="/signup" className="block text-sm font-semibold text-white text-center py-2.5 rounded-xl mt-2" style={{ background: 'linear-gradient(135deg,#06b6d4,#2563eb)' }} onClick={() => setMobileOpen(false)}>
+          <div
+            className="md:hidden border-t py-4 px-6 space-y-1"
+            style={{ background: TOKEN.surface, borderColor: TOKEN.border }}
+          >
+            {[
+              { label: 'Features', href: '#features' },
+              { label: 'How it works', href: '#how' },
+              { label: 'Pricing', href: '#pricing' },
+              { label: 'FAQ', href: '#faq' },
+            ].map(({ label, href }) => (
+              <a
+                key={href}
+                href={href}
+                className="block text-sm font-medium py-2"
+                style={{ color: TOKEN.muted }}
+                onClick={() => setMobileOpen(false)}
+              >
+                {label}
+              </a>
+            ))}
+            <Link
+              href="/signup"
+              className="block text-center text-sm font-semibold text-white py-2.5 rounded-xl mt-3"
+              style={{ background: `linear-gradient(135deg,${TOKEN.accent},${TOKEN.accent2})` }}
+              onClick={() => setMobileOpen(false)}
+            >
               Start free trial
             </Link>
           </div>
         )}
       </header>
 
-      {/* ── HERO ───────────────────────────────────── */}
-      <section className="relative pt-20 pb-24 overflow-hidden">
-        {/* Subtle top gradient */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% -5%, rgba(6,182,212,0.07) 0%, transparent 70%)' }} />
-
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          {/* Eyebrow */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-8 text-xs font-medium bg-cyan-50 text-cyan-700 border border-cyan-100">
-            <div className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
-            Built for Tennessee driving schools
-          </div>
-
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-gray-900 leading-tight mb-6" style={{ letterSpacing: '-0.025em' }}>
-            Run your driving school<br />
-            <span className="text-transparent" style={{ WebkitTextStroke: '1px rgba(6,182,212,0.6)', WebkitTextFillColor: 'transparent', background: 'linear-gradient(135deg,#06b6d4,#2563eb)', WebkitBackgroundClip: 'text', backgroundClip: 'text' }}>
-              without the chaos.
-            </span>
-          </h1>
-
-          <p className="text-lg text-gray-500 max-w-xl mx-auto mb-10 leading-relaxed">
-            Online booking. Automated reminders. Student progress tracking. TCA compliance.
-            One flat price — no per-seat fees.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
-            <Link
-              href="/signup"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-white px-8 py-3.5 rounded-xl transition-all shadow-md"
-              style={{ background: 'linear-gradient(135deg,#06b6d4,#2563eb)', boxShadow: '0 4px 20px rgba(6,182,212,0.3)' }}
-            >
-              Start free trial
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <a
-              href="#how-it-works"
-              className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 px-8 py-3.5 rounded-xl transition-all bg-gray-50 border border-gray-200 hover:bg-gray-100"
-            >
-              See how it works
-            </a>
-          </div>
-
-          {/* Trust badge */}
-          <div className="flex items-center justify-center gap-1.5 text-sm text-gray-400">
-            <CheckCircle className="w-4 h-4 text-emerald-400" />
-            <span>No credit card required</span>
-            <span className="text-gray-200">·</span>
-            <span>Setup in under an hour</span>
-            <span className="text-gray-200">·</span>
-            <span>Cancel anytime</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ── FEATURES ───────────────────────────────── */}
-      <section id="features" className="py-24 bg-gray-50 border-y border-gray-100">
+      {/* ── HERO ──────────────────────────────────────────────────── */}
+      <section className="pt-20 pb-32">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <p className="text-xs font-semibold uppercase tracking-widest text-cyan-600 mb-3">Features</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
-              Everything you need. Nothing you don&apos;t.
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {FEATURES.map(({ title, description, bg, border, iconBg, icon, color }) => (
-              <div
-                key={title}
-                className={`${bg} ${border} border rounded-2xl p-7`}
-              >
-                <div className={`w-11 h-11 ${iconBg} rounded-xl flex items-center justify-center text-2xl mb-5`}>
-                  {icon}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            {/* LEFT — Copy */}
+            <motion.div variants={container} initial="hidden" animate="show">
+              {/* Eyebrow */}
+              <motion.div variants={fadeUp}>
+                <div
+                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest mb-8"
+                  style={{
+                    background: `${TOKEN.accent}15`,
+                    border: `1px solid ${TOKEN.accent}30`,
+                    color: TOKEN.accent,
+                  }}
+                >
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: TOKEN.accent }} />
+                  Built for Tennessee driving schools
                 </div>
-                <h3 className={`text-base font-semibold ${color} mb-2`}>{title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
-              </div>
-            ))}
-          </div>
+              </motion.div>
 
-          {/* Additional features row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-            {[
-              { icon: '👨‍🏫', title: 'Instructor Management', desc: 'Invite instructors, let them set their own availability. You manage — not micromanage.', color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100', iconBg: 'bg-violet-100' },
-              { icon: '📊', title: 'Progress Dashboard', desc: 'Real-time view of every student. Classroom hours, driving hours, and TCA status at a glance.', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100', iconBg: 'bg-amber-100' },
-              { icon: '💳', title: 'Stripe Payments', desc: 'Students pay when they book. Funds go directly to your bank account. We never hold money.', color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100', iconBg: 'bg-indigo-100' },
-            ].map(({ icon, title, desc, color, bg, border, iconBg }) => (
-              <div key={title} className={`${bg} ${border} border rounded-2xl p-7`}>
-                <div className={`w-11 h-11 ${iconBg} rounded-xl flex items-center justify-center text-2xl mb-5`}>{icon}</div>
-                <h3 className={`text-base font-semibold ${color} mb-2`}>{title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{desc}</p>
-              </div>
-            ))}
+              {/* Headline */}
+              <motion.div variants={fadeUp}>
+                <h1
+                  className="font-bold tracking-tight leading-[0.97] mb-6"
+                  style={{ fontSize: 'clamp(2.75rem, 5vw, 4.5rem)', letterSpacing: '-0.025em' }}
+                >
+                  Run your driving school{' '}
+                  <span
+                    style={{
+                      background: `linear-gradient(135deg,${TOKEN.accent},${TOKEN.accent2})`,
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                    }}
+                  >
+                    without the chaos.
+                  </span>
+                </h1>
+              </motion.div>
+
+              {/* Sub */}
+              <motion.div variants={fadeUp}>
+                <p
+                  className="text-lg leading-relaxed mb-10"
+                  style={{ color: TOKEN.muted, maxWidth: '28rem' }}
+                >
+                  Online booking. Automated reminders. Student tracking. TCA compliance.
+                  One flat price — no per-seat fees, no phone tag.
+                </p>
+              </motion.div>
+
+              {/* CTAs */}
+              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 mb-10">
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-white px-8 py-4 rounded-xl"
+                  style={{
+                    background: `linear-gradient(135deg,${TOKEN.accent},${TOKEN.accent2})`,
+                    boxShadow: `0 0 40px rgba(59,130,246,0.35)`,
+                  }}
+                >
+                  Start free trial
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <a
+                  href="#how"
+                  className="inline-flex items-center justify-center gap-2 text-sm font-medium px-8 py-4 rounded-xl"
+                  style={{
+                    background: TOKEN.surface,
+                    border: `1px solid ${TOKEN.border}`,
+                    color: TOKEN.muted,
+                  }}
+                >
+                  See how it works
+                </a>
+              </motion.div>
+
+              {/* Trust */}
+              <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                {[
+                  'No credit card required',
+                  'Setup in under an hour',
+                  'Cancel anytime',
+                ].map(badge => (
+                  <div key={badge} className="flex items-center gap-1.5 text-sm" style={{ color: TOKEN.subtle }}>
+                    <CheckCircle className="w-3.5 h-3.5" style={{ color: TOKEN.success }} />
+                    {badge}
+                  </div>
+                ))}
+              </motion.div>
+            </motion.div>
+
+            {/* RIGHT — Product mockup */}
+            <motion.div
+              initial={{ opacity: 0, x: 32 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+              className="hidden lg:block"
+            >
+              <ProductMockup />
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ─────────────────────────────── */}
-      <section id="how-it-works" className="py-24">
+      {/* ── LOGO BAR ────────────────────────────────────────────────── */}
+      <div
+        className="py-12 border-y"
+        style={{ borderColor: `${TOKEN.border}50` }}
+      >
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <p
+            className="text-xs font-semibold uppercase tracking-widest mb-8"
+            style={{ color: TOKEN.subtle }}
+          >
+            Trusted by driving schools across Tennessee
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-3">
+            {['Oneida', 'Knoxville', 'Crossville', 'Jamestown', 'Huntsville', 'Cookeville'].map(city => (
+              <span key={city} className="text-sm font-semibold tracking-wide" style={{ color: TOKEN.subtle }}>
+                {city}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── FEATURES ───────────────────────────────────────────────── */}
+      <section id="features" className="py-32">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <p className="text-xs font-semibold uppercase tracking-widest text-cyan-600 mb-3">How it works</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
+          {/* Section header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-16"
+          >
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: `${TOKEN.accent}cc` }}>
+              Features
+            </p>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight" style={{ color: TOKEN.text }}>
+              Everything you need.{' '}
+              <span style={{ color: TOKEN.muted }}>Nothing you don&apos;t.</span>
+            </h2>
+          </motion.div>
+
+          {/* Cards grid */}
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            variants={container}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+          >
+            {FEATURES.map(({ icon: Icon, title, description, color }) => (
+              <motion.div
+                key={title}
+                variants={fadeUp}
+                className="group rounded-2xl p-8 border transition-all duration-200 cursor-default"
+                style={{
+                  background: TOKEN.surface,
+                  borderColor: TOKEN.border,
+                }}
+                whileHover={{
+                  borderColor: `${color}60`,
+                  y: -2,
+                  boxShadow: `0 8px 32px rgba(0,0,0,0.3)`,
+                  transition: { duration: 0.2 },
+                }}
+              >
+                <div
+                  className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
+                  style={{ background: `${color}15` }}
+                >
+                  <Icon className="w-5 h-5" style={{ color }} />
+                </div>
+                <h3 className="text-base font-semibold mb-2" style={{ color: TOKEN.text }}>{title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: TOKEN.muted }}>{description}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── HOW IT WORKS ──────────────────────────────────────────── */}
+      <section id="how" className="py-32" style={{ background: TOKEN.surface }}>
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-16"
+          >
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: `${TOKEN.accent}cc` }}>
+              How it works
+            </p>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight" style={{ color: TOKEN.text }}>
               Up and running in an hour.
             </h2>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
-            {/* Connector lines (desktop only) */}
-            <div className="hidden md:block absolute top-10 left-1/3 w-[calc(33.333%-3rem)] h-px bg-gradient-to-r from-cyan-200 via-cyan-300 to-cyan-200" />
-            <div className="hidden md:block absolute top-10 right-1/3 w-[calc(33.333%-3rem)] h-px bg-gradient-to-r from-cyan-200 via-cyan-300 to-cyan-200" style={{ right: 'auto', left: 'calc(66.666% + 1.5rem)' }} />
-
-            {HOW_IT_WORKS.map(({ step, title, description }) => (
-              <div key={step} className="text-center relative">
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-bold text-white mx-auto mb-5"
-                  style={{ background: 'linear-gradient(135deg,#06b6d4,#2563eb)', boxShadow: '0 4px 16px rgba(6,182,212,0.25)' }}
-                >
-                  {step}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {HOW_STEPS.map(({ num, title, description }, i) => (
+              <motion.div
+                key={num}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="relative"
+              >
+                {/* Connector line */}
+                {i < 2 && (
+                  <div
+                    className="hidden md:block absolute top-6 right-0 w-[calc(100%-4rem)] h-px"
+                    style={{
+                      background: `linear-gradient(to right, ${TOKEN.border}, ${TOKEN.accent}40)`,
+                    }}
+                  />
+                )}
+                <div className="text-6xl font-bold leading-none mb-4" style={{ color: `${TOKEN.border}` }}>
+                  {num}
                 </div>
-                <h3 className="text-base font-semibold text-gray-900 mb-2">{title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
-              </div>
+                <h3 className="text-base font-semibold mb-2" style={{ color: TOKEN.text }}>{title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: TOKEN.muted }}>{description}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── SOCIAL PROOF ───────────────────────────── */}
-      <section className="py-16 bg-gray-50 border-y border-gray-100">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-8">Trusted by driving schools across Tennessee</p>
-          <div className="flex flex-wrap items-center justify-center gap-8 opacity-40">
-            {['Oneida', 'Knoxville', 'Crossville', 'Jamestown', 'Huntsville', 'Cookeville'].map(city => (
-              <span key={city} className="text-sm font-semibold text-gray-500 tracking-wide">{city}</span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── PRICING ────────────────────────────────── */}
-      <section id="pricing" className="py-24">
+      {/* ── PRICING ───────────────────────────────────────────────── */}
+      <section id="pricing" className="py-32">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <p className="text-xs font-semibold uppercase tracking-widest text-cyan-600 mb-3">Pricing</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight mb-3">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-16"
+          >
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: `${TOKEN.accent}cc` }}>
+              Pricing
+            </p>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-3" style={{ color: TOKEN.text }}>
               Simple, transparent pricing.
             </h2>
-            <p className="text-gray-500 text-sm">No hidden fees. No per-seat charges. Cancel anytime.</p>
-          </div>
+            <p className="text-base" style={{ color: TOKEN.muted }}>
+              No hidden fees. No per-seat charges. Cancel anytime.
+            </p>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-            {PRICING_TIERS.map(({ name, price, description, features, cta, highlight }) => (
-              <div
+            {PRICING.map(({ name, price, description, features, cta, popular }) => (
+              <motion.div
                 key={name}
-                className={`rounded-2xl p-8 ${highlight ? 'bg-gray-900 text-white shadow-xl' : 'bg-white border border-gray-200 shadow-sm'}`}
-                style={highlight ? {} : {}}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="rounded-3xl p-10 border"
+                style={{
+                  background: popular ? TOKEN.surface : TOKEN.surface,
+                  borderColor: popular ? `${TOKEN.accent}50` : TOKEN.border,
+                  borderWidth: popular ? '2px' : '1px',
+                  boxShadow: popular ? `0 0 60px rgba(59,130,246,0.12)` : 'none',
+                }}
               >
-                {highlight && (
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-500/20 text-cyan-300 mb-5">
+                {popular && (
+                  <div
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold mb-5"
+                    style={{ background: `${TOKEN.accent}20`, color: TOKEN.accent }}
+                  >
+                    <Star className="w-3 h-3 fill-current" />
                     Most popular
                   </div>
                 )}
-                <h3 className={`text-lg font-semibold mb-1 ${highlight ? 'text-white' : 'text-gray-900'}`}>{name}</h3>
-                <div className="flex items-end gap-1.5 mb-1">
-                  <span className={`text-5xl font-bold ${highlight ? 'text-white' : 'text-gray-900'}`}>${price}</span>
-                  <span className={`text-sm mb-2 ${highlight ? 'text-gray-400' : 'text-gray-500'}`}>/mo</span>
-                </div>
-                <p className={`text-sm mb-6 ${highlight ? 'text-gray-400' : 'text-gray-500'}`}>{description}</p>
 
-                <div className={`space-y-2.5 mb-8 ${highlight ? 'border-t border-white/10 pt-6' : 'border-t border-gray-100 pt-6'}`}>
+                <div className="text-sm font-semibold uppercase tracking-wider mb-1" style={{ color: popular ? TOKEN.accent : TOKEN.muted }}>
+                  {name}
+                </div>
+                <div className="flex items-end gap-1.5 mb-1">
+                  <span className="text-6xl font-bold tracking-tight" style={{ color: TOKEN.text }}>${price}</span>
+                  <span className="text-sm mb-2" style={{ color: TOKEN.subtle }}>/mo</span>
+                </div>
+                <p className="text-sm mb-8" style={{ color: TOKEN.subtle }}>{description}</p>
+
+                <div className="border-t pt-6 mb-8 space-y-3" style={{ borderColor: popular ? `${TOKEN.border}` : TOKEN.border }}>
                   {features.map(f => (
-                    <div key={f} className="flex items-center gap-2.5 text-sm">
-                      <CheckCircle className={`w-4 h-4 flex-shrink-0 ${highlight ? 'text-cyan-400' : 'text-emerald-500'}`} />
-                      <span className={highlight ? 'text-gray-300' : 'text-gray-600'}>{f}</span>
+                    <div key={f} className="flex items-center gap-3 text-sm">
+                      <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: TOKEN.success }} />
+                      <span style={{ color: popular ? TOKEN.muted : TOKEN.muted }}>{f}</span>
                     </div>
                   ))}
                 </div>
 
                 <Link
-                  href={cta === 'Contact sales' ? '/signup' : '/signup'}
-                  className={`block w-full text-center text-sm font-semibold py-3 rounded-xl transition-all ${
-                    highlight
-                      ? 'text-gray-900 bg-white hover:bg-gray-100'
-                      : 'text-white'
-                  }`}
-                  style={!highlight ? { background: 'linear-gradient(135deg,#06b6d4,#2563eb)' } : {}}
+                  href="/signup"
+                  className="block w-full text-center text-sm font-semibold py-3.5 rounded-xl transition-all"
+                  style={
+                    popular
+                      ? { background: `linear-gradient(135deg,${TOKEN.accent},${TOKEN.accent2})`, color: TOKEN.text, boxShadow: `0 0 30px rgba(59,130,246,0.3)` }
+                      : { background: TOKEN.surface2, color: TOKEN.muted, border: `1px solid ${TOKEN.border}` }
+                  }
                 >
                   {cta}
                 </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ───────────────────────────────────────────────────── */}
+      <section id="faq" className="py-32" style={{ background: TOKEN.surface }}>
+        <div className="max-w-2xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="mb-12"
+          >
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: `${TOKEN.accent}cc` }}>
+              FAQ
+            </p>
+            <h2 className="text-4xl font-bold tracking-tight" style={{ color: TOKEN.text }}>
+              Questions. Answered.
+            </h2>
+          </motion.div>
+
+          <div className="space-y-2">
+            {FAQS.map(({ q, a }, i) => (
+              <div
+                key={q}
+                className="rounded-2xl overflow-hidden border"
+                style={{ background: TOKEN.bg, borderColor: TOKEN.border }}
+              >
+                <button
+                  className="w-full flex items-center justify-between gap-4 px-6 py-4 text-left"
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                >
+                  <span className="text-sm font-medium" style={{ color: TOKEN.text }}>{q}</span>
+                  <ChevronDown
+                    className="w-4 h-4 flex-shrink-0 transition-transform duration-200"
+                    style={{ color: TOKEN.subtle, transform: openFaq === i ? 'rotate(180deg)' : 'none' }}
+                  />
+                </button>
+                {openFaq === i && (
+                  <div
+                    className="px-6 pb-5 text-sm leading-relaxed border-t"
+                    style={{ color: TOKEN.muted, borderColor: TOKEN.border, paddingTop: '1rem' }}
+                  >
+                    {a}
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── FAQ ───────────────────────────────────── */}
-      <section id="faq" className="py-24 bg-gray-50 border-t border-gray-100">
+      {/* ── FOOTER CTA ─────────────────────────────────────────────── */}
+      <section className="py-24">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-widest text-cyan-600 mb-3">FAQ</p>
-            <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-8">Questions. Answered.</h2>
-
-            <div className="space-y-2">
-              {FAQS.map(({ q, a }, i) => (
-                <div
-                  key={q}
-                  className="bg-white border border-gray-200 rounded-xl overflow-hidden"
-                >
-                  <button
-                    className="w-full flex items-center justify-between text-left px-5 py-4 text-sm font-medium text-gray-900 gap-4"
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  >
-                    {q}
-                    <svg
-                      className={`w-4 h-4 flex-shrink-0 text-gray-400 transition-transform ${openFaq === i ? 'rotate-180' : ''}`}
-                      fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  {openFaq === i && (
-                    <div className="px-5 pb-4 text-sm text-gray-500 leading-relaxed border-t border-gray-100 pt-3">
-                      {a}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── FOOTER CTA ─────────────────────────────── */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <div
-            className="rounded-3xl p-14 text-center relative overflow-hidden"
-            style={{ background: 'linear-gradient(135deg,#06b6d4,#2563eb)' }}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="rounded-3xl p-16 text-center relative overflow-hidden"
+            style={{
+              background: `linear-gradient(135deg,${TOKEN.accent}20,${TOKEN.accent2}15)`,
+              border: `1px solid ${TOKEN.accent}30`,
+            }}
           >
-            {/* Subtle pattern */}
-            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '28px 28px' }} />
+            {/* Background dot grid */}
+            <div
+              className="absolute inset-0 opacity-5"
+              style={{
+                backgroundImage: `radial-gradient(circle, ${TOKEN.text} 1px, transparent 1px)`,
+                backgroundSize: '28px 28px',
+              }}
+            />
             <div className="relative">
-              <h2 className="text-3xl font-bold text-white mb-3 tracking-tight">Ready to run your school better?</h2>
-              <p className="text-cyan-100 text-sm mb-8 max-w-sm mx-auto">Start your free trial today. No credit card required.</p>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4" style={{ color: TOKEN.text }}>
+                Ready to run your school better?
+              </h2>
+              <p className="text-base mb-10" style={{ color: TOKEN.muted }}>
+                Start your free trial today. No credit card required.
+              </p>
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 text-sm font-semibold px-8 py-3.5 rounded-xl text-cyan-700 bg-white hover:bg-cyan-50 transition-all shadow-lg"
+                className="inline-flex items-center gap-2 text-sm font-semibold px-8 py-4 rounded-xl text-white transition-all"
+                style={{
+                  background: `linear-gradient(135deg,${TOKEN.accent},${TOKEN.accent2})`,
+                  boxShadow: `0 0 40px rgba(59,130,246,0.3)`,
+                }}
               >
                 Start free trial
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* ── FOOTER ────────────────────────────────── */}
-      <footer className="py-8 border-t border-gray-100">
+      {/* ── FOOTER ────────────────────────────────────────────────── */}
+      <footer className="py-8 border-t" style={{ borderColor: TOKEN.border }}>
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded flex items-center justify-center text-white text-xs font-bold" style={{ background: 'linear-gradient(135deg,#06b6d4,#2563eb)' }}>DC</div>
-            <span className="text-xs text-gray-400">© 2026 The Driving Center</span>
+            <div
+              className="w-6 h-6 rounded flex items-center justify-center text-white text-xs font-bold"
+              style={{ background: `linear-gradient(135deg,${TOKEN.accent},${TOKEN.accent2})` }}
+            >
+              DC
+            </div>
+            <span className="text-xs" style={{ color: TOKEN.subtle }}>© 2026 The Driving Center</span>
           </div>
           <div className="flex gap-5">
-            <a href="/legal/privacy" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Privacy</a>
-            <a href="/legal/terms" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Terms</a>
+            <a href="/legal/privacy" className="text-xs transition-colors" style={{ color: TOKEN.subtle }}>Privacy</a>
+            <a href="/legal/terms" className="text-xs transition-colors" style={{ color: TOKEN.subtle }}>Terms</a>
           </div>
         </div>
       </footer>
