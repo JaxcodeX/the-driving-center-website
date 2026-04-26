@@ -1,144 +1,206 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { useSearchParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { Plus, Mail, Shield, Pencil, X, Check, User } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
-type Instructor = {
-  id: string
-  name: string
-  email: string | null
-  phone: string | null
-  license_number: string | null
-  license_expiry: string | null
-  active: boolean
+const T = {
+  bg:        '#050505',
+  surface:   '#0D0D0D',
+  elevated:  '#18181b',
+  border:    '#1A1A1A',
+  borderLt:  '#27272a',
+  text:      '#ffffff',
+  secondary: '#94A3B8',
+  muted:     '#52525b',
+  cyan:      '#38BDF8',
+  purple:    '#818CF8',
+  green:     '#10B981',
+  amber:     '#f59e0b',
+  grad:      'linear-gradient(135deg, #38BDF8 0%, #818CF8 100%)',
 }
 
-export default function InstructorsPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-950" />}>
-      <InstructorsContent />
-    </Suspense>
-  )
-}
-
-function InstructorsContent() {
-  const params = useSearchParams()
-  const schoolId = params.get('school_id')
-  const [instructors, setInstructors] = useState<Instructor[]>([])
-  const [loading, setLoading] = useState(true)
-  const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ name: '', email: '', phone: '', license_number: '', license_expiry: '' })
-  const [saving, setSaving] = useState(false)
-
-  async function load() {
-    if (!schoolId) return
-    const res = await fetch(`/api/instructors?school_id=${schoolId}`)
-    const data = await res.json()
-    setInstructors(data)
-    setLoading(false)
-  }
-
-  useEffect(() => { load() }, [schoolId])
+function InviteModal({ onClose, onInvite }: { onClose: () => void; onInvite: (name: string, email: string) => void }) {
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setSaving(true)
-    await fetch('/api/instructors', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-school-id': schoolId! },
-      body: JSON.stringify(form),
-    })
-    setShowForm(false)
-    setForm({ name: '', email: '', phone: '', license_number: '', license_expiry: '' })
-    load()
-    setSaving(false)
+    setLoading(true)
+    onInvite(name, email)
+    setLoading(false)
   }
 
-  async function handleDeactivate(id: string) {
-    if (!confirm('Deactivate this instructor?')) return
-    await fetch(`/api/instructors/${id}`, { method: 'DELETE', headers: { 'x-school-id': schoolId! } })
-    load()
+  const inputStyle = {
+    background: T.elevated, border: `1px solid ${T.borderLt}`,
+    color: T.text, outline: 'none' as const,
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50">
-      <div className="border-b border-white/10 px-6 py-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center text-sm font-bold">DC</div>
-            <span className="font-semibold">Instructors</span>
-          </div>
-          <Link href="/school-admin" className="text-sm text-gray-400 hover:text-white">← Back</Link>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
+      <div className="w-full max-w-sm rounded-2xl p-8" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold" style={{ color: T.text }}>Invite Instructor</h2>
+          <button onClick={onClose} className="p-1" style={{ color: T.muted }}><X className="w-5 h-5" /></button>
         </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>Name</label>
+            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Matt Reedy" required
+              className="w-full rounded-xl px-4 py-3 text-sm"
+              style={inputStyle}
+              onFocus={e => (e.target.style.borderColor = `${T.cyan}60`)}
+              onBlur={e => (e.target.style.borderColor = T.borderLt)} />
+          </div>
+          <div>
+            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>Email</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="matt@school.com" required
+              className="w-full rounded-xl px-4 py-3 text-sm"
+              style={inputStyle}
+              onFocus={e => (e.target.style.borderColor = `${T.cyan}60`)}
+              onBlur={e => (e.target.style.borderColor = T.borderLt)} />
+          </div>
+          <div className="flex gap-3 pt-1">
+            <button type="button" onClick={onClose}
+              className="flex-1 py-3 rounded-xl text-sm font-medium"
+              style={{ background: T.elevated, color: T.secondary, border: `1px solid ${T.border}` }}>
+              Cancel
+            </button>
+            <button type="submit" disabled={loading}
+              className="flex-1 py-3 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
+              style={{ background: T.grad }}>
+              {loading ? 'Sending...' : 'Send Invite'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+export default function InstructorsPage() {
+  const [instructors, setInstructors] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+
+  useEffect(() => {
+    async function load() {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { data: school } = await supabase.from('schools').select('id').eq('owner_id', user.id).single()
+      if (!school) { setLoading(false); return }
+
+      const { data } = await supabase
+        .from('instructors')
+        .select('*')
+        .eq('school_id', school.id)
+        .order('created_at', { ascending: false })
+      setInstructors(data || [])
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  async function handleInvite(name: string, email: string) {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data: school } = await supabase.from('schools').select('id').eq('owner_id', user!.id).single()
+
+    const { data: instructor } = await supabase
+      .from('instructors')
+      .insert({ school_id: school!.id, name, email, status: 'pending' })
+      .select()
+      .single()
+
+    if (instructor) {
+      setInstructors(prev => [instructor, ...prev])
+      setShowModal(false)
+    }
+  }
+
+  return (
+    <div className="max-w-5xl">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold mb-1" style={{ color: T.text }}>Instructors</h1>
+          <p className="text-sm" style={{ color: T.muted }}>{instructors.length} total</p>
+        </div>
+        <button
+          onClick={() => setShowModal(true)}
+          className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl text-white"
+          style={{ background: T.grad }}>
+          <Plus className="w-4 h-4" />
+          Invite Instructor
+        </button>
       </div>
 
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Instructors ({instructors.length})</h1>
-          <button onClick={() => setShowForm(!showForm)} className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:opacity-90">
-            {showForm ? 'Cancel' : '+ Add Instructor'}
+      {loading ? (
+        <div className="text-center py-16" style={{ color: T.muted }}>
+          <p className="text-sm">Loading...</p>
+        </div>
+      ) : !instructors.length ? (
+        <div className="text-center py-16 rounded-2xl" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
+          <User className="w-10 h-10 mx-auto mb-3 opacity-30" style={{ color: T.muted }} />
+          <p className="text-sm mb-3" style={{ color: T.muted }}>No instructors yet</p>
+          <button onClick={() => setShowModal(true)} className="text-sm font-medium" style={{ color: T.cyan }}>
+            Invite your first instructor →
           </button>
         </div>
-
-        {showForm && (
-          <form onSubmit={handleSubmit} className="bg-white/5 border border-white/10 rounded-xl p-6 mb-6 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Name *</label>
-                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cyan-500" />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {instructors.map(instructor => (
+            <div
+              key={instructor.id}
+              className="rounded-2xl p-6"
+              style={{ background: T.surface, border: `1px solid ${T.border}` }}
+            >
+              {/* Avatar */}
+              <div className="flex items-start justify-between mb-4">
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold"
+                  style={{ background: `${T.cyan}15`, color: T.cyan }}
+                >
+                  {instructor.name?.[0]?.toUpperCase() || 'I'}
+                </div>
+                <span
+                  className="text-xs px-2 py-0.5 rounded-full font-medium capitalize"
+                  style={{
+                    background: instructor.status === 'active' ? `${T.green}15` : `${T.amber}15`,
+                    color: instructor.status === 'active' ? T.green : T.amber,
+                  }}
+                >
+                  {instructor.status}
+                </span>
               </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Email</label>
-                <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cyan-500" />
+              <h3 className="text-base font-semibold mb-1" style={{ color: T.text }}>{instructor.name}</h3>
+              <div className="flex items-center gap-1.5 text-sm mb-4" style={{ color: T.muted }}>
+                <Mail className="w-3.5 h-3.5" />
+                {instructor.email}
               </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Phone</label>
-                <input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cyan-500" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">License Number</label>
-                <input value={form.license_number} onChange={(e) => setForm({ ...form, license_number: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cyan-500" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">License Expiry</label>
-                <input type="date" value={form.license_expiry} onChange={(e) => setForm({ ...form, license_expiry: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cyan-500" />
+              <div className="flex gap-2">
+                {instructor.status === 'pending' && (
+                  <div className="text-xs py-1 px-2 rounded-lg" style={{ background: `${T.cyan}15`, color: T.cyan }}>
+                    Awaiting response
+                  </div>
+                )}
+                <Link
+                  href={`/school-admin/instructors/${instructor.id}/schedule`}
+                  className="text-xs py-1 px-2 rounded-lg flex items-center gap-1 transition-colors"
+                  style={{ background: T.elevated, color: T.secondary }}
+                >
+                  <Shield className="w-3 h-3" />
+                  Set schedule
+                </Link>
               </div>
             </div>
-            <button type="submit" disabled={saving} className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold py-2.5 rounded-lg hover:opacity-90 disabled:opacity-50">
-              {saving ? 'Adding...' : 'Add Instructor'}
-            </button>
-          </form>
-        )}
+          ))}
+        </div>
+      )}
 
-        {loading ? (
-          <div className="space-y-3">{[1, 2].map((i) => <div key={i} className="bg-white/5 border border-white/10 rounded-xl h-20 animate-pulse" />)}</div>
-        ) : instructors.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">No instructors yet. Add your first one above.</div>
-        ) : (
-          <div className="space-y-3">
-            {instructors.map((i) => (
-              <div key={i.id} className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center justify-between">
-                <div>
-                  <div className="font-medium text-white">{i.name}</div>
-                  <div className="text-sm text-gray-500">
-                    {i.email && `${i.email} · `}{i.phone && `${i.phone}`}
-                  </div>
-                  {i.license_number && (
-                    <div className="text-xs text-gray-600 mt-1">
-                      License: {i.license_number} · Exp: {i.license_expiry ?? '—'}
-                    </div>
-                  )}
-                </div>
-                <button onClick={() => handleDeactivate(i.id)} className="text-sm text-red-400 hover:text-red-300">
-                  Deactivate
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {showModal && <InviteModal onClose={() => setShowModal(false)} onInvite={handleInvite} />}
     </div>
   )
 }
