@@ -1,48 +1,92 @@
 # CLAUDE.md — The Driving Center SaaS
-**Multi-tenant SaaS for driving schools. Not Matt's project — a product.**
-**Mode: FSO Workflow (Full Stack Open)**
+**Mode: FSO Workflow (strictly enforced)**
+**Updated: 2026-04-26**
 
 ---
 
-## The FSO Workflow — How This Project Runs
+## The One Rule
 
-**Every feature request follows this exact sequence:**
+Every feature request follows this sequence. No exceptions.
 
 ```
 Zax: "Build [feature]"
         ↓
-Everest (conductor): Write SPEC.md first
+Everest: Write SPEC.md (blueprint first)
         ↓
-Everest: Verify connections (L — Link)
+Everest: DeepSeek generates code
         ↓
-Everest: Spawn coding agent → implements from spec (A — Architect)
+Everest: Review diffs + run build
         ↓
-Everest: Review diffs, test in browser, approve or send back (S — Stylize)
+Deploy → Vercel auto-deploys
         ↓
-Push to main → Vercel auto-deploys (T — Trigger)
-        ↓
-Log failures in WORKFLOW_LOG.md
-        ↓
-Next feature
+Log result in WORKFLOW_LOG.md
 ```
 
-**No exceptions.** If there's no SPEC.md, there's no implementation. Ever.
+**If there's no SPEC.md, there's no implementation.**
 
 ---
 
-## Role Rules (Enforced)
+## Who Does What
 
-| Who | What they do |
-|-----|-------------|
-| **Zax** | Directs, tests, approves or rejects output |
-| **Everest** | Writes SPEC.md, spawns agents, reviews output, makes architecture decisions |
-| **Coding Agent** | Implements exactly what SPEC.md says. Reports what was done. Never writes SPEC.md |
+| Role | What |
+|---|---|
+| **Zax** | Directs, reviews output, approves or rejects |
+| **Everest** | Writes specs, spawns DeepSeek, reviews code, makes architecture calls |
+| **DeepSeek** | Generates code from SPEC.md only |
+| **Mark** | Reviews architecture decisions, not code implementation |
 
 **Everest's job is not to write code — it's to write specs and review code.**
+DeepSeek generates the implementation. I review it. You approve it.
 
 ---
 
-## The SPEC.md Template (for every feature)
+## Current Stack
+
+| Role | Tool |
+|---|---|
+| Primary AI | MiniMax-M2.7 (daily driver, planning, review) |
+| Code generation | DeepSeek V4 Flash (deepseek-v4-flash) |
+| Web app | Next.js 16 + React 19 + TailwindCSS 4 |
+| Database | Supabase (PostgreSQL + RLS + Magic Links) |
+| Payments | Stripe ($99/mo subscription) |
+| Email | Resend (stub — needs key) |
+| SMS | Twilio (stub — needs key) |
+| Hosting | Vercel |
+| Automation | OpenClaw cron (no n8n) |
+
+**Coding agents: DeepSeek V4 Flash only.** Codex/Claude/pi are retired for this project.
+
+---
+
+## File Structure (Source of Truth)
+
+```
+the-driving-center-website/
+├── CLAUDE.md          ← THIS FILE — how we work
+├── STATUS.md         ← current state: what works, what's broken, what's next
+├── SPEC.md           ← current feature spec (one active spec at a time)
+├── WORKFLOW_LOG.md   ← every build cycle logged
+│
+├── src/app/          ← all routes + pages
+├── src/lib/
+│   ├── supabase/
+│   ├── migrations/   ← SQL (run in Supabase SQL Editor)
+│   ├── email-templates/
+│   └── security.ts
+│
+├── SPEC_P1_A_*.md    ← past feature specs (archived after cycle complete)
+├── SPEC_P1_B_*.md
+├── SPEC_P1_C_*.md
+├── SPEC_PHASE_2.md    ← Phase 2 spec
+└── SPEC_PHASE_3.md    ← Phase 3 spec
+```
+
+**Delete other .md files after reading:**
+`BUILD_PLAN.md`, `PROGRESS.md`, `DISCOVERIES.md`, `PROJECT_CONSTITUTION.md`, `OPERATIONS_LOG.md`, `OPERATIONS_MANUAL.md` — these are redundant, contradictory, and maintained nowhere. They are the Legos that spilled.
+
+---
+
+## SPEC.md Template
 
 ```markdown
 # SPEC.md — [Feature Name]
@@ -58,77 +102,40 @@ Next feature
 
 ---
 
-## The WORKFLOW_LOG.md (tracks every cycle)
+## Test Framework (Automated, One Command)
 
-Format per entry:
+Run all tests:
+```bash
+cd ~/projects/the-driving-center-website
+npm run test:e2e
+```
+
+All tests live in `tests/e2e/`. Each test hits a real API endpoint with dummy data and verifies the response.
+
+---
+
+## WORKFLOW_LOG.md Format
+
 ```
 ## Cycle N — [Feature]
-Date:
-SPEC.md: [linked]
-Implemented by: [agent]
-Result: [passed / failed / partial]
+Date: YYYY-MM-DD
+SPEC: [linked]
+Implemented by: DeepSeek
+Result: passed / failed / partial
 Failures: [what went wrong]
-Next action: [what we do about it]
+Next action: [what we do next]
 ```
 
 ---
 
-## What Changes When FSO is Enforced
+## Security Rules (Non-Negotiable)
 
-1. **Less drift** — every message is either advancing the spec, reviewing output, or logging
-2. **Better failure tracking** — when something breaks, we know exactly which cycle and why
-3. **Faster builds** — coding agent does the implementation, I'm reviewing not typing
-4. **Clearer accountability** — each change has a spec, a diff, and a log entry
+Every API route must have:
+- [ ] Auth check (`getUser()`)
+- [ ] Ownership check (does this school own this data?)
+- [ ] PII encrypted at write, stripped at read
+- [ ] Input validation
+- [ ] Audit log on all writes
+- [ ] `school_id` in every WHERE clause
 
----
-
-## Current Project State
-
-**Live URL:** https://the-driving-center-website.vercel.app/
-**GitHub:** github.com/JaxcodeX/the-driving-center-website
-**Project path:** `~/projects/the-driving-center-website/`
-
-### What Works
-- School signup → Stripe checkout → magic link → school admin dashboard
-- Student booking wizard → Stripe payment → seat incremented
-- Landing page, pricing, FAQ, legal pages
-
-### P0 Fixes Needed (before any school can actually use it)
-1. Run SQL: `ALTER TABLE schools ADD COLUMN owner_user_id UUID;`
-2. Add `DEMO_OWNER_EMAIL` to Vercel dashboard
-3. Wire booking confirmation email (webhook → notify API)
-4. Build CSV import (stub → real feature)
-
----
-
-## FSO Workflow Log
-
-## Cycle 1 — School Owner Auth Link Fix
-Date: 2026-04-24
-SPEC: SPEC_BLAST_01_SCHOOL_OWNER_FIX.md
-Implemented by: Everest (manual — should have been sub-agent)
-Result: Partial — code fixed, DB migration still pending
-Fixes applied: auth callback dual write, complete-profile redirect, school sessions linked
-DB migration needed: `ALTER TABLE schools ADD COLUMN owner_user_id UUID;`
-Vercel env needed: DEMO_OWNER_EMAIL
-
----
-
-## Build Plan (Priority Order)
-
-### Phase 0 — Foundation (right now)
-- P0-1: owner_user_id column + DEMO_OWNER_EMAIL (5 min SQL + 2 min Vercel)
-- P0-2: Wire booking confirmation email (webhook → /api/notify/booking)
-- P0-3: Build CSV import feature
-
-### Phase 1 — Core Product
-- P1-A: Student profile edit + TCA hours tracking
-- P1-B: Session create/edit/delete + series duplication
-- P1-C: Email/SMS reminders wired to OpenClaw cron
-
-### Phase 2 — Payments
-- Handle failed Stripe payments gracefully
-- Referral program
-
-### Phase 3 — Launch
-- First 5 paying schools via B.L.A.S.T. outreach protocol
+Never: skip ownership check, log PII, allow cross-tenant access, pass real keys to client.
