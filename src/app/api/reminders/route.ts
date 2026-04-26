@@ -8,45 +8,41 @@ import { reminder4hEmail } from '@/lib/email-templates/reminder-4h'
 // Cron hits this every hour. Fires 48h + 4h email reminders.
 // Uses service role (getSupabaseAdmin) — bypasses RLS.
 export async function GET(request: Request) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = getSupabaseAdmin() as any
   const now = new Date()
   const today = now.toISOString().split('T')[0]
-  const in72h = new Date(now.getTime() + 72 * 60 * 60 * 1000).toISOString().split('T')[0]
   const schoolId = new URL(request.url).searchParams.get('school_id')
 
-  // Fetch confirmed bookings with future session dates
+  // Fetch confirmed bookings with session_time set (denormalized field)
   let bookingsQuery = supabase
     .from('bookings')
-    .select('id, student_name, student_email, student_phone, reminder_48h_sent, reminder_4h_sent, status, reschedule_token, session_id')
+    .select('id, student_name, student_email, student_phone, reminder_48h_sent, reminder_4h_sent, status, reschedule_token, session_time')
     .eq('status', 'confirmed')
-
-  if (schoolId) {
-    // Filter by school via sessions join — done below after we fetch bookings
-  }
+    .not('session_time', 'is', null)
 
   const { data: bookings, error: bookingsError } = await bookingsQuery
   if (bookingsError) return NextResponse.json({ error: bookingsError.message }, { status: 500 })
 
-  // No bookings at all — exit fast
   if (!bookings || bookings.length === 0) {
-    return NextResponse.json({ checked: 0, sent_48h: { sms: 0, email: 0 }, sent_4h: { sms: 0, email: 0 }, skipped: 0, strategy: '48h + 4h email (DEMO_MODE)' })
+    return NextResponse.json({
+      checked: 0, sent_48h: { sms: 0, email: 0 }, sent_4h: { sms: 0, email: 0 },
+      skipped: 0, strategy: '48h + 4h email (DEMO_MODE)',
+    })
   }
 
-  // Fetch all sessions that have these booking IDs in one call
-  const sessionIds = bookings.map((b: any) => b.session_id).filter(Boolean)
+  // Fetch sessions that match these booking IDs
+  const sessionTimes = bookings.map((b: any) => b.session_time).filter(Boolean)
   const { data: sessions } = await supabase
     .from('sessions')
-    .select('id, start_date, start_time, location, school_id')
-    .in('id', sessionIds)
+    .select('id, start_date, location, school_id, max_seats')
+    .in('start_date', [today])
 
-  const sessionsById: Record<string, any> = {}
-  sessions?.forEach((s: any) => { sessionsById[s.id] = s })
+  const sessionsByStartDate: Record<string, any> = {}
+  sessions?.forEach((s: any) => { sessionsByStartDate[s.start_date] = s })
 
-  // Optionally filter by school_id
   const filteredBookings = schoolId
     ? bookings.filter((b: any) => {
-        const s = sessionsById[b.session_id]
+        const s = sessionsByStartDate[b.session_time?.split('T')[0] || '']
         return s && s.school_id === schoolId
       })
     : bookings
@@ -55,13 +51,18 @@ export async function GET(request: Request) {
   let sent4hEmail = 0, sent4hSMS = 0
   let skipped = 0
 
-  for (const booking of filteredBookings as any[]) {
-    const session = sessionsById[booking.session_id as string]
+  for (const booking of filteredBookings) {
+    // Derive session date from session_time (format: 'YYYY-MM-DD' or 'YYYY-MM-DDTHH:mm')
+    const sessionDateStr = (booking.session_time || '').split('T')[0]
+    const session = sessionsByStartDate[sessionDateStr]
+
     if (!session) { skipped++; continue }
 
-    const sessionStart = new Date(`${session.start_date}T${session.start_time}`)
-    const hoursUntil = (sessionStart.getTime() - now.getTime()) / (1000 * 60 * 60)
+    // Calculate hours until session
+    const sessionDateTime = new Date(sessionDateStr + 'T12:00:00')
+    const hoursUntil = (sessionDateTime.getTime() - now.getTime()) / (1000 * 60 * 60)
 
+    // Skip if in the past or too far in future
     if (hoursUntil < 0 || hoursUntil > 72) { skipped++; continue }
 
     // ── 48h reminder ─────────────────────────────────────────────────
@@ -116,11 +117,10 @@ async function sendReminder(
   const studentPhone = String(booking.student_phone ?? '')
   const studentEmail = String(booking.student_email ?? '')
   const date = String(session.start_date ?? '')
-  const time = String(session.start_time ?? '')
   const location = String(session.location ?? '')
 
   if (channel === 'sms' && studentPhone) {
-    console.log(`[Reminder SMS] ${type} → ${studentPhone} | ${lessonType} | ${date} at ${time}`)
+    console.log(`[Reminder SMS] ${type} → ${studentPhone} | ${lessonType} | ${date}`)
     return true
   }
 
@@ -134,7 +134,7 @@ async function sendReminder(
           lessonType,
           schoolName: 'The Driving Center',
           date: formattedDate,
-          time,
+          time: '12:00 PM',
           location,
           confirmUrl: `https://the-driving-center-website.vercel.app/book/confirmation?token=${booking.id}`,
           rescheduleUrl: `https://the-driving-center-website.vercel.app/book?session=${session.id}&reschedule=${booking.reschedule_token ?? ''}`,
@@ -145,7 +145,7 @@ async function sendReminder(
           schoolName: 'The Driving Center',
           schoolPhone: '865-555-0100',
           date: formattedDate,
-          time,
+          time: '12:00 PM',
           location,
         })
     const { sendEmail } = await import('@/lib/email')
@@ -154,7 +154,7 @@ async function sendReminder(
   }
 
   if (channel === 'email' && studentEmail && !isEmailConfigured()) {
-    console.log(`[Reminder STUB] ${type} email → ${studentEmail} | ${lessonType} | ${date} at ${time}`)
+    console.log(`[Reminder STUB] ${type} email → ${studentEmail} | ${lessonType} | ${date}`)
     return true
   }
 
