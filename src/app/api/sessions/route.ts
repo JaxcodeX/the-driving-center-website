@@ -1,13 +1,7 @@
 import { NextResponse } from 'next/server'
-import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
-
-function getSupabaseAdmin() {
-  return createSupabaseAdmin(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
 
 // ── GET /api/sessions?school_id=X ──────────────────────────────────────
 export async function GET(request: Request) {
@@ -15,10 +9,12 @@ export async function GET(request: Request) {
   const schoolId = searchParams.get('school_id')
   if (!schoolId) return new NextResponse('Missing school_id', { status: 400 })
 
-  const supabase = createSupabaseAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const supabase = getSupabaseAdmin()
+
+  // Auth check
   const authHeader = request.headers.get('Authorization')
   if (!authHeader?.startsWith('Bearer ')) {
-    const cookieAuth = await import('@/lib/supabase/server').then(m => m.createClient())
+    const cookieAuth = await createClient()
     const { data: { user } } = await cookieAuth.auth.getUser()
     if (!user) return new NextResponse('Unauthorized', { status: 401 })
   }
@@ -42,32 +38,34 @@ export async function GET(request: Request) {
 
 // ── POST /api/sessions ─────────────────────────────────────────────────
 export async function POST(request: Request) {
-  const supabase = getSupabaseAdmin()
   const body = await request.json()
-  const { start_date, start_time, end_time, instructor_id, max_seats, price_cents, location, session_type_id } = body
+  const { start_date, end_date, instructor_id, max_seats, price_cents, location, session_type_id } = body
 
-  if (!start_date || !start_time || !end_time || !max_seats) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+  if (!start_date || !end_date || !max_seats) {
+    return NextResponse.json({ error: 'start_date, end_date, and max_seats are required' }, { status: 400 })
   }
 
+  const supabase = getSupabaseAdmin()
   const schoolId = request.headers.get('x-school-id')
   if (!schoolId) return new NextResponse('Missing x-school-id', { status: 400 })
+
   const authHeader = request.headers.get('Authorization')
 
+  // DEMO_MODE: skip full auth
   if (process.env.DEMO_MODE === 'true') {
     const { data: session, error } = await supabase
       .from('sessions')
       .insert({
         school_id: schoolId,
         start_date: body.start_date,
-        start_time: body.start_time,
-        end_time: body.end_time,
+        end_date: body.end_date,
         instructor_id: body.instructor_id ?? null,
         max_seats: Math.max(1, Math.min(100, body.max_seats ?? 1)),
         price_cents: body.price_cents ?? 0,
         location: body.location ?? '',
         session_type_id: body.session_type_id ?? null,
         seats_booked: 0,
+        status: 'scheduled',
       })
       .select()
       .single()
@@ -90,8 +88,8 @@ export async function POST(request: Request) {
     .single()
   if (!school) return new NextResponse('Forbidden', { status: 403 })
 
-  const sessionDateTime = new Date(`${start_date}T${start_time}`)
-  if (sessionDateTime <= new Date()) {
+  const sessionDate = new Date(start_date)
+  if (sessionDate <= new Date()) {
     return NextResponse.json({ error: 'Session must be in the future' }, { status: 400 })
   }
 
@@ -100,14 +98,14 @@ export async function POST(request: Request) {
     .insert({
       school_id: schoolId,
       start_date,
-      start_time,
-      end_time,
+      end_date,
       instructor_id: instructor_id ?? null,
       max_seats: Math.max(1, Math.min(100, max_seats)),
       price_cents: price_cents ?? 0,
       location: location ?? '',
       session_type_id: session_type_id ?? null,
       seats_booked: 0,
+      status: 'scheduled',
     })
     .select()
     .single()

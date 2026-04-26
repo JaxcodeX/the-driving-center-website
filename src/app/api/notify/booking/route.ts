@@ -1,76 +1,78 @@
 import { NextResponse } from 'next/server'
-import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { sendBookingConfirmationEmail } from '@/lib/email'
-
-function getSupabaseAdmin() {
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) throw new Error('SUPABASE_SERVICE_ROLE_KEY required')
-  return createSupabaseAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY)
-}
 
 export async function POST(request: Request) {
   const body = await request.json()
-  const { studentEmail, studentName, sessionId, schoolId } = body
+  const { studentEmail, studentName, sessionId, bookingId } = body
 
-  if (!studentEmail || !sessionId) {
+  if (!studentEmail || (!sessionId && !bookingId)) {
     return new NextResponse('Missing required fields', { status: 400 })
   }
 
   const supabaseAdmin = getSupabaseAdmin()
 
-  // Get session + school info
-  const { data: session } = await supabaseAdmin
-    .from('sessions')
-    .select('start_date, start_time, location, school_id, session_type_id, max_seats, seats_booked')
-    .eq('id', sessionId)
-    .single()
+  // Get booking details (uses session_date/session_time TEXT fields)
+  let booking: Record<string, unknown> | null = null
+  if (bookingId) {
+    const { data } = await supabaseAdmin
+      .from('bookings')
+      .select('id, student_name, session_date, session_time, booking_token, school_id')
+      .eq('id', bookingId)
+      .single()
+    booking = data
+  } else {
+    const { data } = await supabaseAdmin
+      .from('bookings')
+      .select('id, student_name, session_date, session_time, booking_token, school_id')
+      .eq('session_id', sessionId)
+      .eq('student_email', studentEmail)
+      .single()
+    booking = data
+  }
 
-  if (!session) return new NextResponse('Session not found', { status: 404 })
+  if (!booking) return new NextResponse('Booking not found', { status: 404 })
 
+  const schoolId = booking.school_id as string
+
+  // Get school info
   const { data: school } = await supabaseAdmin
     .from('schools')
     .select('name, phone, slug')
-    .eq('id', session.school_id)
+    .eq('id', schoolId)
     .single()
 
-  // Get session type name
-  const { data: sessionType } = await supabaseAdmin
-    .from('session_types')
-    .select('name')
-    .eq('id', session.session_type_id)
-    .single()
-
-  // Get booking to find reschedule/cancel token
-  const { data: booking } = await supabaseAdmin
-    .from('bookings')
-    .select('id, reschedule_token, cancel_token')
-    .eq('session_id', sessionId)
-    .eq('student_email', studentEmail)
-    .single()
+  // Use session_date + session_time from booking (TEXT fields)
+  const sessionDate = String(booking.session_date ?? '')
+  const sessionTime = String(booking.session_time ?? '')
+  const bookingToken = booking.booking_token as string
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
   const schoolSlug = school?.slug ?? ''
 
-  const rescheduleUrl = booking?.reschedule_token
-    ? `${appUrl}/book/reschedule/${booking.reschedule_token}`
+  const rescheduleUrl = bookingToken
+    ? `${appUrl}/book/reschedule/${bookingToken}`
     : `${appUrl}/school/${schoolSlug}`
-  const cancelUrl = booking?.cancel_token
-    ? `${appUrl}/book/cancel/${booking.cancel_token}`
+  const cancelUrl = bookingToken
+    ? `${appUrl}/book/cancel/${bookingToken}`
     : `${appUrl}/school/${schoolSlug}`
 
-  const formattedDate = new Date(`${session.start_date}T12:00:00`).toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric',
-  })
+  const formattedDate = sessionDate
+    ? new Date(`${sessionDate}T12:00:00`).toLocaleDateString('en-US', {
+        weekday: 'long', month: 'long', day: 'numeric',
+      })
+    : 'TBD'
 
   try {
     await sendBookingConfirmationEmail(
       studentEmail,
-      studentName ?? 'Student',
-      sessionType?.name ?? 'Driving Lesson',
+      studentName ?? (booking.student_name as string) ?? 'Student',
+      'Driving Lesson',
       school?.name ?? 'The Driving Center',
       school?.phone ?? '',
       formattedDate,
-      session.start_time ?? '',
-      session.location ?? 'Contact your instructor',
+      sessionTime,
+      '',
       rescheduleUrl,
       cancelUrl
     )
