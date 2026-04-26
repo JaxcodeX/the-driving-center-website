@@ -13,10 +13,10 @@ export async function GET(request: Request) {
   const today = now.toISOString().split('T')[0]
   const schoolId = new URL(request.url).searchParams.get('school_id')
 
-  // Fetch confirmed bookings with session_time set (denormalized field)
-  let bookingsQuery = supabase
+  // Fetch confirmed bookings (session_time is the denormalized session start_date field)
+  const { data: bookings, error: bookingsError } = await supabase
     .from('bookings')
-    .select('id, student_name, student_email, student_phone, reminder_48h_sent, reminder_4h_sent, status, reschedule_token, session_time')
+    .select('id, student_name, student_email, student_phone, reminder_48h_sent, reminder_4h_sent, status, session_time')
     .eq('status', 'confirmed')
     .not('session_time', 'is', null)
 
@@ -137,7 +137,7 @@ async function sendReminder(
           time: '12:00 PM',
           location,
           confirmUrl: `https://the-driving-center-website.vercel.app/book/confirmation?token=${booking.id}`,
-          rescheduleUrl: `https://the-driving-center-website.vercel.app/book?session=${session.id}&reschedule=${booking.reschedule_token ?? ''}`,
+          rescheduleUrl: `https://the-driving-center-website.vercel.app/book?session=${session.id}`,
         })
       : reminder4hEmail({
           studentName: String(booking.student_name ?? 'Student'),
