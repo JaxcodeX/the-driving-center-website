@@ -34,7 +34,11 @@ function OnboardingFlow() {
   useEffect(() => {
     if (schoolIdFromUrl) {
       setSchoolId(schoolIdFromUrl)
-      return
+    }
+    // Also read slug from URL params (passed from signup redirect)
+    const slugFromUrl = params.get('slug')
+    if (slugFromUrl) {
+      setSchoolSlug(slugFromUrl)
     }
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -138,7 +142,7 @@ function StepProfile({ onNext, schoolId, schoolSlug, onSlug }: { onNext: () => v
   const [form, setForm] = useState({ name: '', tagline: '', phone: '', city: '', slug: '' })
   const [saved, setSaved] = useState(false)
 
-  // Initialize slug with the full slug from parent
+  // Initialize slug with the full slug from parent (passed as prop, not state)
   useEffect(() => {
     if (schoolSlug) {
       setForm(prev => ({ ...prev, slug: schoolSlug }))
@@ -158,7 +162,7 @@ function StepProfile({ onNext, schoolId, schoolSlug, onSlug }: { onNext: () => v
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!schoolId) return
-    const res = await fetch(`/api/schools/${schoolSlug || form.slug}`, {
+    const res = await fetch(`/api/schools/${schoolId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'x-school-id': schoolId },
       body: JSON.stringify(form),

@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         schoolId: school.id,
         slug: school.slug,
-        checkoutUrl: `${origin}/onboarding?school_id=${school.id}&step=profile`,
+        checkoutUrl: `${origin}/onboarding?school_id=${school.id}&slug=${school.slug}&step=profile`,
         demoMode: true,
       })
     } catch (err: unknown) {
