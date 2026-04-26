@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server'
 import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
@@ -9,7 +10,6 @@ export async function GET(
   const { slug } = await params
   const supabase = await createClient()
 
-  // Look up school by slug (used as public URL: /school/[slug])
   const { data: school, error } = await supabase
     .from('schools')
     .select('id, name, phone, state, service_zips, plan_tier')
@@ -20,7 +20,6 @@ export async function GET(
     return new NextResponse('School not found', { status: 404 })
   }
 
-  // Get active session types
   const { data: sessionTypes } = await supabase
     .from('session_types')
     .select('id, name, description, duration_minutes, price_cents, deposit_cents, color, tca_hours_credit')
@@ -28,7 +27,6 @@ export async function GET(
     .eq('active', true)
     .order('price_cents', { ascending: true })
 
-  // Get school profile (public info)
   const { data: profile } = await supabase
     .from('school_profiles')
     .select('tagline, about, address, city, zip, email, website, facebook, instagram')
@@ -58,27 +56,23 @@ export async function PUT(
     data: { user },
   } = await supabase.auth.getUser()
 
-  // DEMO_MODE: allow profile saves without login (school was just created via signup)
   if (!user && process.env.DEMO_MODE !== 'true') {
     return new NextResponse('Unauthorized', { status: 401 })
   }
 
   const body = await request.json()
-
   const supabaseAdmin = getSupabaseAdmin()
 
-  // Get school
-  const { data: school } = await supabaseAdmin
-    .from('schools')
+  const { data: school } = await (supabaseAdmin
+    .from('schools') as any)
     .select('id')
     .eq('slug', slug)
     .single()
 
   if (!school) return new NextResponse('School not found', { status: 404 })
 
-  // Upsert school profile
-  const { data: profile, error } = await supabaseAdmin
-    .from('school_profiles')
+  const { data: profile, error } = await (supabaseAdmin
+    .from('school_profiles') as any)
     .upsert(
       {
         school_id: school.id,
@@ -101,7 +95,7 @@ export async function PUT(
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   if (user) {
-    await supabaseAdmin.from('audit_logs').insert(
+    await (supabaseAdmin.from('audit_logs') as any).insert(
       auditLog('SCHOOL_PROFILE_UPDATED', user.id, { school_id: school.id })
     )
   }
