@@ -90,7 +90,7 @@ function OnboardingFlow() {
 
         {/* Step content */}
         {step === 1 && <StepWelcome onNext={advance} />}
-        {step === 2 && <StepProfile onNext={advance} schoolId={schoolId} onSlug={setSchoolSlug} />}
+        {step === 2 && <StepProfile onNext={advance} schoolId={schoolId} schoolSlug={schoolSlug} onSlug={setSchoolSlug} />}
         {step === 3 && <StepImport onNext={advance} schoolId={schoolId} />}
         {step === 4 && <StepAvailability onNext={advance} schoolId={schoolId} />}
         {step === 5 && <StepFirstSession onNext={advance} schoolId={schoolId} />}
@@ -133,9 +133,16 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
   )
 }
 
-function StepProfile({ onNext, schoolId, onSlug }: { onNext: () => void; schoolId: string | null; onSlug: (s: string) => void }) {
+function StepProfile({ onNext, schoolId, schoolSlug, onSlug }: { onNext: () => void; schoolId: string | null; schoolSlug: string; onSlug: (s: string) => void }) {
   const [form, setForm] = useState({ name: '', tagline: '', phone: '', city: '', slug: '' })
   const [saved, setSaved] = useState(false)
+
+  // Initialize slug with the full slug from parent
+  useEffect(() => {
+    if (schoolSlug) {
+      setForm(prev => ({ ...prev, slug: schoolSlug }))
+    }
+  }, [schoolSlug])
 
   function handleChange(field: string, value: string) {
     setForm(prev => ({ ...prev, [field]: value }))
@@ -150,14 +157,14 @@ function StepProfile({ onNext, schoolId, onSlug }: { onNext: () => void; schoolI
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!schoolId) return
-    const res = await fetch(`/api/schools/${form.slug || 'temp'}`, {
+    const res = await fetch(`/api/schools/${schoolSlug || form.slug}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'x-school-id': schoolId },
       body: JSON.stringify(form),
     })
     if (res.ok) {
       setSaved(true)
-      onSlug(form.slug)
+      onSlug(schoolSlug || form.slug)
       setTimeout(onNext, 800)
     }
   }
