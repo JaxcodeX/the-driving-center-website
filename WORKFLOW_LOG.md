@@ -1,77 +1,110 @@
 # WORKFLOW_LOG.md — FSO Cycle Log
 
-## Cycle 3 — P1-A: Student Profile Edit + TCA Tracking + Certificate Issuance
+**Following Mark Martin's FSO workflow. Every cycle logged honestly.**
+**Format: What we tried → What failed → What fixed it → Root cause**
 
-**Date:** 2026-04-25
-**SPEC.md:** `SPEC_P1_A_STUDENT_EDIT.md`
+---
+
+## Cycle 6 — Architecture Audit + Clean Docs + Test Framework
+
+**Date:** 2026-04-26
+**SPEC.md:** `SPEC.md` (Phase 1D)
+**Implemented by:** Everest + DeepSeek
 **Result:** ✅ Passed — deployed
 
 ### What was done
-Built full student management UI:
-- **GET /api/students**: Now decrypts `legal_name` server-side and returns real names to admin view (was returning `[encrypted]` for every student)
-- **GET /api/students/[id]**: Returns full decrypted record (name, permit, DOB, contacts, hours)
-- **PUT /api/students/[id]**: Full update — encrypts PII on write, handles certificate issuance with TCA eligibility check (≥30h classroom + ≥6h driving)
-- **UI**: Click any student row → slide-over edit panel with all fields, TCA progress bars, certificate button
+Full architecture audit + documentation cleanup:
+- Rewrote `CLAUDE.md` as single source of truth
+- Created `STATUS.md` (honest project state, no contradictions)
+- Created `tests/e2e/run-all.js` (automated API test runner)
+- Defined Phase 1D in `SPEC.md` (5 criticals remaining)
+- Deployed to: `the-driving-center-website-3jznxhlb3-jaxcodexs-projects.vercel.app`
 
-### TCA minimums (TN law)
-- Classroom: 30 hours
-- Behind-wheel: 6 hours
-- Certificate button only active when both minimums met and not already issued
+### What We Got Wrong Before This Cycle
 
-### Failures
-- TypeScript error: `SUPABASE_SERVICE_ROLE_KEY` typed as `string | undefined` — fixed with `!` assertion
+**Documentation sprawl:** 8 files defining the same project state, all contradicting each other.
+- `PROJECT_CONSTITUTION.md` said coding agent was "Kimi K2.6 via Ollama" — hadn't been true for weeks
+- `BUILD_PLAN.md` still listed Phase 0 P0-1 fixes that were resolved months ago
+- `PROGRESS.md` said Phase 1A "in progress" — most items were done
+
+**Root cause:** We built first, documented later. Docs got stale the moment a session ended. Fix: one source of truth (CLAUDE.md), updated at the end of every session.
+
+**B.L.A.S.T. protocol written but never followed:**
+The `PROJECT_CONSTITUTION.md` had a full B.L.A.S.T. protocol. Zero features actually went through it. Every cycle was: Build → Fix → Document retroactively. The spec was written after the code, not before.
+
+**Root cause:** No enforcement mechanism. The workflow existed on paper but had no gate. Fix: CLAUDE.md now enforces "no SPEC.md → no implementation."
+
+### What Still Needs Fixing (Phase 1D)
+
+- [ ] SQL migrations 007 + 008 run in Supabase SQL Editor
+- [ ] Subscription status middleware (canceled/past_due schools redirect)
+- [ ] RLS cross-school test
+- [ ] CSV import (real parsing)
+- [ ] Email wiring (Resend key needed)
 
 ### Next action
-P1-C: Email/SMS reminders wired to OpenClaw cron
+Phase 1D implementation — subscription middleware + RLS test
 
-## Cycle 4 — P1-B: Session Management
-
-**Date:** 2026-04-25
-**SPEC.md:** `SPEC_P1_B_SESSION_MANAGEMENT.md`
-**Result:** ✅ Passed — deployed
-
-### What was done
-Built full session CRUD UI:
-- **GET /api/sessions** — school ownership check added (was open to any authenticated user)
-- **POST /api/sessions** — ownership check + service role client for writes
-- **New POST /api/sessions/duplicate/[id]** — duplicates session N weeks forward (1-12), same day/time/instructor
-- **Sessions page** — school_id now from `/api/auth/session` (not URL params — same fix as P0-4)
-- **Instructor dropdown** — fetched from `/api/instructors?school_id=X`
-- **Edit slide-over** — all fields editable, past sessions locked
-- **Duplicate modal** — 1-12 weeks, creates sessions at 7-day intervals
-- **Cancel** — soft-delete with confirmation
-- **Visual separation** — upcoming vs past/cancelled sessions
-
-### TypeScript fixes
-1. `typeof form` in SessionModal onChange type — defined `CreateForm` type explicitly
-2. `formatDate` used before defined — moved to module scope
-3. `form as Partial<Session>` type mismatch (string vs number) — cast through `unknown`
-
-### Failures
-- None — build passed after type fixes
+---
 
 ## Cycle 5 — P1-C: Email + SMS Reminders Wired to Cron
 
 **Date:** 2026-04-25
-**SPEC.md:** `SPEC_P1_C_REMINDERS.md`
 **Result:** ✅ Passed — deployed
 
-### What was done
-Wired 48h and 4h email reminders alongside existing SMS in `/api/reminders`:
-- **48h channel:** `sendLessonReminderSMS` + `reminder48hEmail` (beautiful HTML template with confirm/reschedule links)
-- **4h channel:** `sendFinalReminderSMS` + `reminder4hEmail` (beautiful HTML template with school phone)
-- **Stub mode:** logs what would be sent when Resend/Twilio not configured — never crashes
-- **CRON_SETUP.md** updated with real Vercel URL (`the-driving-center-website.vercel.app`), job descriptions, key requirements table
-- **Second cron job** added: `tdc-monday-ops` (every Monday 9 AM ET → posts pipeline update to Discord)
+### Failure logged
+**What failed:** Reminder system was SMS-only. No email confirmation after booking.
 
-### API change
-`GET /api/reminders` (and POST for cron) now sends both SMS + email per reminder. Response includes `{ sent_48h: { sms, email }, sent_4h: { sms, email }, email_configured }`.
+**Root cause:** Twilio was wired first (easier stub) because it required only env vars. Email was left as a stub but wasn't implemented at the API level — the reminder route returned SMS but had no email channel.
 
-### Keys still needed (in Vercel)
-- `RESEND_API_KEY` (resend.com)
-- `TWILIO_ACCOUNT_SID` + `TWILIO_AUTH_TOKEN` + `TWILIO_PHONE_NUMBER` (twilio.com)
+**Fix:** Extended `/api/reminders` to support both channels. Stub mode logs what would be sent without crashing. Email templates created (48h + 4h). Cron job configured.
 
-Until keys are added: stub mode logs `[Twilio STUB]` / `[Resend STUB]` — works fine in demo mode.
+**Lesson:** When two delivery mechanisms share a trigger, build them together. SMS-only reminders would have required a second round of API changes to add email.
 
-### Next action
-Phase 2: Stripe subscription flow — gate school admin behind payment, validate Stripe customer ID, handle expired/failed payments.
+---
+
+## Cycle 4 — P1-B: Session Management
+
+**Date:** 2026-04-25
+**Result:** ✅ Passed — deployed
+
+### Failure logged
+**What failed:** Sessions page used `school_id` from URL query params — would break if user navigated directly. Students could see other schools' sessions if they manipulated the URL.
+
+**Root cause:** We trusted client-supplied `school_id` from `useSearchParams` instead of getting it from the authenticated session. First-pass security hole.
+
+**Fix:** `school_id` now comes from `/api/auth/session` server call. URL params used only for initial render.
+
+**Lesson:** Every `school_id` that isn't sourced from the server session is a potential data leak vector. Client-supplied school_id is never trustworthy.
+
+---
+
+## Cycle 3 — P1-A: Student Profile Edit + TCA Tracking
+
+**Date:** 2026-04-25
+**Result:** ✅ Passed — deployed
+
+### Failure logged
+**What failed:** Student API returned `[encrypted]` for every name. Decryption wasn't happening at read time.
+
+**Root cause:** Encryption was correctly applied at write (legal_name encrypted before INSERT), but the read path in the API route didn't call `decrypt()`. The data was always encrypted in the DB — the API just wasn't decrypting it.
+
+**Fix:** Added server-side decryption in both GET /api/students and GET /api/students/[id].
+
+**Lesson:** If PII is encrypted at rest, every read path must explicitly decrypt. Encryption at write without decryption at read = data you can't use.
+
+---
+
+## Cycle 1 — Auth + Initial Build
+
+**Date:** 2026-04-22
+**Result:** ✅ Passed — deployed
+
+### Failure logged
+**What failed:** Magic link auth callback didn't create a link between the Supabase auth user and the school_id in our schools table. School owners logged in but the system didn't know which school they owned.
+
+**Root cause:** Auth callback wrote to `user_metadata.school_id` but the admin dashboard was reading `owner_email` from the schools table — two separate identity systems that never got reconciled.
+
+**Fix:** Dual-write in auth callback: `user_metadata.school_id` + `schools.owner_email` written at the same time.
+
+**Lesson:** Auth identity and business identity are separate systems. The link between them must be explicit and tested with every auth change.
