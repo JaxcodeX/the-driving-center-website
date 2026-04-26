@@ -1,177 +1,260 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { Save, CheckCircle } from 'lucide-react'
 
-interface UpcomingSession {
-  id: string
-  session_date: string
-  session_time: string
-  status: string
-  student_name: string | null
-  session_type_name: { name: string; duration_minutes: number; color: string } | null
-  location: string | null
-}
+const DAYS = [
+  { value: 1, label: 'Monday' },
+  { value: 2, label: 'Tuesday' },
+  { value: 3, label: 'Wednesday' },
+  { value: 4, label: 'Thursday' },
+  { value: 5, label: 'Friday' },
+  { value: 6, label: 'Saturday' },
+  { value: 7, label: 'Sunday' },
+]
 
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr + 'T12:00:00')
-  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
-}
-
-function groupByDate(sessions: UpcomingSession[]) {
-  const groups: Record<string, UpcomingSession[]> = {}
-  for (const s of sessions) {
-    if (!groups[s.session_date]) groups[s.session_date] = []
-    groups[s.session_date].push(s)
-  }
-  return groups
+function formatTime(time: string): string {
+  if (!time) return '09:00'
+  return time
 }
 
 export default function InstructorSchedulePage() {
-  const [sessions, setSessions] = useState<UpcomingSession[]>([])
+  const [instructorId, setInstructorId] = useState<string>('')
+  const [schoolId, setSchoolId] = useState<string>('')
+  const [instructorName, setInstructorName] = useState<string>('')
+  const [schoolName, setSchoolName] = useState<string>('')
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
-  const [instructorName, setInstructorName] = useState('')
+
+  const [availability, setAvailability] = useState<Record<number, {
+    active: boolean
+    start_time: string
+    end_time: string
+  }>>({})
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const iid = params.get('instructor_id')
+    const sid = params.get('school')
+
+    if (!iid || !sid) {
+      setError('Invalid schedule link. Ask your school administrator for a new link.')
+      setLoading(false)
+      return
+    }
+
+    setInstructorId(iid)
+    setSchoolId(sid)
+
+    const supabase = createClient()
+
     async function load() {
-      try {
-        const res = await fetch('/api/instructor/schedule')
-        if (!res.ok) throw new Error('Not authorized')
-        const data = await res.json()
-        setSessions(data.upcoming ?? [])
-        setInstructorName(data.instructor_name ?? '')
-      } catch (err: any) {
-        setError(err.message)
-      }
+      const [{ data: instructorData }, { data: availabilityData }, { data: schoolData }] = await Promise.all([
+        supabase.from('instructors').select('name, school_id').eq('id', iid).single(),
+        supabase.from('instructor_availability').select('*').eq('instructor_id', iid),
+        supabase.from('schools').select('name').eq('id', sid).single(),
+      ])
+
+      setInstructorName(instructorData?.name ?? 'Instructor')
+      setSchoolName(schoolData?.name ?? 'Your school')
+
+      // Initialize availability map with defaults (all disabled)
+      const initState: Record<number, { active: boolean; start_time: string; end_time: string }> = {}
+      DAYS.forEach(d => {
+        initState[d.value] = { active: false, start_time: '09:00', end_time: '17:00' }
+      })
+
+      // Override with existing availability
+      ;(availabilityData ?? []).forEach((row: any) => {
+        if (initState[row.day_of_week]) {
+          initState[row.day_of_week] = {
+            active: row.active,
+            start_time: row.start_time ?? '09:00',
+            end_time: row.end_time ?? '17:00',
+          }
+        }
+      })
+
+      setAvailability(initState)
       setLoading(false)
     }
+
     load()
   }, [])
+
+  async function handleSave() {
+    setSaving(true)
+    setError('')
+    setSaved(false)
+
+    const payload = DAYS.map(day => ({
+      day_of_week: day.value,
+      active: availability[day.value]?.active ?? false,
+      start_time: availability[day.value]?.start_time ?? '09:00',
+      end_time: availability[day.value]?.end_time ?? '17:00',
+    }))
+
+    const res = await fetch('/api/instructor-availability', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-school-id': schoolId,
+      },
+      body: JSON.stringify({ instructor_id: instructorId, availability: payload }),
+    })
+
+    if (!res.ok) {
+      const data = await res.json()
+      setError(data.error ?? 'Failed to save')
+    } else {
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    }
+
+    setSaving(false)
+  }
+
+  function toggleDay(day: number) {
+    setAvailability(prev => ({
+      ...prev,
+      [day]: { ...prev[day], active: !prev[day]?.active },
+    }))
+  }
 
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-gray-400">Loading schedule...</div>
+        <div className="text-gray-400 text-sm">Loading your schedule...</div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-3xl mb-4">🔒</div>
-          <h1 className="text-xl font-bold text-white mb-2">Sign in required</h1>
-          <p className="text-gray-400 mb-6 text-sm">{error}</p>
-          <Link href="/login" className="text-cyan-400 hover:text-cyan-300 text-sm">
-            Sign in →
-          </Link>
-        </div>
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
+        <div className="text-red-400 text-sm text-center">{error}</div>
       </div>
     )
   }
 
-  const grouped = groupByDate(sessions)
-  const dates = Object.keys(grouped).sort()
-
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Header */}
-      <div className="border-b border-white/10 px-6 py-4">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center text-sm font-bold">DC</div>
-            <div>
-              <div className="text-white font-semibold text-sm">
-                {instructorName ? `${instructorName}'s Schedule` : 'My Schedule'}
-              </div>
-              <div className="text-gray-500 text-xs">Instructor View</div>
-            </div>
-          </div>
-          <Link href="/dashboard" className="text-sm text-gray-400 hover:text-white">
-            ← Dashboard
-          </Link>
+      <div className="bg-slate-900 border-b border-white/10 px-6 py-5">
+        <div className="max-w-lg mx-auto">
+          <div className="text-xs text-cyan-400 font-medium uppercase tracking-wider mb-1">Instructor Schedule</div>
+          <h1 className="text-xl font-bold">{instructorName}</h1>
+          <p className="text-sm text-gray-400">{schoolName}</p>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl font-bold">Upcoming Lessons</h1>
-          <span className="text-sm text-gray-500">{sessions.length} upcoming</span>
+      <div className="max-w-lg mx-auto px-6 py-6">
+        {/* Instructions */}
+        <div className="text-sm text-gray-400 mb-5">
+          Toggle the days you&apos;re available and set your hours for each day.
+          Your schedule is visible to students booking lessons.
         </div>
 
-        {sessions.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="text-4xl mb-4">📅</div>
-            <h2 className="text-lg font-semibold text-white mb-2">No upcoming lessons</h2>
-            <p className="text-gray-400 text-sm">When students book with you, they'll show up here.</p>
-          </div>
-        ) : (
-          <div className="space-y-8">
-            {dates.map(date => (
-              <div key={date}>
-                {/* Date header */}
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="text-sm font-semibold text-cyan-400">
-                    {formatDate(date)}
-                  </span>
-                  <div className="flex-1 h-px bg-white/10" />
-                  <span className="text-xs text-gray-600">
-                    {grouped[date].length} lesson{grouped[date].length !== 1 ? 's' : ''}
-                  </span>
-                </div>
-
-                {/* Sessions for this date */}
-                <div className="space-y-2">
-                  {grouped[date]
-                    .sort((a, b) => a.session_time.localeCompare(b.session_time))
-                    .map(session => (
+        {/* Day grid */}
+        <div className="space-y-3">
+          {DAYS.map(day => {
+            const dayAvail = availability[day.value] ?? { active: false, start_time: '09:00', end_time: '17:00' }
+            return (
+              <div
+                key={day.value}
+                className={`rounded-xl border transition-all ${
+                  dayAvail.active
+                    ? 'bg-slate-800 border-cyan-500/30'
+                    : 'bg-slate-900 border-white/8'
+                }`}
+              >
+                {/* Day header */}
+                <div className="flex items-center justify-between px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => toggleDay(day.value)}
+                      className={`w-10 h-6 rounded-full transition-all relative ${
+                        dayAvail.active ? 'bg-cyan-500' : 'bg-slate-700'
+                      }`}
+                      style={{ width: 40, height: 24 }}
+                    >
                       <div
-                        key={session.id}
-                        className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-4"
-                      >
-                        {/* Color dot */}
-                        <div
-                          className="w-2 h-10 rounded-full shrink-0"
-                          style={{ backgroundColor: session.session_type_name?.color ?? '#06b6d4' }}
-                        />
-
-                        {/* Time */}
-                        <div className="w-14 shrink-0">
-                          <div className="text-sm font-semibold text-white">
-                            {session.session_time.substring(0, 5)}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {session.session_type_name?.duration_minutes ?? '--'}m
-                          </div>
-                        </div>
-
-                        {/* Details */}
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-white text-sm truncate">
-                            {session.student_name ?? 'Student'}
-                          </div>
-                          <div className="text-xs text-gray-400 truncate">
-                            {session.session_type_name?.name ?? 'Lesson'}
-                            {session.location ? ` · ${session.location}` : ''}
-                          </div>
-                        </div>
-
-                        {/* Status */}
-                        <div className="shrink-0">
-                          <span className="inline-flex items-center gap-1 text-xs text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-full">
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                            Confirmed
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                        className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                          dayAvail.active ? 'translate-x-[22px]' : 'translate-x-1'
+                        }`}
+                        style={{ width: 16, height: 16 }}
+                      />
+                    </button>
+                    <span className="text-sm font-medium text-white">{day.label}</span>
+                  </div>
+                  {dayAvail.active && (
+                    <span className="text-xs text-cyan-400">
+                      {dayAvail.start_time} – {dayAvail.end_time}
+                    </span>
+                  )}
                 </div>
+
+                {/* Time pickers — only when active */}
+                {dayAvail.active && (
+                  <div className="flex gap-3 px-4 pb-4">
+                    <div className="flex-1">
+                      <label className="text-xs text-gray-500 mb-1 block">Start</label>
+                      <input
+                        type="time"
+                        value={dayAvail.start_time}
+                        onChange={e => setAvailability(prev => ({
+                          ...prev,
+                          [day.value]: { ...prev[day.value], start_time: e.target.value },
+                        }))}
+                        className="w-full bg-slate-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="text-xs text-gray-500 mb-1 block">End</label>
+                      <input
+                        type="time"
+                        value={dayAvail.end_time}
+                        onChange={e => setAvailability(prev => ({
+                          ...prev,
+                          [day.value]: { ...prev[day.value], end_time: e.target.value },
+                        }))}
+                        className="w-full bg-slate-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
-            ))}
+            )
+          })}
+        </div>
+
+        {/* Save button */}
+        {error && (
+          <div className="mt-4 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 text-sm text-red-400">
+            {error}
           </div>
         )}
+
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="mt-5 w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          {saving ? (
+            'Saving...'
+          ) : saved ? (
+            <>
+              <CheckCircle className="w-4 h-4" /> Saved!
+            </>
+          ) : (
+            <>
+              <Save className="w-4 h-4" /> Save Schedule
+            </>
+          )}
+        </button>
       </div>
     </div>
   )

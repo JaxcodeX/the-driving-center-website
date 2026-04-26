@@ -1,106 +1,88 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { auditLog } from '@/lib/security'
+import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
+import { createServerClient } from '@supabase/ssr'
+import { NextRequest } from 'next/server'
 
-export async function GET(request: Request) {
+// ── GET instructor's own availability, or owner's view of an instructor's availability ──
+
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const instructorId = searchParams.get('instructor_id')
 
   if (!instructorId) {
-    return NextResponse.json({ error: 'instructor_id required' }, { status: 400 })
+    return NextResponse.json({ error: 'instructor_id query param required' }, { status: 400 })
   }
 
-  const supabase = await createClient()
-  const { data: windows, error } = await supabase
-    .from('instructor_availability')
-    .select('*')
-    .eq('instructor_id', instructorId)
-    .order('day_of_week')
-    .order('start_time')
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-
-  return NextResponse.json(windows ?? [])
-}
-
-export async function POST(request: Request) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) return new NextResponse('Unauthorized', { status: 401 })
-
-  const schoolId = request.headers.get('x-school-id')
-  if (!schoolId) return new NextResponse('Missing x-school-id', { status: 400 })
-
-  const body = await request.json()
-  const { availability } = body // array of { instructor_id, day_of_week, start_time, end_time, location }
-
-  if (!Array.isArray(availability)) {
-    return NextResponse.json({ error: 'availability array required' }, { status: 400 })
-  }
-
-  const supabaseAdmin = await createClient()
-
-  // Delete existing and replace (upsert pattern)
-  for (const window of availability) {
-    if (!window.instructor_id || window.day_of_week === undefined || !window.start_time || !window.end_time) {
-      continue
-    }
-
-    const { error } = await supabaseAdmin
-      .from('instructor_availability')
-      .upsert(
-        {
-          instructor_id: window.instructor_id,
-          day_of_week: window.day_of_week,
-          start_time: window.start_time,
-          end_time: window.end_time,
-          location: window.location ?? null,
-        },
-        { onConflict: 'instructor_id,day_of_week,start_time' }
-      )
-
-    if (error) {
-      console.error('Availability upsert error:', error)
-    }
-  }
-
-  await supabaseAdmin.from('audit_logs').insert(
-    auditLog('INSTRUCTOR_AVAILABILITY_UPDATED', user.id, {
-      school_id: schoolId,
-      instructor_count: availability.length,
-    })
+  const supabaseAdmin = createSupabaseAdmin(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  return NextResponse.json({ success: true })
+  const { data, error } = await supabaseAdmin
+    .from('instructor_availability')
+    .select('id, instructor_id, day_of_week, start_time, end_time, active')
+    .eq('instructor_id', instructorId)
+    .order('day_of_week', { ascending: true })
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ availability: data ?? [] })
 }
 
-export async function DELETE(request: Request) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+// ── PUT replaces all availability for an instructor ──
+// Body: { instructor_id, availability: [{ day_of_week, start_time, end_time, active }] }
 
-  if (!user) return new NextResponse('Unauthorized', { status: 401 })
+export async function PUT(request: NextRequest) {
+  const demoMode = process.env.DEMO_MODE === 'true'
 
-  const { searchParams } = new URL(request.url)
-  const windowId = searchParams.get('id')
-
-  if (!windowId) return new NextResponse('Window ID required', { status: 400 })
-
-  const supabaseAdmin = await createClient()
-  const { error } = await supabaseAdmin
-    .from('instructor_availability')
-    .delete()
-    .eq('id', windowId)
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  if (demoMode) {
+    const schoolId = request.headers.get('x-school-id')
+    if (!schoolId) return NextResponse.json({ error: 'Missing x-school-id' }, { status: 400 })
+  } else {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll() { return request.cookies.getAll() }, setAll() {} } }
+    )
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  return new NextResponse('OK')
+  const body = await request.json()
+  const { instructor_id, availability } = body
+
+  if (!instructor_id || !Array.isArray(availability)) {
+    return NextResponse.json({ error: 'instructor_id and availability[] required' }, { status: 400 })
+  }
+
+  const supabaseAdmin = createSupabaseAdmin(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
+  // Delete existing availability for this instructor
+  await supabaseAdmin
+    .from('instructor_availability')
+    .delete()
+    .eq('instructor_id', instructor_id)
+
+  // Insert new availability (only active days)
+  const toInsert = availability
+    .filter((day: any) => day.active)
+    .map((day: any) => ({
+      instructor_id,
+      day_of_week: day.day_of_week,
+      start_time: day.start_time,
+      end_time: day.end_time,
+      active: true,
+    }))
+
+  if (toInsert.length > 0) {
+    const { error } = await supabaseAdmin
+      .from('instructor_availability')
+      .insert(toInsert)
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json({ success: true, days_saved: toInsert.length })
 }
