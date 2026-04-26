@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   const schoolId = searchParams.get('school_id')
   if (!schoolId) return new NextResponse('Missing school_id', { status: 400 })
 
-  const supabase = getSupabaseAdmin()
+  const admin: any = getSupabaseAdmin()
 
   // Auth check
   const authHeader = request.headers.get('Authorization')
@@ -19,14 +19,14 @@ export async function GET(request: Request) {
     if (!user) return new NextResponse('Unauthorized', { status: 401 })
   }
 
-  const { data: school } = await supabase
+  const { data: school } = await admin
     .from('schools')
     .select('id')
     .eq('id', schoolId)
     .single()
   if (!school) return new NextResponse('Forbidden', { status: 403 })
 
-  const { data: sessions, error } = await supabase
+  const { data: sessions, error } = await admin
     .from('sessions')
     .select('*, instructor:instructors(id, name)')
     .eq('school_id', schoolId)
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'start_date, end_date, and max_seats are required' }, { status: 400 })
   }
 
-  const supabase = getSupabaseAdmin()
+  const admin: any = getSupabaseAdmin()
   const schoolId = request.headers.get('x-school-id')
   if (!schoolId) return new NextResponse('Missing x-school-id', { status: 400 })
 
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
 
   // DEMO_MODE: skip full auth
   if (process.env.DEMO_MODE === 'true') {
-    const { data: session, error } = await supabase
+    const { data: session, error } = await admin
       .from('sessions')
       .insert({
         school_id: schoolId,
@@ -77,10 +77,10 @@ export async function POST(request: Request) {
   // Non-demo: full auth
   if (!authHeader?.startsWith('Bearer ')) return new NextResponse('Unauthorized', { status: 401 })
   const token = authHeader.slice(7)
-  const { data: { user } } = await supabase.auth.getUser(token)
+  const { data: { user } } = await admin.auth.getUser(token)
   if (!user) return new NextResponse('Invalid token', { status: 401 })
 
-  const { data: school } = await supabase
+  const { data: school } = await admin
     .from('schools')
     .select('id')
     .eq('id', schoolId)
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Session must be in the future' }, { status: 400 })
   }
 
-  const { data: session, error } = await supabase
+  const { data: session, error } = await admin
     .from('sessions')
     .insert({
       school_id: schoolId,
@@ -112,7 +112,7 @@ export async function POST(request: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  await supabase.from('audit_logs').insert(
+  await admin.from('audit_logs').insert(
     auditLog('SESSION_CREATED', user.id, { session_id: session.id, school_id: schoolId, instructor_id })
   )
 

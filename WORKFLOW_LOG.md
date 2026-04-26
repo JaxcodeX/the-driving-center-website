@@ -108,3 +108,42 @@ Phase 1D implementation — subscription middleware + RLS test
 **Fix:** Dual-write in auth callback: `user_metadata.school_id` + `schools.owner_email` written at the same time.
 
 **Lesson:** Auth identity and business identity are separate systems. The link between them must be explicit and tested with every auth change.
+
+---
+
+## Cycle 7 — Schema Fix: Align Code to Actual DB Schema
+
+**Date:** 2026-04-26
+**SPEC.md:** `SPEC_SCHEMA_FIX.md`
+**Implemented by:** Everest
+**Result:** ✅ Passed — committed + pushed
+
+### What was wrong
+Code assumed database columns that don't exist in `evswdlsqlaztvajibgta`:
+- `POST /api/bookings`: inserted `session_id` (UUID FK) + `deposit_amount_cents` into columns that don't exist → hard error on every booking
+- `bookings.confirmation_token` doesn't exist (actual column: `booking_token`)
+- `sessions.cancelled` doesn't exist (actual: `sessions.status` TEXT)
+- `sessions.start_time` doesn't exist (sessions only have `start_date`)
+- `/api/schools` POST had no auth check — anyone could create a school
+- `getSupabaseAdmin()` defined inline in 13+ files
+
+### What was fixed
+1. `POST /api/bookings` — rewritten to use actual DB columns: `session_date` + `session_time` (TEXT), `booking_token`
+2. `GET /api/sessions` — removed `.eq('cancelled', false)`, uses `.eq('status', 'scheduled')` (actual DB has `status` not `cancelled`)
+3. `POST /api/sessions` — removed `start_time`/`end_time` references, uses `start_date`/`end_date` only
+4. `/api/schools` POST — added auth check (DEMO_MODE requires logged-in user)
+5. `/api/notify/booking` — uses `booking_token` instead of `reschedule_token`
+6. All routes now import `getSupabaseAdmin()` from `@/lib/supabase/server` (single source)
+
+### Root cause
+Schema was designed with certain column names but Supabase project had different actual schema. Code was written based on design assumptions, not actual DB inspection.
+
+### Lesson
+Inspect actual DB schema via live API calls before writing code that touches it. Never assume column names — verify.
+
+### What's still pending
+- [ ] Migration 009 SQL run in Supabase SQL Editor (add session_id FK + missing columns)
+- [ ] RLS test run (`tests/e2e/rls-test.js`)
+- [ ] Production Vercel redeploy
+- [ ] Full end-to-end test with Zax
+

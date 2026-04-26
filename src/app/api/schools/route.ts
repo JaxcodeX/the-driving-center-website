@@ -29,11 +29,11 @@ export async function POST(request: Request) {
     }
   }
 
-  const supabaseAdmin = getSupabaseAdmin()
+  const admin: any = getSupabaseAdmin()
   const slug = schoolName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) + '-' + Date.now().toString(36)
 
   // Check if email already owns a school
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await admin
     .from('schools')
     .select('id')
     .eq('owner_email', email)
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'A school with this email already exists' }, { status: 409 })
   }
 
-  const { data: school, error: schoolError } = await supabaseAdmin
+  const { data: school, error: schoolError } = await admin
     .from('schools')
     .insert({
       name: schoolName,
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
   })
 
   if (checkoutSession.customer) {
-    await supabaseAdmin.from('schools').update({ stripe_customer_id: checkoutSession.customer as string }).eq('id', school.id)
+    await admin.from('schools').update({ stripe_customer_id: checkoutSession.customer as string }).eq('id', school.id)
   }
 
   return NextResponse.json({ schoolId: school.id, slug: school.slug, checkoutUrl: checkoutSession.url })
