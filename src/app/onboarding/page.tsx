@@ -379,18 +379,38 @@ function StepFirstSession({ onNext, schoolId }: { onNext: () => void; schoolId: 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
     setCreating(true)
+
+    // Map form title to duration and price
+    const durationMap: Record<string, { minutes: number; price_cents: number }> = {
+      'Traffic School': { minutes: 360, price_cents: 12500 },
+      'Private Lesson': { minutes: 60, price_cents: 7500 },
+      'Driving Assessment': { minutes: 120, price_cents: 10000 },
+    }
+    const { minutes: duration_minutes, price_cents } = durationMap[title] ?? { minutes: 60, price_cents: 7500 }
+
+    // Calculate end_time from start_time + duration
+    const [h, m] = time.split(':').map(Number)
+    const startMinutes = h * 60 + m
+    const endMinutes = startMinutes + duration_minutes
+    const endTime = `${String(Math.floor(endMinutes / 60)).padStart(2, '0')}:${String(endMinutes % 60).padStart(2, '0')}`
+
+    const payload = {
+      start_date: date,
+      start_time: time,
+      end_time: endTime,
+      max_seats: 1,
+      price_cents,
+      location: '',
+    }
+
     const res = await fetch('/api/sessions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-school-id': schoolId ?? '' },
-      body: JSON.stringify({
-        title,
-        session_date: date,
-        session_time: time,
-        duration_minutes: 60,
-        max_seats: 1,
-        price_cents: 12500,
-        location: '',
-      }),
+      headers: {
+        'Content-Type': 'application/json',
+        'x-school-id': schoolId ?? '',
+        ...(process.env.NEXT_PUBLIC_DEMO_MODE === 'true' ? {} : { 'Authorization': 'Bearer demo' }),
+      },
+      body: JSON.stringify(payload),
     })
     setCreating(false)
     if (res.ok) {
