@@ -11,27 +11,25 @@ export async function GET(request: Request) {
   const supabase = getSupabaseAdmin() as any
   const now = new Date()
   const today = now.toISOString().split('T')[0]
-  const schoolId = new URL(request.url).searchParams.get('school_id')
 
-  // Fetch confirmed bookings (session_time is the denormalized session start_date field)
-  const { data: bookings, error: bookingsError } = await supabase
+  // Fetch confirmed bookings with session_time set (denormalized field)
+  const { data: confirmedBookings, error: bookingsError } = await supabase
     .from('bookings')
     .select('id, student_name, student_email, student_phone, reminder_48h_sent, reminder_4h_sent, status, session_time')
     .eq('status', 'confirmed')
     .not('session_time', 'is', null)
 
-  const { data: bookings, error: bookingsError } = await bookingsQuery
   if (bookingsError) return NextResponse.json({ error: bookingsError.message }, { status: 500 })
 
-  if (!bookings || bookings.length === 0) {
+  const bookings = confirmedBookings ?? []
+  if (bookings.length === 0) {
     return NextResponse.json({
       checked: 0, sent_48h: { sms: 0, email: 0 }, sent_4h: { sms: 0, email: 0 },
       skipped: 0, strategy: '48h + 4h email (DEMO_MODE)',
     })
   }
 
-  // Fetch sessions that match these booking IDs
-  const sessionTimes = bookings.map((b: any) => b.session_time).filter(Boolean)
+  // Fetch today's sessions for location lookup
   const { data: sessions } = await supabase
     .from('sessions')
     .select('id, start_date, location, school_id, max_seats')
@@ -40,18 +38,11 @@ export async function GET(request: Request) {
   const sessionsByStartDate: Record<string, any> = {}
   sessions?.forEach((s: any) => { sessionsByStartDate[s.start_date] = s })
 
-  const filteredBookings = schoolId
-    ? bookings.filter((b: any) => {
-        const s = sessionsByStartDate[b.session_time?.split('T')[0] || '']
-        return s && s.school_id === schoolId
-      })
-    : bookings
-
   let sent48hEmail = 0, sent48hSMS = 0
   let sent4hEmail = 0, sent4hSMS = 0
   let skipped = 0
 
-  for (const booking of filteredBookings) {
+  for (const booking of bookings) {
     // Derive session date from session_time (format: 'YYYY-MM-DD' or 'YYYY-MM-DDTHH:mm')
     const sessionDateStr = (booking.session_time || '').split('T')[0]
     const session = sessionsByStartDate[sessionDateStr]
@@ -62,7 +53,7 @@ export async function GET(request: Request) {
     const sessionDateTime = new Date(sessionDateStr + 'T12:00:00')
     const hoursUntil = (sessionDateTime.getTime() - now.getTime()) / (1000 * 60 * 60)
 
-    // Skip if in the past or too far in future
+    // Skip if in the past or more than 72h away
     if (hoursUntil < 0 || hoursUntil > 72) { skipped++; continue }
 
     // ── 48h reminder ─────────────────────────────────────────────────
@@ -90,7 +81,7 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json({
-    checked: filteredBookings.length,
+    checked: bookings.length,
     sent_48h: { sms: sent48hSMS, email: sent48hEmail },
     sent_4h: { sms: sent4hSMS, email: sent4hEmail },
     skipped,
