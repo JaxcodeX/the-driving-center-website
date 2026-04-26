@@ -57,7 +57,11 @@ export async function PUT(
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) return new NextResponse('Unauthorized', { status: 401 })
+
+  // DEMO_MODE: allow profile saves without login (school was just created via signup)
+  if (!user && process.env.DEMO_MODE !== 'true') {
+    return new NextResponse('Unauthorized', { status: 401 })
+  }
 
   const body = await request.json()
 
@@ -96,9 +100,11 @@ export async function PUT(
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  await supabaseAdmin.from('audit_logs').insert(
-    auditLog('SCHOOL_PROFILE_UPDATED', user.id, { school_id: school.id })
-  )
+  if (user) {
+    await supabaseAdmin.from('audit_logs').insert(
+      auditLog('SCHOOL_PROFILE_UPDATED', user.id, { school_id: school.id })
+    )
+  }
 
   return NextResponse.json(profile)
 }
