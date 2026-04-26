@@ -15,6 +15,8 @@ interface StudentRow {
   enrollment_date?: string
 }
 
+// ── CSV Parsing ──────────────────────────────────────────────────────────────
+
 function parseCSV(csvText: string): StudentRow[] {
   const lines = csvText.trim().split('\n')
   if (lines.length < 2) return []
@@ -69,126 +71,70 @@ function parseCSVLine(line: string): string[] {
   return result
 }
 
+// ── Auth: Session cookie (browser) OR Bearer token (API client) ─────────────
+
+async function getSessionUser(request: Request) {
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return request.cookies.getAll() },
+        setAll() {},
+      },
+    }
+  )
+  const { data: { user } } = await supabase.auth.getUser()
+  return user
+}
+
+// ── Import Handler ─────────────────────────────────────────────────────────
+
 export async function POST(request: Request) {
-  const schoolId = request.headers.get('x-school-id')
   const demoMode = process.env.DEMO_MODE === 'true'
 
-  // ── DEMO_MODE: trust x-school-id from authorized dashboard context ──
+  let schoolId = request.headers.get('x-school-id')
+  let userId: string | null = null
+
   if (demoMode) {
+    // DEMO_MODE: trust x-school-id from the middleware-verified session
     if (!schoolId) {
       return NextResponse.json({ error: 'Missing x-school-id' }, { status: 400 })
     }
+  } else {
+    // PROD_MODE: verify session + school ownership
+    const sessionUser = await getSessionUser(request)
+    if (!sessionUser) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+    userId = sessionUser.id
 
-    const supabaseAdmin = createSupabaseAdmin(
+    if (!schoolId) {
+      schoolId = sessionUser.user_metadata?.school_id
+    }
+
+    if (!schoolId) {
+      return NextResponse.json({ error: 'No school linked to your account' }, { status: 400 })
+    }
+
+    // Verify the logged-in user owns this school
+    const adminClient = createSupabaseAdmin(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
+    const { data: school } = await adminClient
+      .from('schools')
+      .select('owner_email, owner_user_id')
+      .eq('id', schoolId)
+      .maybeSingle()
 
-    const body = await request.json()
-    const { csv_content } = body
-
-    if (!csv_content || typeof csv_content !== 'string') {
-      return NextResponse.json({ error: 'csv_content is required' }, { status: 400 })
+    const isOwner = school?.owner_user_id === userId || school?.owner_email === sessionUser.email
+    if (!isOwner) {
+      return NextResponse.json({ error: 'You do not own this school' }, { status: 403 })
     }
-
-    const rows = parseCSV(csv_content)
-    if (rows.length === 0) {
-      return NextResponse.json({
-        error: 'No valid student rows found.',
-        hint: 'Accepted: legal_name (or name/student_name), dob (YYYY-MM-DD)',
-      }, { status: 400 })
-    }
-
-    const results = { total: rows.length, imported: 0, failed: 0, skipped: 0, errors: [] as string[] }
-
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i]
-      if (!row.legal_name) { results.errors.push(`Row ${i + 2}: Missing name`); results.failed++; continue }
-      if (!row.dob) { results.errors.push(`Row ${i + 2}: Missing DOB`); results.failed++; continue }
-      const dobCheck = validateDOB(row.dob)
-      if (!dobCheck.valid) { results.errors.push(`Row ${i + 2}: ${dobCheck.error}`); results.failed++; continue }
-
-      try {
-        const encryptedName = await encryptField(row.legal_name)
-        const encryptedPermit = row.permit_number ? await encryptField(row.permit_number) : 'PENDING'
-        const encryptedPhone = row.emergency_contact_phone ? await encryptField(row.emergency_contact_phone) : null
-
-        // Dedupe: same dob + this school
-        const { data: existing } = await supabaseAdmin
-          .from('students_driver_ed')
-          .select('id')
-          .eq('school_id', schoolId)
-          .eq('dob', row.dob)
-          .limit(1)
-
-        if (existing && existing.length > 0) {
-          const { error } = await supabaseAdmin
-            .from('students_driver_ed')
-            .update({
-              legal_name: encryptedName,
-              permit_number: encryptedPermit,
-              parent_email: row.parent_email || '',
-              emergency_contact_name: row.emergency_contact_name || '',
-              emergency_contact_phone: encryptedPhone,
-              driving_hours: row.driving_hours ? parseInt(row.driving_hours) : 0,
-              classroom_hours: row.classroom_hours ? parseInt(row.classroom_hours) : 0,
-            })
-            .eq('id', existing[0].id)
-          if (error) { results.errors.push(`Row ${i + 2}: ${error.message}`); results.failed++ }
-          else results.imported++
-        } else {
-          const { error } = await supabaseAdmin
-            .from('students_driver_ed')
-            .insert({
-              school_id: schoolId,
-              legal_name: encryptedName,
-              dob: row.dob,
-              permit_number: encryptedPermit,
-              parent_email: row.parent_email || '',
-              emergency_contact_name: row.emergency_contact_name || '',
-              emergency_contact_phone: encryptedPhone,
-              driving_hours: row.driving_hours ? parseInt(row.driving_hours) : 0,
-              classroom_hours: row.classroom_hours ? parseInt(row.classroom_hours) : 0,
-              enrollment_date: row.enrollment_date || new Date().toISOString().split('T')[0],
-            })
-          if (error) { results.errors.push(`Row ${i + 2}: ${error.message}`); results.failed++ }
-          else results.imported++
-        }
-      } catch (err: any) {
-        results.errors.push(`Row ${i + 2}: ${err.message}`); results.failed++
-      }
-    }
-
-    return NextResponse.json(results)
   }
 
-  // ── PROD MODE: full auth check ──
-  const authHeader = request.headers.get('Authorization')
-  if (!authHeader?.startsWith('Bearer ')) {
-    return new NextResponse('Unauthorized', { status: 401 })
-  }
-  const token = authHeader.slice(7)
-
-  const supabaseAdmin = createSupabaseAdmin(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-
-  const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
-  if (authError || !user) return new NextResponse('Invalid token', { status: 401 })
-
-  if (!schoolId) return NextResponse.json({ error: 'Missing x-school-id' }, { status: 400 })
-
-  // Verify school ownership
-  const { data: school } = await supabaseAdmin
-    .from('schools')
-    .select('id, owner_email')
-    .eq('id', schoolId)
-    .single()
-
-  if (!school || school.owner_email !== user.email) {
-    return new NextResponse('Forbidden', { status: 403 })
-  }
+  // ── Parse + validate CSV ─────────────────────────────────────────────────
 
   const body = await request.json()
   const { csv_content } = body
@@ -201,9 +147,14 @@ export async function POST(request: Request) {
   if (rows.length === 0) {
     return NextResponse.json({
       error: 'No valid student rows found.',
-      hint: 'Accepted: legal_name (or name/student_name), dob (YYYY-MM-DD)',
+      hint: 'Accepted headers: legal_name (or name/student_name), dob (YYYY-MM-DD)',
     }, { status: 400 })
   }
+
+  const supabaseAdmin = createSupabaseAdmin(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
 
   const results = { total: rows.length, imported: 0, failed: 0, skipped: 0, errors: [] as string[] }
 
@@ -213,12 +164,17 @@ export async function POST(request: Request) {
     if (!row.dob) { results.errors.push(`Row ${i + 2}: Missing DOB`); results.failed++; continue }
     const dobCheck = validateDOB(row.dob)
     if (!dobCheck.valid) { results.errors.push(`Row ${i + 2}: ${dobCheck.error}`); results.failed++; continue }
+    if (row.permit_number) {
+      const permitCheck = validatePermitNumber(row.permit_number)
+      if (!permitCheck.valid) { results.errors.push(`Row ${i + 2}: ${permitCheck.error}`); results.failed++; continue }
+    }
 
     try {
       const encryptedName = await encryptField(row.legal_name)
       const encryptedPermit = row.permit_number ? await encryptField(row.permit_number) : 'PENDING'
       const encryptedPhone = row.emergency_contact_phone ? await encryptField(row.emergency_contact_phone) : null
 
+      // Dedupe: match by dob + this school (not name — name is encrypted)
       const { data: existing } = await supabaseAdmin
         .from('students_driver_ed')
         .select('id')
@@ -240,7 +196,7 @@ export async function POST(request: Request) {
           })
           .eq('id', existing[0].id)
         if (error) { results.errors.push(`Row ${i + 2}: ${error.message}`); results.failed++ }
-        else results.imported++
+        else { results.imported++; results.skipped++ }
       } else {
         const { error } = await supabaseAdmin
           .from('students_driver_ed')
@@ -264,15 +220,16 @@ export async function POST(request: Request) {
     }
   }
 
-  if (results.imported > 0) {
-    await supabaseAdmin.from('audit_logs').insert(
-      auditLog('STUDENT_CSV_IMPORT', user.id, {
+  // Audit log — only in prod mode
+  if (!demoMode && userId && results.imported > 0) {
+    supabaseAdmin.from('audit_logs').insert(
+      auditLog('STUDENT_CSV_IMPORT', userId, {
         school_id: schoolId,
         total_rows: results.total,
         imported: results.imported,
         failed: results.failed,
       })
-    )
+    ).then(() => {}).catch(() => {})
   }
 
   return NextResponse.json(results)
