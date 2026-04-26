@@ -21,9 +21,6 @@ function getSupabaseAdmin() {
   )
 }
 
-// Replay protection
-const processedEvents = new Set<string>()
-
 export async function POST(req: Request) {
   const body = await req.text()
   const headersList = await headers()
@@ -38,12 +35,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 401 })
   }
 
-  if (processedEvents.has(event.id)) {
+  // Idempotency check — Stripe can send the same event multiple times
+  const supabaseAdmin = getSupabaseAdmin()
+  const { data: existing } = await supabaseAdmin
+    .from('processed_stripe_events')
+    .select('event_id')
+    .eq('event_id', event.id)
+    .maybeSingle()
+
+  if (existing) {
     return NextResponse.json({ received: true, note: 'already processed' })
   }
-  processedEvents.add(event.id)
-
-  const supabaseAdmin = getSupabaseAdmin()
+  await supabaseAdmin
+    .from('processed_stripe_events')
+    .insert({ event_id: event.id })
 
   // ── School subscription checkout completed ─────────────────────────
   if (event.type === 'checkout.session.completed') {
