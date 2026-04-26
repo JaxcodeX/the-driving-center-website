@@ -30,7 +30,7 @@ export default function CalendarPage() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const { data: school } = await supabase.from('schools').select('id').eq('owner_id', user.id).single()
+      const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
       if (!school) return
 
       const start = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)

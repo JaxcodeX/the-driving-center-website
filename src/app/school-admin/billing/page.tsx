@@ -30,7 +30,7 @@ export default function BillingPage() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const { data: school } = await supabase.from('schools').select('id, name, subscription_status, stripe_customer_id').eq('owner_id', user.id).single()
+      const { data: school } = await supabase.from('schools').select('id, name, subscription_status, stripe_customer_id').eq('owner_user_id', user.id).single()
       if (!school) { setLoading(false); return }
       setSubscription(school)
       setLoading(false)

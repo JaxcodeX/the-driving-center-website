@@ -133,7 +133,7 @@ export default function DashboardPage() {
       const { data: school } = await supabase
         .from('schools')
         .select('id')
-        .eq('owner_id', user.id)
+        .eq('owner_user_id', user.id)
         .single()
 
       if (!school) return

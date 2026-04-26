@@ -90,7 +90,7 @@ export default function InstructorsPage() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const { data: school } = await supabase.from('schools').select('id').eq('owner_id', user.id).single()
+      const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
       if (!school) { setLoading(false); return }
 
       const { data } = await supabase
@@ -107,7 +107,7 @@ export default function InstructorsPage() {
   async function handleInvite(name: string, email: string) {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    const { data: school } = await supabase.from('schools').select('id').eq('owner_id', user!.id).single()
+    const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user!.id).single()
 
     const { data: instructor } = await supabase
       .from('instructors')

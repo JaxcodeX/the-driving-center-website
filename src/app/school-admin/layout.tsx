@@ -137,7 +137,7 @@ export default function SchoolAdminLayout({ children }: { children: React.ReactN
       const { data: school } = await supabase
         .from('schools')
         .select('name')
-        .eq('owner_id', user.id)
+        .eq('owner_user_id', user.id)
         .single()
 
       setSchoolName(school?.name || '')

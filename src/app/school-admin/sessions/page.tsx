@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { Plus, Calendar, Clock, Users, Pencil, Play, Pause } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
@@ -21,26 +20,38 @@ const T = {
   grad:      'linear-gradient(135deg, #38BDF8 0%, #818CF8 100%)',
 }
 
-function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: any) => void }) {
-  const [form, setForm] = useState({ student_id: '', instructor_id: '', session_type_id: '', starts_at: '', duration_minutes: 60 })
-  const [students, setStudents] = useState<any[]>([])
+// Actual sessions table columns: id, start_date, end_date, max_seats, seats_booked, created_at, school_id, instructor_id, session_type_id, status, location
+type Session = {
+  id: string
+  start_date: string
+  end_date: string
+  max_seats: number
+  seats_booked: number
+  instructor_id: string | null
+  session_type_id: string | null
+  status: 'scheduled' | 'canceled' | 'completed'
+  location: string | null
+  instructor: { id: string; name: string } | null
+  session_type: { id: string; name: string; duration_minutes: number; color: string } | null
+}
+
+function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: Session) => void }) {
+  const [form, setForm] = useState({ start_date: '', instructor_id: '', session_type_id: '', location: '', max_seats: 10 })
   const [instructors, setInstructors] = useState<any[]>([])
   const [sessionTypes, setSessionTypes] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  const supabase = createClient()
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      const { data: school } = await supabase.from('schools').select('id').eq('owner_id', user!.id).single()
+      const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user!.id).single()
       if (!school) return
 
-      const [s, i, st] = await Promise.all([
-        supabase.from('students').select('id, name').eq('school_id', school.id).eq('status', 'active'),
-        supabase.from('instructors').select('id, name').eq('school_id', school.id).eq('status', 'active'),
+      const [i, st] = await Promise.all([
+        supabase.from('instructors').select('id, name').eq('school_id', school.id).eq('active', true),
         supabase.from('session_types').select('id, name, duration_minutes').eq('school_id', school.id).eq('active', true),
       ])
-      setStudents(s.data || [])
       setInstructors(i.data || [])
       setSessionTypes(st.data || [])
     }
@@ -50,19 +61,31 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: a
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
-    const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    const { data: school } = await supabase.from('schools').select('id').eq('owner_id', user!.id).single()
+    const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user!.id).single()
+    if (!school) { setLoading(false); return }
+
     const { data, error } = await supabase
       .from('sessions')
-      .insert({ ...form, school_id: school!.id, status: 'pending' })
-      .select('*, students(name), instructors(name), session_types(name)')
+      .insert({
+        school_id: school.id,
+        start_date: form.start_date,
+        end_date: form.start_date,
+        instructor_id: form.instructor_id || null,
+        session_type_id: form.session_type_id || null,
+        location: form.location || '',
+        max_seats: Math.max(1, parseInt(String(form.max_seats)) || 10),
+        seats_booked: 0,
+        status: 'scheduled',
+      })
+      .select()
       .single()
-    if (!error && data) { onAdd(data); onClose() }
+
+    if (!error && data) { onAdd(data as Session); onClose() }
     setLoading(false)
   }
 
-  const inputStyle = { background: T.elevated, border: `1px solid ${T.borderLt}`, color: T.text, outline: 'none' as const }
+  const inputStyle = { background: T.elevated, border: `1px solid ${T.borderLt}`, color: T.text, outline: 'none' as const, borderRadius: '12px' }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
@@ -70,47 +93,45 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: a
         <h2 className="text-lg font-semibold mb-6" style={{ color: T.text }}>Schedule Session</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>Student</label>
-            <select value={form.student_id} onChange={e => setForm(f => ({ ...f, student_id: e.target.value }))} required
-              className="w-full rounded-xl px-4 py-3 text-sm" style={inputStyle}>
-              <option value="">Select student</option>
-              {students.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
+            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>Date</label>
+            <input type="date" value={form.start_date} onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))} required
+              className="w-full px-4 py-3 text-sm" style={inputStyle}
+              onFocus={e => (e.target.style.borderColor = `${T.cyan}60`)}
+              onBlur={e => (e.target.style.borderColor = T.borderLt)} />
           </div>
           <div>
             <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>Instructor</label>
-            <select value={form.instructor_id} onChange={e => setForm(f => ({ ...f, instructor_id: e.target.value }))} required
-              className="w-full rounded-xl px-4 py-3 text-sm" style={inputStyle}>
+            <select value={form.instructor_id} onChange={e => setForm(f => ({ ...f, instructor_id: e.target.value }))}
+              className="w-full px-4 py-3 text-sm" style={inputStyle}>
               <option value="">Select instructor</option>
               {instructors.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
             </select>
           </div>
           <div>
             <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>Session Type</label>
-            <select value={form.session_type_id} onChange={e => setForm(f => ({ ...f, session_type_id: e.target.value }))} required
-              className="w-full rounded-xl px-4 py-3 text-sm" style={inputStyle}>
+            <select value={form.session_type_id} onChange={e => setForm(f => ({ ...f, session_type_id: e.target.value }))}
+              className="w-full px-4 py-3 text-sm" style={inputStyle}>
               <option value="">Select type</option>
               {sessionTypes.map(st => <option key={st.id} value={st.id}>{st.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>Date & Time</label>
-            <input type="datetime-local" value={form.starts_at} onChange={e => setForm(f => ({ ...f, starts_at: e.target.value }))} required
-              className="w-full rounded-xl px-4 py-3 text-sm" style={inputStyle}
+            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>Location</label>
+            <input type="text" value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
+              placeholder="e.g. 123 Main St" className="w-full px-4 py-3 text-sm" style={inputStyle}
               onFocus={e => (e.target.style.borderColor = `${T.cyan}60`)}
               onBlur={e => (e.target.style.borderColor = T.borderLt)} />
           </div>
+          <div>
+            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>Max Seats</label>
+            <input type="number" value={form.max_seats} onChange={e => setForm(f => ({ ...f, max_seats: parseInt(e.target.value) || 10 }))}
+              min="1" max="100" className="w-full px-4 py-3 text-sm" style={inputStyle} />
+          </div>
           <div className="flex gap-3 pt-1">
-            <button type="button" onClick={onClose}
-              className="flex-1 py-3 rounded-xl text-sm font-medium"
-              style={{ background: T.elevated, color: T.secondary, border: `1px solid ${T.border}` }}>
-              Cancel
-            </button>
-            <button type="submit" disabled={loading}
-              className="flex-1 py-3 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
-              style={{ background: T.grad }}>
-              {loading ? 'Scheduling...' : 'Schedule'}
-            </button>
+            <button type="button" onClick={onClose} className="flex-1 py-3 rounded-xl text-sm font-medium"
+              style={{ background: T.elevated, color: T.secondary, border: `1px solid ${T.border}` }}>Cancel</button>
+            <button type="submit" disabled={loading} className="flex-1 py-3 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
+              style={{ background: T.grad }}>{loading ? 'Scheduling...' : 'Schedule'}</button>
           </div>
         </form>
       </div>
@@ -119,34 +140,33 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: a
 }
 
 export default function SessionsPage() {
-  const [sessions, setSessions] = useState<any[]>([])
+  const [sessions, setSessions] = useState<Session[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const supabase = createClient()
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const { data: school } = await supabase.from('schools').select('id').eq('owner_id', user.id).single()
+      const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
       if (!school) { setLoading(false); return }
 
       const { data } = await supabase
         .from('sessions')
-        .select('*, students(name), instructors(name), session_types(name)')
+        .select('*, instructor:instructors(id, name), session_type:session_types(id, name, duration_minutes, color)')
         .eq('school_id', school.id)
-        .order('starts_at', { ascending: true })
-      setSessions(data || [])
+        .order('start_date', { ascending: true })
+      setSessions((data as Session[]) || [])
       setLoading(false)
     }
     load()
   }, [])
 
   async function handleStatusToggle(id: string, currentStatus: string) {
-    const supabase = createClient()
-    const newStatus = currentStatus === 'confirmed' ? 'canceled' : 'confirmed'
+    const newStatus = currentStatus === 'scheduled' ? 'canceled' : 'scheduled'
     await supabase.from('sessions').update({ status: newStatus }).eq('id', id)
-    setSessions(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s))
+    setSessions(prev => prev.map(s => s.id === id ? { ...s, status: newStatus as Session['status'] } : s))
   }
 
   return (
@@ -156,8 +176,7 @@ export default function SessionsPage() {
           <h1 className="text-2xl font-bold mb-1" style={{ color: T.text }}>Sessions</h1>
           <p className="text-sm" style={{ color: T.muted }}>{sessions.length} total</p>
         </div>
-        <button onClick={() => setShowModal(true)}
-          className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl text-white"
+        <button onClick={() => setShowModal(true)} className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl text-white"
           style={{ background: T.grad }}>
           <Plus className="w-4 h-4" /> New Session
         </button>
@@ -176,16 +195,13 @@ export default function SessionsPage() {
       ) : (
         <div className="space-y-2">
           {sessions.map(session => {
-            const date = new Date(session.starts_at)
+            const date = new Date(session.start_date + 'T12:00:00')
             const isPast = date < new Date()
             return (
-              <div
-                key={session.id}
+              <div key={session.id}
                 className="flex items-center justify-between p-4 rounded-2xl transition-all"
-                style={{ background: T.surface, border: `1px solid ${T.border}` }}
-              >
+                style={{ background: T.surface, border: `1px solid ${T.border}` }}>
                 <div className="flex items-center gap-4">
-                  {/* Date block */}
                   <div className="text-center w-12 flex-shrink-0">
                     <div className="text-xs font-semibold" style={{ color: T.cyan }}>{date.toLocaleDateString('en-US', { month: 'short' })}</div>
                     <div className="text-2xl font-bold" style={{ color: T.text }}>{date.getDate()}</div>
@@ -194,31 +210,28 @@ export default function SessionsPage() {
                   <div className="w-px h-10 rounded" style={{ background: T.border }} />
                   <div>
                     <div className="text-sm font-medium mb-0.5" style={{ color: T.text }}>
-                      {session.student?.name || 'Student'} · {session.instructor?.name || 'Instructor'}
+                      {session.session_type?.name || 'Session'} · {session.instructor?.name || 'No instructor'}
                     </div>
                     <div className="flex items-center gap-3 text-xs" style={{ color: T.muted }}>
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
-                      <span>{session.session_type?.name || 'Session'}</span>
-                      <span>{session.duration_minutes || 60} min</span>
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{session.session_type?.duration_minutes || 60} min</span>
+                      {session.location && <span>{session.location}</span>}
+                      <span><Users className="w-3 h-3 inline mr-1" />{session.seats_booked}/{session.max_seats}</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-xs px-2 py-1 rounded-full font-medium capitalize"
                     style={{
-                      background: session.status === 'confirmed' ? `${T.green}15` : session.status === 'canceled' ? '#ef444415' : `${T.amber}15`,
-                      color: session.status === 'confirmed' ? T.green : session.status === 'canceled' ? '#ef4444' : T.amber,
+                      background: session.status === 'scheduled' ? `${T.green}15` : '#ef444415',
+                      color: session.status === 'scheduled' ? T.green : '#ef4444',
                     }}>
                     {session.status}
                   </span>
-                  <button
-                    onClick={() => handleStatusToggle(session.id, session.status)}
-                    className="p-2 rounded-lg transition-colors"
-                    style={{ color: T.muted }}
+                  <button onClick={() => handleStatusToggle(session.id, session.status)}
+                    className="p-2 rounded-lg" style={{ color: T.muted }}
                     onMouseEnter={e => (e.currentTarget.style.background = T.elevated)}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                  >
-                    {session.status === 'confirmed' ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                    {session.status === 'scheduled' ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
