@@ -26,7 +26,7 @@ function OnboardingFlow() {
   const params = useSearchParams()
   const schoolIdFromUrl = params.get('school_id')
   const stepFromUrl = parseInt(params.get('step') ?? '1', 10)
-  const [step, setStep] = useState(stepFromUrl)
+  const [step, setStep] = useState(isNaN(stepFromUrl) ? 1 : stepFromUrl)
   const [schoolSlug, setSchoolSlug] = useState('')
   const [schoolId, setSchoolId] = useState<string | null>(schoolIdFromUrl)
 
