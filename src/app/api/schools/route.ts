@@ -20,15 +20,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'schoolName and email required' }, { status: 400 })
   }
 
-  // DEMO_MODE: still requires auth cookie to prevent anonymous school creation
-  if (process.env.DEMO_MODE === 'true') {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'You must be logged in to create a school' }, { status: 401 })
-    }
-  }
-
+  // DEMO_MODE: skip auth — school creation is open for demo signups
+  // The auth link is sent after school creation via magic link
   const admin: any = getSupabaseAdmin()
   const slug = schoolName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) + '-' + Date.now().toString(36)
 
