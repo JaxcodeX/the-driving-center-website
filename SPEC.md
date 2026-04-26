@@ -1,97 +1,91 @@
-# SPEC.md — Phase 1D: Critical Infrastructure Fixes
+# SPEC.md — The Driving Center Homepage Redesign
 
-**Date:** 2026-04-26
-**Status:** Active
-**Goal:** Clear every remaining critical before first prospect demo
-
----
-
-## What Phase 1D Fixes (and Why)
-
-These are not features. These are the things that if broken, kill the business:
-
-1. **Webhook idempotency** — Stripe sends events twice. Without `processed_stripe_events`, double-charges possible.
-2. **Seats race condition** — two students book the same session simultaneously. Without `safe_increment_seats()`, one gets a seat that doesn't exist.
-3. **Subscription middleware** — a canceled school still has dashboard access. They see real student data they shouldn't.
-4. **RLS not tested** — school A querying school B's data. This is the worst possible bug. We haven't proven it can't happen.
-5. **CSV import** — schools can't bulk-load their existing students. Manual entry for 50 students is a deal-killer.
+## Goal
+Redesign the Hero and Features sections of the landing page to match premium B2B SaaS standards (Linear/Vercel/Stripe quality), aligned with Jack Roberts' brand patterns.
 
 ---
 
-## What You Must Do (Zax — 5 min Supabase SQL Editor)
+## 1. Design Tokens (Applied)
 
-**Migration 008 (webhook idempotency):**
-```sql
-CREATE TABLE IF NOT EXISTS processed_stripe_events (
-  event_id TEXT PRIMARY KEY,
-  processed_at TIMESTAMPTZ DEFAULT NOW()
-);
+| Token | Value | Usage |
+|---|---|---|
+| bg | `#050505` | Page background |
+| surface | `#0D0D0D` | Cards, elevated surfaces |
+| elevated | `#18181b` | Sidebar, inputs |
+| border | `#1A1A1A` | Card borders, dividers |
+| primary | `#006FFF` | Accent, CTA backgrounds |
+| button-shadow | `0 4px 30px rgba(0,111,255,0.25)` | Primary CTA glow |
+| button-radius | `12px` | All CTA buttons |
+| body-text | `#5C6370` | Body / description text |
+| secondary-tint | `#E6F1FF` | Light blue section backgrounds |
+| green | `#10B981` | Success / confirmation states |
+| grad | `linear-gradient(135deg, #006FFF, #818CF8)` | Headline accent, popular badge |
+
+---
+
+## 2. Hero Section
+
+### Layout
+- Two-column grid: 55% copy / 45% browser mockup
+- Eyebrow badge → H1 → Subheadline → CTAs → Trust badges → **Stats Bar**
+
+### H1
+- Outcome-focused, ≤8 words
+- Copy: "Run your driving school without the chaos."
+- Style: clamp(3rem, 5vw, 4.5rem), bold, tracking -0.02em, leading 0.97
+- Accent word: "chaos." in gradient (006FFF → 818CF8)
+
+### Primary CTA
+- Solid `#006FFF` background
+- Border-radius: `12px`
+- Box-shadow: `0 4px 30px rgba(0, 111, 255, 0.25)`
+- Never use black-on-white buttons again
+
+### Stats Bar (New — Jack Roberts Pattern)
+- Full-width strip directly below hero CTAs
+- 3 stats: large bold number + small label
+- Example: `240+ Students` · `1,400+ Sessions booked` · `98% Retention`
+- Border top/bottom, centered, compact
+
+### Browser Mockup
+- 3D tilt: `rotateY(-4deg) rotateX(2deg)`
+- Full browser chrome with traffic lights
+- Dashboard inside showing: greeting, stat cards, upcoming sessions
+- Floating badge (bottom-left): "Certificate issued — Jordan K."
+- No stock photos; real UI only
+
+---
+
+## 3. Features Section — Bento Grid
+
+### Layout: Asymmetric 2-row bento grid
+```
+Row 1: [Online Booking — 2/3 width] [Automated Reminders — 1/3]
+Row 2: [TCA Compliance — 1/3] [Student Management — 1/3] [Payments — 1/3]
+Row 3: [Progress Dashboard — full width]
 ```
 
-**Migration 007 (seats increment):**
-```sql
-CREATE OR REPLACE FUNCTION safe_increment_seats(session_uuid UUID)
-RETURNS SETOF sessions AS $$
-DECLARE
-  current_seats integer;
-  max_seats integer;
-BEGIN
-  SELECT seats_booked, max_seats INTO current_seats, max_seats
-  FROM sessions WHERE id = session_uuid FOR UPDATE;
-  IF current_seats >= max_seats THEN
-    RAISE EXCEPTION 'Session is fully booked';
-  END IF;
-  UPDATE sessions SET seats_booked = current_seats + 1 WHERE id = session_uuid;
-  RETURN QUERY SELECT * FROM sessions WHERE id = session_uuid;
-END;
-$$ LANGUAGE plpgsql;
-```
+### Card sizes
+- **Large (2/3):** Online Booking
+- **Standard (1/3 each):** Reminders, TCA, Students, Payments
+- **Full-width:** Progress Dashboard
+
+### Card styling
+- `bg: #0D0D0D`, border: `1px solid #1A1A1A`
+- Hover: border lifts to `#27272a`, translateY(-2px), elevated shadow
+- Icon container: 48×48px, rounded-2xl, with color-matched background at 12% opacity + border
+- Title: `text-base font-semibold`, color `#ffffff`
+- Description: `text-sm leading-relaxed`, color `#5C6370`
+
+### Social Proof Integration
+- TCA card: include micro-badge "Used by 40+ TN schools"
+- Payments card: "Stripe certified" trust note
 
 ---
 
-## Implementation Plan (DeepSeek Generates)
-
-### Fix 1: Subscription Status Middleware
-**File:** `src/middleware.ts`
-**What:** Every request to `/school-admin/*` checks `subscription_status` from the school. If `canceled` or `past_due`, redirect to `/billing`. Skip check if `DEMO_MODE=true`.
-
-### Fix 2: RLS Test Script
-**File:** `tests/e2e/rls-test.js`
-**What:** Node.js script that:
-1. Creates school A (with service role key)
-2. Creates school B (with service role key)
-3. Uses school B's anon key to try to query school A's students via REST API
-4. If response has rows → RLS BROKEN (critical)
-5. If 403/empty → RLS working (secure)
-
-### Fix 3: Wire email/SMS (stubs → real)
-**Files:** `src/lib/email.ts`, `src/lib/twilio.ts`
-**What:** Read RESEND_API_KEY + TWILIO_* from env. If present, send real emails/SMS. If not, continue stub mode (log only).
-
-### Fix 4: CSV Import
-**File:** `src/app/api/import/students/route.ts` (currently stub)
-**What:**
-- Accepts multipart CSV upload
-- Parses columns: name, email, phone, permit_number, dob, parent_email
-- Validates each row — returns preview with error count
-- Bulk inserts valid rows
-- Returns: `{ created: N, errors: [{ row: N, error: '...' }] }`
-
----
-
-## Out of Scope
-
-- Student booking wizard changes
-- New frontend pages
-- Marketing/email sequences
-- Stripe live key swap
-
----
-
-## Success Criteria
-
-- [ ] Migration 007 + 008 run in Supabase SQL Editor
-- [ ] `npm run test:e2e` passes (basic API tests green)
-- [ ] `tests/e2e/rls-test.js` confirms no cross-school data leak
-- [ ] Subscription middleware deployed and working
-- [ ] CSV import creates students in test school
+## 4. What NOT To Do
+- No black-on-white primary CTA buttons
+- No uniform 3-column feature grid (must be bento)
+- No decorative gradients throughout
+- No rounded-lg on cards (minimum rounded-2xl)
+- No emojis as icons (Lucide only)

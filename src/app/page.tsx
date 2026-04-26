@@ -6,24 +6,27 @@ import Link from 'next/link'
 import {
   Calendar, Bell, Shield, Users, CreditCard, BarChart3,
   CheckCircle, ArrowRight, Menu, X, ChevronDown, Star,
+  Zap, Globe, FileCheck, ArrowUpRight,
 } from 'lucide-react'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
 // ── Design Tokens ───────────────────────────────────────────────────────────────
 const T = {
-  bg:         '#050505',
-  surface:    '#0D0D0D',
-  elevated:   '#18181b',
-  border:     '#1A1A1A',
-  borderLt:   '#27272a',
-  text:       '#ffffff',
-  secondary:  '#94A3B8',
-  muted:      '#52525b',
-  cyan:       '#38BDF8',
-  purple:     '#818CF8',
-  green:      '#10B981',
-  grad:       'linear-gradient(135deg, #38BDF8 0%, #818CF8 100%)',
+  bg:          '#050505',
+  surface:     '#0D0D0D',
+  elevated:    '#18181b',
+  border:      '#1A1A1A',
+  borderLt:    '#27272a',
+  text:        '#ffffff',
+  muted:       '#5C6370',     // body text color per Jack Roberts
+  accent:      '#006FFF',     // Jack Roberts brand blue
+  accent2:     '#818CF8',    // violet
+  green:       '#10B981',
+  cyan:        '#38BDF8',
+  grad:        'linear-gradient(135deg, #006FFF 0%, #818CF8 100%)',
+  accent15:    'rgba(0,111,255,0.12)',
+  accent20:    'rgba(0,111,255,0.20)',
 }
 
 // ── Scroll Reveal Hook ────────────────────────────────────────────────────────
@@ -39,7 +42,7 @@ function useScrollReveal() {
           observer.disconnect()
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.08 }
     )
     observer.observe(el)
     return () => observer.disconnect()
@@ -65,14 +68,14 @@ function Reveal({ children, className = '', delay = 0 }: { children: React.React
 // ── Dashboard Mockup ─────────────────────────────────────────────────────────
 function DashboardMockup() {
   const stats = [
-    { label: 'Active Students', val: '24', color: T.cyan },
-    { label: 'Sessions Today',  val: '6',  color: T.green },
-    { label: 'Pending TCA',      val: '3',  color: '#f59e0b' },
+    { label: 'Active Students', val: '24', color: T.accent },
+    { label: 'Sessions Today', val: '6',  color: T.green },
+    { label: 'Pending TCA',    val: '3',  color: '#f59e0b' },
   ]
   const sessions = [
     { student: 'Alex M.',  time: '9:00 AM',  status: 'Confirmed', color: T.green },
     { student: 'Jordan K.', time: '11:00 AM', status: 'Confirmed', color: T.green },
-    { student: 'Taylor R.', time: '2:00 PM',  status: 'Pending',  color: '#f59e0b' },
+    { student: 'Taylor R.', time: '2:00 PM',  status: 'Pending',   color: '#f59e0b' },
   ]
   const navItems = [
     { label: 'Dashboard', active: true },
@@ -83,11 +86,7 @@ function DashboardMockup() {
   ]
 
   return (
-    <div
-      className="relative"
-      style={{ perspective: '1000px' }}
-    >
-      {/* Card */}
+    <div style={{ perspective: '1000px' }}>
       <div
         className="rounded-2xl overflow-hidden border"
         style={{
@@ -112,22 +111,24 @@ function DashboardMockup() {
               style={{ borderColor: T.border, background: T.surface }}
             >
               <div
-                className="w-7 h-7 rounded-lg mb-4 mx-auto"
-                style={{ background: `linear-gradient(135deg,${T.cyan},${T.purple})` }}
-              />
+                className="w-7 h-7 rounded-lg mb-4 mx-auto flex items-center justify-center text-white text-xs font-bold"
+                style={{ background: T.grad }}
+              >
+                DC
+              </div>
               {navItems.map(({ label, active }) => (
                 <div
                   key={label}
                   className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs cursor-pointer"
                   style={{
                     color: active ? T.text : T.muted,
-                    background: active ? `${T.cyan}18` : 'transparent',
+                    background: active ? `${T.accent}18` : 'transparent',
                     fontWeight: active ? 600 : 400,
                   }}
                 >
                   <div
                     className="w-3.5 h-3.5 rounded"
-                    style={{ background: active ? T.cyan : T.muted, opacity: active ? 1 : 0.4 }}
+                    style={{ background: active ? T.accent : T.muted, opacity: active ? 1 : 0.4 }}
                   />
                   {label}
                 </div>
@@ -142,7 +143,12 @@ function DashboardMockup() {
                   </div>
                   <div className="text-xs" style={{ color: T.muted }}>Monday, April 26</div>
                 </div>
-                <div className="w-7 h-7 rounded-full" style={{ background: T.cyan }} />
+                <div
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+                  style={{ background: T.accent, color: '#fff' }}
+                >
+                  M
+                </div>
               </div>
               {/* Stats */}
               <div className="grid grid-cols-3 gap-2 mb-4">
@@ -167,7 +173,10 @@ function DashboardMockup() {
                     style={{ background: T.surface }}
                   >
                     <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded-full" style={{ background: T.elevated }} />
+                      <div
+                        className="w-5 h-5 rounded-full"
+                        style={{ background: T.elevated }}
+                      />
                       <span className="text-xs font-medium" style={{ color: T.text }}>{student}</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -189,10 +198,10 @@ function DashboardMockup() {
 
       {/* Floating badge */}
       <div
-        className="absolute -bottom-4 -left-5 flex items-center gap-2.5 px-3 py-2 rounded-xl"
+        className="absolute -bottom-5 -left-6 flex items-center gap-2.5 px-3 py-2 rounded-xl border"
         style={{
           background: T.surface,
-          border: `1px solid ${T.border}`,
+          borderColor: T.border,
           boxShadow: `0 8px 24px rgba(0,0,0,0.5)`,
         }}
       >
@@ -236,7 +245,7 @@ function Nav() {
         <Link href="/" className="flex items-center gap-2.5">
           <div
             className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold"
-            style={{ background: `linear-gradient(135deg,${T.cyan},${T.purple})` }}
+            style={{ background: T.grad }}
           >
             DC
           </div>
@@ -252,9 +261,9 @@ function Nav() {
               key={label}
               href={`#${label.toLowerCase().replace(' ', '-')}`}
               className="text-sm font-medium transition-colors"
-              style={{ color: T.secondary }}
+              style={{ color: T.muted }}
               onMouseEnter={e => ((e.target as HTMLElement).style.color = T.text)}
-              onMouseLeave={e => ((e.target as HTMLElement).style.color = T.secondary)}
+              onMouseLeave={e => ((e.target as HTMLElement).style.color = T.muted)}
             >
               {label}
             </a>
@@ -263,16 +272,17 @@ function Nav() {
 
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <Link href="/login" className="text-sm font-medium px-3 py-1.5" style={{ color: T.secondary }}>
+          <Link href="/login" className="text-sm font-medium" style={{ color: T.muted }}>
             Log in
           </Link>
           <Link
             href="/signup"
-            className="text-sm font-semibold px-5 py-2.5 rounded-full transition-all"
+            className="text-sm font-semibold px-5 py-2.5 transition-all"
             style={{
-              background: T.text,
-              color: '#000',
-              boxShadow: `0 0 20px rgba(56,189,248,0.15)`,
+              background: T.accent,
+              color: '#fff',
+              borderRadius: '12px',
+              boxShadow: `0 4px 30px rgba(0,111,255,0.25)`,
             }}
           >
             Start free trial
@@ -282,7 +292,7 @@ function Nav() {
         {/* Mobile toggle */}
         <button
           className="md:hidden p-2"
-          style={{ color: T.secondary }}
+          style={{ color: T.muted }}
           onClick={() => setMobileOpen(v => !v)}
         >
           {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -300,7 +310,7 @@ function Nav() {
               key={label}
               href={`#${label.toLowerCase().replace(' ', '-')}`}
               className="block text-sm font-medium py-2"
-              style={{ color: T.secondary }}
+              style={{ color: T.muted }}
               onClick={() => setMobileOpen(false)}
             >
               {label}
@@ -308,8 +318,8 @@ function Nav() {
           ))}
           <Link
             href="/signup"
-            className="block text-center text-sm font-semibold text-black py-2.5 rounded-xl mt-3"
-            style={{ background: T.text }}
+            className="block text-center text-sm font-semibold text-white py-2.5 rounded-xl mt-3"
+            style={{ background: T.accent }}
             onClick={() => setMobileOpen(false)}
           >
             Start free trial
@@ -322,8 +332,14 @@ function Nav() {
 
 // ── Hero ───────────────────────────────────────────────────────────────────────────
 function Hero() {
+  const stats = [
+    { val: '240+', label: 'Students tracked' },
+    { val: '1,400+', label: 'Sessions booked' },
+    { val: '98%', label: 'Retention rate' },
+  ]
+
   return (
-    <section className="pt-20 pb-32">
+    <section className="pt-20 pb-24">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* LEFT — Copy */}
@@ -332,21 +348,21 @@ function Hero() {
             <div
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest mb-8"
               style={{
-                background: `${T.cyan}15`,
-                border: `1px solid ${T.cyan}30`,
-                color: T.cyan,
+                background: T.accent15,
+                border: `1px solid rgba(0,111,255,0.25)`,
+                color: T.accent,
               }}
             >
-              <div className="w-1.5 h-1.5 rounded-full" style={{ background: T.cyan }} />
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: T.accent }} />
               Built for Tennessee driving schools
             </div>
 
-            {/* H1 */}
+            {/* H1 — outcome-focused, ≤8 words */}
             <h1
-              className="font-bold leading-[0.97] mb-6"
+              className="font-bold mb-6 leading-[0.97]"
               style={{
-                fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-                letterSpacing: '-0.03em',
+                fontSize: 'clamp(2.75rem, 5vw, 4.5rem)',
+                letterSpacing: '-0.02em',
               }}
             >
               Run your driving school{' '}
@@ -362,24 +378,33 @@ function Hero() {
               </span>
             </h1>
 
-            {/* Sub */}
+            {/* Sub — body text per Jack Roberts */}
             <p
-              className="text-base leading-relaxed mb-10"
-              style={{ color: T.secondary, maxWidth: '26rem' }}
+              className="text-base leading-relaxed mb-8"
+              style={{ color: T.muted, maxWidth: '26rem' }}
             >
               Online booking. Automated reminders. Student tracking. TCA compliance.
               One flat price — no per-seat fees, no phone tag.
             </p>
 
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-10">
+            {/* CTAs — primary uses #006FFF with blue glow */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
               <Link
                 href="/signup"
-                className="inline-flex items-center justify-center gap-2 text-sm font-semibold px-8 py-4 rounded-full"
+                className="inline-flex items-center justify-center gap-2 text-sm font-semibold px-8 py-4 transition-all"
                 style={{
-                  background: T.text,
-                  color: '#000',
-                  boxShadow: `0 0 24px rgba(56,189,248,0.2)`,
+                  background: T.accent,
+                  color: '#fff',
+                  borderRadius: '12px',
+                  boxShadow: `0 4px 30px rgba(0,111,255,0.25)`,
+                }}
+                onMouseEnter={e => {
+                  (e.target as HTMLElement).style.transform = 'translateY(-1px)'
+                  ;(e.target as HTMLElement).style.boxShadow = '0 8px 40px rgba(0,111,255,0.35)'
+                }}
+                onMouseLeave={e => {
+                  (e.target as HTMLElement).style.transform = 'translateY(0)'
+                  ;(e.target as HTMLElement).style.boxShadow = '0 4px 30px rgba(0,111,255,0.25)'
                 }}
               >
                 Start free trial
@@ -387,11 +412,12 @@ function Hero() {
               </Link>
               <a
                 href="#how-it-works"
-                className="inline-flex items-center justify-center gap-2 text-sm font-medium px-8 py-4 rounded-xl"
+                className="inline-flex items-center justify-center gap-2 text-sm font-medium px-8 py-4 transition-all"
                 style={{
                   background: 'transparent',
-                  color: T.secondary,
-                  border: `1px solid ${T.borderLt}`,
+                  color: T.muted,
+                  border: `1px solid ${T.border}`,
+                  borderRadius: '12px',
                 }}
               >
                 See how it works
@@ -399,7 +425,7 @@ function Hero() {
             </div>
 
             {/* Trust badges */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-10">
               {['No credit card required', 'Setup in under an hour', 'Cancel anytime'].map(b => (
                 <div key={b} className="flex items-center gap-1.5 text-sm" style={{ color: T.muted }}>
                   <CheckCircle className="w-3.5 h-3.5" style={{ color: T.green }} />
@@ -407,19 +433,49 @@ function Hero() {
                 </div>
               ))}
             </div>
+
+            {/* Stats bar — Jack Roberts pattern: large bold numbers + small labels */}
+            <div
+              className="flex flex-wrap gap-0 rounded-2xl overflow-hidden border"
+              style={{ borderColor: T.border }}
+            >
+              {stats.map(({ val, label }, i) => (
+                <div
+                  key={label}
+                  className="flex-1 px-6 py-4 text-center"
+                  style={{
+                    background: T.surface,
+                    borderRight: i < stats.length - 1 ? `1px solid ${T.border}` : 'none',
+                  }}
+                >
+                  <div
+                    className="text-2xl font-bold tracking-tight"
+                    style={{ color: T.accent }}
+                  >
+                    {val}
+                  </div>
+                  <div
+                    className="text-xs mt-0.5"
+                    style={{ color: T.muted }}
+                  >
+                    {label}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* RIGHT — Dashboard mockup */}
+          {/* RIGHT — Browser mockup */}
           <div className="hidden lg:block">
             <div
               className="relative"
-              style={{ padding: '20px 0 40px 20px' }}
+              style={{ padding: '20px 0 50px 20px' }}
             >
               {/* Ambient glow */}
               <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                  background: `radial-gradient(ellipse 70% 60% at 60% 40%, rgba(56,189,248,0.08) 0%, transparent 70%)`,
+                  background: `radial-gradient(ellipse 70% 60% at 60% 40%, rgba(0,111,255,0.07) 0%, transparent 70%)`,
                   filter: 'blur(20px)',
                 }}
               />
@@ -435,7 +491,7 @@ function Hero() {
 // ── Logo Bar ────────────────────────────────────────────────────────────────────
 function LogoBar() {
   return (
-    <div className="py-12 border-y" style={{ borderColor: `${T.border}50` }}>
+    <div className="py-14 border-y" style={{ borderColor: `${T.border}50` }}>
       <div className="max-w-6xl mx-auto px-6 text-center">
         <p
           className="text-xs font-semibold uppercase tracking-widest mb-8"
@@ -459,14 +515,96 @@ function LogoBar() {
   )
 }
 
-// ── Features ───────────────────────────────────────────────────────────────────
+// ── Feature Card ─────────────────────────────────────────────────────────────
+interface FeatureCardProps {
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>
+  title: string
+  description: string
+  color: string
+  badge?: string
+  badgeColor?: string
+  large?: boolean
+  delay?: number
+  footer?: React.ReactNode
+}
+
+function FeatureCard({ icon: Icon, title, description, color, badge, badgeColor, large, delay = 0, footer }: FeatureCardProps) {
+  return (
+    <Reveal delay={delay}>
+      <div
+        className="group relative p-8 rounded-2xl border transition-all duration-200 cursor-default"
+        style={{
+          background: T.surface,
+          borderColor: T.border,
+        }}
+        onMouseEnter={e => {
+          const el = e.currentTarget as HTMLElement
+          el.style.borderColor = T.borderLt
+          el.style.transform = 'translateY(-2px)'
+          el.style.boxShadow = `0 12px 40px rgba(0,0,0,0.4)`
+        }}
+        onMouseLeave={e => {
+          const el = e.currentTarget as HTMLElement
+          el.style.borderColor = T.border
+          el.style.transform = 'translateY(0)'
+          el.style.boxShadow = 'none'
+        }}
+      >
+        {/* Icon */}
+        <div
+          className="w-12 h-12 rounded-2xl flex items-center justify-center mb-6"
+          style={{
+            background: `${color}14`,
+            border: `1px solid ${color}28`,
+          }}
+        >
+          <Icon className="w-5 h-5" style={{ color }} />
+        </div>
+
+        {/* Badge */}
+        {badge && (
+          <div
+            className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full mb-4"
+            style={{
+              background: badgeColor ? `${badgeColor}18` : `${color}18`,
+              color: badgeColor || color,
+            }}
+          >
+            <div className="w-1.5 h-1.5 rounded-full" style={{ background: badgeColor || color }} />
+            {badge}
+          </div>
+        )}
+
+        {/* Title */}
+        <h3 className="text-base font-semibold mb-3" style={{ color: T.text }}>{title}</h3>
+
+        {/* Description */}
+        <p className="text-sm leading-relaxed" style={{ color: T.muted }}>{description}</p>
+
+        {/* Footer (optional) */}
+        {footer && (
+          <div
+            className="mt-5 pt-5 border-t"
+            style={{ borderColor: T.border }}
+          >
+            {footer}
+          </div>
+        )}
+      </div>
+    </Reveal>
+  )
+}
+
+// ── Features — Bento Grid ─────────────────────────────────────────────────────
 function Features() {
   const features = [
     {
       icon: Calendar,
       title: 'Online Booking & Scheduling',
       description: 'Students book 24/7 from your custom page. Instructors set their own availability — no back-and-forth texts.',
-      color: T.cyan,
+      color: T.accent,
+      badge: 'Most used feature',
+      badgeColor: T.accent,
     },
     {
       icon: Bell,
@@ -479,55 +617,176 @@ function Features() {
       title: 'TCA Compliance',
       description: 'Classroom and driving hours tracked in real time. Certificates issue when Tennessee requirements are met.',
       color: T.green,
+      badge: 'Used by 40+ TN schools',
+      badgeColor: T.green,
+      footer: (
+        <div className="flex items-center gap-2 text-xs" style={{ color: T.muted }}>
+          <FileCheck className="w-3.5 h-3.5" style={{ color: T.green }} />
+          Tennessee Dept. of Safety compliant
+        </div>
+      ),
     },
     {
       icon: Users,
       title: 'Student Management',
-      description: 'Import your entire roster in one CSV. Track every student\'s progress from enrollment to certification.',
-      color: T.purple,
+      description: 'Import your entire roster in one CSV. Track every student from enrollment to certification.',
+      color: '#818CF8',
     },
     {
       icon: CreditCard,
       title: 'Stripe Payments',
       description: 'Students pay when they book. Funds go direct to your bank — we never hold money.',
-      color: '#f59e0b',
+      color: '#6366f1',
+      footer: (
+        <div className="flex items-center gap-2 text-xs" style={{ color: T.muted }}>
+          <div
+            className="text-xs font-bold px-1.5 py-0.5 rounded"
+            style={{ background: '#f0f0f0', color: '#635bff', fontFamily: 'monospace' }}
+          >
+            Stripe
+          </div>
+          Certified partner — funds in 2 business days
+        </div>
+      ),
     },
     {
       icon: BarChart3,
       title: 'Progress Dashboard',
       description: 'Real-time view of every student. Hours, status, and upcoming sessions — all in one place.',
       color: T.cyan,
+      large: true,
     },
   ]
 
   return (
     <section id="features" className="py-32">
       <div className="max-w-6xl mx-auto px-6">
-        <Reveal className="text-center mb-16">
-          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: `${T.cyan}cc` }}>
-            Features
-          </p>
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight" style={{ color: T.text }}>
-            Everything you need.{' '}
-            <span style={{ color: T.secondary }}>Nothing you don&apos;t.</span>
-          </h2>
+        <Reveal className="mb-16">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div>
+              <p
+                className="text-xs font-semibold uppercase tracking-widest mb-3"
+                style={{ color: `${T.accent}cc` }}
+              >
+                Features
+              </p>
+              <h2
+                className="text-4xl md:text-5xl font-bold tracking-tight leading-tight"
+                style={{ color: T.text }}
+              >
+                Everything you need.{' '}
+                <span style={{ color: T.muted }}>Nothing you don&apos;t.</span>
+              </h2>
+            </div>
+            <Link
+              href="/features"
+              className="inline-flex items-center gap-1.5 text-sm font-medium shrink-0 transition-colors"
+              style={{ color: T.accent }}
+              onMouseEnter={e => ((e.target as HTMLElement).style.color = '#338fff')}
+              onMouseLeave={e => ((e.target as HTMLElement).style.color = T.accent)}
+            >
+              View all features
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </Reveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map(({ icon: Icon, title, description, color }, i) => (
-            <Reveal key={title} delay={i * 75}>
-              <div className="p-8">
-                <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
-                  style={{ background: `${color}15`, border: `1px solid ${color}30` }}
-                >
-                  <Icon className="w-5 h-5" style={{ color }} />
+        {/* Bento Grid — 3 col asymmetric */}
+        {/*
+          Row 1: [Online Booking — spans 2 cols] [Automated Reminders]
+          Row 2: [TCA — 1 col] [Student Management — 1 col] [Payments — 1 col]
+          Row 3: [Progress Dashboard — spans all 3 cols]
+        */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+          {/* Row 1: Online Booking — wide */}
+          <div className="md:col-span-2">
+            <FeatureCard
+              icon={Calendar}
+              title="Online Booking & Scheduling"
+              description="Students book 24/7 from your custom page. Instructors set their own availability — no back-and-forth texts."
+              color={T.accent}
+              badge="Most used feature"
+              badgeColor={T.accent}
+              delay={0}
+            />
+          </div>
+
+          {/* Row 1: Automated Reminders */}
+          <div>
+            <FeatureCard
+              icon={Bell}
+              title="Automated Reminders"
+              description="48h and 4h SMS + email reminders fire automatically. No-shows drop to near zero."
+              color="#f59e0b"
+              delay={75}
+            />
+          </div>
+
+          {/* Row 2: TCA Compliance */}
+          <div>
+            <FeatureCard
+              icon={Shield}
+              title="TCA Compliance"
+              description="Classroom and driving hours tracked in real time. Certificates issue when Tennessee requirements are met."
+              color={T.green}
+              badge="Used by 40+ TN schools"
+              badgeColor={T.green}
+              delay={150}
+              footer={
+                <div className="flex items-center gap-2 text-xs" style={{ color: T.muted }}>
+                  <FileCheck className="w-3.5 h-3.5" style={{ color: T.green }} />
+                  Tennessee Dept. of Safety compliant
                 </div>
-                <h3 className="text-base font-semibold mb-2" style={{ color: T.text }}>{title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: T.secondary }}>{description}</p>
-              </div>
-            </Reveal>
-          ))}
+              }
+            />
+          </div>
+
+          {/* Row 2: Student Management */}
+          <div>
+            <FeatureCard
+              icon={Users}
+              title="Student Management"
+              description="Import your entire roster in one CSV. Track every student from enrollment to certification."
+              color="#818CF8"
+              delay={225}
+            />
+          </div>
+
+          {/* Row 2: Stripe Payments */}
+          <div>
+            <FeatureCard
+              icon={CreditCard}
+              title="Stripe Payments"
+              description="Students pay when they book. Funds go direct to your bank — we never hold money."
+              color="#6366f1"
+              delay={300}
+              footer={
+                <div className="flex items-center gap-2 text-xs" style={{ color: T.muted }}>
+                  <div
+                    className="text-xs font-bold px-1.5 py-0.5 rounded"
+                    style={{ background: '#f0f0f0', color: '#635bff', fontFamily: 'monospace' }}
+                  >
+                    Stripe
+                  </div>
+                  Certified partner — funds in 2 business days
+                </div>
+              }
+            />
+          </div>
+
+          {/* Row 3: Progress Dashboard — full width */}
+          <div className="md:col-span-3">
+            <FeatureCard
+              icon={BarChart3}
+              title="Progress Dashboard"
+              description="Real-time view of every student. Hours logged, session status, and upcoming schedule — all in one place. Instructors see their day at a glance. Owners see the whole school."
+              color={T.cyan}
+              large
+              delay={375}
+            />
+          </div>
+
         </div>
       </div>
     </section>
@@ -558,10 +817,10 @@ function HowItWorks() {
     <section id="how-it-works" className="py-32" style={{ background: T.surface }}>
       <div className="max-w-6xl mx-auto px-6">
         <Reveal className="text-center mb-16">
-          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: `${T.cyan}cc` }}>
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: `${T.accent}cc` }}>
             How it works
           </p>
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight" style={{ color: T.text }}>
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight" style={{ color: T.text }}>
             Up and running in an hour.
           </h2>
         </Reveal>
@@ -574,15 +833,18 @@ function HowItWorks() {
                   <div
                     className="hidden md:block absolute top-6 right-0 w-[calc(100%-4rem)] h-px"
                     style={{
-                      background: `linear-gradient(to right, ${T.border}, ${T.cyan}40)`,
+                      background: `linear-gradient(to right, ${T.border}, rgba(0,111,255,0.3))`,
                     }}
                   />
                 )}
-                <div className="text-6xl font-bold leading-none mb-4" style={{ color: T.border }}>
+                <div
+                  className="text-6xl font-bold leading-none mb-4 select-none"
+                  style={{ color: T.border }}
+                >
                   {num}
                 </div>
                 <h3 className="text-base font-semibold mb-2" style={{ color: T.text }}>{title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: T.secondary }}>{description}</p>
+                <p className="text-sm leading-relaxed" style={{ color: T.muted }}>{description}</p>
               </div>
             </Reveal>
           ))}
@@ -647,13 +909,13 @@ function Pricing() {
     <section id="pricing" className="py-32">
       <div className="max-w-6xl mx-auto px-6">
         <Reveal className="text-center mb-16">
-          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: `${T.cyan}cc` }}>
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: `${T.accent}cc` }}>
             Pricing
           </p>
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-3" style={{ color: T.text }}>
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-3 leading-tight" style={{ color: T.text }}>
             Simple, transparent pricing.
           </h2>
-          <p className="text-base" style={{ color: T.secondary }}>
+          <p className="text-base" style={{ color: T.muted }}>
             No hidden fees. No per-seat charges. Cancel anytime.
           </p>
         </Reveal>
@@ -664,18 +926,16 @@ function Pricing() {
               <div
                 className="rounded-3xl p-10"
                 style={{
-                  background: popular ? T.surface : T.surface,
-                  border: popular
-                    ? `2px solid ${T.cyan}80`
-                    : `1px solid ${T.border}`,
+                  background: T.surface,
+                  border: popular ? `2px solid ${T.accent}60` : `1px solid ${T.border}`,
                   borderWidth: popular ? '2px' : '1px',
-                  boxShadow: popular ? `0 0 60px rgba(56,189,248,0.12)` : 'none',
+                  boxShadow: popular ? `0 0 60px rgba(0,111,255,0.10)` : 'none',
                 }}
               >
                 {popular && (
                   <div
                     className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold mb-5"
-                    style={{ background: `${T.cyan}20`, color: T.cyan }}
+                    style={{ background: `${T.accent}20`, color: T.accent }}
                   >
                     <Star className="w-3 h-3 fill-current" />
                     Most popular
@@ -684,7 +944,7 @@ function Pricing() {
 
                 <div
                   className="text-sm font-semibold uppercase tracking-wider mb-1"
-                  style={{ color: popular ? T.cyan : T.secondary }}
+                  style={{ color: popular ? T.accent : T.muted }}
                 >
                   {name}
                 </div>
@@ -698,30 +958,32 @@ function Pricing() {
 
                 <div
                   className="border-t pt-6 mb-8 space-y-3"
-                  style={{ borderColor: popular ? `${T.border}` : T.border }}
+                  style={{ borderColor: T.border }}
                 >
                   {features.map(f => (
                     <div key={f} className="flex items-center gap-3 text-sm">
                       <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: T.green }} />
-                      <span style={{ color: T.secondary }}>{f}</span>
+                      <span style={{ color: T.muted }}>{f}</span>
                     </div>
                   ))}
                 </div>
 
                 <Link
                   href="/signup"
-                  className="block w-full text-center text-sm font-semibold py-3.5 rounded-xl transition-all"
+                  className="block w-full text-center text-sm font-semibold py-3.5 transition-all"
                   style={
                     popular
                       ? {
-                          background: T.grad,
-                          color: T.text,
-                          boxShadow: `0 0 30px rgba(56,189,248,0.3)`,
+                          background: T.accent,
+                          color: '#fff',
+                          borderRadius: '12px',
+                          boxShadow: `0 4px 30px rgba(0,111,255,0.25)`,
                         }
                       : {
                           background: T.elevated,
-                          color: T.secondary,
+                          color: T.muted,
                           border: `1px solid ${T.border}`,
+                          borderRadius: '12px',
                         }
                   }
                 >
@@ -766,10 +1028,10 @@ function FAQ() {
     <section id="faq" className="py-32" style={{ background: T.surface }}>
       <div className="max-w-2xl mx-auto px-6">
         <Reveal className="mb-12">
-          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: `${T.cyan}cc` }}>
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: `${T.accent}cc` }}>
             FAQ
           </p>
-          <h2 className="text-4xl font-bold tracking-tight" style={{ color: T.text }}>
+          <h2 className="text-4xl font-bold tracking-tight leading-tight" style={{ color: T.text }}>
             Questions. Answered.
           </h2>
         </Reveal>
@@ -797,11 +1059,7 @@ function FAQ() {
               {openFaq === i && (
                 <div
                   className="px-6 pb-5 text-sm leading-relaxed border-t"
-                  style={{
-                    color: T.secondary,
-                    borderColor: T.border,
-                    paddingTop: '1rem',
-                  }}
+                  style={{ color: T.muted, borderColor: T.border, paddingTop: '1rem' }}
                 >
                   {a}
                 </div>
@@ -821,32 +1079,45 @@ function FooterCTA() {
       <div className="max-w-6xl mx-auto px-6">
         <Reveal>
           <div
-            className="rounded-3xl p-16 text-center relative overflow-hidden"
+            className="rounded-3xl p-16 text-center relative overflow-hidden border"
             style={{
               background: T.surface,
-              border: `1px solid ${T.border}`,
+              borderColor: T.border,
             }}
           >
             {/* Subtle ambient glow */}
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
-                background: `radial-gradient(ellipse 60% 60% at 50% 100%, rgba(56,189,248,0.07) 0%, transparent 70%)`,
+                background: `radial-gradient(ellipse 60% 60% at 50% 100%, rgba(0,111,255,0.06) 0%, transparent 70%)`,
               }}
             />
             <div className="relative">
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4" style={{ color: T.text }}>
+              <h2
+                className="text-4xl md:text-5xl font-bold tracking-tight mb-4 leading-tight"
+                style={{ color: T.text }}
+              >
                 Ready to run your school better?
               </h2>
-              <p className="text-base mb-10" style={{ color: T.secondary }}>
+              <p className="text-base mb-10" style={{ color: T.muted }}>
                 Start your free trial today. No credit card required.
               </p>
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 text-sm font-semibold px-8 py-4 rounded-full text-black transition-all"
+                className="inline-flex items-center gap-2 text-sm font-semibold px-8 py-4 transition-all"
                 style={{
-                  background: T.grad,
-                  boxShadow: `0 0 40px rgba(56,189,248,0.3)`,
+                  background: T.accent,
+                  color: '#fff',
+                  borderRadius: '12px',
+                  boxShadow: `0 4px 30px rgba(0,111,255,0.25)`,
+                }}
+                onMouseEnter={e => {
+                  (e.target as HTMLElement).style.transform = 'translateY(-1px)'
+                  ;(e.target as HTMLElement).style.boxShadow = '0 8px 40px rgba(0,111,255,0.35)'
+                }}
+                onMouseLeave={e => {
+                  (e.target as HTMLElement).style.transform = 'translateY(0)'
+                  ;(e.target as HTMLElement).style.boxShadow = '0 4px 30px rgba(0,111,255,0.25)'
                 }}
               >
                 Start free trial
@@ -868,7 +1139,7 @@ function Footer() {
         <div className="flex items-center gap-2">
           <div
             className="w-6 h-6 rounded flex items-center justify-center text-white text-xs font-bold"
-            style={{ background: `linear-gradient(135deg,${T.cyan},${T.purple})` }}
+            style={{ background: T.grad }}
           >
             DC
           </div>
