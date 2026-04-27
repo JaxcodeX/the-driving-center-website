@@ -28,15 +28,36 @@ export default function BillingPage() {
   useEffect(() => {
     async function load() {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      const { data: school } = await supabase.from('schools').select('id, name, subscription_status, stripe_customer_id').eq('owner_user_id', user.id).single()
-      if (!school) { setLoading(false); return }
-      setSubscription(school)
+      let schoolId: string | null = null
+
+      // Try demo_user cookie first (DEMO_MODE)
+      const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
+      if (demoCookie) {
+        try {
+          const payload = JSON.parse(atob(decodeURIComponent(demoCookie.split('=')[1])))
+          schoolId = payload.schoolId
+        } catch {}
+      }
+
+      // Fall back to Supabase auth
+      if (!schoolId) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) { window.location.href = '/login'; return }
+        const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
+        if (!school) { setLoading(false); return }
+        schoolId = school.id
+      }
+
+      const { data } = await supabase
+        .from('schools')
+        .select('id, name, subscription_status, stripe_customer_id')
+        .eq('id', schoolId)
+      setSubscription(data)
       setLoading(false)
     }
     load()
   }, [])
+
 
   async function openBillingPortal() {
     const res = await fetch('/api/schools/billing-portal')

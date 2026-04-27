@@ -24,30 +24,41 @@ const HOURS = Array.from({ length: 12 }, (_, i) => i + 8) // 8am-7pm
 export default function CalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [sessions, setSessions] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
-      if (!school) return
+      let schoolId: string | null = null
 
-      const start = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
-      const end = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59)
+      // Try demo_user cookie first (DEMO_MODE)
+      const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
+      if (demoCookie) {
+        try {
+          const payload = JSON.parse(atob(decodeURIComponent(demoCookie.split('=')[1])))
+          schoolId = payload.schoolId
+        } catch {}
+      }
+
+      // Fall back to Supabase auth
+      if (!schoolId) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) { window.location.href = '/login'; return }
+        const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
+        if (!school) { setLoading(false); return }
+        schoolId = school.id
+      }
 
       const { data } = await supabase
         .from('sessions')
-        .select('*, students(name), instructors(name)')
-        .eq('school_id', school.id)
-        .gte('starts_at', start.toISOString())
-        .lte('starts_at', end.toISOString())
-        .order('starts_at', { ascending: true })
-
-      setSessions(data || [])
+        .select('id, start_date, end_date, max_seats, instructor_id, session_type_id, status, location')
+        .eq('school_id', schoolId)
+      setSessions((data as any[]) || [])
+      setLoading(false)
     }
     load()
-  }, [currentDate])
+  }, [])
+
 
   const year = currentDate.getFullYear()
   const month = currentDate.getMonth()

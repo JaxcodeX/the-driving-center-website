@@ -9,29 +9,25 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#0a0a0f",
-        surface: "#12121a",
-        glass: "rgba(255, 255, 255, 0.05)",
-        border: "rgba(255, 255, 255, 0.08)",
-        accent: "#00d4ff",
-        accentPurple: "#7c3aed",
+        background: "#FFFFFF",
+        surface: "#FFFFFF",
+        primary: "#0F172A",
+        secondary: "#64748B",
+        accent: "#3B82F6",
+        "accent-hover": "#2563EB",
+        border: "#E2E8F0",
+        "border-dark": "#CBD5E1",
       },
-      backgroundImage: {
-        "mesh-gradient": "radial-gradient(at 40% 20%, hsla(240, 100%, 50%, 0.15) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(280, 100%, 50%, 0.1) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(220, 100%, 60%, 0.12) 0px, transparent 50%)",
+      boxShadow: {
+        card: "0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)",
+        "card-hover": "0 10px 25px rgba(0,0,0,0.08)",
+        "card-lg": "0 4px 14px rgba(0,0,0,0.06)",
       },
-      animation: {
-        "glow-pulse": "glow-pulse 2s ease-in-out infinite",
-        "float": "float 6s ease-in-out infinite",
+      borderRadius: {
+        card: "12px",
       },
-      keyframes: {
-        "glow-pulse": {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(0, 212, 255, 0.3)" },
-          "50%": { boxShadow: "0 0 40px rgba(0, 212, 255, 0.6)" },
-        },
-        "float": {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-20px)" },
-        },
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
       },
     },
   },

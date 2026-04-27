@@ -145,21 +145,37 @@ export default function StudentsPage() {
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
-      if (!school) { setLoading(false); return }
+      const supabase = createClient()
+      let schoolId: string | null = null
+
+      // Try demo_user cookie first (DEMO_MODE)
+      const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
+      if (demoCookie) {
+        try {
+          const payload = JSON.parse(atob(decodeURIComponent(demoCookie.split('=')[1])))
+          schoolId = payload.schoolId
+        } catch {}
+      }
+
+      // Fall back to Supabase auth
+      if (!schoolId) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) { window.location.href = '/login'; return }
+        const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
+        if (!school) { setLoading(false); return }
+        schoolId = school.id
+      }
 
       const { data } = await supabase
         .from('students_driver_ed')
         .select('id, legal_name, parent_email, classroom_hours, driving_hours, certificate_issued_at, emergency_contact_phone, enrollment_date, created_at')
-        .eq('school_id', school.id)
-        .order('created_at', { ascending: false })
-      setStudents((data as Student[]) || [])
+        .eq('school_id', schoolId)
+      setStudents((data as any[]) || [])
       setLoading(false)
     }
     load()
   }, [])
+
 
   const filtered = students.filter(s =>
     s.legal_name.toLowerCase().includes(search.toLowerCase()) ||

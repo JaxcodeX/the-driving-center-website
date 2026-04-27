@@ -44,19 +44,38 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser()
-      const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user!.id).single()
-      if (!school) return
+      const supabase = createClient()
+      let schoolId: string | null = null
+
+      // Try demo_user cookie first (DEMO_MODE)
+      const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
+      if (demoCookie) {
+        try {
+          const payload = JSON.parse(atob(decodeURIComponent(demoCookie.split('=')[1])))
+          schoolId = payload.schoolId
+        } catch {}
+      }
+
+      // Fall back to Supabase auth
+      if (!schoolId) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) { window.location.href = '/login'; return }
+        const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
+        if (!school) { setLoading(false); return }
+        schoolId = school.id
+      }
 
       const [i, st] = await Promise.all([
-        supabase.from('instructors').select('id, name').eq('school_id', school.id).eq('active', true),
-        supabase.from('session_types').select('id, name, duration_minutes').eq('school_id', school.id).eq('active', true),
+        supabase.from('instructors').select('id, name').eq('school_id', schoolId).eq('active', true),
+        supabase.from('session_types').select('id, name, duration_minutes').eq('school_id', schoolId).eq('active', true),
       ])
       setInstructors(i.data || [])
       setSessionTypes(st.data || [])
+      setLoading(false)
     }
     load()
   }, [])
+
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
