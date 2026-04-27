@@ -82,7 +82,8 @@ export default function LoginPage() {
       }
 
       // Redirect to dashboard — middleware reads demo_session cookie
-      router.push('/school-admin')
+      // Use window.location to force a hard navigation so cookie is guaranteed sent
+      window.location.href = '/school-admin'
     } catch {
       setDemoError('Network error — try again')
       setDemoLoading(false)
