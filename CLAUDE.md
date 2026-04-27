@@ -52,8 +52,8 @@ Log result in WORKFLOW_LOG.md
 | **DeepSeek** | Generates code from SPEC.md only |
 | **Mark** | Reviews architecture decisions, not code implementation |
 
-**Everest's job is not to write code — it's to write specs and review code.**
-DeepSeek generates the implementation. You approve it.
+**Everest's job is not to write code — Everest directs, DeepSeek generates, Zax approves.**
+DeepSeek generates the implementation from SPEC.md. You approve it.
 
 ---
 
@@ -79,20 +79,18 @@ DeepSeek generates the implementation. You approve it.
 the-driving-center-website/
 ├── CLAUDE.md              ← THIS FILE — how we work
 ├── STATUS.md             ← current state: what works, what's broken, what's next
-├── SPEC_ONE_WEEK_SPRINT  ← active sprint spec
 ├── WORKFLOW_LOG.md       ← every build cycle logged
+├── SPEC_ONE_WEEK_SPRINT.md ← active sprint (for demo)
+├── SPEC_FULL_REDESIGN.md ← active UI redesign spec
 ├── src/app/              ← all routes + pages
 ├── src/lib/
-│   ├── supabase/
-│   ├── migrations/       ← SQL (run in Supabase SQL Editor)
-│   ├── email-templates/
-│   └── security.ts
+│   ├── supabase/      ← client + server helpers
+│   ├── migrations/      ← SQL (run in Supabase SQL Editor)
+│   ├── email-templates/ ← Resend email templates
+│   └── security.ts     ← encryption, validation, audit logging
 ├── tests/e2e/           ← automated tests
-└── SPEC_*.md            ← all specs (one active, rest archived)
+└── SPEC.md              ← phase specs (archived after use)
 ```
-
-**Delete these — redundant Legos that spilled:**
-`BUILD_PLAN.md`, `PROGRESS.md`, `DISCOVERIES.md`, `PROJECT_CONSTITUTION.md`, `OPERATIONS_LOG.md`, `OPERATIONS_MANUAL.md`, `SPEC_WEBSITE_OVERHAUL.md`
 
 ---
 

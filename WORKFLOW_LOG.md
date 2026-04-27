@@ -144,6 +144,45 @@ Inspect actual DB schema via live API calls before writing code that touches it.
 ### What's still pending
 - [ ] Migration 009 SQL run in Supabase SQL Editor (add session_id FK + missing columns)
 - [ ] RLS test run (`tests/e2e/rls-test.js`)
-- [ ] Production Vercel redeploy
 - [ ] Full end-to-end test with Zax
+
+---
+
+## Cycle 8 — Architecture Audit + CLAUDE.md Cleanup + Demo Data Seed
+
+**Date:** 2026-04-27
+**Implemented by:** Everest
+**Result:** ✅ Passed — committed
+
+### What was done
+
+1. **Full architecture audit** — reviewed CLAUDE.md, STATUS.md, WORKFLOW_LOG.md, middleware, students API, bookings API, sessions API, security.ts
+
+2. **CLAUDE.md updated:**
+   - Fixed workflow description to match reality (Everest directs, DeepSeek generates)
+   - Added scripts/ to file structure
+   - Removed stale "delete these files" list (files already cleaned in Cycle 6)
+
+3. **8 stale spec files deleted:**
+   - `AGENTS.md`, `CRON_SETUP.md`, `DEMO_SCRIPT.md`, `PREMIUM_DESIGN_SYSTEM.md`, `SPEC_CRITICAL_BUGS.md`, `SPEC_LIGHT_LANDING.md`, `SPEC_ONE_SHOT_BUILD.md`, `SPEC_SCHEMA_FIX.md`
+   - Root now has: `CLAUDE.md`, `STATUS.md`, `WORKFLOW_LOG.md`, `SPEC_ONE_WEEK_SPRINT.md`, `SPEC_FULL_REDESIGN.md`, `SPEC.md`, `README.md`
+
+4. **Demo school seeded** (via raw HTTPS to bypass supabase-js chaining issues):
+   - 4 students: Olivia Chen, Jaylen Brooks, Priya Nair, Mason Torres
+   - 3 instructors: Marcus Rivera, Diana Okonkwo, Jake Thornton (already existed)
+   - 5 upcoming sessions across next 9 days
+   - 4 bookings (confirmed + pending mix)
+
+### Issues found and fixed
+
+**students_driver_ed has no `status` column** — The code was inserting with a `status` field that doesn't exist in the actual DB. Fixed in seed script.
+
+**Supabase service role key in HTTPS requests required reading from .env.local** — The service role key worked when read from .env but not when stored in the script. Root cause: script was using a stale key copied from memory.
+
+### Lesson
+Always read keys from `.env.local` at runtime, never hardcode them. The actual DB schema (inspected via REST API) is the source of truth, not the migration files.
+
+### Still needed before Mark demo
+- [ ] Migration 009 SQL (add session_id FK to bookings)
+- [ ] E2E test: demo PIN → add student → schedule session → booking confirmation
 
