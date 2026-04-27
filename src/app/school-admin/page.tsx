@@ -56,9 +56,9 @@ function RecentSessions({ schoolId }: { schoolId: string }) {
       const supabase = createClient()
       const { data } = await supabase
         .from('sessions')
-        .select('*, students(name), instructors(name)')
+        .select('*, instructor:instructors(name), session_type:session_types(name)')
         .eq('school_id', schoolId)
-        .order('starts_at', { ascending: true })
+        .order('start_date', { ascending: true })
         .limit(5)
       setSessions(data || [])
     }
@@ -98,10 +98,10 @@ function RecentSessions({ schoolId }: { schoolId: string }) {
             </div>
             <div>
               <div className="text-sm font-medium" style={{ color: T.text }}>
-                {session.student?.name || 'Student'}
+                {session.session_type?.name || 'Session'}
               </div>
               <div className="text-xs" style={{ color: T.muted }}>
-                {session.instructor?.name || 'Instructor'} · {new Date(session.starts_at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                {session.instructor?.name || 'Instructor'} · {new Date(session.start_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
               </div>
             </div>
           </div>
@@ -127,22 +127,31 @@ export default function DashboardPage() {
   useEffect(() => {
     async function load() {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      let schoolId: string | null = null
 
-      const { data: school } = await supabase
-        .from('schools')
-        .select('id')
-        .eq('owner_user_id', user.id)
-        .single()
+      // Try demo_user cookie first (DEMO_MODE — no Supabase JWT needed)
+      const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
+      if (demoCookie) {
+        try {
+          const payload = JSON.parse(atob(demoCookie.split('=')[1]))
+          schoolId = payload.schoolId
+        } catch {}
+      }
 
-      if (!school) return
-      setSchoolId(school.id)
+      // Fall back to Supabase auth
+      if (!schoolId) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+        const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
+        if (!school) return
+        schoolId = school.id
+      }
+      setSchoolId(schoolId ?? '')
 
       const [{ count: students }, { count: sessions }, { count: instructors }] = await Promise.all([
-        supabase.from('students').select('*', { count: 'exact', head: true }).eq('school_id', school.id),
-        supabase.from('sessions').select('*', { count: 'exact', head: true }).eq('school_id', school.id),
-        supabase.from('instructors').select('*', { count: 'exact', head: true }).eq('school_id', school.id),
+        supabase.from('students_driver_ed').select('*', { count: 'exact', head: true }).eq('school_id', schoolId),
+        supabase.from('sessions').select('*', { count: 'exact', head: true }).eq('school_id', schoolId),
+        supabase.from('instructors').select('*', { count: 'exact', head: true }).eq('school_id', schoolId),
       ])
 
       setStats({

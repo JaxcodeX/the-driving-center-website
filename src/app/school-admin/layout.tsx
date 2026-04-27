@@ -127,6 +127,27 @@ export default function SchoolAdminLayout({ children }: { children: React.ReactN
 
   useEffect(() => {
     async function loadSchool() {
+      // Check demo_user cookie first (set by DEMO_MODE login)
+      const demoUserCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
+      if (demoUserCookie) {
+        try {
+          const payload = JSON.parse(atob(decodeURIComponent(demoUserCookie.split('=')[1])))
+          if (payload.schoolId) {
+            // Read school data directly using the schoolId we already have
+            const supabase = createClient()
+            const { data: school } = await supabase
+              .from('schools')
+              .select('name')
+              .eq('id', payload.schoolId)
+              .single()
+            setSchoolName(school?.name || '')
+            setLoading(false)
+            return
+          }
+        } catch { /* fall through to Supabase auth check */ }
+      }
+
+      // Normal Supabase auth check
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
