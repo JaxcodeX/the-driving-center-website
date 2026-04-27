@@ -4,97 +4,33 @@
 
 :root {
   --bg: #050505;
-  --surface: #0D0D0D;
-  --elevated: #18181b;
-  --border: #1A1A1A;
-  --border-lt: #27272a;
+  --surface: #0a0a0a;
+  --elevated: #111111;
+  --border: #1a1a1a;
   --text: #ffffff;
-  --secondary: #94A3B8;
-  --muted: #52525b;
-  --accent: #006FFF;
-  --cyan: #38BDF8;
-  --purple: #818CF8;
-  --green: #10B981;
-  --amber: #f59e0b;
-  --grad: linear-gradient(135deg, #006FFF 0%, #818CF8 100%);
-  --glow: 0 4px 30px rgba(0,111,255,0.25);
-}
-
-html {
-  scroll-behavior: smooth;
+  --muted: #666666;
+  --subtle: #888888;
+  --accent: #0066FF;
+  --green: #22C55E;
+  --amber: #F59E0B;
 }
 
 body {
   background: var(--bg);
   color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* ── Utility classes ─────────────────────────────────────────────────────── */
 
 .gradient-text {
-  background: linear-gradient(90deg, #006FFF, #818CF8);
+  background: linear-gradient(135deg, #0066FF, #8B5CF6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background: var(--accent);
-  color: #fff;
-  font-weight: 600;
-  font-size: 1rem;
-  padding: 0.875rem 2rem;
-  border-radius: 9999px;
-  border: none;
-  cursor: pointer;
-  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 0 30px rgba(0,111,255,0.4);
-}
-
-.btn-primary:hover {
-  background: #005dd6;
-  transform: translateY(-1px);
-  box-shadow: 0 0 40px rgba(0,111,255,0.5);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.card-dark {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card-dark:hover {
-  border-color: var(--border-lt);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-}
-
-.starfield-bg {
-  background-image:
-    radial-gradient(circle at 1px 1px, rgba(255,255,255,0.12) 1px, transparent 0);
+.starfield {
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0);
   background-size: 32px 32px;
-  background-color: var(--bg);
-}
-
-.section {
-  padding-top: 5rem;
-  padding-bottom: 5rem;
-}
-
-.section-tight {
-  padding-top: 3rem;
-  padding-bottom: 3rem;
 }

@@ -1,749 +1,302 @@
 'use client'
-
 import { Inter } from 'next/font/google'
-import { useState } from 'react'
 import Link from 'next/link'
-import {
-  Calendar, Bell, Shield, Users, CreditCard, BarChart3,
-  CheckCircle, ArrowRight, Menu, X, ChevronDown, Star,
-} from 'lucide-react'
 
-const inter = Inter({ subsets: ['latin'], display: 'swap' })
+const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
 
-// ── Icons (inline SVG to avoid extra dependencies) ────────────────────────────
-function GradientBarChart() {
+function Section({ children, className = '', dark = false }: { children: React.ReactNode; className?: string; dark?: boolean }) {
   return (
-    <div className="flex items-end gap-2 h-24">
-      {[40, 65, 45, 80, 55, 90, 70, 95, 60, 85, 75, 100].map((h, i) => (
-        <div
-          key={i}
-          className="flex-1 rounded-sm"
-          style={{
-            height: `${h}%`,
-            background: `linear-gradient(180deg, #818CF8 0%, #006FFF 100%)`,
-            opacity: 0.7 + (i / 12) * 0.3,
-          }}
-        />
-      ))}
-    </div>
+    <section className={`${className}`} style={{ background: dark ? '#0a0a0a' : '#050505' }}>
+      <div className="max-w-5xl mx-auto px-6">{children}</div>
+    </section>
   )
 }
 
-function GrowthLineChart() {
-  const points = [
-    [0, 60], [1, 55], [2, 65], [3, 58], [4, 70],
-    [5, 68], [6, 75], [7, 72], [8, 80], [9, 78], [10, 88],
-  ]
-  const maxX = points.length - 1
-  const maxY = 100
-  const w = 220
-  const h = 40
-  const pathData = points
-    .map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${(x / maxX) * w} ${h - (y / maxY) * h}`)
-    .join(' ')
-
+export default function HomePage() {
   return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="w-full">
-      <defs>
-        <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#10B981" stopOpacity="0.4" />
-          <stop offset="100%" stopColor="#10B981" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      {/* Glow fill */}
-      <path
-        d={`${pathData} L ${w} ${h} L 0 ${h} Z`}
-        fill="url(#lineGrad)"
-      />
-      {/* Line */}
-      <path
-        d={pathData}
-        fill="none"
-        stroke="#10B981"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        style={{ filter: 'drop-shadow(0 0 6px #10B981)' }}
-      />
-      {/* Dot */}
-      <circle
-        cx={(points[points.length - 1][0] / maxX) * w}
-        cy={h - (points[points.length - 1][1] / maxY) * h}
-        r="3"
-        fill="#10B981"
-        style={{ filter: 'drop-shadow(0 0 6px #10B981)' }}
-      />
-    </svg>
-  )
-}
+    <main className="min-h-screen" style={{ background: '#050505', fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-// ── Dashboard Mockup ──────────────────────────────────────────────────────────
-function DashboardMockup() {
-  const sessions = [
-    { name: 'Emma Thompson', initials: 'ET', time: '9:00 AM', status: 'Confirmed', statusColor: '#10B981' },
-    { name: 'Lucas Rivera', initials: 'LR', time: '10:30 AM', status: 'In Progress', statusColor: '#f59e0b' },
-    { name: 'Aisha Patel', initials: 'AP', time: '1:00 PM', status: 'Pending TCA', statusColor: '#818CF8' },
-  ]
-  const navItems = ['Dashboard', 'Students', 'Sessions', 'Certificates', 'Payments', 'Settings']
-  const activeIdx = 0
-
-  const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
-
-  return (
-    <div className="relative mx-auto max-w-5xl px-4" style={{ perspective: '1200px' }}>
-      {/* Outer glow */}
-      <div
-        className="absolute inset-0 rounded-3xl pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0,111,255,0.18) 0%, transparent 70%)',
-          transform: 'translateY(20px)',
-          filter: 'blur(20px)',
-        }}
-      />
-
-      {/* Browser chrome */}
-      <div
-        className="relative rounded-2xl overflow-hidden shadow-2xl"
-        style={{
-          background: '#111113',
-          transform: 'rotateY(-5deg) rotateX(2deg)',
-          border: '1px solid #27272a',
-          boxShadow: '0 25px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)',
-        }}
-      >
-        {/* Title bar */}
-        <div
-          className="flex items-center gap-2 px-4 py-3"
-          style={{ background: '#0D0D0D', borderBottom: '1px solid #1A1A1A' }}
-        >
-          <div className="w-3 h-3 rounded-full" style={{ background: '#ff5f57' }} />
-          <div className="w-3 h-3 rounded-full" style={{ background: '#febc2e' }} />
-          <div className="w-3 h-3 rounded-full" style={{ background: '#28c840' }} />
-          <div
-            className="flex-1 mx-4 flex items-center justify-center h-6 rounded text-xs"
-            style={{ background: '#18181b', color: '#52525b' }}
-          >
-            app.thedrivingcenter.com
+      {/* ── NAVBAR ── */}
+      <nav className="sticky top-0 z-50 border-b" style={{ background: 'rgba(5,5,5,0.9)', borderColor: '#1a1a1a', backdropFilter: 'blur(12px)' }}>
+        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold" style={{ background: '#0066FF' }}>DC</div>
+            <span className="text-white font-semibold text-sm">The Driving Center</span>
           </div>
-        </div>
-
-        {/* Dashboard body */}
-        <div className="flex" style={{ background: '#0D0D0D', minHeight: '360px' }}>
-          {/* Sidebar */}
-          <div
-            className="w-44 flex-shrink-0 py-4 flex flex-col"
-            style={{ background: '#0D0D0D', borderRight: '1px solid #1A1A1A' }}
-          >
-            {/* Logo */}
-            <div className="px-4 mb-4 flex items-center gap-2">
-              <div
-                className="w-7 h-7 rounded-md flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                style={{ background: 'var(--accent)' }}
-              >
-                DC
-              </div>
-              <span className="text-xs text-white font-semibold">Driving Center</span>
-            </div>
-
-            {/* Nav */}
-            <nav className="flex-1 px-2 space-y-0.5">
-              {navItems.map((item, i) => (
-                <div
-                  key={item}
-                  className="flex items-center gap-2 px-2 py-2 rounded-md text-xs relative"
-                  style={{
-                    color: i === activeIdx ? '#ffffff' : '#52525b',
-                    background: i === activeIdx ? '#18181b' : 'transparent',
-                  }}
-                >
-                  {i === activeIdx && (
-                    <div
-                      className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 rounded-r"
-                      style={{ background: 'var(--accent)' }}
-                    />
-                  )}
-                  {item}
-                </div>
-              ))}
-            </nav>
-
-            {/* Profile */}
-            <div className="px-4 pt-3 mt-auto flex items-center gap-2" style={{ borderTop: '1px solid #1A1A1A' }}>
-              <div
-                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg, #818CF8, #006FFF)' }}
-              >
-                MK
-              </div>
-              <div>
-                <div className="text-xs text-white font-medium">Mark</div>
-                <div className="text-xs" style={{ color: '#52525b' }}>Instructor</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Main content */}
-          <div className="flex-1 p-5 overflow-hidden">
-            {/* Greeting */}
-            <div className="mb-4">
-              <h2 className="text-base font-semibold text-white">Good morning, Mark</h2>
-              <p className="text-xs" style={{ color: '#52525b' }}>{today}</p>
-            </div>
-
-            {/* Stat cards */}
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              {[
-                { label: 'Active Students', value: '24', color: 'var(--accent)' },
-                { label: 'Sessions Today', value: '6', color: '#10B981' },
-                { label: 'Pending TCA', value: '3', color: '#f59e0b' },
-              ].map(({ label, value, color }) => (
-                <div
-                  key={label}
-                  className="p-3 rounded-lg"
-                  style={{ background: '#18181b', border: '1px solid #1A1A1A' }}
-                >
-                  <div className="text-xs mb-1" style={{ color: '#52525b' }}>{label}</div>
-                  <div className="text-xl font-bold" style={{ color }}>{value}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Sessions list */}
-            <div className="mb-4">
-              <div className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#52525b' }}>
-                Today&apos;s Sessions
-              </div>
-              <div className="space-y-2">
-                {sessions.map(s => (
-                  <div
-                    key={s.name}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg"
-                    style={{ background: '#18181b', border: '1px solid #1A1A1A' }}
-                  >
-                    <div
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                      style={{ background: 'linear-gradient(135deg, #818CF8, #006FFF)' }}
-                    >
-                      {s.initials}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs text-white font-medium">{s.name}</div>
-                      <div className="text-xs" style={{ color: '#52525b' }}>{s.time}</div>
-                    </div>
-                    <div
-                      className="text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0"
-                      style={{ background: `${s.statusColor}20`, color: s.statusColor }}
-                    >
-                      {s.status}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Charts row */}
-            <div className="grid grid-cols-2 gap-3">
-              {/* Bar chart */}
-              <div className="p-3 rounded-lg" style={{ background: '#18181b', border: '1px solid #1A1A1A' }}>
-                <div className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#52525b' }}>
-                  Weekly Sessions
-                </div>
-                <GradientBarChart />
-              </div>
-
-              {/* Line chart */}
-              <div className="p-3 rounded-lg" style={{ background: '#18181b', border: '1px solid #1A1A1A' }}>
-                <div className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#52525b' }}>
-                  Growth Trend
-                </div>
-                <GrowthLineChart />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Floating certificate badge */}
-        <div
-          className="absolute -top-3 -right-6 flex items-center gap-2 px-3 py-2 rounded-full text-xs font-medium"
-          style={{
-            background: '#0D0D0D',
-            border: '1px solid #10B981',
-            color: '#10B981',
-            boxShadow: '0 0 20px rgba(16,185,129,0.3)',
-          }}
-        >
-          <CheckCircle className="w-3.5 h-3.5" />
-          Jordan K. — just now
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ── Navbar ────────────────────────────────────────────────────────────────────
-function Nav() {
-  const [mobileOpen, setMobileOpen] = useState(false)
-
-  return (
-    <header
-      className="sticky top-0 z-50"
-      style={{ background: '#0D0D0D', borderBottom: '1px solid #1A1A1A' }}
-    >
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold"
-            style={{ background: 'var(--accent)' }}
-          >
-            DC
-          </div>
-          <span className="text-sm font-semibold text-white">
-            The Driving Center
-          </span>
-        </Link>
-
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-8">
-          {['Features', 'How it works', 'Pricing', 'FAQ'].map(label => (
-            <a
-              key={label}
-              href={`#${label.toLowerCase().replace(/ /g, '-')}`}
-              className="text-sm font-medium transition-colors"
-              style={{ color: '#94A3B8' }}
-              onMouseEnter={e => ((e.target as HTMLElement).style.color = '#ffffff')}
-              onMouseLeave={e => ((e.target as HTMLElement).style.color = '#94A3B8')}
-            >
-              {label}
-            </a>
-          ))}
-        </nav>
-
-        {/* CTA */}
-        <div className="hidden md:flex items-center gap-4">
-          <Link href="/login" className="text-sm font-medium" style={{ color: '#94A3B8' }}>
-            Sign in
-          </Link>
-          <Link
-            href="/signup"
-            className="btn-primary text-sm"
-          >
-            Start free trial
-          </Link>
-        </div>
-
-        {/* Mobile toggle */}
-        <button
-          className="md:hidden p-2"
-          style={{ color: '#94A3B8' }}
-          onClick={() => setMobileOpen(v => !v)}
-        >
-          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
-      </div>
-
-      {/* Mobile nav */}
-      {mobileOpen && (
-        <div
-          className="md:hidden border-t py-4 px-6 space-y-1"
-          style={{ background: '#0D0D0D', borderColor: '#1A1A1A' }}
-        >
-          {['Features', 'How it works', 'Pricing', 'FAQ'].map(label => (
-            <a
-              key={label}
-              href={`#${label.toLowerCase().replace(/ /g, '-')}`}
-              className="block text-sm font-medium py-2"
-              style={{ color: '#94A3B8' }}
-              onClick={() => setMobileOpen(false)}
-            >
-              {label}
-            </a>
-          ))}
-          <div className="flex flex-col gap-2 pt-3">
-            <Link href="/login" className="text-center text-sm font-medium py-2" style={{ color: '#94A3B8' }} onClick={() => setMobileOpen(false)}>
-              Sign in
-            </Link>
-            <Link href="/signup" className="block text-center text-sm font-semibold text-white py-3 rounded-full" style={{ background: 'var(--accent)', boxShadow: '0 0 30px rgba(0,111,255,0.4)' }} onClick={() => setMobileOpen(false)}>
+          <div className="flex items-center gap-6">
+            <Link href="/login" className="text-sm text-[#888888] hover:text-white transition-colors">Sign in</Link>
+            <Link href="/signup" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-all" style={{ background: '#0066FF' }}>
               Start free trial
             </Link>
           </div>
         </div>
-      )}
-    </header>
-  )
-}
+      </nav>
 
-// ── Hero ─────────────────────────────────────────────────────────────────────
-function Hero() {
-  return (
-    <section className="starfield-bg py-24 md:py-32">
-      <div className="max-w-[1100px] mx-auto px-6 text-center">
-        {/* Eyebrow pill */}
-        <div
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-8"
-          style={{
-            background: 'rgba(0,111,255,0.15)',
-            color: '#006FFF',
-            border: '1px solid rgba(0,111,255,0.3)',
-          }}
-        >
-          Built for Tennessee driving schools
-        </div>
-
-        {/* Headline */}
-        <h1
-          className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6"
-          style={{ color: '#ffffff', letterSpacing: '-0.02em' }}
-        >
-          Run your driving school{' '}
-          <span className="gradient-text">without the chaos.</span>
-        </h1>
-
-        {/* Subline */}
-        <p
-          className="text-base md:text-lg leading-relaxed"
-          style={{ color: '#94A3B8', maxWidth: '540px', margin: '0 auto 2.5rem' }}
-        >
-          Online booking. Automated reminders. Student tracking. TCA compliance.
-          One flat price — no per-seat fees, no phone tag.
-        </p>
-
-        {/* CTA */}
-        <Link
-          href="/signup"
-          className="btn-primary text-base px-10 py-4"
-        >
-          Start free trial
-          <ArrowRight className="w-4 h-4" />
-        </Link>
-
-        {/* Trust badges */}
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8">
-          {['No credit card required', 'Setup in under an hour', 'Cancel anytime'].map(b => (
-            <div key={b} className="flex items-center gap-1.5 text-sm" style={{ color: '#94A3B8' }}>
-              <CheckCircle className="w-4 h-4" style={{ color: '#10B981' }} />
-              {b}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ── Social Proof ─────────────────────────────────────────────────────────────
-function LogoBar() {
-  return (
-    <section className="py-12" style={{ background: '#0D0D0D', borderTop: '1px solid #1A1A1A', borderBottom: '1px solid #1A1A1A' }}>
-      <div className="max-w-6xl mx-auto px-6 text-center">
-        <p
-          className="text-xs font-semibold uppercase tracking-widest mb-6"
-          style={{ color: '#52525b' }}
-        >
-          Trusted by driving schools across Tennessee
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
-          {['Oneida', 'Knoxville', 'Crossville', 'Jamestown', 'Huntsville', 'Cookeville'].map(city => (
-            <span
-              key={city}
-              className="text-sm font-medium tracking-wide"
-              style={{ color: '#52525b' }}
-            >
-              {city}
-            </span>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ── Features ─────────────────────────────────────────────────────────────────
-function Features() {
-  const features = [
-    { icon: Calendar, color: '#006FFF', title: 'Online Booking & Scheduling', description: 'Students book 24/7 from your custom page. Instructors set their own availability — no back-and-forth texts.' },
-    { icon: Bell, color: '#f59e0b', title: 'Automated Reminders', description: '48h and 4h SMS + email reminders fire automatically. No-shows drop to near zero.' },
-    { icon: Shield, color: '#10B981', title: 'TCA Compliance', description: 'Classroom and driving hours tracked in real time. Certificates issue when Tennessee requirements are met.' },
-    { icon: Users, color: '#818CF8', title: 'Student Management', description: 'Import your entire roster in one CSV. Track every student from enrollment to certification.' },
-    { icon: CreditCard, color: '#6366f1', title: 'Stripe Payments', description: 'Students pay when they book. Funds go direct to your bank — we never hold money.' },
-    { icon: BarChart3, color: '#38BDF8', title: 'Progress Dashboard', description: 'Real-time view of every student. Hours, status, and upcoming sessions — all in one place.' },
-  ]
-
-  return (
-    <section id="features" className="py-20" style={{ background: '#050505' }}>
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-14">
-          <h2
-            className="text-3xl md:text-4xl font-bold"
-            style={{ color: '#ffffff', letterSpacing: '-0.02em' }}
-          >
-            Everything you need. Nothing you don&apos;t.
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map(({ icon: Icon, color, title, description }) => (
-            <div
-              key={title}
-              className="card-dark p-8 rounded-2xl cursor-default"
-            >
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-                style={{ background: `${color}15` }}
-              >
-                <Icon className="w-5 h-5" style={{ color }} />
-              </div>
-              <h3 className="text-base font-semibold mb-2" style={{ color: '#ffffff' }}>{title}</h3>
-              <p className="text-sm leading-relaxed" style={{ color: '#94A3B8' }}>{description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ── How It Works ─────────────────────────────────────────────────────────────
-function HowItWorks() {
-  const steps = [
-    { num: '01', title: 'Import your students', description: 'Upload a CSV or add them manually. Name, email, phone — all in under a minute.' },
-    { num: '02', title: 'Set instructor availability', description: 'Each instructor logs in and blocks out their times. Students see only open slots.' },
-    { num: '03', title: 'Get paid automatically', description: 'Students book and pay in advance. Sessions confirmed instantly. You focus on teaching.' },
-  ]
-
-  return (
-    <section id="how-it-works" className="py-20" style={{ background: '#0D0D0D' }}>
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-14">
-          <h2
-            className="text-3xl md:text-4xl font-bold"
-            style={{ color: '#ffffff', letterSpacing: '-0.02em' }}
-          >
-            Up and running in an hour.
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          {/* Connecting line */}
-          <div
-            className="hidden md:block absolute top-6 left-1/2 w-full h-px"
-            style={{ background: 'linear-gradient(90deg, transparent 0%, #1A1A1A 20%, #1A1A1A 80%, transparent 100%)' }}
-          />
-
-          {steps.map(({ num, title, description }) => (
-            <div key={num} className="text-center md:text-left relative">
-              <div
-                className="text-6xl font-bold leading-none mb-4 select-none w-full"
-                style={{ color: '#18181b' }}
-              >
-                {num}
-              </div>
-              <h3 className="text-base font-semibold mb-2" style={{ color: '#ffffff' }}>{title}</h3>
-              <p className="text-sm leading-relaxed" style={{ color: '#94A3B8' }}>{description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ── Pricing ───────────────────────────────────────────────────────────────────
-function Pricing() {
-  const tiers = [
-    {
-      name: 'Starter', price: '99', description: 'Up to 3 instructors, 50 students',
-      features: ['Unlimited bookings', 'SMS + email reminders', 'TCA compliance tracking', 'Certificate issuance', 'CSV student import', 'Stripe payments', 'Email support'],
-      cta: 'Start free trial', popular: false,
-    },
-    {
-      name: 'Growth', price: '199', description: 'Up to 8 instructors, 200 students',
-      features: ['Everything in Starter', 'White-label booking page', 'Parent/guardian portal', 'Custom session types', 'Priority support', 'API access'],
-      cta: 'Start free trial', popular: true,
-    },
-    {
-      name: 'Enterprise', price: '399', description: 'Unlimited, multi-location',
-      features: ['Everything in Growth', 'Multi-location management', 'Advanced reporting', 'Custom integrations', 'Dedicated account manager', 'SLA guarantee'],
-      cta: 'Contact sales', popular: false,
-    },
-  ]
-
-  return (
-    <section id="pricing" className="py-20" style={{ background: '#050505' }}>
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-14">
-          <h2
-            className="text-3xl md:text-4xl font-bold mb-3"
-            style={{ color: '#ffffff', letterSpacing: '-0.02em' }}
-          >
-            Simple, transparent pricing.
-          </h2>
-          <p className="text-base" style={{ color: '#94A3B8' }}>
-            No hidden fees. No per-seat charges. Cancel anytime.
+      {/* ── HERO ── */}
+      <section className="relative overflow-hidden" style={{ background: '#050505', paddingTop: '100px', paddingBottom: '100px' }}>
+        <div className="absolute inset-0 starfield opacity-60" />
+        <div className="relative max-w-5xl mx-auto px-6 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium mb-8" style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', color: '#888888' }}>
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#22C55E' }} />
+            Built for Tennessee driving schools
+          </div>
+          <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight tracking-tight mb-6">
+            Run your driving school
+            <br />
+            <span className="gradient-text">without the chaos.</span>
+          </h1>
+          <p className="text-lg text-[#888888] max-w-xl mx-auto mb-12 leading-relaxed">
+            The all-in-one platform for managing students, scheduling sessions, tracking TCA compliance, and billing — designed for driving schools in Tennessee.
           </p>
+          <div className="flex items-center justify-center gap-4">
+            <Link href="/signup" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-semibold text-white transition-all" style={{ background: '#0066FF', boxShadow: '0 0 40px rgba(0,102,255,0.3)' }}>
+              Start free trial
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </Link>
+            <Link href="/school/nolachuckey" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-medium text-[#888888] border transition-all" style={{ borderColor: '#1a1a1a' }}>
+              See a live demo
+            </Link>
+          </div>
+          <p className="mt-8 text-xs text-[#666666]">No credit card required · 14-day free trial · Cancel anytime</p>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-          {tiers.map(({ name, price, description, features, cta, popular }) => (
-            <div
-              key={name}
-              className="card-dark p-8 rounded-2xl"
-              style={{
-                border: popular ? '2px solid var(--accent)' : '1px solid #1A1A1A',
-                boxShadow: popular ? '0 0 0 4px rgba(0,111,255,0.15), 0 4px 14px rgba(0,111,255,0.2)' : 'none',
-              }}
-            >
-              {popular && (
-                <div
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold mb-5"
-                  style={{ background: 'rgba(0,111,255,0.15)', color: '#006FFF' }}
-                >
-                  <Star className="w-3 h-3 fill-current" />
-                  Most popular
+      {/* ── LOGO BAR ── */}
+      <div className="border-y" style={{ background: '#0a0a0a', borderColor: '#1a1a1a' }}>
+        <div className="max-w-5xl mx-auto px-6 py-10">
+          <p className="text-xs text-center text-[#666666] uppercase tracking-widest mb-8">Trusted by driving schools across Tennessee</p>
+          <div className="flex items-center justify-center gap-12 flex-wrap">
+            {['Knoxville', 'Nashville', 'Chattanooga', 'Memphis', 'Nolachuckey', 'Oneida', 'Cumberland', 'Oak Ridge'].map(city => (
+              <span key={city} className="text-sm text-[#444444]">{city}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── FEATURES ── */}
+      <Section dark>
+        <div style={{ paddingTop: '100px', paddingBottom: '60px' }}>
+          <h2 className="text-3xl font-bold text-white text-center mb-4">Everything you need. Nothing you don't.</h2>
+          <p style={{ color: '#666666' }} className="text-center text-base mb-16">Replace spreadsheets, paper forms, and billing chaos with one platform.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                title: 'Student Management',
+                desc: 'Keep every student\'s contact info, permit status, session history, and TCA progress in one place. No more spreadsheets.',
+                color: '#0066FF',
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                ),
+              },
+              {
+                title: 'Smart Scheduling',
+                desc: 'Book sessions, assign instructors, and manage availability without the phone tag. Students pick times that work.',
+                color: '#8B5CF6',
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                ),
+              },
+              {
+                title: 'TCA Compliance',
+                desc: 'Track every student\'s 6-hour observation and 60-hour behind-the-wheel requirement. Certificates auto-generate when complete.',
+                color: '#22C55E',
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                ),
+              },
+              {
+                title: 'Automated Reminders',
+                desc: 'Students get email and SMS reminders 48 hours and 4 hours before each session. Less no-shows, less stress.',
+                color: '#F59E0B',
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                  </svg>
+                ),
+              },
+              {
+                title: 'Stripe Billing',
+                desc: 'Parents pay online before the session. No chasing checks. Your school gets paid before you hit the road.',
+                color: '#6366F1',
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+                  </svg>
+                ),
+              },
+              {
+                title: 'CSV Import',
+                desc: 'Move your existing student list into the platform in minutes. One CSV file, zero data entry.',
+                color: '#EC4899',
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                ),
+              },
+            ].map(({ title, desc, color, icon }) => (
+              <div key={title} className="p-6 rounded-2xl border" style={{ background: '#0a0a0a', borderColor: '#1a1a1a' }}>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ background: `${color}15` }}>
+                  <div style={{ color }}>{icon}</div>
                 </div>
-              )}
-
-              <div className="text-sm font-semibold uppercase tracking-wider mb-1" style={{ color: popular ? '#006FFF' : '#94A3B8' }}>
-                {name}
+                <h3 className="text-base font-semibold text-white mb-2">{title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: '#666666' }}>{desc}</p>
               </div>
-              <div className="flex items-end gap-1 mb-1">
-                <span className="text-5xl font-bold tracking-tight" style={{ color: '#ffffff' }}>${price}</span>
-                <span className="text-sm mb-2" style={{ color: '#94A3B8' }}>/mo</span>
-              </div>
-              <p className="text-sm mb-8" style={{ color: '#94A3B8' }}>{description}</p>
+            ))}
+          </div>
+        </div>
+      </Section>
 
-              <div className="border-t mb-8 pt-6 space-y-3" style={{ borderColor: '#1A1A1A' }}>
-                {features.map(f => (
-                  <div key={f} className="flex items-center gap-3 text-sm">
-                    <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: '#10B981' }} />
-                    <span style={{ color: '#94A3B8' }}>{f}</span>
-                  </div>
+      {/* ── HOW IT WORKS ── */}
+      <Section>
+        <div style={{ paddingTop: '100px', paddingBottom: '100px' }}>
+          <h2 className="text-3xl font-bold text-white text-center mb-12">Up and running in minutes</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { num: '01', title: 'Create your school', desc: 'Sign up in 60 seconds. Add your school name, logo, and set your session types and pricing.' },
+              { num: '02', title: 'Import your students', desc: 'Upload a CSV or add students one by one. Import their session history and TCA hours.' },
+              { num: '03', title: 'Start booking', desc: 'Share your booking link with students. They pick a time, pay online, and get a reminder automatically.' },
+            ].map(({ num, title, desc }) => (
+              <div key={num} className="relative">
+                <div className="text-6xl font-bold text-[#1a1a1a] mb-4">{num}</div>
+                <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: '#666666' }}>{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* ── PRICING ── */}
+      <Section dark>
+        <div style={{ paddingTop: '100px', paddingBottom: '100px' }}>
+          <h2 className="text-3xl font-bold text-white text-center mb-4">Simple, transparent pricing</h2>
+          <p className="text-center text-base mb-12" style={{ color: '#666666' }}>No setup fees. No per-seat charges. Cancel anytime.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Starter */}
+            <div className="p-8 rounded-2xl border" style={{ background: '#0a0a0a', borderColor: '#1a1a1a' }}>
+              <h3 className="text-sm font-medium text-[#888888] uppercase tracking-wider mb-2">Starter</h3>
+              <div className="flex items-baseline gap-1 mb-6">
+                <span className="text-4xl font-bold text-white">$99</span>
+                <span className="text-[#666666]">/month</span>
+              </div>
+              <p className="text-sm mb-6" style={{ color: '#666666' }}>For small driving schools just getting started.</p>
+              <ul className="space-y-3 mb-8">
+                {['Up to 25 students', 'Unlimited sessions', 'Email + SMS reminders', 'Stripe payments', 'TCA tracking', 'CSV import'].map(f => (
+                  <li key={f} className="flex items-center gap-3 text-sm" style={{ color: '#888888' }}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3 3 7-7" stroke="#22C55E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    {f}
+                  </li>
                 ))}
-              </div>
-
-              <Link
-                href="/signup"
-                className="block w-full text-center text-sm font-semibold py-3 rounded-full transition-all"
-                style={
-                  popular
-                    ? { background: 'var(--accent)', color: '#fff', boxShadow: '0 0 30px rgba(0,111,255,0.4)' }
-                    : { background: '#18181b', color: '#94A3B8', border: '1px solid #27272a' }
-                }
-              >
-                {cta}
+              </ul>
+              <Link href="/signup" className="block w-full text-center py-3 rounded-xl text-sm font-medium border transition-all" style={{ borderColor: '#1a1a1a', color: '#888888' }}>
+                Get started
               </Link>
             </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ── FAQ ───────────────────────────────────────────────────────────────────────
-function FAQ() {
-  const items = [
-    { q: 'How long does it take to set up?', a: "Most schools are fully operational within an hour. Import your student roster, set instructor availability, and you're ready to accept bookings." },
-    { q: 'Do students need to install anything?', a: 'No. Students access your booking page through a link you share — it works on any device with a browser. No app download required.' },
-    { q: 'How does TCA compliance work?', a: "You log each student's classroom and driving hours as they complete them. When Tennessee requirements are met, the system automatically issues a compliance certificate." },
-    { q: 'What if I already use another scheduling tool?', a: 'You can migrate existing student data via CSV import. Our team can help with larger data migrations — contact us to discuss your situation.' },
-    { q: 'Can instructors manage their own availability?', a: "Yes. Each instructor gets their own login and can block out times they're unavailable. Students only see open slots." },
-    { q: 'Is there a free trial?', a: 'Yes — 14 days free, no credit card required. You can explore every feature before deciding whether to subscribe.' },
-  ]
-
-  return (
-    <section id="faq" className="py-20" style={{ background: '#0D0D0D' }}>
-      <div className="max-w-3xl mx-auto px-6">
-        <div className="text-center mb-14">
-          <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#ffffff', letterSpacing: '-0.02em' }}>
-            Common questions
-          </h2>
-        </div>
-
-        <div className="space-y-3">
-          {items.map(({ q, a }) => (
-            <details
-              key={q}
-              className="group rounded-xl"
-              style={{ background: '#18181b', border: '1px solid #1A1A1A' }}
-            >
-              <summary
-                className="flex items-center justify-between gap-4 px-6 py-4 cursor-pointer list-none select-none"
-              >
-                <span className="text-sm font-medium" style={{ color: '#ffffff' }}>{q}</span>
-                <ChevronDown
-                  className="w-4 h-4 flex-shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: '#52525b' }}
-                />
-              </summary>
-              <div className="px-6 pb-5">
-                <p className="text-sm leading-relaxed" style={{ color: '#94A3B8' }}>{a}</p>
+            {/* Growth - highlighted */}
+            <div className="p-8 rounded-2xl border-2 relative" style={{ background: '#0a0a0a', borderColor: '#0066FF', boxShadow: '0 0 60px rgba(0,102,255,0.12)' }}>
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-medium" style={{ background: '#0066FF', color: 'white' }}>Most popular</div>
+              <h3 className="text-sm font-medium text-[#888888] uppercase tracking-wider mb-2">Growth</h3>
+              <div className="flex items-baseline gap-1 mb-6">
+                <span className="text-4xl font-bold text-white">$199</span>
+                <span className="text-[#666666]">/month</span>
               </div>
-            </details>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ── Footer CTA ────────────────────────────────────────────────────────────────
-function FooterCTA() {
-  return (
-    <section className="py-20 starfield-bg">
-      <div className="max-w-3xl mx-auto px-6 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#ffffff', letterSpacing: '-0.02em' }}>
-          Ready to run your school better?
-        </h2>
-        <p className="text-base mb-10" style={{ color: '#94A3B8' }}>
-          Start your free trial today. No credit card required.
-        </p>
-        <Link href="/signup" className="btn-primary text-base px-10 py-4">
-          Start free trial
-          <ArrowRight className="w-4 h-4" />
-        </Link>
-      </div>
-    </section>
-  )
-}
-
-// ── Footer ────────────────────────────────────────────────────────────────────
-function Footer() {
-  return (
-    <footer className="py-8" style={{ borderTop: '1px solid #1A1A1A' }}>
-      <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <div
-            className="w-6 h-6 rounded flex items-center justify-center text-white text-xs font-bold"
-            style={{ background: 'var(--accent)' }}
-          >
-            DC
+              <p className="text-sm mb-6" style={{ color: '#666666' }}>For growing schools that need more power and flexibility.</p>
+              <ul className="space-y-3 mb-8">
+                {['Up to 100 students', 'Everything in Starter', 'Instructor management', 'Parent portal', 'Priority support', 'Custom branding'].map(f => (
+                  <li key={f} className="flex items-center gap-3 text-sm" style={{ color: '#888888' }}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3 3 7-7" stroke="#22C55E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/signup" className="block w-full text-center py-3 rounded-xl text-sm font-semibold text-white transition-all" style={{ background: '#0066FF' }}>
+                Start free trial
+              </Link>
+            </div>
+            {/* Enterprise */}
+            <div className="p-8 rounded-2xl border" style={{ background: '#0a0a0a', borderColor: '#1a1a1a' }}>
+              <h3 className="text-sm font-medium text-[#888888] uppercase tracking-wider mb-2">Enterprise</h3>
+              <div className="flex items-baseline gap-1 mb-6">
+                <span className="text-4xl font-bold text-white">$399</span>
+                <span className="text-[#666666]">/month</span>
+              </div>
+              <p className="text-sm mb-6" style={{ color: '#666666' }}>For multi-location schools with advanced needs.</p>
+              <ul className="space-y-3 mb-8">
+                {['Unlimited students', 'Everything in Growth', 'Multi-location support', 'API access', 'Dedicated success manager', 'Custom integrations'].map(f => (
+                  <li key={f} className="flex items-center gap-3 text-sm" style={{ color: '#888888' }}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3 3 7-7" stroke="#22C55E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/signup" className="block w-full text-center py-3 rounded-xl text-sm font-medium border transition-all" style={{ borderColor: '#1a1a1a', color: '#888888' }}>
+                Contact sales
+              </Link>
+            </div>
           </div>
-          <span className="text-sm" style={{ color: '#52525b' }}>© 2026 The Driving Center</span>
         </div>
-        <div className="flex gap-6">
-          <a href="/legal/privacy" className="text-sm transition-colors" style={{ color: '#52525b' }}>Privacy</a>
-          <a href="/legal/terms" className="text-sm transition-colors" style={{ color: '#52525b' }}>Terms</a>
-        </div>
-      </div>
-    </footer>
-  )
-}
+      </Section>
 
-// ── Page ──────────────────────────────────────────────────────────────────────
-export default function HomePage() {
-  return (
-    <div className={inter.className} style={{ background: '#050505', color: '#ffffff' }}>
-      <Nav />
-      <Hero />
-      <DashboardMockup />
-      <LogoBar />
-      <Features />
-      <HowItWorks />
-      <Pricing />
-      <FAQ />
-      <FooterCTA />
-      <Footer />
-    </div>
+      {/* ── FAQ ── */}
+      <Section>
+        <div style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+          <h2 className="text-3xl font-bold text-white text-center mb-10">Common questions</h2>
+          <div className="max-w-2xl mx-auto space-y-2">
+            {[
+              { q: 'Do I need a credit card to start?', a: 'No. Start your 14-day free trial with no credit card required. Only pay when you\'re ready.' },
+              { q: 'Can I import my existing student list?', a: 'Yes. Upload a CSV with your student list and history in minutes. No manual re-entry required.' },
+              { q: 'How does TCA compliance work?', a: 'The system tracks every student\'s 6-hour observation and 60-hour behind-the-wheel requirement. Certificates auto-generate when requirements are met.' },
+              { q: 'Can parents pay online?', a: 'Yes. Stripe is built in. Parents pay when they book. Your school gets paid before the session happens.' },
+              { q: 'What if I need to cancel?', a: 'Cancel anytime from your account settings. No questions asked, no penalties.' },
+            ].map(({ q, a }) => (
+              <details key={q} className="group rounded-xl border" style={{ background: '#0a0a0a', borderColor: '#1a1a1a' }}>
+                <summary className="flex items-center justify-between px-6 py-4 cursor-pointer list-none">
+                  <span className="text-sm font-medium text-white">{q}</span>
+                  <svg className="group-open:rotate-180 transition-transform" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M4 6l4 4 4-4" stroke="#666666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </summary>
+                <div className="px-6 pb-5">
+                  <p className="text-sm leading-relaxed" style={{ color: '#666666' }}>{a}</p>
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* ── FOOTER CTA ── */}
+      <Section dark>
+        <div className="text-center" style={{ paddingTop: '100px', paddingBottom: '100px' }}>
+          <h2 className="text-4xl font-bold text-white mb-4">Ready to run your school better?</h2>
+          <p className="text-base mb-10" style={{ color: '#666666' }}>Start your free trial today. No credit card required.</p>
+          <Link href="/signup" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-semibold text-white transition-all" style={{ background: '#0066FF', boxShadow: '0 0 40px rgba(0,102,255,0.3)' }}>
+            Start free trial
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </Link>
+        </div>
+      </Section>
+
+      {/* ── FOOTER ── */}
+      <footer className="border-t" style={{ background: '#0a0a0a', borderColor: '#1a1a1a' }}>
+        <div className="max-w-5xl mx-auto px-6 py-10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold" style={{ background: '#0066FF' }}>DC</div>
+            <span className="text-sm text-[#444444]">© 2026 The Driving Center</span>
+          </div>
+          <div className="flex items-center gap-6">
+            <Link href="/legal/privacy" className="text-xs text-[#444444] hover:text-[#888888]">Privacy</Link>
+            <Link href="/legal/terms" className="text-xs text-[#444444] hover:text-[#888888]">Terms</Link>
+          </div>
+        </div>
+      </footer>
+    </main>
   )
 }
