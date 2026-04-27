@@ -1,36 +1,52 @@
+@import url('../lib/design-tokens.css');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg: #050505;
-  --surface: #0a0a0a;
-  --elevated: #111111;
-  --border: #1a1a1a;
-  --text: #ffffff;
-  --muted: #666666;
-  --subtle: #888888;
-  --accent: #0066FF;
-  --green: #22C55E;
-  --amber: #F59E0B;
+/* Starfield background texture */
+.starfield {
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.07) 1px, transparent 0);
+  background-size: 32px 32px;
 }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
+/* Gradient text utility */
 .gradient-text {
-  background: linear-gradient(135deg, #0066FF, #8B5CF6);
+  background: linear-gradient(135deg, var(--accent) 0%, #8B5CF6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.starfield {
-  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0);
-  background-size: 32px 32px;
+/* CTA button — white, glowing, only one per page section */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-8);
+  background: var(--text);
+  color: var(--bg);
+  font-size: var(--text-base);
+  font-weight: 700;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.15);
+  transition: box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
+}
+.btn-primary:hover {
+  box-shadow: 0 0 60px rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Dark card */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+/* FAQ accordion chevron animation */
+details[open] .faq-chevron {
+  transform: rotate(180deg);
+}
+details summary::-webkit-details-marker {
+  display: none;
 }
