@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { encryptField, decryptField, validateDOB, validatePermitNumber, validateEmail, validatePhone, auditLog } from '@/lib/security'
+import { isLikelyValidEmail } from '@/lib/email'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -78,9 +79,8 @@ export async function POST(request: Request) {
     const p = validatePermitNumber(permit_number)
     if (!p.valid) return NextResponse.json({ error: p.error }, { status: 400 })
   }
-  if (parent_email) {
-    const e = validateEmail(parent_email)
-    if (!e.valid) return NextResponse.json({ error: e.error }, { status: 400 })
+  if (parent_email && !isLikelyValidEmail(parent_email)) {
+    return NextResponse.json({ error: 'Invalid or disallowed email address' }, { status: 400 })
   }
   if (emergency_contact_phone) {
     const p = validatePhone(emergency_contact_phone)

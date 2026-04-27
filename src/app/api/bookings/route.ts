@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
 import { validateEmail, validatePhone } from '@/lib/security'
+import { isLikelyValidEmail } from '@/lib/email'
 
 // ── POST /api/bookings ─────────────────────────────────────────────────
 export async function POST(request: Request) {
@@ -18,6 +19,12 @@ export async function POST(request: Request) {
 
   const emailCheck = validateEmail(student_email)
   if (!emailCheck.valid) return new NextResponse(emailCheck.error, { status: 400 })
+
+  // Bounce protection — reject fake/placeholder emails before they hit Resend
+  if (!isLikelyValidEmail(student_email)) {
+    return NextResponse.json({ error: 'Invalid or disallowed email address' }, { status: 400 })
+  }
+
   if (student_phone) {
     const phoneCheck = validatePhone(student_phone)
     if (!phoneCheck.valid) return new NextResponse(phoneCheck.error, { status: 400 })

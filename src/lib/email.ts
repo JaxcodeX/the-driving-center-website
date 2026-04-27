@@ -1,6 +1,20 @@
 // Resend email client — stub mode when key not configured
 
 const apiKey = process.env.RESEND_API_KEY
+const BOUNCE_SAFE_DOMAINS = new Set([
+  'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com',
+  'protonmail.com', 'proton.me', 'mail.com', 'aol.com', 'zoho.com',
+  'live.com', 'msn.com', 'icloud.com', 'me.com', 'mac.com',
+])
+
+function isLikelyValidEmail(email: string): boolean {
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false
+  const domain = email.split('@')[1]?.toLowerCase()
+  if (!domain) return false
+  // Block obvious test/junk emails
+  if (domain === 'test.com' || domain === 'email.com' || domain === 'example.com') return false
+  return true
+}
 
 export function isEmailConfigured() {
   return Boolean(apiKey)
@@ -15,6 +29,11 @@ interface EmailOptions {
 export async function sendEmail({ to, subject, html }: EmailOptions): Promise<void> {
   if (!apiKey) {
     console.log(`[Resend STUB] To: ${to} | Subject: ${subject}`)
+    return
+  }
+
+  if (!isLikelyValidEmail(to)) {
+    console.log(`[Resend BLOCKED] Unsafe email rejected: ${to}`)
     return
   }
 
