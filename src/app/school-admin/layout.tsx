@@ -5,41 +5,21 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, Users, Calendar, Clock, CreditCard,
-  Settings, LogOut, Bell, ChevronRight, Menu, X,
+  Settings, LogOut, Bell, Menu, X, Upload, UserCheck,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-const T = {
-  bg:        '#050505',
-  surface:   '#0D0D0D',
-  elevated:  '#18181b',
-  border:    '#1A1A1A',
-  borderLt:  '#27272a',
-  text:      '#ffffff',
-  secondary: '#94A3B8',
-  muted:     '#52525b',
-  cyan:      '#38BDF8',
-  purple:    '#818CF8',
-  green:     '#10B981',
-  grad:      'linear-gradient(135deg, #38BDF8 0%, #818CF8 100%)',
-}
-
 const NAV_ITEMS = [
-  { icon: LayoutDashboard, label: 'Dashboard', href: '/school-admin' },
-  { icon: Users,          label: 'Students',   href: '/school-admin/students' },
-  { icon: Calendar,      label: 'Sessions',   href: '/school-admin/sessions' },
-  { icon: Clock,         label: 'Calendar',   href: '/school-admin/calendar' },
-  { icon: CreditCard,    label: 'Billing',   href: '/school-admin/billing' },
-  { icon: Settings,      label: 'Settings',   href: '/school-admin/profile' },
+  { icon: LayoutDashboard, label: 'Dashboard',    href: '/school-admin' },
+  { icon: Users,           label: 'Students',     href: '/school-admin/students' },
+  { icon: Calendar,        label: 'Sessions',     href: '/school-admin/sessions' },
+  { icon: Calendar,        label: 'Calendar',     href: '/school-admin/calendar' },
+  { icon: UserCheck,       label: 'Instructors',  href: '/school-admin/instructors' },
+  { icon: CreditCard,      label: 'Billing',      href: '/school-admin/billing' },
+  { icon: Upload,          label: 'Import',       href: '/school-admin/import' },
 ]
 
-function Sidebar({
-  schoolName,
-  onClose,
-}: {
-  schoolName?: string
-  onClose?: () => void
-}) {
+function Sidebar({ schoolName, onClose }: { schoolName?: string; onClose?: () => void }) {
   const pathname = usePathname()
   const supabase = createClient()
 
@@ -50,31 +30,16 @@ function Sidebar({
 
   return (
     <aside
-      className="flex flex-col h-full"
-      style={{ background: T.surface, borderRight: `1px solid ${T.border}` }}
+      className="flex flex-col h-full sidebar"
     >
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b" style={{ borderColor: T.border }}>
+      <div className="logo-bar">
         <Link href="/" className="flex items-center gap-2.5">
-          <div
-            className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold"
-            style={{ background: T.grad }}
-          >
-            DC
-          </div>
-          <div>
-            <div className="text-sm font-semibold tracking-tight" style={{ color: T.text }}>
-              {schoolName || 'Your School'}
-            </div>
-            <div className="text-xs" style={{ color: T.muted }}>School Admin</div>
-          </div>
+          <div className="dc-badge">DC</div>
+          <span className="logo-name">The Driving Center</span>
         </Link>
         {onClose && (
-          <button
-            className="ml-auto p-1 md:hidden"
-            onClick={onClose}
-            style={{ color: T.muted }}
-          >
+          <button className="ml-auto p-1 md:hidden sidebar-close" onClick={onClose}>
             <X className="w-5 h-5" />
           </button>
         )}
@@ -89,32 +54,36 @@ function Sidebar({
               key={href}
               href={href}
               onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
-              style={{
-                background: active ? T.elevated : 'transparent',
-                color: active ? T.cyan : T.secondary,
-                borderLeft: active ? `2px solid ${T.cyan}` : '2px solid transparent',
-              }}
+              className={`nav-item ${active ? 'nav-item--active' : ''}`}
             >
-              <Icon className="w-5 h-5 flex-shrink-0" style={{ color: active ? T.cyan : T.muted }} />
+              <Icon className="w-4 h-4 flex-shrink-0" />
               {label}
             </Link>
           )
         })}
       </nav>
 
-      {/* Logout */}
-      <div className="px-3 py-4 border-t" style={{ borderColor: T.border }}>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium w-full transition-all"
-          style={{ color: T.muted }}
-          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = T.elevated)}
-          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
-        >
-          <LogOut className="w-5 h-5" />
-          Log out
-        </button>
+      {/* Footer */}
+      <div className="sidebar-footer">
+        <Link href="/school-admin/profile" className="nav-item">
+          <Settings className="w-4 h-4" />
+          Settings
+        </Link>
+
+        {/* School name + avatar */}
+        <div className="school-chip">
+          <div className="avatar-circle">
+            {schoolName ? schoolName[0].toUpperCase() : 'S'}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-xs font-medium truncate text-white">
+              {schoolName || 'Your School'}
+            </div>
+          </div>
+          <button onClick={handleLogout} className="flex-shrink-0 logout-btn" title="Log out">
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </aside>
   )
@@ -122,18 +91,16 @@ function Sidebar({
 
 export default function SchoolAdminLayout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [schoolName, setSchoolName] = useState<string>('')
+  const [schoolName, setSchoolName] = useState('')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function loadSchool() {
-      // Check demo_user cookie first (set by DEMO_MODE login)
       const demoUserCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
       if (demoUserCookie) {
         try {
           const payload = JSON.parse(atob(decodeURIComponent(demoUserCookie.split('=')[1])))
           if (payload.schoolId) {
-            // Read school data directly using the schoolId we already have
             const supabase = createClient()
             const { data: school } = await supabase
               .from('schools')
@@ -144,10 +111,9 @@ export default function SchoolAdminLayout({ children }: { children: React.ReactN
             setLoading(false)
             return
           }
-        } catch { /* fall through to Supabase auth check */ }
+        } catch { /* fall through */ }
       }
 
-      // Normal Supabase auth check
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
@@ -169,35 +135,25 @@ export default function SchoolAdminLayout({ children }: { children: React.ReactN
 
   if (loading) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ background: T.bg }}
-      >
-        <div className="text-sm" style={{ color: T.muted }}>Loading...</div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#050505' }}>
+        <div className="text-sm" style={{ color: '#64748B' }}>Loading...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex" style={{ background: T.bg }}>
+    <div className="layout-root">
       {/* Desktop sidebar */}
-      <div className="hidden md:flex flex-col w-60 flex-shrink-0 sticky top-0 h-screen">
+      <div className="hidden md:flex flex-col sticky top-0 h-screen">
         <Sidebar schoolName={schoolName} />
       </div>
 
       {/* Mobile sidebar overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
-          <div
-            className="absolute inset-0"
-            style={{ background: 'rgba(0,0,0,0.6)' }}
-            onClick={() => setMobileOpen(false)}
-          />
-          <div className="relative w-64 flex-shrink-0">
-            <Sidebar
-              schoolName={schoolName}
-              onClose={() => setMobileOpen(false)}
-            />
+          <div className="mobile-overlay" onClick={() => setMobileOpen(false)} />
+          <div className="relative">
+            <Sidebar schoolName={schoolName} onClose={() => setMobileOpen(false)} />
           </div>
         </div>
       )}
@@ -205,17 +161,10 @@ export default function SchoolAdminLayout({ children }: { children: React.ReactN
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <header
-          className="flex items-center justify-between px-6 h-16 flex-shrink-0"
-          style={{
-            background: T.surface,
-            borderBottom: `1px solid ${T.border}`,
-          }}
-        >
+        <header className="topbar">
           {/* Mobile hamburger */}
           <button
-            className="md:hidden p-2 -ml-2"
-            style={{ color: T.secondary }}
+            className="md:hidden p-2 -ml-2 topbar-hamburger"
             onClick={() => setMobileOpen(true)}
           >
             <Menu className="w-5 h-5" />
@@ -225,25 +174,17 @@ export default function SchoolAdminLayout({ children }: { children: React.ReactN
 
           {/* Right side */}
           <div className="flex items-center gap-3">
-            <button
-              className="relative p-2 rounded-xl transition-colors"
-              style={{ color: T.muted }}
-              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = T.elevated)}
-              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
-            >
+            <button className="topbar-icon-btn">
               <Bell className="w-5 h-5" />
             </button>
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-              style={{ background: T.grad, color: T.text }}
-            >
+            <div className="avatar-circle">
               {schoolName ? schoolName[0].toUpperCase() : 'S'}
             </div>
           </div>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-6 md:p-8">
+        <main className="flex-1 overflow-y-auto p-6 md:p-8">
           {children}
         </main>
       </div>

@@ -130,3 +130,150 @@ details summary::-webkit-details-marker {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #000; }
 ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 3px; }
+
+/* ── School Admin Layout ─────────────────────────────────────────── */
+.layout-root {
+  min-height: 100vh;
+  display: flex;
+  background: #050505;
+}
+
+.sidebar {
+  background: #0a0a0a;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  width: 240px;
+  flex-shrink: 0;
+}
+
+.logo-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.dc-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffffff;
+  background: linear-gradient(135deg, #7ED4FD, #707BFF);
+  flex-shrink: 0;
+}
+
+.logo-name {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+.sidebar-close {
+  color: #64748B;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #94A3B8;
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+  border-left: 2px solid transparent;
+}
+.nav-item:hover {
+  color: #ffffff;
+  background: rgba(255,255,255,0.05);
+}
+.nav-item--active {
+  color: #ffffff !important;
+  background: rgba(0,102,255,0.1) !important;
+  border-left: 2px solid #0066FF;
+}
+.nav-item--active svg {
+  color: #0066FF !important;
+}
+
+.sidebar-footer {
+  padding: 16px 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.school-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  margin-top: 4px;
+}
+
+.avatar-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #7ED4FD, #707BFF);
+  flex-shrink: 0;
+}
+
+.logout-btn {
+  color: #64748B;
+  flex-shrink: 0;
+}
+.logout-btn:hover {
+  color: #ffffff;
+}
+
+.mobile-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 64px;
+  background: rgba(5,5,5,0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+
+.topbar-hamburger {
+  color: #94A3B8;
+}
+
+.topbar-icon-btn {
+  padding: 8px;
+  border-radius: 10px;
+  color: #64748B;
+  transition: background 0.15s;
+}
+.topbar-icon-btn:hover {
+  background: rgba(255,255,255,0.06);
+}
