@@ -750,7 +750,7 @@ export default function HomePage() {
               { q: 'Can I import my existing student list?', a: 'Yes. Upload a CSV with your student list and TCA history in minutes. No manual re-entry needed.' },
               { q: 'How does TCA compliance tracking work?', a: 'Track every student\'s 6-hour observation and 60-hour drive requirement. Certificates auto-generate when requirements are met.' },
               { q: 'Can parents pay online?', a: 'Yes. Stripe is built in. Parents pay when they book. Your school receives funds before the session.' },
-              { q: 'What if I need to cancel?', a: 'Cancel anytime from your account settings. No questions, no penalties. We'll be sad but we\'ll let you go.' },
+              { q: 'What if I need to cancel?', a: 'Cancel anytime from your account settings.' },
             ].map(({ q, a }) => (
               <FaqItem key={q} q={q} a={a} />
             ))}
@@ -802,22 +802,6 @@ export default function HomePage() {
         });
       `}} />
 
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-        details[open] .faq-chevron {
-          transform: rotate(180deg);
-        }
-        details summary::-webkit-details-marker {
-          display: none;
-        }
-        * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 3px; }
-      `}}</style>
     </main>
   )
 }

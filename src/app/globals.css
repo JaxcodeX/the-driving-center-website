@@ -112,3 +112,21 @@ body {
   border-left-color: rgba(255,255,255,0.12);
   border-radius: 12px;
 }
+
+/* FAQ accordion */
+@keyframes faqOpen {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(180deg); }
+}
+details[open] .faq-chevron {
+  transform: rotate(180deg);
+}
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Scrollbar */
+* { box-sizing: border-box; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 3px; }
