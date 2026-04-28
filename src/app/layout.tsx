@@ -15,7 +15,7 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme="dark" className={inter.className}>
+    <html lang="en" data-theme="light" className={inter.className}>
       <head>
         <script
           dangerouslySetInnerHTML={{
