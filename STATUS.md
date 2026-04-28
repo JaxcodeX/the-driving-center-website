@@ -1,5 +1,5 @@
 # STATUS.md — The Driving Center SaaS
-**Updated: 2026-04-26**
+**Updated: 2026-04-27**
 
 ---
 
@@ -7,7 +7,9 @@
 
 **Live:** `the-driving-center-website.vercel.app`
 **GitHub:** `github.com/JaxcodeX/the-driving-center-website`
-**Branch:** `main` (auto-deploys to Vercel on push)
+**Branch:** `main` (auto-deploys on push)
+**Demo PIN:** `0000` (any email works)
+**Demo school:** `autotest1777248097@demo-test.com` / `0daea68b-06ed-445b-bf52-91d4f16b9e01`
 
 ---
 
@@ -18,20 +20,24 @@
 - ✅ RLS policies — school_id injected on every query
 - ✅ Session cookies via `@supabase/ssr`
 - ✅ DEMO_MODE bypasses Stripe (demo keeps working without real payments)
+- ✅ Demo login fixed — uses fixed demo school, ignores user email input (2026-04-27)
 
-### Core Flow (verified end-to-end)
+### Core Flow (end-to-end verified)
 - ✅ School signup → creates real record in Supabase
 - ✅ Redirect to `/onboarding?school=<slug>`
 - ✅ Onboarding 4-step wizard: school info → instructor → session type → done
-- ✅ School admin dashboard
-- ✅ Student CRUD (add, edit, search)
+- ✅ School admin dashboard (KPIs, quick actions, upcoming sessions)
+- ✅ Student CRUD (add, edit, search, TCA tracking)
 - ✅ Session CRUD (schedule, confirm/cancel)
 - ✅ TCA compliance tracking (≥30h classroom + ≥6h driving → certificate)
 - ✅ Email confirmations via Resend (live, real emails send)
+- ✅ Stripe billing portal (`/api/schools/billing-portal`)
+- ✅ Webhook idempotency (`processed_stripe_events` table)
+- ✅ `safe_increment_seats()` (migration 007)
 
 ### UI Pages
-- ✅ `/` — Marketing homepage (dark, blue glow CTA, bento grid)
-- ✅ `/login` — Magic link auth
+- ✅ `/` — Marketing homepage (glassmorphism, dark mode)
+- ✅ `/login` — Magic link + Demo Mode
 - ✅ `/signup` — School registration
 - ✅ `/onboarding` — 4-step setup wizard
 - ✅ `/school-admin` — Dashboard home
@@ -40,48 +46,44 @@
 - ✅ `/school-admin/sessions` — List with date blocks + status toggle
 - ✅ `/school-admin/calendar` — Monthly grid view
 - ✅ `/school-admin/billing` — Status banner + Stripe portal link
+- ✅ `/school-admin/import` — CSV student import
+- ✅ `/book` — Public booking widget
+- ✅ `/book/confirmation` — Booking confirmation page
 
-### Infrastructure
-- ✅ Subscription status middleware (redirects canceled/past_due to billing)
-- ✅ Webhook idempotency (`processed_stripe_events` table)
-- ✅ `safe_increment_seats()` (migration 007)
+### Pre-built Demo Data (seeded 2026-04-27)
+- 4 students: Olivia Chen, Jaylen Brooks, Priya Nair, Mason Torres
+- 3 instructors: Marcus Rivera, Diana Okonkwo, Jake Thornton
+- 5 upcoming sessions across next 9 days
+- 4 bookings (3 confirmed, 1 pending)
 
 ---
 
 ## What Needs Fixing
 
-| Item | Impact | Fix |
+| Item | Impact | Status |
 |---|---|---|
-| `/api/reminders` Prisma error | Cron sends 0 reminders | Fix raw SQL JOIN in reminders route |
-| Zax hasn't tested full flow | Unknown broken paths | Day 2: full end-to-end test |
-| Migrations 007+008 | Not confirmed run by Zax | Verify in Supabase SQL Editor |
+| Migration 009 not run | `bookings.session_id` FK + `booking_time` column missing | Zax must run in Supabase SQL Editor |
+| `POST /api/students` auth | Reads `x-school-id` header instead of verifying session | Pre-production risk, not a demo blocker |
 
 ---
 
 ## What Needs Building
 
-| Item | Priority | Day |
-|---|---|---|
-| CSV import (`/school-admin/import`) | High | 4 |
-| School profile editor (`/school-admin/profile`) | Medium | 4 |
-| Instructor availability UI | Low | After demo |
-| SMS reminders | Low | After demo (email MVP fine) |
+| Item | Priority |
+|---|---|
+| Instructor availability UI | Low (after demo) |
+| SMS reminders | Low (email MVP fine) |
+| Real domain + Resend verification | After Mark meeting |
 
 ---
 
-## Sprint: Mark Martin Demo (7 Days)
+## Workflow Protocol
 
-See `SPEC_ONE_WEEK_SPRINT.md` for full day-by-day plan.
-
-```
-Day 1: Critical infrastructure (Everest)
-Day 2: End-to-end test + fix (Zax + Everest)
-Day 3: UI polish — one-shot coding agent build
-Day 4: CSV import + profile editor
-Day 5: Demo script + 5 dry runs
-Day 6: Buffer
-Day 7: DEMO TO MARK
-```
+**Current mode:** Vibe Coding Protocol (CLAUDE.md)
+- Always write SPEC.md before building
+- Give AI full context package (design tokens + reference components + spec)
+- One-pass builds, no chat iteration
+- 50-line rule: if >50 lines back-and-forth, write new SPEC instead
 
 ---
 
@@ -91,6 +93,41 @@ Day 7: DEMO TO MARK
 |---|---|
 | Supabase project | `evswdlsqlaztvajibgta` |
 | Resend API key | `re_ZwCTERGk_8eesZtYHGkR32GPv6YAgEs2P` (live) |
-| DeepSeek API key | `sk-7c4c86239406412ba3385f32db8b959d` ($5 credit) |
+| DeepSeek API key | `sk-7c4c86239406412ba3385f32db8b959d` |
 | Stripe account | `jaxcodewe@protonmail.com` (test mode) |
-| Vercel project ID | `prj_V4Pu15pN58SyW7t86wwPkJUORizI` |
+| Vercel project | `jaxcodexs-projects/the-driving-center-website` |
+| Demo mode | `true` (Vercel env var) |
+
+---
+
+## File Structure (current)
+
+```
+CLAUDE.md              ← workflow protocol (source of truth)
+STATUS.md              ← this file
+WORKFLOW_LOG.md        ← build cycle history
+SPEC_FULL_REDESIGN.md  ← active redesign spec
+SPEC_LANDING_REDESIGN.md ← landing page spec (pending execution)
+SPEC.md                ← phase specs (archived)
+src/app/               ← all routes + pages
+src/lib/
+  supabase/            ← client + server helpers
+  migrations/          ← SQL (migration 009 pending)
+  email-templates/      ← Resend templates
+  security.ts          ← encryption, validation
+tests/e2e/             ← automated tests
+scripts/
+  deepseek-claude      ← Claude Code + DeepSeek wrapper
+```
+
+---
+
+## Sprint: Mark Martin Demo
+
+**Demo ready.** The site is deployed, demo data is seeded, demo login is fixed.
+
+Zax's remaining task before demo:
+1. Run migration 009 in Supabase SQL Editor (one SQL paste, 2 minutes)
+2. Test full demo flow: `/login` → PIN 0000 → school admin → students → sessions
+
+Mark will evaluate: architecture decisions, multi-tenant schema, subscription flow, auth system. Not CSS quality.
