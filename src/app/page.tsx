@@ -5,11 +5,15 @@ import ScrollToTop from '@/components/ScrollToTop'
 
 // ─── Theme Toggle ───────────────────────────────────────────────────
 function ThemeToggle() {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const [theme, setTheme] = useState<'dark' | 'light'>('light')
 
   useEffect(() => {
     const saved = localStorage.getItem('theme') as 'dark' | 'light' | null
-    if (saved) setTheme(saved)
+    if (saved) {
+      setTheme(saved)
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light')
+    }
   }, [])
 
   function toggle() {
@@ -37,12 +41,12 @@ function ThemeToggle() {
 
 // ─── Dashboard Mockup ──────────────────────────────────────────────
 function DashboardMockup() {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const [theme, setTheme] = useState<'dark' | 'light'>('light')
 
   useEffect(() => {
-    setTheme(document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'dark')
+    setTheme(document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'light')
     const observer = new MutationObserver(() => {
-      setTheme(document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'dark')
+      setTheme(document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'light')
     })
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
     return () => observer.disconnect()
@@ -203,7 +207,7 @@ function BookingCalendar() {
             style={{
               padding: '8px 14px', borderRadius: '999px', fontSize: '12px', fontWeight: '500',
               border: selectedTime === t ? '1.5px solid #1A56FF' : '1px solid rgba(255,255,255,0.1)',
-              background: selectedTime === t ? 'rgba(26,86,255,0.15)' : 'transparent',
+              background: selectedTime === t ? 'rgba(26,86,246,0.15)' : 'transparent',
               color: selectedTime === t ? '#4A8FFF' : '#94A3B8',
               cursor: 'pointer', transition: 'all 0.15s',
             }}
@@ -418,16 +422,14 @@ export default function HomePage() {
 
       {/* ── SECTION 1: HERO ────────────────────────────── */}
       <section style={{ padding: '100px 24px 80px', position: 'relative', overflow: 'hidden' }}>
-        {/* NO starfield, NO mesh gradient — plain bg-base only */}
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          {/* Split layout */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center' }}>
             {/* Left: headline + CTA */}
             <div>
               <div className="fade-up" style={{ marginBottom: '32px' }}>
                 <span className="eyebrow">
                   <span className="eyebrow-dot" />
-                  Trusted by 50+ driving schools
+                  For driving schools across Tennessee
                 </span>
               </div>
               <div className="fade-up">
@@ -452,10 +454,10 @@ export default function HomePage() {
                   Automate bookings, track progress, get paid. The all-in-one platform for driving schools in Tennessee.
                 </p>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '40px' }}>
-                  <Link href="/signup" className="btn-glow cta-pill" style={{ padding: '14px 28px', fontSize: '15px', fontWeight: '600', textDecoration: 'none', borderRadius: '12px', background: '#111827', color: '#ffffff' }}>
+                  <Link href="/signup" className="btn-glow" style={{ padding: '14px 28px', fontSize: '15px', fontWeight: '600', textDecoration: 'none' }}>
                     Start free trial
                   </Link>
-                  <Link href="#features" className="btn-ghost" style={{ padding: '14px 28px', fontSize: '15px', fontWeight: '600', textDecoration: 'none', borderRadius: '12px' }}>
+                  <Link href="#features" className="btn-ghost" style={{ padding: '14px 28px', fontSize: '15px', fontWeight: '600', textDecoration: 'none' }}>
                     See how it works
                   </Link>
                 </div>
@@ -480,7 +482,7 @@ export default function HomePage() {
             {['Knoxville', 'Nashville', 'Chattanooga', 'Memphis', 'Oneida', 'Cumberland'].map((city, i) => (
               <>
                 <span key={city} style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: '500' }}>{city}</span>
-                {i < 5 && <span style={{ color: 'var(--border)' }}>·</span>}
+                {i < 5 && <span key={`dot-${city}`} style={{ color: 'var(--border)' }}>·</span>}
               </>
             ))}
           </div>
@@ -569,7 +571,6 @@ export default function HomePage() {
 
       {/* ── SECTION 6: BOOKING WIDGET (always dark) ──────── */}
       <section style={{ padding: '96px 24px', background: '#0D1117', position: 'relative', overflow: 'hidden' }}>
-        {/* Decorative blurred circles */}
         <div className="bg-circle" style={{ width: '300px', height: '300px', left: '5%', top: '20%', background: '#38BDF8', filter: 'blur(120px)', opacity: 0.12 }} />
         <div className="bg-circle" style={{ width: '250px', height: '250px', right: '5%', bottom: '20%', background: '#F472B6', filter: 'blur(100px)', opacity: 0.1 }} />
         <div className="bg-circle" style={{ width: '200px', height: '200px', left: '40%', bottom: '10%', background: '#FB923C', filter: 'blur(100px)', opacity: 0.08 }} />
@@ -641,10 +642,10 @@ export default function HomePage() {
               14-day free trial. No credit card required.
             </p>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <Link href="/signup" style={{ padding: '14px 28px', fontSize: '15px', fontWeight: '600', textDecoration: 'none', borderRadius: '12px', background: '#111827', color: '#ffffff' }}>
+              <Link href="/signup" className="btn-glow" style={{ padding: '14px 28px', fontSize: '15px', fontWeight: '600', textDecoration: 'none' }}>
                 Start free trial
               </Link>
-              <Link href="/signup" className="btn-ghost" style={{ padding: '14px 28px', fontSize: '15px', fontWeight: '600', textDecoration: 'none', borderRadius: '12px' }}>
+              <Link href="/signup" className="btn-ghost" style={{ padding: '14px 28px', fontSize: '15px', fontWeight: '600', textDecoration: 'none' }}>
                 Book a call
               </Link>
             </div>
