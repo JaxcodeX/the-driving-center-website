@@ -8,17 +8,6 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-const T = {
-  text:      '#ffffff',
-  muted:     '#94A3B8',
-  subtle:    '#64748B',
-  green:     '#4ADE80',
-  cyan:      '#38BDF8',
-  purple:    '#818CF8',
-  amber:     '#F59E0B',
-  bg:        '#050505',
-}
-
 type UpcomingSession = {
   id: string
   start_date: string
@@ -123,7 +112,7 @@ export default function DashboardPage() {
       delta: stats.studentsDelta,
       positive: true,
       icon: Users,
-      color: T.cyan,
+      color: 'var(--accent)',
       href: '/school-admin/students',
     },
     {
@@ -132,7 +121,7 @@ export default function DashboardPage() {
       delta: stats.sessionsDelta,
       positive: true,
       icon: Calendar,
-      color: T.green,
+      color: 'var(--success)',
       href: '/school-admin/sessions',
     },
     {
@@ -141,7 +130,7 @@ export default function DashboardPage() {
       delta: stats.revenueDelta,
       positive: true,
       icon: CreditCard,
-      color: T.purple,
+      color: '#818CF8',
       href: '/school-admin/billing',
     },
     {
@@ -150,17 +139,17 @@ export default function DashboardPage() {
       delta: stats.completionDelta,
       positive: true,
       icon: TrendingUp,
-      color: T.amber,
+      color: '#F59E0B',
       href: '/school-admin/sessions',
     },
   ]
 
   const quickActions = [
-    { icon: Plus, label: 'Add Student', href: '/school-admin/students', color: T.cyan },
-    { icon: Calendar, label: 'Schedule Session', href: '/school-admin/sessions', color: T.green },
-    { icon: Mail, label: 'Send Reminder', href: '/school-admin/sessions', color: T.amber },
-    { icon: Calendar, label: 'View Calendar', href: '/school-admin/calendar', color: T.purple },
-    { icon: BarChart2, label: 'Import CSV', href: '/school-admin/import', color: T.cyan },
+    { icon: Plus, label: 'Add Student', href: '/school-admin/students', color: 'var(--accent)' },
+    { icon: Calendar, label: 'Schedule Session', href: '/school-admin/sessions', color: 'var(--success)' },
+    { icon: Mail, label: 'Send Reminder', href: '/school-admin/sessions', color: '#F59E0B' },
+    { icon: Calendar, label: 'View Calendar', href: '/school-admin/calendar', color: '#818CF8' },
+    { icon: BarChart2, label: 'Import CSV', href: '/school-admin/import', color: 'var(--accent)' },
   ]
 
   const sessionStatusMap: Record<string, string> = {
@@ -170,8 +159,8 @@ export default function DashboardPage() {
   }
 
   const sessionBorderMap: Record<string, string> = {
-    scheduled: '#38BDF8',
-    completed: '#4ADE80',
+    scheduled: 'var(--accent)',
+    completed: 'var(--success)',
     canceled: '#F97316',
   }
 
@@ -180,17 +169,16 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold mb-1" style={{ color: T.text }}>
+          <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>
             {greeting}
           </h1>
-          <p className="text-sm" style={{ color: T.subtle }}>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
         </div>
         <Link
           href="/school-admin/students"
-          className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-full text-white transition-opacity hover:opacity-90"
-          style={{ background: '#0066FF', boxShadow: '0 0 20px rgba(0,102,255,0.3)' }}
+          className="btn-glow inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-full"
         >
           <Plus className="w-4 h-4" />
           Add Student
@@ -204,10 +192,9 @@ export default function DashboardPage() {
             key={label}
             href={href}
             className="glass-card block group"
-            style={{ borderColor: 'rgba(255,255,255,0.08)' }}
           >
             <div className="flex items-start justify-between mb-3">
-              <p className="text-xs font-medium uppercase tracking-wider" style={{ color: T.subtle }}>{label}</p>
+              <p className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{label}</p>
               <div
                 className="w-9 h-9 rounded-xl flex items-center justify-center"
                 style={{ background: `${color}15` }}
@@ -215,7 +202,7 @@ export default function DashboardPage() {
                 <Icon className="w-4 h-4" style={{ color }} />
               </div>
             </div>
-            <div className="kpi-value mb-1" style={{ color: T.text }}>{value}</div>
+            <div className="kpi-value mb-1" style={{ color: 'var(--text-primary)' }}>{value}</div>
             <span className={`kpi-delta ${positive ? 'positive' : 'negative'}`}>
               {positive ? '↑' : '↓'} {delta}
             </span>
@@ -246,20 +233,20 @@ export default function DashboardPage() {
       {/* Upcoming Sessions Strip */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold" style={{ color: T.text }}>Upcoming Sessions</h2>
-          <Link href="/school-admin/sessions" className="text-xs font-medium flex items-center gap-1" style={{ color: T.cyan }}>
+          <h2 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>Upcoming Sessions</h2>
+          <Link href="/school-admin/sessions" className="text-xs font-medium flex items-center gap-1" style={{ color: 'var(--accent)' }}>
             View all <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
         {loadingSessions ? (
-          <div className="glass-card text-center py-10" style={{ color: T.subtle }}>
+          <div className="glass-card text-center py-10" style={{ color: 'var(--text-muted)' }}>
             <p className="text-sm">Loading sessions...</p>
           </div>
         ) : upcomingSessions.length === 0 ? (
-          <div className="glass-card text-center py-10" style={{ color: T.subtle }}>
+          <div className="glass-card text-center py-10" style={{ color: 'var(--text-muted)' }}>
             <Clock className="w-8 h-8 mx-auto mb-2 opacity-40" />
             <p className="text-sm">No upcoming sessions</p>
-            <Link href="/school-admin/sessions" className="text-xs font-medium mt-2 inline-block" style={{ color: T.cyan }}>
+            <Link href="/school-admin/sessions" className="text-xs font-medium mt-2 inline-block" style={{ color: 'var(--accent)' }}>
               Schedule one now →
             </Link>
           </div>
@@ -271,7 +258,7 @@ export default function DashboardPage() {
             {upcomingSessions.map(session => {
               const date = new Date(session.start_date + 'T12:00:00')
               const statusClass = sessionStatusMap[session.status] || 'status-active'
-              const borderColor = sessionBorderMap[session.status] || T.cyan
+              const borderColor = sessionBorderMap[session.status] || 'var(--accent)'
               return (
                 <div
                   key={session.id}
@@ -283,20 +270,20 @@ export default function DashboardPage() {
                   }}
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: T.subtle }}>
+                    <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
                       {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </div>
                     <span className={`status-pill ${statusClass}`}>
                       {session.status}
                     </span>
                   </div>
-                  <div className="text-sm font-semibold mb-1" style={{ color: T.text }}>
+                  <div className="text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
                     {session.session_type?.name || 'Session'}
                   </div>
-                  <div className="text-xs" style={{ color: T.muted }}>
+                  <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
                     {session.instructor?.name || 'No instructor'}
                   </div>
-                  <div className="text-xs mt-1" style={{ color: T.subtle }}>
+                  <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                     {date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                   </div>
                 </div>
@@ -309,15 +296,15 @@ export default function DashboardPage() {
       {/* Recent Activity Table */}
       <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
         <div className="flex items-center justify-between px-6 pt-5 pb-4">
-          <h2 className="text-base font-semibold" style={{ color: T.text }}>Recent Activity</h2>
-          <Link href="/school-admin/students" className="text-xs font-medium flex items-center gap-1" style={{ color: T.cyan }}>
+          <h2 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>Recent Activity</h2>
+          <Link href="/school-admin/students" className="text-xs font-medium flex items-center gap-1" style={{ color: 'var(--accent)' }}>
             View all <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
 
         {schoolId ? <RecentActivityTable schoolId={schoolId} /> : (
           <div className="text-center py-10 px-6">
-            <p className="text-sm" style={{ color: T.subtle }}>Loading recent activity...</p>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading recent activity...</p>
           </div>
         )}
       </div>
@@ -351,7 +338,7 @@ function RecentActivityTable({ schoolId }: { schoolId: string }) {
   if (!rows.length) {
     return (
       <div className="text-center py-10 px-6">
-        <p className="text-sm" style={{ color: T.subtle }}>No recent activity</p>
+        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No recent activity</p>
       </div>
     )
   }
@@ -364,7 +351,7 @@ function RecentActivityTable({ schoolId }: { schoolId: string }) {
             <th
               key={i}
               className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-              style={{ color: T.subtle }}
+              style={{ color: 'var(--text-muted)' }}
             >
               {h}
             </th>
@@ -385,18 +372,18 @@ function RecentActivityTable({ schoolId }: { schoolId: string }) {
               onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
             >
               <td className="px-6 py-4">
-                <div className="text-sm font-medium" style={{ color: T.text }}>
+                <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                   {row.session_type?.name || 'Session'}
                 </div>
-                <div className="text-xs mt-0.5" style={{ color: T.subtle }}>
+                <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
                   {row.instructor?.name || 'Instructor'}
                 </div>
               </td>
               <td className="px-6 py-4">
-                <div className="text-sm" style={{ color: T.muted }}>
+                <div className="text-sm" style={{ color: 'var(--text-muted)' }}>
                   {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </div>
-                <div className="text-xs mt-0.5" style={{ color: T.subtle }}>
+                <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
                   {date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                 </div>
               </td>
@@ -410,11 +397,11 @@ function RecentActivityTable({ schoolId }: { schoolId: string }) {
                       className="h-full rounded-full"
                       style={{
                         width: `${progress}%`,
-                        background: row.status === 'completed' ? '#4ADE80' : '#38BDF8',
+                        background: row.status === 'completed' ? 'var(--success)' : 'var(--accent)',
                       }}
                     />
                   </div>
-                  <span className="text-xs" style={{ color: T.subtle }}>{progress}%</span>
+                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{progress}%</span>
                 </div>
               </td>
               <td className="px-6 py-4">
@@ -427,7 +414,7 @@ function RecentActivityTable({ schoolId }: { schoolId: string }) {
                   style={{
                     background: 'rgba(255,255,255,0.06)',
                     border: '1px solid rgba(255,255,255,0.08)',
-                    color: T.muted,
+                    color: 'var(--text-muted)',
                   }}
                 >
                   View

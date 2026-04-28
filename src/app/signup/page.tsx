@@ -44,7 +44,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden" style={{ background: '#080809' }}>
+    <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden" style={{ background: 'var(--bg-base)' }}>
       {/* Decorative gradient circles */}
       <div
         className="bg-circle"
@@ -72,17 +72,17 @@ export default function SignupPage() {
       {/* Logo */}
       <Link href="/" className="flex items-center gap-3 mb-12 absolute top-8 left-1/2 -translate-x-1/2">
         <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold" style={{ background: 'linear-gradient(135deg, #7ED4FD, #707BFF)' }}>DC</div>
-        <span className="text-sm font-semibold tracking-tight" style={{ color: '#ffffff' }}>The Driving Center</span>
+        <span className="text-sm font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>The Driving Center</span>
       </Link>
 
       {/* Glassmorphism card */}
       <div
         className="relative w-full max-w-[480px] mx-auto px-8 py-10"
         style={{
-          background: 'rgba(255,255,255,0.04)',
+          background: 'var(--card-bg)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          border: '1px solid var(--card-border)',
           borderRadius: '16px',
         }}
       >
@@ -102,8 +102,8 @@ export default function SignupPage() {
                 <div
                   className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold"
                   style={{
-                    background: i === 0 ? '#1A56FF' : 'rgba(255,255,255,0.06)',
-                    color: i === 0 ? '#ffffff' : '#64748B',
+                    background: i === 0 ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
+                    color: i === 0 ? 'var(--text-primary)' : 'var(--text-muted)',
                     border: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.12)',
                   }}
                 >
@@ -111,7 +111,7 @@ export default function SignupPage() {
                 </div>
                 <span
                   className="text-[10px] font-medium"
-                  style={{ color: i === 0 ? '#94A3B8' : '#64748B' }}
+                  style={{ color: i === 0 ? 'var(--text-secondary)' : 'var(--text-muted)' }}
                 >
                   {step}
                 </span>
@@ -122,15 +122,15 @@ export default function SignupPage() {
 
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>Create your school account</h1>
-          <p className="text-sm" style={{ color: '#94A3B8' }}>Start your 14-day free trial. No credit card required.</p>
+          <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Create your school account</h1>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Start your 14-day free trial. No credit card required.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Full name */}
           <div className="relative">
             <div className="absolute left-4 top-1/2 -translate-y-1/2">
-              <User className="w-4 h-4" style={{ color: '#64748B' }} />
+              <User className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
             </div>
             <input
               type="text"
@@ -140,20 +140,20 @@ export default function SignupPage() {
               required
               className="w-full h-[50px] rounded-[999px] pl-11 pr-4 text-sm"
               style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                color: '#ffffff',
+                background: 'var(--card-bg)',
+                border: '1px solid var(--card-border)',
+                color: 'var(--text-primary)',
                 outline: 'none',
               }}
               onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(26,86,255,0.6)')}
-              onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.08)')}
+              onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--card-border)')}
             />
           </div>
 
           {/* Email */}
           <div className="relative">
             <div className="absolute left-4 top-1/2 -translate-y-1/2">
-              <Mail className="w-4 h-4" style={{ color: '#64748B' }} />
+              <Mail className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
             </div>
             <input
               type="email"
@@ -163,33 +163,33 @@ export default function SignupPage() {
               required
               className="w-full h-[50px] rounded-[999px] pl-11 pr-4 text-sm"
               style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                color: '#ffffff',
+                background: 'var(--card-bg)',
+                border: '1px solid var(--card-border)',
+                color: 'var(--text-primary)',
                 outline: 'none',
               }}
               onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(26,86,255,0.6)')}
-              onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.08)')}
+              onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--card-border)')}
             />
           </div>
 
           {/* Password */}
           <div className="relative">
             <div className="absolute left-4 top-1/2 -translate-y-1/2">
-              <Lock className="w-4 h-4" style={{ color: '#64748B' }} />
+              <Lock className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
             </div>
             <input
               type="password"
               placeholder="Create a password (optional)"
               className="w-full h-[50px] rounded-[999px] pl-11 pr-4 text-sm"
               style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                color: '#ffffff',
+                background: 'var(--card-bg)',
+                border: '1px solid var(--card-border)',
+                color: 'var(--text-primary)',
                 outline: 'none',
               }}
               onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(26,86,255,0.6)')}
-              onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.08)')}
+              onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--card-border)')}
             />
           </div>
 
@@ -203,11 +203,7 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-[50px] rounded-[999px] text-sm font-semibold text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-            style={{
-              background: '#1A56FF',
-              boxShadow: '0 0 20px rgba(26,86,255,0.25)',
-            }}
+            className="btn-glow w-full h-[50px] rounded-[999px] text-sm font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {loading ? 'Creating school...' : 'Create school account'}
             {!loading && <ArrowRight className="w-4 h-4" />}
@@ -216,7 +212,7 @@ export default function SignupPage() {
       </div>
 
       {/* Sign in link */}
-      <p className="text-sm mt-6" style={{ color: '#94A3B8' }}>
+      <p className="text-sm mt-6" style={{ color: 'var(--text-secondary)' }}>
         Already have an account?{' '}
         <Link href="/login" className="font-semibold" style={{ color: '#7ED4FD' }}>Sign in</Link>
       </p>

@@ -5,20 +5,6 @@ import Link from 'next/link'
 import { Plus, Search, Pencil, Shield, Mail, Phone } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-const T = {
-  bg:        '#050505',
-  surface:   '#0F172A',
-  elevated:  '#141B2D',
-  border:    '#0F172A',
-  text:      '#ffffff',
-  secondary: '#94A3B8',
-  muted:     '#64748B',
-  cyan:      '#38BDF8',
-  green:     '#10B981',
-  amber:     '#f59e0b',
-  grad:      'linear-gradient(135deg, #38BDF8 0%, #818CF8 100%)',
-}
-
 type Student = {
   id: string
   legal_name: string
@@ -128,17 +114,17 @@ function AddStudentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: P
   }
 
   const inputStyle = {
-    background: T.elevated,
+    background: 'var(--bg-elevated)',
     border: `1px solid rgba(255,255,255,0.08)`,
-    color: T.text,
+    color: 'var(--text-primary)',
     outline: 'none' as const,
     borderRadius: '12px',
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="w-full max-w-md rounded-2xl p-8" style={{ background: T.surface, border: `1px solid rgba(255,255,255,0.08)` }}>
-        <h2 className="text-lg font-semibold mb-6" style={{ color: T.text }}>Add Student</h2>
+      <div className="w-full max-w-md rounded-2xl p-8" style={{ background: 'var(--bg-surface)', border: `1px solid rgba(255,255,255,0.08)` }}>
+        <h2 className="text-lg font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Add Student</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {[
             { key: 'legal_name', label: 'Full Legal Name', placeholder: 'Jordan Kim', type: 'text' },
@@ -148,7 +134,7 @@ function AddStudentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: P
             { key: 'emergency_contact_phone', label: 'Emergency Phone', placeholder: '(615) 555-0100', type: 'tel' },
           ].map(({ key, label, placeholder, type = 'text' }) => (
             <div key={key}>
-              <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>{label}</label>
+              <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>{label}</label>
               <input
                 type={type}
                 value={(form as any)[key]}
@@ -157,14 +143,14 @@ function AddStudentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: P
                 required
                 className="w-full px-4 py-3 text-sm"
                 style={inputStyle}
-                onFocus={e => (e.target.style.borderColor = `${T.cyan}60`)}
+                onFocus={e => (e.target.style.borderColor = `rgba(56,189,248,0.6)`)}
                 onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
               />
             </div>
           ))}
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="flex-1 py-3 rounded-xl text-sm font-medium"
-              style={{ background: T.elevated, color: T.secondary, border: `1px solid rgba(255,255,255,0.08)` }}>
+              style={{ background: 'var(--bg-elevated)', color: 'var(--text-secondary)', border: `1px solid rgba(255,255,255,0.08)` }}>
               Cancel
             </button>
             <button type="submit" disabled={loading}
@@ -227,8 +213,8 @@ export default function StudentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold mb-1" style={{ color: T.text }}>Students</h1>
-          <p className="text-sm" style={{ color: T.muted }}>{students.length} total</p>
+          <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Students</h1>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{students.length} total</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -244,7 +230,7 @@ export default function StudentsPage() {
       <div className="relative mb-6">
         <Search
           className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4"
-          style={{ color: T.muted }}
+          style={{ color: 'var(--text-muted)' }}
         />
         <input
           type="text"
@@ -259,15 +245,15 @@ export default function StudentsPage() {
       {/* Table */}
       {loading ? (
         <div className="glass-card text-center py-16">
-          <p className="text-sm" style={{ color: T.muted }}>Loading students...</p>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading students...</p>
         </div>
       ) : !filtered.length ? (
         <div className="glass-card text-center py-16">
-          <p className="text-sm mb-3" style={{ color: T.muted }}>
+          <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
             {search ? 'No students match your search' : 'No students yet'}
           </p>
           {!search && (
-            <button onClick={() => setShowModal(true)} className="text-sm font-medium" style={{ color: T.cyan }}>
+            <button onClick={() => setShowModal(true)} className="text-sm font-medium" style={{ color: 'var(--accent)' }}>
               Add your first student →
             </button>
           )}
@@ -280,7 +266,7 @@ export default function StudentsPage() {
             style={{
               gridTemplateColumns: '2fr 1.5fr 1fr 1fr auto',
               gap: '16px',
-              color: T.muted,
+              color: 'var(--text-muted)',
               borderBottom: `1px solid rgba(255,255,255,0.06)`,
             }}
           >
@@ -323,12 +309,12 @@ export default function StudentsPage() {
                     {initials}
                   </div>
                   <div className="min-w-0">
-                    <div className="font-medium truncate" style={{ color: T.text }}>{displayName}</div>
-                    <div className="text-xs flex items-center gap-1 mt-0.5" style={{ color: T.muted }}>
+                    <div className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>{displayName}</div>
+                    <div className="text-xs flex items-center gap-1 mt-0.5" style={{ color: 'var(--text-muted)' }}>
                       <Shield
                         className="w-3 h-3"
                         style={{
-                          color: student.classroom_hours >= 6 && student.driving_hours >= 6 ? T.green : T.muted,
+                          color: student.classroom_hours >= 6 && student.driving_hours >= 6 ? 'var(--success)' : 'var(--text-muted)',
                         }}
                       />
                       {student.classroom_hours}h class · {student.driving_hours}h drive
@@ -339,14 +325,14 @@ export default function StudentsPage() {
                 {/* Contact */}
                 <div className="space-y-1.5">
                   {student.parent_email && (
-                    <div className="flex items-center gap-1.5 text-xs truncate" style={{ color: T.secondary }}>
-                      <Mail className="w-3 h-3 flex-shrink-0" style={{ color: T.muted }} />
+                    <div className="flex items-center gap-1.5 text-xs truncate" style={{ color: 'var(--text-secondary)' }}>
+                      <Mail className="w-3 h-3 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />
                       {student.parent_email}
                     </div>
                   )}
                   {student.emergency_contact_phone && (
-                    <div className="flex items-center gap-1.5 text-xs" style={{ color: T.secondary }}>
-                      <Phone className="w-3 h-3 flex-shrink-0" style={{ color: T.muted }} />
+                    <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      <Phone className="w-3 h-3 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />
                       {student.emergency_contact_phone}
                     </div>
                   )}
@@ -366,7 +352,7 @@ export default function StudentsPage() {
                       }}
                     />
                   </div>
-                  <span className="text-xs flex-shrink-0" style={{ color: T.muted }}>
+                  <span className="text-xs flex-shrink-0" style={{ color: 'var(--text-muted)' }}>
                     {tcaPct}%
                   </span>
                 </div>
@@ -381,8 +367,8 @@ export default function StudentsPage() {
                   <Link
                     href={`/school-admin/students/${student.id}`}
                     className="p-2 rounded-lg transition-colors"
-                    style={{ color: T.muted }}
-                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = T.elevated)}
+                    style={{ color: 'var(--text-muted)' }}
+                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'var(--bg-elevated)')}
                     onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                   >
                     <Pencil className="w-4 h-4" />

@@ -4,21 +4,6 @@ import { useState, useEffect } from 'react'
 import { Plus, Calendar, Clock, Users, Pencil, Play, Pause } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-const T = {
-  bg:        '#050505',
-  surface:   '#0F172A',
-  elevated:  '#141B2D',
-  border:    '#0F172A',
-  text:      '#ffffff',
-  secondary: '#94A3B8',
-  muted:     '#64748B',
-  cyan:      '#38BDF8',
-  purple:    '#818CF8',
-  green:     '#10B981',
-  amber:     '#f59e0b',
-  grad:      'linear-gradient(135deg, #38BDF8 0%, #818CF8 100%)',
-}
-
 type Session = {
   id: string
   start_date: string
@@ -42,9 +27,9 @@ function statusPillClass(status: string): string {
 }
 
 function borderColor(status: string): string {
-  if (status === 'completed') return '#4ADE80'
+  if (status === 'completed') return 'var(--success)'
   if (status === 'canceled') return '#F97316'
-  return '#38BDF8'
+  return 'var(--accent)'
 }
 
 function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: Session) => void }) {
@@ -127,20 +112,20 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
   }
 
   const inputStyle = {
-    background: T.elevated,
+    background: 'var(--bg-elevated)',
     border: `1px solid rgba(255,255,255,0.08)`,
-    color: T.text,
+    color: 'var(--text-primary)',
     outline: 'none' as const,
     borderRadius: '12px',
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="w-full max-w-md rounded-2xl p-8" style={{ background: T.surface, border: `1px solid rgba(255,255,255,0.08)` }}>
-        <h2 className="text-lg font-semibold mb-6" style={{ color: T.text }}>Schedule Session</h2>
+      <div className="w-full max-w-md rounded-2xl p-8" style={{ background: 'var(--bg-surface)', border: `1px solid rgba(255,255,255,0.08)` }}>
+        <h2 className="text-lg font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Schedule Session</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>Date</label>
+            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Date</label>
             <input
               type="date"
               value={form.start_date}
@@ -148,12 +133,12 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
               required
               className="w-full px-4 py-3 text-sm"
               style={inputStyle}
-              onFocus={e => (e.target.style.borderColor = `${T.cyan}60`)}
+              onFocus={e => (e.target.style.borderColor = `rgba(56,189,248,0.6)`)}
               onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
             />
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>Instructor</label>
+            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Instructor</label>
             <select
               value={form.instructor_id}
               onChange={e => setForm(f => ({ ...f, instructor_id: e.target.value }))}
@@ -165,7 +150,7 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>Session Type</label>
+            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Session Type</label>
             <select
               value={form.session_type_id}
               onChange={e => setForm(f => ({ ...f, session_type_id: e.target.value }))}
@@ -177,7 +162,7 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>Location</label>
+            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Location</label>
             <input
               type="text"
               value={form.location}
@@ -185,12 +170,12 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
               placeholder="e.g. 123 Main St"
               className="w-full px-4 py-3 text-sm"
               style={inputStyle}
-              onFocus={e => (e.target.style.borderColor = `${T.cyan}60`)}
+              onFocus={e => (e.target.style.borderColor = `rgba(56,189,248,0.6)`)}
               onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
             />
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>Max Seats</label>
+            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Max Seats</label>
             <input
               type="number"
               value={form.max_seats}
@@ -202,7 +187,7 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
           </div>
           <div className="flex gap-3 pt-1">
             <button type="button" onClick={onClose} className="flex-1 py-3 rounded-xl text-sm font-medium"
-              style={{ background: T.elevated, color: T.secondary, border: `1px solid rgba(255,255,255,0.08)` }}>
+              style={{ background: 'var(--bg-elevated)', color: 'var(--text-secondary)', border: `1px solid rgba(255,255,255,0.08)` }}>
               Cancel
             </button>
             <button type="submit" disabled={loading}
@@ -279,8 +264,8 @@ export default function SessionsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold mb-1" style={{ color: T.text }}>Sessions</h1>
-          <p className="text-sm" style={{ color: T.muted }}>{sessions.length} total</p>
+          <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Sessions</h1>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{sessions.length} total</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -307,7 +292,7 @@ export default function SessionsPage() {
                   }
                 : {
                     background: 'rgba(255,255,255,0.04)',
-                    color: T.muted,
+                    color: 'var(--text-muted)',
                     border: '1px solid rgba(255,255,255,0.06)',
                   }
             }
@@ -320,16 +305,16 @@ export default function SessionsPage() {
       {/* Calendar / Session List */}
       {loading ? (
         <div className="glass-card text-center py-16">
-          <p className="text-sm" style={{ color: T.muted }}>Loading sessions...</p>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading sessions...</p>
         </div>
       ) : !filteredSessions.length ? (
         <div className="glass-card text-center py-16">
-          <Calendar className="w-10 h-10 mx-auto mb-3 opacity-30" style={{ color: T.muted }} />
-          <p className="text-sm mb-3" style={{ color: T.muted }}>
+          <Calendar className="w-10 h-10 mx-auto mb-3 opacity-30" style={{ color: 'var(--text-muted)' }} />
+          <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
             {activeFilter === 'all' ? 'No sessions yet' : `No ${activeFilter} sessions`}
           </p>
           {activeFilter === 'all' && (
-            <button onClick={() => setShowModal(true)} className="text-sm font-medium" style={{ color: T.cyan }}>
+            <button onClick={() => setShowModal(true)} className="text-sm font-medium" style={{ color: 'var(--accent)' }}>
               Schedule your first session →
             </button>
           )}
@@ -342,7 +327,7 @@ export default function SessionsPage() {
             style={{
               gridTemplateColumns: '80px 1fr 120px 100px 80px',
               gap: '16px',
-              color: T.muted,
+              color: 'var(--text-muted)',
               borderBottom: `1px solid rgba(255,255,255,0.06)`,
             }}
           >
@@ -377,18 +362,18 @@ export default function SessionsPage() {
                     <div className="text-xs font-semibold uppercase" style={{ color: leftColor }}>
                       {date.toLocaleDateString('en-US', { month: 'short' })}
                     </div>
-                    <div className="text-2xl font-bold" style={{ color: T.text }}>{date.getDate()}</div>
-                    <div className="text-xs" style={{ color: T.muted }}>
+                    <div className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{date.getDate()}</div>
+                    <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
                       {date.toLocaleDateString('en-US', { weekday: 'short' })}
                     </div>
                   </div>
 
                   {/* Session info */}
                   <div>
-                    <div className="font-medium mb-0.5" style={{ color: T.text }}>
+                    <div className="font-medium mb-0.5" style={{ color: 'var(--text-primary)' }}>
                       {session.session_type?.name || 'Session'}
                     </div>
-                    <div className="flex items-center gap-2 text-xs" style={{ color: T.muted }}>
+                    <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}>
                       {session.instructor?.name && (
                         <span>{session.instructor.name}</span>
                       )}
@@ -403,12 +388,12 @@ export default function SessionsPage() {
 
                   {/* Details */}
                   <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-1.5 text-xs" style={{ color: T.secondary }}>
-                      <Clock className="w-3 h-3" style={{ color: T.muted }} />
+                    <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      <Clock className="w-3 h-3" style={{ color: 'var(--text-muted)' }} />
                       {session.session_type?.duration_minutes || 60} min
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs" style={{ color: T.secondary }}>
-                      <Users className="w-3 h-3" style={{ color: T.muted }} />
+                    <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      <Users className="w-3 h-3" style={{ color: 'var(--text-muted)' }} />
                       {session.seats_booked}/{session.max_seats} seats
                     </div>
                   </div>
@@ -423,8 +408,8 @@ export default function SessionsPage() {
                     <button
                       onClick={() => handleStatusToggle(session.id, session.status)}
                       className="p-2 rounded-lg transition-colors"
-                      style={{ color: T.muted }}
-                      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = T.elevated)}
+                      style={{ color: 'var(--text-muted)' }}
+                      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'var(--bg-elevated)')}
                       onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                       title={session.status === 'scheduled' ? 'Cancel session' : 'Reactivate session'}
                     >

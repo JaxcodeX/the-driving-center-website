@@ -7,20 +7,6 @@ import { motion } from 'framer-motion'
 import { Check, School, Users, Calendar, ArrowRight, ChevronRight, ChevronLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-const T = {
-  bg:        '#080809',
-  surface:   'rgba(255,255,255,0.04)',
-  border:    'rgba(255,255,255,0.08)',
-  text:      '#ffffff',
-  secondary: '#94A3B8',
-  muted:     '#64748B',
-  cyan:      '#7ED4FD',
-  purple:    '#707BFF',
-  green:     '#4ADE80',
-  grad:      'linear-gradient(135deg, #7ED4FD 0%, #707BFF 100%)',
-  gradSolid: '#0066FF',
-}
-
 const STEPS = [
   { num: 1, label: 'School Info', icon: School },
   { num: 2, label: 'Instructor', icon: Users },
@@ -57,14 +43,14 @@ function StepIndicator({ current }: { current: number }) {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap"
                 style={{
                   background: done ? 'rgba(74,222,128,0.15)' : active ? 'rgba(126,212,253,0.15)' : 'rgba(255,255,255,0.04)',
-                  color: done ? '#4ADE80' : active ? '#7ED4FD' : '#64748B',
-                  border: `1px solid ${done ? 'rgba(74,222,128,0.3)' : active ? 'rgba(126,212,253,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                  color: done ? 'var(--success)' : active ? '#7ED4FD' : 'var(--text-muted)',
+                  border: `1px solid ${done ? 'rgba(74,222,128,0.3)' : active ? 'rgba(126,212,253,0.3)' : 'var(--card-border)'}`,
                 }}
               >
                 {done ? <Check className="w-3.5 h-3.5" /> : <Icon className="w-3.5 h-3.5" />}
                 <span className="hidden sm:inline">{label}</span>
               </div>
-              {num < 4 && <ChevronRight className="w-3.5 h-3.5 shrink-0" style={{ color: '#64748B' }} />}
+              {num < 4 && <ChevronRight className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--text-muted)' }} />}
             </div>
           )
         })}
@@ -75,9 +61,9 @@ function StepIndicator({ current }: { current: number }) {
 
 // ─── Pill Input helper ──────────────────────────────────────────────────────
 const pillInput = {
-  background: 'rgba(255,255,255,0.04)',
-  border: '1px solid rgba(255,255,255,0.1)',
-  color: '#ffffff',
+  background: 'var(--card-bg)',
+  border: '1px solid var(--card-border)',
+  color: 'var(--text-primary)',
   outline: 'none' as const,
   borderRadius: '999px',
   padding: '12px 20px',
@@ -179,15 +165,15 @@ function OnboardingContent() {
   function handleDone() { router.push('/school-admin') }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 relative" style={{ background: '#080809' }}>
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 relative" style={{ background: 'var(--bg-base)' }}>
       {/* decorative circles */}
       <div className="bg-circle w-[500px] h-[500px] -top-48 -left-48" style={{ background: 'radial-gradient(circle, rgba(0,102,255,0.2) 0%, transparent 70%)' }} />
       <div className="bg-circle w-[400px] h-[400px] bottom-20 -right-32" style={{ background: 'radial-gradient(circle, rgba(112,123,255,0.15) 0%, transparent 70%)' }} />
 
       {/* Logo */}
       <Link href="/" className="flex items-center gap-2.5 mb-12 relative z-10">
-        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-bold" style={{ background: T.grad }}>DC</div>
-        <span className="text-sm font-semibold tracking-tight" style={{ color: T.text }}>The Driving Center</span>
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-bold" style={{ background: 'linear-gradient(135deg, #7ED4FD, #707BFF)' }}>DC</div>
+        <span className="text-sm font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>The Driving Center</span>
       </Link>
 
       <div className="w-full max-w-md relative z-10">
@@ -200,19 +186,19 @@ function OnboardingContent() {
           {/* Step 1 — School Info */}
           {step === 1 && (
             <>
-              <div className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: '#64748B' }}>Step 1 of 4</div>
-              <h2 className="text-2xl font-bold mb-1.5" style={{ color: T.text }}>School information</h2>
-              <p className="text-sm mb-7" style={{ color: '#94A3B8' }}>
-                Setting up <span className="font-medium" style={{ color: T.text }}>{!schoolData && schoolSlug ? 'Loading...' : schoolData?.name || schoolSlug || '—'}</span>
+              <div className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-muted)' }}>Step 1 of 4</div>
+              <h2 className="text-2xl font-bold mb-1.5" style={{ color: 'var(--text-primary)' }}>School information</h2>
+              <p className="text-sm mb-7" style={{ color: 'var(--text-secondary)' }}>
+                Setting up <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{!schoolData && schoolSlug ? 'Loading...' : schoolData?.name || schoolSlug || '—'}</span>
               </p>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: '#64748B' }}>Phone number</label>
+                  <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Phone number</label>
                   <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="(615) 555-0100"
                     className="input-pill" style={pillInput} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: '#64748B' }}>Address</label>
+                  <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Address</label>
                   <input type="text" value={address} onChange={e => setAddress(e.target.value)} placeholder="123 Main St, Oneida, TN 37841"
                     className="input-pill" style={{ ...pillInput, borderRadius: '12px' }} />
                 </div>
@@ -221,7 +207,7 @@ function OnboardingContent() {
                   style={{ padding: '14px 24px' }}>
                   Continue <ArrowRight className="w-4 h-4" />
                 </button>
-                <button onClick={() => setStep(4)} className="w-full text-center text-xs" style={{ color: '#64748B' }}>
+                <button onClick={() => setStep(4)} className="w-full text-center text-xs" style={{ color: 'var(--text-muted)' }}>
                   Skip for now →
                 </button>
               </div>
@@ -232,21 +218,21 @@ function OnboardingContent() {
           {step === 2 && (
             <>
               <div className="flex items-center gap-2 mb-4">
-                <button onClick={() => setStep(1)} className="p-1.5 rounded-full transition-colors hover:bg-white/5" style={{ color: '#94A3B8' }}>
+                <button onClick={() => setStep(1)} className="p-1.5 rounded-full transition-colors hover:bg-white/5" style={{ color: 'var(--text-secondary)' }}>
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#64748B' }}>Step 2 of 4</div>
+                <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Step 2 of 4</div>
               </div>
-              <h2 className="text-2xl font-bold mb-1.5" style={{ color: T.text }}>Add an instructor</h2>
-              <p className="text-sm mb-7" style={{ color: '#94A3B8' }}>You can add more instructors later from your dashboard.</p>
+              <h2 className="text-2xl font-bold mb-1.5" style={{ color: 'var(--text-primary)' }}>Add an instructor</h2>
+              <p className="text-sm mb-7" style={{ color: 'var(--text-secondary)' }}>You can add more instructors later from your dashboard.</p>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: '#64748B' }}>Instructor name</label>
+                  <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Instructor name</label>
                   <input type="text" value={instructorName} onChange={e => setInstructorName(e.target.value)} placeholder="Matt Reedy"
                     className="input-pill" style={pillInput} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: '#64748B' }}>Instructor email</label>
+                  <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Instructor email</label>
                   <input type="email" value={instructorEmail} onChange={e => setInstructorEmail(e.target.value)} placeholder="matt@yourdrivingschool.com"
                     className="input-pill" style={pillInput} />
                 </div>
@@ -255,7 +241,7 @@ function OnboardingContent() {
                   style={{ padding: '14px 24px' }}>
                   Continue <ArrowRight className="w-4 h-4" />
                 </button>
-                <button onClick={() => setStep(4)} className="w-full text-center text-xs" style={{ color: '#64748B' }}>
+                <button onClick={() => setStep(4)} className="w-full text-center text-xs" style={{ color: 'var(--text-muted)' }}>
                   Skip for now →
                 </button>
               </div>
@@ -266,27 +252,27 @@ function OnboardingContent() {
           {step === 3 && (
             <>
               <div className="flex items-center gap-2 mb-4">
-                <button onClick={() => setStep(2)} className="p-1.5 rounded-full transition-colors hover:bg-white/5" style={{ color: '#94A3B8' }}>
+                <button onClick={() => setStep(2)} className="p-1.5 rounded-full transition-colors hover:bg-white/5" style={{ color: 'var(--text-secondary)' }}>
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#64748B' }}>Step 3 of 4</div>
+                <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Step 3 of 4</div>
               </div>
-              <h2 className="text-2xl font-bold mb-1.5" style={{ color: T.text }}>Add a session type</h2>
-              <p className="text-sm mb-7" style={{ color: '#94A3B8' }}>This is what students will book and pay for.</p>
+              <h2 className="text-2xl font-bold mb-1.5" style={{ color: 'var(--text-primary)' }}>Add a session type</h2>
+              <p className="text-sm mb-7" style={{ color: 'var(--text-secondary)' }}>This is what students will book and pay for.</p>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: '#64748B' }}>Session name</label>
+                  <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Session name</label>
                   <input type="text" value={sessionName} onChange={e => setSessionName(e.target.value)} placeholder="Behind-the-Wheel Lesson"
                     className="input-pill" style={pillInput} />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: '#64748B' }}>Price ($)</label>
+                    <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Price ($)</label>
                     <input type="number" value={sessionPrice} onChange={e => setSessionPrice(e.target.value)} placeholder="50"
                       className="input-pill" style={{ ...pillInput, borderRadius: '12px' }} />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: '#64748B' }}>Duration (min)</label>
+                    <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Duration (min)</label>
                     <input type="number" value={sessionDuration} onChange={e => setSessionDuration(e.target.value)} placeholder="60"
                       className="input-pill" style={{ ...pillInput, borderRadius: '12px' }} />
                   </div>
@@ -309,10 +295,10 @@ function OnboardingContent() {
                 transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
                 className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
                 style={{ background: 'rgba(74,222,128,0.12)', border: '1px solid rgba(74,222,128,0.3)' }}>
-                <Check className="w-8 h-8" style={{ color: '#4ADE80' }} />
+                <Check className="w-8 h-8" style={{ color: 'var(--success)' }} />
               </motion.div>
-              <h2 className="text-2xl font-bold mb-2.5" style={{ color: T.text }}>You're all set!</h2>
-              <p className="text-sm mb-8" style={{ color: '#94A3B8' }}>
+              <h2 className="text-2xl font-bold mb-2.5" style={{ color: 'var(--text-primary)' }}>You're all set!</h2>
+              <p className="text-sm mb-8" style={{ color: 'var(--text-secondary)' }}>
                 Your school is ready. Head to your dashboard to start managing students and sessions.
               </p>
               <button onClick={handleDone}
@@ -333,7 +319,7 @@ function OnboardingContent() {
 
 export default function OnboardingPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen" style={{ background: '#080809' }} />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ background: 'var(--bg-base)' }} />}>
       <OnboardingContent />
     </Suspense>
   )

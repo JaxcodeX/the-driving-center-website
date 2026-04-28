@@ -79,7 +79,7 @@ function Sidebar({ schoolName, onClose }: { schoolName?: string; onClose?: () =>
             {schoolName ? schoolName[0].toUpperCase() : 'S'}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-xs font-medium truncate" style={{ color: '#ffffff' }}>
+            <div className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>
               {schoolName || 'Your School'}
             </div>
           </div>
@@ -138,8 +138,8 @@ export default function SchoolAdminLayout({ children }: { children: React.ReactN
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#050505' }}>
-        <div className="text-sm" style={{ color: '#64748B' }}>Loading...</div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-base)' }}>
+        <div className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading...</div>
       </div>
     )
   }

@@ -5,22 +5,6 @@ import Link from 'next/link'
 import { CreditCard, CheckCircle, ExternalLink, AlertCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-const T = {
-  bg:        '#050505',
-  surface:   '#0D0D0D',
-  elevated:  '#18181b',
-  border:    '#1A1A1A',
-  borderLt:  '#27272a',
-  text:      '#ffffff',
-  secondary: '#94A3B8',
-  muted:     '#52525b',
-  cyan:      '#38BDF8',
-  purple:    '#818CF8',
-  green:     '#10B981',
-  amber:     '#f59e0b',
-  grad:      'linear-gradient(135deg, #38BDF8 0%, #818CF8 100%)',
-}
-
 export default function BillingPage() {
   const [subscription, setSubscription] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -68,7 +52,7 @@ export default function BillingPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-sm" style={{ color: T.muted }}>Loading...</p>
+        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading...</p>
       </div>
     )
   }
@@ -78,32 +62,32 @@ export default function BillingPage() {
   return (
     <div className="max-w-3xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-2" style={{ color: T.text }}>Billing</h1>
-        <p className="text-sm" style={{ color: T.muted }}>Manage your subscription and payment settings.</p>
+        <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Billing</h1>
+        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Manage your subscription and payment settings.</p>
       </div>
 
       {/* Status banner */}
       <div
         className="flex items-start gap-4 p-5 rounded-2xl mb-6"
         style={{
-          background: status === 'active' ? `${T.green}10` : status === 'past_due' ? `${T.amber}10` : `${T.cyan}10`,
-          border: `1px solid ${status === 'active' ? `${T.green}30` : status === 'past_due' ? `${T.amber}30` : `${T.cyan}30`}`,
+          background: status === 'active' ? `rgba(74,222,128,0.10)` : status === 'past_due' ? `rgba(245,158,11,0.10)` : `rgba(56,189,248,0.10)`,
+          border: `1px solid ${status === 'active' ? `rgba(74,222,128,0.30)` : status === 'past_due' ? `rgba(245,158,11,0.30)` : `rgba(56,189,248,0.30)`}`,
         }}
       >
         <div className="mt-0.5">
           {status === 'active' ? (
-            <CheckCircle className="w-5 h-5" style={{ color: T.green }} />
+            <CheckCircle className="w-5 h-5" style={{ color: 'var(--success)' }} />
           ) : status === 'past_due' ? (
-            <AlertCircle className="w-5 h-5" style={{ color: T.amber }} />
+            <AlertCircle className="w-5 h-5" style={{ color: '#f59e0b' }} />
           ) : (
-            <CreditCard className="w-5 h-5" style={{ color: T.cyan }} />
+            <CreditCard className="w-5 h-5" style={{ color: '#38BDF8' }} />
           )}
         </div>
         <div>
-          <div className="text-sm font-semibold mb-0.5" style={{ color: T.text }}>
+          <div className="text-sm font-semibold mb-0.5" style={{ color: 'var(--text-primary)' }}>
             {status === 'active' ? 'Subscription active' : status === 'past_due' ? 'Payment past due' : 'Free trial'}
           </div>
-          <div className="text-xs" style={{ color: T.secondary }}>
+          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
             {status === 'active'
               ? 'Your subscription is active and billing is up to date.'
               : status === 'past_due'
@@ -116,23 +100,23 @@ export default function BillingPage() {
       {/* Plan card */}
       <div
         className="rounded-2xl p-6 mb-6"
-        style={{ background: T.surface, border: `1px solid ${T.border}` }}
+        style={{ background: 'var(--bg-surface)', border: `1px solid var(--card-border)` }}
       >
         <div className="flex items-start justify-between mb-4">
           <div>
-            <div className="text-sm font-semibold mb-1" style={{ color: T.text }}>Current Plan</div>
-            <div className="text-2xl font-bold" style={{ color: T.cyan }}>Starter</div>
-            <div className="text-sm" style={{ color: T.muted }}>$99/month</div>
+            <div className="text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>Current Plan</div>
+            <div className="text-2xl font-bold" style={{ color: '#38BDF8' }}>Starter</div>
+            <div className="text-sm" style={{ color: 'var(--text-muted)' }}>$99/month</div>
           </div>
           <div
             className="text-xs px-3 py-1 rounded-full font-medium capitalize"
-            style={{ background: `${T.green}15`, color: T.green }}
+            style={{ background: `rgba(74,222,128,0.15)`, color: 'var(--success)' }}
           >
             {status}
           </div>
         </div>
 
-        <div className="space-y-2 mb-6 pt-4 border-t" style={{ borderColor: T.border }}>
+        <div className="space-y-2 mb-6 pt-4 border-t" style={{ borderColor: 'var(--card-border)' }}>
           {[
             'Unlimited bookings',
             'SMS + email reminders',
@@ -141,8 +125,8 @@ export default function BillingPage() {
             'CSV student import',
             'Stripe payments',
           ].map(f => (
-            <div key={f} className="flex items-center gap-2 text-sm" style={{ color: T.secondary }}>
-              <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: T.green }} />
+            <div key={f} className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+              <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--success)' }} />
               {f}
             </div>
           ))}
@@ -151,7 +135,7 @@ export default function BillingPage() {
         <button
           onClick={openBillingPortal}
           className="w-full py-3 rounded-xl text-sm font-semibold text-white"
-          style={{ background: T.elevated, border: `1px solid ${T.border}` }}
+          style={{ background: 'var(--bg-elevated)', border: `1px solid var(--card-border)` }}
         >
           Manage subscription
         </button>
@@ -161,20 +145,20 @@ export default function BillingPage() {
       {subscription?.stripe_customer_id && (
         <div
           className="rounded-2xl p-6"
-          style={{ background: T.surface, border: `1px solid ${T.border}` }}
+          style={{ background: 'var(--bg-surface)', border: `1px solid var(--card-border)` }}
         >
           <div className="flex items-center justify-between mb-4">
-            <div className="text-sm font-semibold" style={{ color: T.text }}>Payment method</div>
-            <CreditCard className="w-4 h-4" style={{ color: T.muted }} />
+            <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Payment method</div>
+            <CreditCard className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
           </div>
-          <div className="text-sm" style={{ color: T.muted }}>
+          <div className="text-sm" style={{ color: 'var(--text-muted)' }}>
             Visa •••• 4242
-            <span className="ml-2" style={{ color: T.secondary }}>Expires 12/26</span>
+            <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>Expires 12/26</span>
           </div>
           <button
             onClick={openBillingPortal}
             className="mt-4 text-xs font-medium flex items-center gap-1"
-            style={{ color: T.cyan }}
+            style={{ color: 'var(--accent)' }}
           >
             Update payment method <ExternalLink className="w-3 h-3" />
           </button>

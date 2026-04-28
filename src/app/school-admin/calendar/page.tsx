@@ -4,21 +4,6 @@ import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Clock } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-const T = {
-  bg:        '#050505',
-  surface:   '#0D0D0D',
-  elevated:  '#18181b',
-  border:    '#1A1A1A',
-  borderLt:  '#27272a',
-  text:      '#ffffff',
-  secondary: '#94A3B8',
-  muted:     '#52525b',
-  cyan:      '#38BDF8',
-  purple:    '#818CF8',
-  green:     '#10B981',
-  amber:     '#f59e0b',
-}
-
 const HOURS = Array.from({ length: 12 }, (_, i) => i + 8) // 8am-7pm
 
 export default function CalendarPage() {
@@ -88,28 +73,28 @@ export default function CalendarPage() {
     <div>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold" style={{ color: T.text }}>Calendar</h1>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Calendar</h1>
         <div className="flex items-center gap-2">
-          <button onClick={prevMonth} className="p-2 rounded-xl transition-colors" style={{ color: T.secondary, background: T.surface, border: `1px solid ${T.border}` }}
-            onMouseEnter={e => (e.currentTarget.style.color = T.text)}
-            onMouseLeave={e => (e.currentTarget.style.color = T.secondary)}>
+          <button onClick={prevMonth} className="p-2 rounded-xl transition-colors" style={{ color: 'var(--text-secondary)', background: 'var(--bg-surface)', border: `1px solid var(--card-border)` }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}>
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="text-sm font-medium px-3 py-1.5 rounded-xl" style={{ color: T.text }}>{monthName}</span>
-          <button onClick={nextMonth} className="p-2 rounded-xl transition-colors" style={{ color: T.secondary, background: T.surface, border: `1px solid ${T.border}` }}
-            onMouseEnter={e => (e.currentTarget.style.color = T.text)}
-            onMouseLeave={e => (e.currentTarget.style.color = T.secondary)}>
+          <span className="text-sm font-medium px-3 py-1.5 rounded-xl" style={{ color: 'var(--text-primary)' }}>{monthName}</span>
+          <button onClick={nextMonth} className="p-2 rounded-xl transition-colors" style={{ color: 'var(--text-secondary)', background: 'var(--bg-surface)', border: `1px solid var(--card-border)` }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
 
       {/* Calendar grid */}
-      <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${T.border}` }}>
+      <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid var(--card-border)` }}>
         {/* Day headers */}
-        <div className="grid grid-cols-7" style={{ background: T.surface, borderBottom: `1px solid ${T.border}` }}>
+        <div className="grid grid-cols-7" style={{ background: 'var(--bg-surface)', borderBottom: `1px solid var(--card-border)` }}>
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-            <div key={d} className="py-3 text-center text-xs font-semibold uppercase tracking-wide" style={{ color: T.muted }}>
+            <div key={d} className="py-3 text-center text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
               {d}
             </div>
           ))}
@@ -125,7 +110,7 @@ export default function CalendarPage() {
                 className="min-h-24 p-2 border-b border-r"
                 style={{
                   background: day ? 'transparent' : 'transparent',
-                  borderColor: T.border,
+                  borderColor: 'var(--card-border)',
                   opacity: day ? 1 : 0.3,
                 }}
               >
@@ -134,8 +119,8 @@ export default function CalendarPage() {
                     <div
                       className="text-xs font-semibold mb-1 w-6 h-6 flex items-center justify-center rounded-full"
                       style={{
-                        color: isToday ? '#050505' : T.secondary,
-                        background: isToday ? T.cyan : 'transparent',
+                        color: isToday ? 'var(--bg-base)' : 'var(--text-secondary)',
+                        background: isToday ? '#38BDF8' : 'transparent',
                       }}
                     >
                       {day}
@@ -147,7 +132,7 @@ export default function CalendarPage() {
                           <div
                             key={s.id}
                             className="text-xs px-1.5 py-0.5 rounded truncate"
-                            style={{ background: `${T.cyan}20`, color: T.cyan }}
+                            style={{ background: `rgba(56,189,248,0.2)`, color: '#38BDF8' }}
                             title={`${s.student?.name || 'Student'} · ${time}`}
                           >
                             {time} {s.student?.name?.split(' ')[0] || ''}
@@ -155,7 +140,7 @@ export default function CalendarPage() {
                         )
                       })}
                       {daySessions.length > 3 && (
-                        <div className="text-xs" style={{ color: T.muted }}>+{daySessions.length - 3} more</div>
+                        <div className="text-xs" style={{ color: 'var(--text-muted)' }}>+{daySessions.length - 3} more</div>
                       )}
                     </div>
                   </>
@@ -168,27 +153,27 @@ export default function CalendarPage() {
 
       {/* Sessions list for selected month */}
       <div className="mt-6">
-        <h2 className="text-sm font-semibold mb-3" style={{ color: T.muted }}>{monthName} Sessions</h2>
+        <h2 className="text-sm font-semibold mb-3" style={{ color: 'var(--text-muted)' }}>{monthName} Sessions</h2>
         {sessions.length === 0 ? (
-          <div className="text-center py-8" style={{ color: T.muted }}>
+          <div className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
             <Clock className="w-8 h-8 mx-auto mb-2 opacity-30" />
             <p className="text-sm">No sessions this month</p>
           </div>
         ) : (
           <div className="space-y-2">
             {sessions.map(s => (
-              <div key={s.id} className="flex items-center gap-4 p-3 rounded-xl" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
-                <div className="text-sm font-bold w-16 text-center" style={{ color: T.cyan }}>
+              <div key={s.id} className="flex items-center gap-4 p-3 rounded-xl" style={{ background: 'var(--bg-surface)', border: `1px solid var(--card-border)` }}>
+                <div className="text-sm font-bold w-16 text-center" style={{ color: '#38BDF8' }}>
                   {new Date(s.starts_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm font-medium" style={{ color: T.text }}>{s.student?.name || 'Student'}</div>
-                  <div className="text-xs" style={{ color: T.muted }}>
+                  <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{s.student?.name || 'Student'}</div>
+                  <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
                     {new Date(s.starts_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} · {s.instructor?.name || 'Instructor'}
                   </div>
                 </div>
                 <span className="text-xs px-2 py-0.5 rounded-full capitalize"
-                  style={{ background: `${T.green}15`, color: T.green }}>
+                  style={{ background: `rgba(74,222,128,0.15)`, color: 'var(--success)' }}>
                   {s.status}
                 </span>
               </div>
