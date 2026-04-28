@@ -63,17 +63,17 @@ function DashboardMockup() {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '56px', padding: '0 24px' }}>
       <div style={{
-        filter: isDark ? 'drop-shadow(0 0 60px rgba(26,86,255,0.18))' : 'drop-shadow(0 8px 32px rgba(0,0,0,0.1))',
-        width: '100%', maxWidth: '820px',
+        filter: isDark ? 'drop-shadow(0 0 80px rgba(26,86,255,0.2))' : 'drop-shadow(0 12px 48px rgba(0,0,0,0.12))',
+        width: '100%', maxWidth: '920px',
       }}>
         <div style={{
           background: isDark ? '#0F172A' : '#FFFFFF',
           border: `1px solid ${cardBorder}`,
-          borderRadius: '16px',
+          borderRadius: '20px',
           overflow: 'hidden',
           boxShadow: isDark
             ? '0 0 80px rgba(26,86,255,0.12), 0 32px 64px rgba(0,0,0,0.5)'
-            : '0 8px 40px rgba(0,0,0,0.1)',
+            : '0 12px 48px rgba(0,0,0,0.1)',
         }}>
           {/* Title bar */}
           <div style={{
@@ -86,7 +86,7 @@ function DashboardMockup() {
             ))}
           </div>
           {/* Body */}
-          <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', minHeight: '380px', background: bodyBg }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', minHeight: '400px', background: bodyBg }}>
             {/* Sidebar */}
             <div style={{ background: sidebarBg, borderRight: `1px solid ${cardBorder}`, padding: '20px 0', display: 'flex', flexDirection: 'column', gap: '2px' }}>
               {['Dashboard', 'Students', 'Sessions', 'Billing', 'Reports'].map((label, i) => (
@@ -153,26 +153,13 @@ function DashboardMockup() {
   )
 }
 
-// ─── Gradient Icon Block ───────────────────────────────────────────
-function GradientIcon({ colors, children }: { colors: string; children: React.ReactNode }) {
-  return (
-    <div style={{
-      width: '48px', height: '48px', borderRadius: '12px',
-      background: colors, display: 'flex', alignItems: 'center', justifyContent: 'center',
-      boxShadow: '0 4px 16px rgba(0,0,0,0.2)', flexShrink: 0,
-    }}>
-      {children}
-    </div>
-  )
-}
-
 // ─── Pricing Card ───────────────────────────────────────────────────
 function PricingCard({ name, price, desc, features, highlighted, cta }: {
   name: string; price: string; desc: string;
   features: string[]; highlighted?: boolean; cta: string;
 }) {
   return (
-    <div className="card" style={highlighted ? { border: '1.5px solid var(--accent)', boxShadow: '0 0 60px var(--accent-glow)', position: 'relative' as const } : { position: 'relative' as const }}>
+    <div className="glass-card" style={highlighted ? { border: '1.5px solid var(--accent)', boxShadow: '0 0 60px var(--accent-glow)', position: 'relative' as const } : { position: 'relative' as const }}>
       {highlighted && (
         <div style={{
           position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)',
@@ -180,7 +167,7 @@ function PricingCard({ name, price, desc, features, highlighted, cta }: {
           background: 'var(--accent)', color: 'white',
           fontSize: '11px', fontWeight: '700', whiteSpace: 'nowrap' as const, letterSpacing: '0.05em',
         }}>
-          Most popular
+          Popular
         </div>
       )}
       <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: 'var(--text-muted)', marginBottom: '12px' }}>
@@ -204,7 +191,7 @@ function PricingCard({ name, price, desc, features, highlighted, cta }: {
       <Link
         href="/signup"
         className={highlighted ? 'btn-glow' : 'btn-ghost'}
-        style={{ display: 'flex', justifyContent: 'center', fontSize: '15px', textDecoration: 'none', padding: '14px 28px' }}
+        style={{ display: 'flex', justifyContent: 'center', fontSize: '15px', textDecoration: 'none', borderRadius: '999px' }}
       >
         {cta}
       </Link>
@@ -215,10 +202,10 @@ function PricingCard({ name, price, desc, features, highlighted, cta }: {
 // ─── FAQ Item ────────────────────────────────────────────────────────
 function FaqItem({ q, a }: { q: string; a: string }) {
   return (
-    <details style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '12px', overflow: 'hidden' }}>
+    <details className="glass-card" style={{ cursor: 'pointer', padding: 0 }}>
       <summary style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '20px 24px', cursor: 'pointer', listStyle: 'none',
+        padding: '20px 24px', listStyle: 'none',
         fontSize: '15px', fontWeight: '500', color: 'var(--text-primary)', userSelect: 'none',
       }}>
         <span>{q}</span>
@@ -249,7 +236,7 @@ function BookingCalendar() {
   const [selectedTime, setSelectedTime] = useState('10:00 AM')
 
   return (
-    <div style={{ background: '#111827', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '24px' }}>
+    <div style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '24px' }}>
       {/* Month nav */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
         <button style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#94A3B8', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', lineHeight: '1' }}>‹</button>
@@ -291,7 +278,7 @@ function BookingCalendar() {
             key={t}
             onClick={() => setSelectedTime(t)}
             style={{
-              padding: '8px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: '500',
+              padding: '8px 14px', borderRadius: '999px', fontSize: '12px', fontWeight: '500',
               border: selectedTime === t ? '1.5px solid #1A56FF' : '1px solid rgba(255,255,255,0.1)',
               background: selectedTime === t ? 'rgba(26,86,255,0.15)' : 'transparent',
               color: selectedTime === t ? '#4A8FFF' : '#94A3B8',
@@ -303,10 +290,8 @@ function BookingCalendar() {
         ))}
       </div>
       {/* Confirm */}
-      <button style={{
-        width: '100%', marginTop: '16px', padding: '14px 28px',
-        background: '#1A56FF', color: 'white', fontSize: '15px', fontWeight: '600',
-        borderRadius: '10px', border: 'none', cursor: 'pointer', transition: 'opacity 0.2s',
+      <button className="btn-glow" style={{
+        width: '100%', marginTop: '16px', fontSize: '15px',
       }}>
         Confirm booking
       </button>
@@ -315,7 +300,7 @@ function BookingCalendar() {
 }
 
 // ─── Decorative Circles ────────────────────────────────────────────
-function DecorativeCircles() {
+function DecorativeCircles({ className = '' }: { className?: string }) {
   const circles = [
     { size: 80, x: 0, y: 20, color: '#4ADE80' },
     { size: 60, x: 90, y: 0, color: '#F472B6' },
@@ -325,7 +310,7 @@ function DecorativeCircles() {
     { size: 28, x: 20, y: 120, color: '#A78BFA' },
   ]
   return (
-    <div style={{ position: 'relative', width: '200px', height: '160px', flexShrink: 0 }}>
+    <div style={{ position: 'relative', width: '200px', height: '160px', flexShrink: 0 }} className={className}>
       {circles.map((c, i) => (
         <div key={i} style={{
           position: 'absolute', left: c.x, top: c.y,
@@ -338,22 +323,6 @@ function DecorativeCircles() {
   )
 }
 
-// ─── Problem Cards ───────────────────────────────────────────────────
-const PROBLEMS = [
-  { icon: '📋', text: 'Spreadsheets everywhere — student logs, TCA hours, and payment tracking all over the place.' },
-  { icon: '📞', text: 'Endless phone calls just to schedule one session — and no-shows with no reminder.' },
-  { icon: '💸', text: 'Checks that bounce, cash that goes missing, parents who forget to pay.' },
-]
-
-function ProblemCard({ icon, text }: { icon: string; text: string }) {
-  return (
-    <div className="card" style={{ textAlign: 'left' }}>
-      <div style={{ fontSize: '28px', marginBottom: '16px' }}>{icon}</div>
-      <p style={{ fontSize: '15px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{text}</p>
-    </div>
-  )
-}
-
 // ─── Feature Cards ───────────────────────────────────────────────────
 const FEATURES = [
   { gradient: 'linear-gradient(135deg, #3B82F6, #8B5CF6)', title: 'Track every student', desc: 'Log sessions, TCA hours, and progress. Auto-generate certificates when requirements are met.' },
@@ -361,37 +330,35 @@ const FEATURES = [
   { gradient: 'linear-gradient(135deg, #F59E0B, #EF4444)', title: 'Get paid and stay compliant', desc: 'Stripe handles payments. TCA tracking is automatic. Tennessee state compliance built in.' },
 ]
 
-function FeatureCard({ gradient, title, desc }: { gradient: string; title: string; desc: string }) {
+function FeatureIcon({ gradient }: { gradient: string }) {
   return (
-    <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <GradientIcon colors={gradient}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M9 11l3 3L22 4"/>
-          <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-        </svg>
-      </GradientIcon>
-      <div>
-        <h3 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '10px', letterSpacing: '-0.01em' }}>{title}</h3>
-        <p style={{ fontSize: '15px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{desc}</p>
-      </div>
+    <div style={{
+      width: '48px', height: '48px', borderRadius: '12px',
+      background: gradient, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      boxShadow: '0 4px 16px rgba(0,0,0,0.2)', flexShrink: 0,
+    }}>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 11l3 3L22 4"/>
+        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+      </svg>
     </div>
   )
 }
 
 // ─── Testimonial Cards ───────────────────────────────────────────────
 const TESTIMONIALS = [
-  { quote: 'This platform cut my administrative work in half. I spend less time on the phone and more time teaching.', name: 'Matt Reedy', role: 'Driving Instructor, East Tennessee', initials: 'MR' },
-  { quote: 'Finally, a tool that actually understands how a driving school works. TCA tracking alone is worth the price.', name: 'Mark Martin', role: 'CS Teacher & Mentor', initials: 'MM' },
+  { quote: 'This platform cut my administrative work in half. I spend less time on the phone and more time teaching.', name: 'Matt Reedy', role: 'Driving Instructor, East Tennessee', initials: 'MR', bg: 'linear-gradient(135deg, #7ED4FD, #707BFF)' },
+  { quote: 'Finally, a tool that actually understands how a driving school works. TCA tracking alone is worth the price.', name: 'Mark Martin', role: 'CS Teacher & Mentor', initials: 'MM', bg: 'linear-gradient(135deg, #F97316, #EC4899)' },
 ]
 
-function TestimonialCard({ quote, name, role, initials }: { quote: string; name: string; role: string; initials: string }) {
+function TestimonialCard({ quote, name, role, initials, bg }: { quote: string; name: string; role: string; initials: string; bg: string }) {
   return (
-    <div className="card" style={{ position: 'relative' }}>
+    <div className="glass-card" style={{ borderRadius: '16px' }}>
       <p style={{ fontSize: '16px', color: 'var(--text-secondary)', lineHeight: '1.7', marginBottom: '24px', fontStyle: 'italic' as const }}>{quote}</p>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <div style={{
           width: '40px', height: '40px', borderRadius: '50%',
-          background: 'linear-gradient(135deg, #7ED4FD, #707BFF)',
+          background: bg,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: '13px', fontWeight: '700', color: 'white', flexShrink: 0,
         }}>{initials}</div>
@@ -425,6 +392,13 @@ const PRICING_TIERS = [
   { name: 'Starter', price: '$99', desc: 'For small schools getting started.', features: ['Up to 25 students', 'Unlimited sessions', 'Email + SMS reminders', 'Stripe payments', 'TCA tracking'], highlighted: false, cta: 'Get started' },
   { name: 'Growth', price: '$199', desc: 'For growing schools that need more power.', features: ['Up to 100 students', 'Everything in Starter', 'Instructor management', 'Parent portal', 'Priority support'], highlighted: true, cta: 'Start free trial' },
   { name: 'Enterprise', price: '$399', desc: 'For multi-location schools.', features: ['Unlimited students', 'Everything in Growth', 'Multi-location support', 'API access', 'Dedicated success manager'], highlighted: false, cta: 'Contact sales' },
+]
+
+// ─── Problem Cards ───────────────────────────────────────────────────
+const PROBLEMS = [
+  { icon: '📋', text: 'Spreadsheets everywhere — student logs, TCA hours, and payment tracking all over the place.' },
+  { icon: '📞', text: 'Endless phone calls just to schedule one session — and no-shows with no reminder.' },
+  { icon: '💸', text: 'Checks that bounce, cash that goes missing, parents who forget to pay.' },
 ]
 
 // ─── Main Page ──────────────────────────────────────────────────────
@@ -463,6 +437,14 @@ export default function HomePage() {
 
       {/* ── HERO ──────────────────────────────────────── */}
       <section style={{ padding: '100px 24px 40px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        {/* Atmospheric gradient backdrop */}
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none',
+          background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(26,86,255,0.12) 0%, transparent 70%)',
+        }} />
+        {/* Decorative circles behind dashboard */}
+        <div className="bg-circle" style={{ width: '400px', height: '400px', left: '5%', top: '20%', background: '#1A56FF', filter: 'blur(120px)', opacity: 0.08 }} />
+        <div className="bg-circle" style={{ width: '300px', height: '300px', right: '10%', top: '40%', background: '#8B5CF6', filter: 'blur(100px)', opacity: 0.08 }} />
         <div style={{ position: 'relative', maxWidth: '1200px', margin: '0 auto' }}>
           <div className="fade-up" style={{ marginBottom: '32px' }}>
             <span className="eyebrow">
@@ -518,7 +500,7 @@ export default function HomePage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', maxWidth: '900px', margin: '0 auto' }}>
             {PROBLEMS.map(p => (
-              <div key={p.text} className="card fade-up" style={{ textAlign: 'left' }}>
+              <div key={p.text} className="glass-card fade-up" style={{ textAlign: 'left' }}>
                 <div style={{ fontSize: '28px', marginBottom: '16px' }}>{p.icon}</div>
                 <p style={{ fontSize: '15px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{p.text}</p>
               </div>
@@ -537,15 +519,23 @@ export default function HomePage() {
               <br />Nothing you don't.
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
-            {FEATURES.map(f => (
-              <div key={f.title} className="card fade-up">
-                <GradientIcon colors={f.gradient}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {/* Bento grid — first card spans 2 cols */}
+          <div className="bento-grid fade-up">
+            {FEATURES.map((f, i) => (
+              <div key={f.title} className={`glass-card ${i === 0 ? 'bento-large' : ''}`} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div style={{
+                  width: i === 0 ? '64px' : '48px',
+                  height: i === 0 ? '64px' : '48px',
+                  borderRadius: i === 0 ? '16px' : '12px',
+                  background: f.gradient,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.2)', flexShrink: 0,
+                }}>
+                  <svg width={i === 0 ? 32 : 24} height={i === 0 ? 32 : 24} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M9 11l3 3L22 4"/>
                     <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
                   </svg>
-                </GradientIcon>
+                </div>
                 <div>
                   <h3 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '10px', letterSpacing: '-0.01em' }}>{f.title}</h3>
                   <p style={{ fontSize: '15px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{f.desc}</p>
@@ -586,21 +576,7 @@ export default function HomePage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
             {TESTIMONIALS.map(t => (
-              <div key={t.name} className="card fade-up">
-                <p style={{ fontSize: '16px', color: 'var(--text-secondary)', lineHeight: '1.7', marginBottom: '24px', fontStyle: 'italic' as const }}>{t.quote}</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{
-                    width: '40px', height: '40px', borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #7ED4FD, #707BFF)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '13px', fontWeight: '700', color: 'white', flexShrink: 0,
-                  }}>{t.initials}</div>
-                  <div>
-                    <p style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>{t.name}</p>
-                    <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.role}</p>
-                  </div>
-                </div>
-              </div>
+              <TestimonialCard key={t.name} {...t} />
             ))}
           </div>
         </div>
@@ -627,8 +603,11 @@ export default function HomePage() {
       </section>
 
       {/* ── BOOKING WIDGET (always dark) ─────────────────── */}
-      <section style={{ padding: '120px 24px', background: '#0D1117' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <section style={{ padding: '120px 24px', background: '#0D1117', position: 'relative', overflow: 'hidden' }}>
+        {/* Decorative circles */}
+        <div className="bg-circle" style={{ width: '300px', height: '300px', left: '-5%', top: '10%', background: '#4ADE80', filter: 'blur(120px)', opacity: 0.1 }} />
+        <div className="bg-circle" style={{ width: '250px', height: '250px', right: '5%', bottom: '10%', background: '#8B5CF6', filter: 'blur(100px)', opacity: 0.1 }} />
+        <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) minmax(320px, 1fr)', gap: '80px', alignItems: 'center' }}>
             {/* Left */}
             <div className="fade-up">

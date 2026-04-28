@@ -13,17 +13,19 @@ Zax: "Build [feature]"
         ↓
 Everest: Write SPEC.md (blueprint first)
         ↓
-Everest: DeepSeek generates code
+Everest: Spawn DeepSeek-Claude sub-agent (Claude Code on DeepSeek V4 Flash)
         ↓
-Everest: Review diffs + run build
+Sub-agent: reads spec → builds → fixes errors → commits → pushes
         ↓
-Deploy → Vercel auto-deploys
+Everest: Verify build passes + report back
         ↓
 Log result in WORKFLOW_LOG.md
 ```
 
 **If there's no SPEC.md, there's no implementation.**
 **Plans live in project files. Discord is for coordination only.**
+
+**Current project:** SPEC_FULL_REDESIGN.md — full site redesign (landing, auth, dashboard, students, sessions, booking)
 
 ---
 
@@ -48,8 +50,8 @@ Log result in WORKFLOW_LOG.md
 | Role | What |
 |---|---|
 | **Zax** | Directs, reviews output, approves or rejects |
-| **Everest** | Writes specs, spawns DeepSeek, reviews code, makes architecture calls |
-| **DeepSeek** | Generates code from SPEC.md only |
+| **Everest** | Writes specs, spawns coding agents, reviews output, makes architecture calls |
+| **DeepSeek-Claude** | Claude Code CLI routed through DeepSeek V4 Flash — builds from SPEC.md, self-corrects, commits |
 | **Mark** | Reviews architecture decisions, not code implementation |
 
 **Everest's job is not to write code — Everest directs, DeepSeek generates, Zax approves.**
