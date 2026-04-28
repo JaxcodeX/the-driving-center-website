@@ -7,7 +7,7 @@ const BOUNCE_SAFE_DOMAINS = new Set([
   'live.com', 'msn.com', 'icloud.com', 'me.com', 'mac.com',
 ])
 
-function isLikelyValidEmail(email: string): boolean {
+export function isLikelyValidEmail(email: string): boolean {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false
   const domain = email.split('@')[1]?.toLowerCase()
   if (!domain) return false
