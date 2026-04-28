@@ -75,7 +75,6 @@ function DashboardMockup() {
             ? '0 0 80px rgba(26,86,255,0.12), 0 32px 64px rgba(0,0,0,0.5)'
             : '0 12px 48px rgba(0,0,0,0.1)',
         }}>
-          {/* Title bar */}
           <div style={{
             height: '44px', background: isDark ? '#0F172A' : '#F5F4F0',
             display: 'flex', alignItems: 'center', padding: '0 16px', gap: '12px',
@@ -85,9 +84,7 @@ function DashboardMockup() {
               <div key={i} style={{ width: '11px', height: '11px', borderRadius: '50%', background: c, flexShrink: 0 }} />
             ))}
           </div>
-          {/* Body */}
           <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', minHeight: '400px', background: bodyBg }}>
-            {/* Sidebar */}
             <div style={{ background: sidebarBg, borderRight: `1px solid ${cardBorder}`, padding: '20px 0', display: 'flex', flexDirection: 'column', gap: '2px' }}>
               {['Dashboard', 'Students', 'Sessions', 'Billing', 'Reports'].map((label, i) => (
                 <div key={label} style={{
@@ -100,13 +97,11 @@ function DashboardMockup() {
                 }}>{label}</div>
               ))}
             </div>
-            {/* Main */}
             <div style={{ padding: '24px 24px 24px 20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <p style={{ fontSize: '16px', fontWeight: '600', color: textPrimary, marginBottom: '2px' }}>Good morning, Mark</p>
                 <p style={{ fontSize: '12px', color: textMuted }}>Monday, April 26, 2026</p>
               </div>
-              {/* Stats */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
                 {[['STUDENTS', '24', '+3 this week'], ['HOURS LOGGED', '6.4h', '+1.2h today'], ['REVENUE', '$840', '+ $120']].map(([l, v, c]) => (
                   <div key={l} style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: '10px', padding: '12px 14px' }}>
@@ -116,7 +111,6 @@ function DashboardMockup() {
                   </div>
                 ))}
               </div>
-              {/* Charts */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: '10px', padding: '12px 14px' }}>
                   <p style={{ fontSize: '10px', color: textMuted, marginBottom: '10px', fontWeight: '500' }}>Weekly Sessions</p>
@@ -153,6 +147,123 @@ function DashboardMockup() {
   )
 }
 
+// ─── Booking Calendar ───────────────────────────────────────────────
+const CAL_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const CAL_CELLS: {d: string}[] = [
+  {d:''},{d:''},{d:''},{d:''},{d:''},{d:'1'},{d:'2'},
+  {d:'3'},{d:'4'},{d:'5'},{d:'6'},{d:'7'},{d:'8'},{d:'9'},
+  {d:'10'},{d:'11'},{d:'12'},{d:'13'},{d:'14'},{d:'15'},{d:'16'},
+  {d:'17'},{d:'18'},{d:'19'},{d:'20'},{d:'21'},{d:'22'},{d:'23'},
+  {d:'24'},{d:'25'},{d:'26'},{d:'27'},{d:'28'},{d:'29'},{d:'30'},
+]
+
+function BookingCalendar() {
+  const times = ['9:00 AM', '10:00 AM', '11:00 AM', '2:00 PM', '3:00 PM', '4:00 PM']
+  const [selectedDay, setSelectedDay] = useState(14)
+  const [selectedTime, setSelectedTime] = useState('10:00 AM')
+
+  return (
+    <div style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '24px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+        <button style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#94A3B8', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', lineHeight: '1' }}>‹</button>
+        <p style={{ fontSize: '15px', fontWeight: '600', color: '#fff' }}>May 2026</p>
+        <button style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#94A3B8', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', lineHeight: '1' }}>›</button>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '8px' }}>
+        {CAL_DAYS.map(d => <div key={d} style={{ textAlign: 'center', fontSize: '11px', color: '#64748B', fontWeight: '600', padding: '4px 0' }}>{d}</div>)}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '20px' }}>
+        {CAL_CELLS.map((cell, i) => {
+          const isSelected = selectedDay === parseInt(cell.d)
+          const isEmpty = cell.d === ''
+          const bg = isSelected ? '#1A56FF' : 'transparent'
+          const fg = isEmpty ? 'transparent' : isSelected ? '#fff' : '#94A3B8'
+          return (
+            <div
+              key={i}
+              onClick={() => !isEmpty && setSelectedDay(parseInt(cell.d))}
+              style={{
+                textAlign: 'center', fontSize: '13px', color: fg,
+                padding: '8px 4px', borderRadius: '8px',
+                cursor: isEmpty ? 'default' : 'pointer',
+                background: bg, fontWeight: isSelected ? '600' : '400',
+                transition: 'background 0.15s, color 0.15s',
+              }}
+            >
+              {cell.d}
+            </div>
+          )
+        })}
+      </div>
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        {times.map(t => (
+          <button
+            key={t}
+            onClick={() => setSelectedTime(t)}
+            style={{
+              padding: '8px 14px', borderRadius: '999px', fontSize: '12px', fontWeight: '500',
+              border: selectedTime === t ? '1.5px solid #1A56FF' : '1px solid rgba(255,255,255,0.1)',
+              background: selectedTime === t ? 'rgba(26,86,255,0.15)' : 'transparent',
+              color: selectedTime === t ? '#4A8FFF' : '#94A3B8',
+              cursor: 'pointer', transition: 'all 0.15s',
+            }}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+      <button className="btn-glow" style={{ width: '100%', marginTop: '16px', fontSize: '15px' }}>
+        Confirm booking
+      </button>
+    </div>
+  )
+}
+
+// ─── Decorative Circles ────────────────────────────────────────────
+function DecorativeCircles({ className = '' }: { className?: string }) {
+  const circles = [
+    { size: 80, x: 0, y: 20, color: '#4ADE80' },
+    { size: 60, x: 90, y: 0, color: '#F472B6' },
+    { size: 50, x: 120, y: 60, color: '#FB923C' },
+    { size: 40, x: 60, y: 90, color: '#60A5FA' },
+    { size: 36, x: 140, y: 110, color: '#FBBF24' },
+    { size: 28, x: 20, y: 120, color: '#A78BFA' },
+  ]
+  return (
+    <div style={{ position: 'relative', width: '200px', height: '160px', flexShrink: 0 }} className={className}>
+      {circles.map((c, i) => (
+        <div key={i} style={{
+          position: 'absolute', left: c.x, top: c.y,
+          width: c.size, height: c.size, borderRadius: '50%',
+          background: c.color, opacity: 0.85 - i * 0.05,
+          boxShadow: `0 8px 32px ${c.color}40`,
+        }} />
+      ))}
+    </div>
+  )
+}
+
+// ─── Testimonial Card ───────────────────────────────────────────────
+function TestimonialCard({ quote, name, role, initials, bg }: { quote: string; name: string; role: string; initials: string; bg: string }) {
+  return (
+    <div className="glass-card" style={{ borderRadius: '16px' }}>
+      <p style={{ fontSize: '16px', color: 'var(--text-secondary)', lineHeight: '1.7', marginBottom: '24px', fontStyle: 'italic' as const }}>{quote}</p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{
+          width: '40px', height: '40px', borderRadius: '50%',
+          background: bg,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '13px', fontWeight: '700', color: 'white', flexShrink: 0,
+        }}>{initials}</div>
+        <div>
+          <p style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>{name}</p>
+          <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{role}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Pricing Card ───────────────────────────────────────────────────
 function PricingCard({ name, price, desc, features, highlighted, cta }: {
   name: string; price: string; desc: string;
@@ -167,7 +278,7 @@ function PricingCard({ name, price, desc, features, highlighted, cta }: {
           background: 'var(--accent)', color: 'white',
           fontSize: '11px', fontWeight: '700', whiteSpace: 'nowrap' as const, letterSpacing: '0.05em',
         }}>
-          Popular
+          Most popular
         </div>
       )}
       <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: 'var(--text-muted)', marginBottom: '12px' }}>
@@ -199,192 +310,20 @@ function PricingCard({ name, price, desc, features, highlighted, cta }: {
   )
 }
 
-// ─── FAQ Item ────────────────────────────────────────────────────────
-function FaqItem({ q, a }: { q: string; a: string }) {
-  return (
-    <details className="glass-card" style={{ cursor: 'pointer', padding: 0 }}>
-      <summary style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '20px 24px', listStyle: 'none',
-        fontSize: '15px', fontWeight: '500', color: 'var(--text-primary)', userSelect: 'none',
-      }}>
-        <span>{q}</span>
-        <svg className="faq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, color: 'var(--text-muted)', transition: 'transform 0.25s' }}>
-          <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </summary>
-      <div style={{ padding: '0 24px 20px' }}>
-        <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: '1.7' }}>{a}</p>
-      </div>
-    </details>
-  )
-}
-
-// ─── Booking Calendar ───────────────────────────────────────────────
-const CAL_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const CAL_CELLS: {d: string}[] = [
-  {d:''},{d:''},{d:''},{d:''},{d:''},{d:'1'},{d:'2'},
-  {d:'3'},{d:'4'},{d:'5'},{d:'6'},{d:'7'},{d:'8'},{d:'9'},
-  {d:'10'},{d:'11'},{d:'12'},{d:'13'},{d:'14'},{d:'15'},{d:'16'},
-  {d:'17'},{d:'18'},{d:'19'},{d:'20'},{d:'21'},{d:'22'},{d:'23'},
-  {d:'24'},{d:'25'},{d:'26'},{d:'27'},{d:'28'},{d:'29'},{d:'30'},
-]
-
-function BookingCalendar() {
-  const times = ['9:00 AM', '10:00 AM', '11:00 AM', '2:00 PM', '3:00 PM', '4:00 PM']
-  const [selectedDay, setSelectedDay] = useState(14)
-  const [selectedTime, setSelectedTime] = useState('10:00 AM')
-
-  return (
-    <div style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '24px' }}>
-      {/* Month nav */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-        <button style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#94A3B8', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', lineHeight: '1' }}>‹</button>
-        <p style={{ fontSize: '15px', fontWeight: '600', color: '#fff' }}>May 2026</p>
-        <button style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#94A3B8', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', lineHeight: '1' }}>›</button>
-      </div>
-      {/* Days header */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '8px' }}>
-        {CAL_DAYS.map(d => <div key={d} style={{ textAlign: 'center', fontSize: '11px', color: '#64748B', fontWeight: '600', padding: '4px 0' }}>{d}</div>)}
-      </div>
-      {/* Calendar grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '20px' }}>
-        {CAL_CELLS.map((cell, i) => {
-          const isSelected = selectedDay === parseInt(cell.d)
-          const isEmpty = cell.d === ''
-          const bg = isSelected ? '#1A56FF' : 'transparent'
-          const fg = isEmpty ? 'transparent' : isSelected ? '#fff' : '#94A3B8'
-          return (
-            <div
-              key={i}
-              onClick={() => !isEmpty && setSelectedDay(parseInt(cell.d))}
-              style={{
-                textAlign: 'center', fontSize: '13px', color: fg,
-                padding: '8px 4px', borderRadius: '8px',
-                cursor: isEmpty ? 'default' : 'pointer',
-                background: bg, fontWeight: isSelected ? '600' : '400',
-                transition: 'background 0.15s, color 0.15s',
-              }}
-            >
-              {cell.d}
-            </div>
-          )
-        })}
-      </div>
-      {/* Time slots */}
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-        {times.map(t => (
-          <button
-            key={t}
-            onClick={() => setSelectedTime(t)}
-            style={{
-              padding: '8px 14px', borderRadius: '999px', fontSize: '12px', fontWeight: '500',
-              border: selectedTime === t ? '1.5px solid #1A56FF' : '1px solid rgba(255,255,255,0.1)',
-              background: selectedTime === t ? 'rgba(26,86,255,0.15)' : 'transparent',
-              color: selectedTime === t ? '#4A8FFF' : '#94A3B8',
-              cursor: 'pointer', transition: 'all 0.15s',
-            }}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
-      {/* Confirm */}
-      <button className="btn-glow" style={{
-        width: '100%', marginTop: '16px', fontSize: '15px',
-      }}>
-        Confirm booking
-      </button>
-    </div>
-  )
-}
-
-// ─── Decorative Circles ────────────────────────────────────────────
-function DecorativeCircles({ className = '' }: { className?: string }) {
-  const circles = [
-    { size: 80, x: 0, y: 20, color: '#4ADE80' },
-    { size: 60, x: 90, y: 0, color: '#F472B6' },
-    { size: 50, x: 120, y: 60, color: '#FB923C' },
-    { size: 40, x: 60, y: 90, color: '#60A5FA' },
-    { size: 36, x: 140, y: 110, color: '#FBBF24' },
-    { size: 28, x: 20, y: 120, color: '#A78BFA' },
-  ]
-  return (
-    <div style={{ position: 'relative', width: '200px', height: '160px', flexShrink: 0 }} className={className}>
-      {circles.map((c, i) => (
-        <div key={i} style={{
-          position: 'absolute', left: c.x, top: c.y,
-          width: c.size, height: c.size, borderRadius: '50%',
-          background: c.color, opacity: 0.85 - i * 0.05,
-          boxShadow: `0 8px 32px ${c.color}40`,
-        }} />
-      ))}
-    </div>
-  )
-}
-
-// ─── Feature Cards ───────────────────────────────────────────────────
-const FEATURES = [
+// ─── Feature Cards Data ─────────────────────────────────────────────
+const FEATURE_CARDS = [
   { gradient: 'linear-gradient(135deg, #3B82F6, #8B5CF6)', title: 'Track every student', desc: 'Log sessions, TCA hours, and progress. Auto-generate certificates when requirements are met.' },
   { gradient: 'linear-gradient(135deg, #8B5CF6, #EC4899)', title: 'Schedule without friction', desc: 'Students book online. Parents pay upfront. No more phone tag — just show up.' },
   { gradient: 'linear-gradient(135deg, #F59E0B, #EF4444)', title: 'Get paid and stay compliant', desc: 'Stripe handles payments. TCA tracking is automatic. Tennessee state compliance built in.' },
+  { gradient: 'linear-gradient(135deg, #06B6D4, #3B82F6)', title: 'Multi-tenant by design', desc: 'Each school gets their own isolated space. Data never leaks between schools.' },
+  { gradient: 'linear-gradient(135deg, #10B981, #3B82F6)', title: 'Automated reminders', desc: 'SMS and email reminders go out automatically. Fewer no-shows, less admin work.' },
+  { gradient: 'linear-gradient(135deg, #F97316, #8B5CF6)', title: 'Instructor management', desc: 'Invite instructors, set availability, track their schedules — all from one dashboard.' },
 ]
 
-function FeatureIcon({ gradient }: { gradient: string }) {
-  return (
-    <div style={{
-      width: '48px', height: '48px', borderRadius: '12px',
-      background: gradient, display: 'flex', alignItems: 'center', justifyContent: 'center',
-      boxShadow: '0 4px 16px rgba(0,0,0,0.2)', flexShrink: 0,
-    }}>
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9 11l3 3L22 4"/>
-        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-      </svg>
-    </div>
-  )
-}
-
-// ─── Testimonial Cards ───────────────────────────────────────────────
+// ─── Testimonials Data ───────────────────────────────────────────────
 const TESTIMONIALS = [
   { quote: 'This platform cut my administrative work in half. I spend less time on the phone and more time teaching.', name: 'Matt Reedy', role: 'Driving Instructor, East Tennessee', initials: 'MR', bg: 'linear-gradient(135deg, #7ED4FD, #707BFF)' },
   { quote: 'Finally, a tool that actually understands how a driving school works. TCA tracking alone is worth the price.', name: 'Mark Martin', role: 'CS Teacher & Mentor', initials: 'MM', bg: 'linear-gradient(135deg, #F97316, #EC4899)' },
-]
-
-function TestimonialCard({ quote, name, role, initials, bg }: { quote: string; name: string; role: string; initials: string; bg: string }) {
-  return (
-    <div className="glass-card" style={{ borderRadius: '16px' }}>
-      <p style={{ fontSize: '16px', color: 'var(--text-secondary)', lineHeight: '1.7', marginBottom: '24px', fontStyle: 'italic' as const }}>{quote}</p>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{
-          width: '40px', height: '40px', borderRadius: '50%',
-          background: bg,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '13px', fontWeight: '700', color: 'white', flexShrink: 0,
-        }}>{initials}</div>
-        <div>
-          <p style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>{name}</p>
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{role}</p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ─── FAQ Data ────────────────────────────────────────────────────────
-const FAQ_ITEMS = [
-  { q: 'Do I need a credit card to start?', a: 'No. Start your 14-day free trial with no credit card required. Only pay when you\'re ready to subscribe.' },
-  { q: 'Can I import my existing student list?', a: 'Yes. Upload a CSV with your student list and TCA history in minutes. No manual re-entry needed.' },
-  { q: 'How does TCA compliance tracking work?', a: 'Track every student\'s 6-hour observation and 60-hour drive requirement. Certificates auto-generate when requirements are met.' },
-  { q: 'Can parents pay online?', a: 'Yes. Stripe is built in. Parents pay when they book. Your school receives funds before the session.' },
-  { q: 'What if I need to cancel?', a: 'Cancel anytime from your account settings.' },
-]
-
-// ─── How It Works Steps ─────────────────────────────────────────────
-const HOW_STEPS = [
-  { num: '01', title: 'Create your school', desc: 'Sign up in 60 seconds. Add your school name, set your session types, and invite your instructors.' },
-  { num: '02', title: 'Import your students', desc: 'Upload a CSV or add students one at a time. Import their history and TCA hours automatically.' },
-  { num: '03', title: 'Start booking', desc: 'Share your link. Students book, parents pay online, and reminders go out automatically.' },
 ]
 
 // ─── Pricing Tiers ───────────────────────────────────────────────────
@@ -392,13 +331,6 @@ const PRICING_TIERS = [
   { name: 'Starter', price: '$99', desc: 'For small schools getting started.', features: ['Up to 25 students', 'Unlimited sessions', 'Email + SMS reminders', 'Stripe payments', 'TCA tracking'], highlighted: false, cta: 'Get started' },
   { name: 'Growth', price: '$199', desc: 'For growing schools that need more power.', features: ['Up to 100 students', 'Everything in Starter', 'Instructor management', 'Parent portal', 'Priority support'], highlighted: true, cta: 'Start free trial' },
   { name: 'Enterprise', price: '$399', desc: 'For multi-location schools.', features: ['Unlimited students', 'Everything in Growth', 'Multi-location support', 'API access', 'Dedicated success manager'], highlighted: false, cta: 'Contact sales' },
-]
-
-// ─── Problem Cards ───────────────────────────────────────────────────
-const PROBLEMS = [
-  { icon: '📋', text: 'Spreadsheets everywhere — student logs, TCA hours, and payment tracking all over the place.' },
-  { icon: '📞', text: 'Endless phone calls just to schedule one session — and no-shows with no reminder.' },
-  { icon: '💸', text: 'Checks that bounce, cash that goes missing, parents who forget to pay.' },
 ]
 
 // ─── Main Page ──────────────────────────────────────────────────────
@@ -429,20 +361,18 @@ export default function HomePage() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Link href="/login" style={{ fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: '400' }}>Sign in</Link>
-            <Link href="/signup" style={{ padding: '10px 20px', borderRadius: '8px', background: 'var(--accent)', color: 'white', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}>See pricing</Link>
+            <Link href="/signup" className="btn-ghost" style={{ padding: '10px 20px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', borderRadius: '999px' }}>See pricing</Link>
             <ThemeToggle />
           </div>
         </div>
       </nav>
 
-      {/* ── HERO ──────────────────────────────────────── */}
+      {/* ── SECTION 1: HERO ────────────────────────────── */}
       <section style={{ padding: '100px 24px 40px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-        {/* Atmospheric gradient backdrop */}
         <div style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
           background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(26,86,255,0.12) 0%, transparent 70%)',
         }} />
-        {/* Decorative circles behind dashboard */}
         <div className="bg-circle" style={{ width: '400px', height: '400px', left: '5%', top: '20%', background: '#1A56FF', filter: 'blur(120px)', opacity: 0.08 }} />
         <div className="bg-circle" style={{ width: '300px', height: '300px', right: '10%', top: '40%', background: '#8B5CF6', filter: 'blur(100px)', opacity: 0.08 }} />
         <div style={{ position: 'relative', maxWidth: '1200px', margin: '0 auto' }}>
@@ -452,34 +382,33 @@ export default function HomePage() {
               Trusted by driving schools in Tennessee
             </span>
           </div>
-          <div className="fade-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <span className="hero-badge">Built for Tennessee driving schools</span>
+          <div className="fade-up">
             <h1 style={{
               fontSize: 'clamp(2.5rem, 7vw, 64px)',
               fontWeight: '800', lineHeight: '1.0', letterSpacing: '-0.03em',
-              color: 'var(--text-primary)', marginBottom: '28px',
+              color: 'var(--text-primary)', marginBottom: '24px',
             }}>
-              The simplest way to run
-              <br />
-              <span className="gradient-text">your driving school.</span>
+              The simplest way to run<br />your driving school.
             </h1>
             <p style={{ fontSize: '18px', color: 'var(--text-secondary)', lineHeight: '1.65', maxWidth: '480px', marginBottom: '40px', fontWeight: '400' }}>
               Automate bookings, track student progress, manage instructors, and get paid — all in one place.
             </p>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <Link href="/signup" className="btn-glow">Book a free call</Link>
-              <Link href="/signup" className="btn-ghost">Start free trial</Link>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '16px' }}>
+              <Link href="/signup" className="btn-glow" style={{ padding: '14px 32px', fontSize: '15px', textDecoration: 'none', borderRadius: '999px' }}>Get Started</Link>
+              <Link href="/signup" className="btn-ghost" style={{ padding: '14px 32px', fontSize: '15px', textDecoration: 'none', borderRadius: '999px' }}>Start free trial</Link>
             </div>
-            <p style={{ marginTop: '16px', fontSize: '13px', color: 'var(--text-muted)' }}>No credit card required · 14-day free trial · Cancel anytime</p>
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No credit card required · 14-day free trial · Cancel anytime</p>
           </div>
           <DashboardMockup />
         </div>
       </section>
 
-      {/* ── LOGO BAR ──────────────────────────────────── */}
+      {/* ── SECTION 3: SOCIAL PROOF ─────────────────────── */}
       <div style={{ borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', background: 'var(--bg-surface)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 24px', textAlign: 'center' }}>
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '24px', fontWeight: '600' }}>Trusted by schools in</p>
+          <p style={{ fontSize: '12px', color: 'var(--text-muted)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '24px', fontWeight: '600' }}>
+            Trusted by driving schools in Tennessee
+          </p>
           <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '32px' }}>
             {['Knoxville', 'Nashville', 'Chattanooga', 'Memphis', 'Oneida', 'Cumberland'].map(city => (
               <span key={city} style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: '500' }}>{city}</span>
@@ -488,40 +417,17 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── PROBLEM ───────────────────────────────────── */}
-      <section style={{ padding: '120px 24px', background: 'var(--bg-base)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
-          <div className="fade-up" style={{ marginBottom: '16px' }}>
-            <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '16px' }}>The problem</p>
-            <h2 style={{ fontSize: 'clamp(2rem, 5vw, 48px)', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: '1.1', marginBottom: '64px' }}>
-              Running a driving school
-              <br />shouldn't feel like this.
-            </h2>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', maxWidth: '900px', margin: '0 auto' }}>
-            {PROBLEMS.map(p => (
-              <div key={p.text} className="glass-card fade-up" style={{ textAlign: 'left' }}>
-                <div style={{ fontSize: '28px', marginBottom: '16px' }}>{p.icon}</div>
-                <p style={{ fontSize: '15px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{p.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── FEATURES ──────────────────────────────────── */}
+      {/* ── SECTION 2: FEATURES ─────────────────────────── */}
       <section style={{ padding: '120px 24px', background: 'var(--bg-surface)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div className="fade-up" style={{ textAlign: 'center', marginBottom: '64px' }}>
             <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '16px' }}>The tool</p>
             <h2 style={{ fontSize: 'clamp(2rem, 5vw, 48px)', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: '1.1' }}>
-              Everything you need.
-              <br />Nothing you don't.
+              Everything you need.<br />Nothing you don&apos;t.
             </h2>
           </div>
-          {/* Bento grid — first card spans 2 cols */}
           <div className="bento-grid fade-up">
-            {FEATURES.map((f, i) => (
+            {FEATURE_CARDS.map((f, i) => (
               <div key={f.title} className={`glass-card ${i === 0 ? 'bento-large' : ''}`} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 <div style={{
                   width: i === 0 ? '64px' : '48px',
@@ -546,49 +452,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ────────────────────────────────── */}
-      <section style={{ padding: '120px 24px', background: 'var(--bg-base)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div className="fade-up" style={{ textAlign: 'center', marginBottom: '80px' }}>
-            <h2 style={{ fontSize: 'clamp(2rem, 5vw, 48px)', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>How it works</h2>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '64px' }}>
-            {HOW_STEPS.map(s => (
-              <div key={s.num} className="fade-up">
-                <div className="section-num" style={{ marginBottom: '20px' }}>{s.num}</div>
-                <h3 style={{ fontSize: '22px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '14px', letterSpacing: '-0.01em' }}>{s.title}</h3>
-                <p style={{ fontSize: '15px', color: 'var(--text-secondary)', lineHeight: '1.7' }}>{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── TESTIMONIALS ────────────────────────────────── */}
-      <section style={{ padding: '120px 24px', background: 'var(--bg-surface)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div className="fade-up" style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '16px' }}>What instructors say</p>
-            <h2 style={{ fontSize: 'clamp(2rem, 5vw, 48px)', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-              Real feedback from
-              <br />real schools.
-            </h2>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
-            {TESTIMONIALS.map(t => (
-              <TestimonialCard key={t.name} {...t} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── PRICING ──────────────────────────────────────── */}
+      {/* ── SECTION 4: PRICING ──────────────────────────── */}
       <section style={{ padding: '120px 24px', background: 'var(--bg-base)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div className="fade-up" style={{ textAlign: 'center', marginBottom: '64px' }}>
             <h2 style={{ fontSize: 'clamp(2rem, 5vw, 48px)', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '16px' }}>
               Simple, transparent pricing
-              <span className="pricing-badge">New</span>
             </h2>
             <p style={{ fontSize: '17px', color: 'var(--text-secondary)' }}>No setup fees. No per-seat charges. Cancel anytime.</p>
           </div>
@@ -602,17 +471,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── BOOKING WIDGET (always dark) ─────────────────── */}
+      {/* ── SECTION 5: TESTIMONIALS ─────────────────────── */}
+      <section style={{ padding: '120px 24px', background: 'var(--bg-surface)' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div className="fade-up" style={{ textAlign: 'center', marginBottom: '64px' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '16px' }}>What instructors say</p>
+            <h2 style={{ fontSize: 'clamp(2rem, 5vw, 48px)', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+              Real feedback from<br />real schools.
+            </h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+            {TESTIMONIALS.map(t => (
+              <TestimonialCard key={t.name} {...t} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 6: BOOKING WIDGET (always dark) ──────── */}
       <section style={{ padding: '120px 24px', background: '#0D1117', position: 'relative', overflow: 'hidden' }}>
-        {/* Decorative circles */}
         <div className="bg-circle" style={{ width: '300px', height: '300px', left: '-5%', top: '10%', background: '#4ADE80', filter: 'blur(120px)', opacity: 0.1 }} />
         <div className="bg-circle" style={{ width: '250px', height: '250px', right: '5%', bottom: '10%', background: '#8B5CF6', filter: 'blur(100px)', opacity: 0.1 }} />
         <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) minmax(320px, 1fr)', gap: '80px', alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 45%) 1fr', gap: '80px', alignItems: 'center' }}>
             {/* Left */}
             <div className="fade-up">
               <h2 style={{ fontSize: 'clamp(2rem, 5vw, 48px)', fontWeight: '800', color: '#fff', letterSpacing: '-0.02em', lineHeight: '1.1', marginBottom: '16px' }}>
-                Let's talk.
+                Let&apos;s talk.
               </h2>
               <p style={{ fontSize: '17px', color: '#94A3B8', lineHeight: '1.6', marginBottom: '32px' }}>
                 30 minutes. No pitch. Just a real walkthrough.
@@ -629,7 +514,7 @@ export default function HomePage() {
               </ul>
               <DecorativeCircles />
             </div>
-            {/* Right — calendar */}
+            {/* Right */}
             <div className="fade-up">
               <BookingCalendar />
             </div>
@@ -637,29 +522,38 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── FAQ ─────────────────────────────────────────── */}
-      <section style={{ padding: '120px 24px', background: 'var(--bg-surface)' }}>
-        <div style={{ maxWidth: '680px', margin: '0 auto' }}>
-          <div className="fade-up" style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <h2 style={{ fontSize: 'clamp(2rem, 5vw, 40px)', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>Common questions</h2>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {FAQ_ITEMS.map(f => <FaqItem key={f.q} q={f.q} a={f.a} />)}
+      {/* ── SECTION 7: CTA ──────────────────────────────── */}
+      <section style={{ padding: '120px 24px', background: 'var(--bg-base)' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
+          <div className="fade-up">
+            <h2 style={{ fontSize: 'clamp(2rem, 5vw, 48px)', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '16px' }}>
+              Ready to grow your school?
+            </h2>
+            <p style={{ fontSize: '17px', color: 'var(--text-secondary)', marginBottom: '40px' }}>
+              14-day free trial. No credit card required.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <Link href="/signup" className="btn-glow" style={{ padding: '14px 32px', fontSize: '15px', textDecoration: 'none', borderRadius: '999px' }}>Start free trial</Link>
+              <Link href="/signup" className="btn-ghost" style={{ padding: '14px 32px', fontSize: '15px', textDecoration: 'none', borderRadius: '999px' }}>Book a call</Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── FOOTER ──────────────────────────────────────── */}
+      {/* ── SECTION 8: FOOTER ───────────────────────────── */}
       <footer style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-base)', padding: '32px 24px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ width: '26px', height: '26px', borderRadius: '7px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '11px', fontWeight: '700' }}>DC</div>
-            <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>© 2026 The Driving Center</span>
+            <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>The Driving Center</span>
           </div>
           <div style={{ display: 'flex', gap: '24px' }}>
             <Link href="/legal/privacy" style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'none' }}>Privacy</Link>
             <Link href="/legal/terms" style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'none' }}>Terms</Link>
+            <Link href="/login" style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'none' }}>Login</Link>
+            <Link href="/signup" style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'none' }}>Sign up</Link>
           </div>
+          <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>© 2026 The Driving Center</span>
         </div>
       </footer>
 
