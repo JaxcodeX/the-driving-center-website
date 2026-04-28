@@ -1,249 +1,40 @@
 'use client'
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import ScrollToTop from '@/components/ScrollToTop'
 
-// ─── Theme Toggle ───────────────────────────────────────────────────
-function ThemeToggle() {
-  const [theme, setTheme] = useState<'dark' | 'light'>('light')
-
-  useEffect(() => {
-    const saved = localStorage.getItem('theme') as 'dark' | 'light' | null
-    if (saved) {
-      setTheme(saved)
-    } else {
-      document.documentElement.setAttribute('data-theme', 'light')
-    }
-  }, [])
-
-  function toggle() {
-    const next = theme === 'dark' ? 'light' : 'dark'
-    setTheme(next)
-    document.documentElement.setAttribute('data-theme', next)
-    localStorage.setItem('theme', next)
-  }
-
+// ─── Clean Navbar ───────────────────────────────────────────────────
+function Navbar() {
   return (
-    <button className="theme-toggle" onClick={toggle} aria-label="Toggle theme">
-      {theme === 'dark' ? (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="4"/>
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
-        </svg>
-      ) : (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-      )}
-    </button>
-  )
-}
-
-// ─── Dashboard Mockup ──────────────────────────────────────────────
-function DashboardMockup() {
-  const [theme, setTheme] = useState<'dark' | 'light'>('light')
-
-  useEffect(() => {
-    setTheme(document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'light')
-    const observer = new MutationObserver(() => {
-      setTheme(document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'light')
-    })
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
-    return () => observer.disconnect()
-  }, [])
-
-  const isDark = theme === 'dark'
-  const sidebarBg = isDark ? '#0F172A' : '#F5F4F0'
-  const sidebarText = isDark ? '#64748B' : '#9B9B9B'
-  const sidebarActive = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'
-  const sidebarActiveBorder = '2px solid #1A56FF'
-  const bodyBg = isDark ? '#080809' : '#F5F4F0'
-  const cardBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.8)'
-  const cardBorder = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'
-  const textPrimary = isDark ? '#fff' : '#0A0A0A'
-  const textMuted = isDark ? '#64748B' : '#9B9B9B'
-  const chartColor = isDark ? '#4ADE80' : '#1A56FF'
-
-  return (
-    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '56px', padding: '0 24px' }}>
+    <nav style={{
+      position: 'sticky', top: 0, zIndex: 50,
+      height: '56px', background: '#fff',
+      borderBottom: '1px solid #E5E5E3',
+    }}>
       <div style={{
-        filter: isDark ? 'drop-shadow(0 0 80px rgba(26,86,255,0.2))' : 'drop-shadow(0 12px 48px rgba(0,0,0,0.12))',
-        width: '100%', maxWidth: '920px',
+        maxWidth: '1100px', margin: '0 auto', padding: '0 24px',
+        height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
-        <div style={{
-          background: isDark ? '#0F172A' : '#FFFFFF',
-          border: `1px solid ${cardBorder}`,
-          borderRadius: '20px',
-          overflow: 'hidden',
-          boxShadow: isDark
-            ? '0 0 80px rgba(26,86,255,0.12), 0 32px 64px rgba(0,0,0,0.5)'
-            : '0 12px 48px rgba(0,0,0,0.1)',
-        }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
           <div style={{
-            height: '44px', background: isDark ? '#0F172A' : '#F5F4F0',
-            display: 'flex', alignItems: 'center', padding: '0 16px', gap: '12px',
-            borderBottom: `1px solid ${cardBorder}`,
-          }}>
-            {['#FF5F57', '#FFBD2E', '#28C840'].map((c, i) => (
-              <div key={i} style={{ width: '11px', height: '11px', borderRadius: '50%', background: c, flexShrink: 0 }} />
-            ))}
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', minHeight: '400px', background: bodyBg }}>
-            <div style={{ background: sidebarBg, borderRight: `1px solid ${cardBorder}`, padding: '20px 0', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              {['Dashboard', 'Students', 'Sessions', 'Billing', 'Reports'].map((label, i) => (
-                <div key={label} style={{
-                  padding: '8px 14px', fontSize: '12px',
-                  color: i === 0 ? textPrimary : sidebarText,
-                  fontWeight: i === 0 ? '600' : '400',
-                  display: 'flex', alignItems: 'center', gap: '8px',
-                  background: i === 0 ? sidebarActive : 'transparent',
-                  borderLeft: i === 0 ? sidebarActiveBorder : '2px solid transparent',
-                }}>{label}</div>
-              ))}
-            </div>
-            <div style={{ padding: '24px 24px 24px 20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div>
-                <p style={{ fontSize: '16px', fontWeight: '600', color: textPrimary, marginBottom: '2px' }}>Good morning, Mark</p>
-                <p style={{ fontSize: '12px', color: textMuted }}>Monday, April 26, 2026</p>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
-                {[['STUDENTS', '24', '+3 this week'], ['HOURS LOGGED', '6.4h', '+1.2h today'], ['REVENUE', '$840', '+ $120']].map(([l, v, c]) => (
-                  <div key={l} style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: '10px', padding: '12px 14px' }}>
-                    <p style={{ fontSize: '9px', fontWeight: '700', letterSpacing: '0.1em', color: textMuted, textTransform: 'uppercase', marginBottom: '5px' }}>{l}</p>
-                    <p style={{ fontSize: '24px', fontWeight: '700', color: textPrimary, lineHeight: '1', marginBottom: '5px' }}>{v}</p>
-                    <p style={{ fontSize: '10px', color: '#4ADE80', fontWeight: '500' }}>▲ {c}</p>
-                  </div>
-                ))}
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: '10px', padding: '12px 14px' }}>
-                  <p style={{ fontSize: '10px', color: textMuted, marginBottom: '10px', fontWeight: '500' }}>Weekly Sessions</p>
-                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', height: '50px' }}>
-                    {[0.4, 0.65, 0.45, 0.8, 0.55, 0.7, 0.9].map((h, i) => (
-                      <div key={i} style={{
-                        flex: 1,
-                        background: isDark ? 'linear-gradient(180deg, #1A56FF 0%, rgba(26,86,255,0.3) 100%)' : 'linear-gradient(180deg, #1A56FF 0%, rgba(26,86,255,0.2) 100%)',
-                        borderRadius: '3px 3px 0 0', height: `${h * 100}%`, minHeight: '6px', opacity: 0.7 + i * 0.04,
-                      }} />
-                    ))}
-                  </div>
-                </div>
-                <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: '10px', padding: '12px 14px' }}>
-                  <p style={{ fontSize: '10px', color: textMuted, marginBottom: '10px', fontWeight: '500' }}>Revenue Trend</p>
-                  <svg viewBox="0 0 200 50" width="100%" height="50" style={{ overflow: 'visible' }}>
-                    <defs>
-                      <linearGradient id={`lg-${theme}`} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={chartColor} stopOpacity="0.3" />
-                        <stop offset="100%" stopColor={chartColor} stopOpacity="0" />
-                      </linearGradient>
-                    </defs>
-                    <path d="M0,40 L25,32 L60,36 L90,20 L130,26 L170,12 L200,8 L200,50 L0,50 Z" fill={`url(#lg-${theme})`} />
-                    <path d="M0,40 L25,32 L60,36 L90,20 L130,26 L170,12 L200,8" fill="none" stroke={chartColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <circle cx="200" cy="8" r="3" fill={chartColor} />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
+            width: '30px', height: '30px', borderRadius: '7px',
+            background: '#0A0A0A', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', fontSize: '12px', fontWeight: '700', flexShrink: 0,
+          }}>DC</div>
+          <span style={{ fontSize: '14px', fontWeight: '600', color: '#0A0A0A' }}>The Driving Center</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+          <Link href="#features" style={{ fontSize: '14px', color: '#555', textDecoration: 'none', fontWeight: '500' }}>Features</Link>
+          <Link href="#pricing" style={{ fontSize: '14px', color: '#555', textDecoration: 'none', fontWeight: '500' }}>Pricing</Link>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Link href="/login" style={{ fontSize: '14px', color: '#555', textDecoration: 'none', fontWeight: '500' }}>Sign in</Link>
+          <Link href="/signup" style={{
+            background: '#0A0A0A', color: '#fff',
+            padding: '8px 18px', borderRadius: '8px',
+            fontSize: '14px', fontWeight: '600', textDecoration: 'none',
+          }}>Get started</Link>
         </div>
       </div>
-    </div>
-  )
-}
-
-// ─── Booking Calendar ───────────────────────────────────────────────
-const CAL_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const CAL_CELLS: {d: string}[] = [
-  {d:''},{d:''},{d:''},{d:''},{d:''},{d:'1'},{d:'2'},
-  {d:'3'},{d:'4'},{d:'5'},{d:'6'},{d:'7'},{d:'8'},{d:'9'},
-  {d:'10'},{d:'11'},{d:'12'},{d:'13'},{d:'14'},{d:'15'},{d:'16'},
-  {d:'17'},{d:'18'},{d:'19'},{d:'20'},{d:'21'},{d:'22'},{d:'23'},
-  {d:'24'},{d:'25'},{d:'26'},{d:'27'},{d:'28'},{d:'29'},{d:'30'},
-]
-
-function BookingCalendar() {
-  const times = ['9:00 AM', '10:00 AM', '11:00 AM', '2:00 PM', '3:00 PM', '4:00 PM']
-  const [selectedDay, setSelectedDay] = useState(14)
-  const [selectedTime, setSelectedTime] = useState('10:00 AM')
-
-  return (
-    <div style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '24px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-        <button style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#94A3B8', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', lineHeight: '1' }}>‹</button>
-        <p style={{ fontSize: '15px', fontWeight: '600', color: '#fff' }}>May 2026</p>
-        <button style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#94A3B8', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', lineHeight: '1' }}>›</button>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '8px' }}>
-        {CAL_DAYS.map(d => <div key={d} style={{ textAlign: 'center', fontSize: '11px', color: '#64748B', fontWeight: '600', padding: '4px 0' }}>{d}</div>)}
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '20px' }}>
-        {CAL_CELLS.map((cell, i) => {
-          const isSelected = selectedDay === parseInt(cell.d)
-          const isEmpty = cell.d === ''
-          const bg = isSelected ? '#1A56FF' : 'transparent'
-          const fg = isEmpty ? 'transparent' : isSelected ? '#fff' : '#94A3B8'
-          return (
-            <div
-              key={i}
-              onClick={() => !isEmpty && setSelectedDay(parseInt(cell.d))}
-              style={{
-                textAlign: 'center', fontSize: '13px', color: fg,
-                padding: '8px 4px', borderRadius: '8px',
-                cursor: isEmpty ? 'default' : 'pointer',
-                background: bg, fontWeight: isSelected ? '600' : '400',
-                transition: 'background 0.15s, color 0.15s',
-              }}
-            >
-              {cell.d}
-            </div>
-          )
-        })}
-      </div>
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-        {times.map(t => (
-          <button
-            key={t}
-            onClick={() => setSelectedTime(t)}
-            style={{
-              padding: '8px 14px', borderRadius: '999px', fontSize: '12px', fontWeight: '500',
-              border: selectedTime === t ? '1.5px solid #1A56FF' : '1px solid rgba(255,255,255,0.1)',
-              background: selectedTime === t ? 'rgba(26,86,246,0.15)' : 'transparent',
-              color: selectedTime === t ? '#4A8FFF' : '#94A3B8',
-              cursor: 'pointer', transition: 'all 0.15s',
-            }}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
-      <button className="btn-glow" style={{ width: '100%', marginTop: '16px', fontSize: '15px' }}>
-        Confirm booking
-      </button>
-    </div>
-  )
-}
-
-// ─── Decorative Circles ────────────────────────────────────────────
-function DecorativeCircles({ className = '' }: { className?: string }) {
-  const circles = [
-    { size: 80, x: 0, y: 20, color: '#38BDF8' },
-    { size: 60, x: 90, y: 0, color: '#F472B6' },
-    { size: 50, x: 120, y: 60, color: '#FB923C' },
-    { size: 40, x: 60, y: 90, color: '#FBBF24' },
-    { size: 36, x: 140, y: 110, color: '#A78BFA' },
-    { size: 28, x: 20, y: 120, color: '#4ADE80' },
-  ]
-  return (
-    <div style={{ position: 'relative', width: '200px', height: '160px', flexShrink: 0 }} className={className}>
-      {circles.map((c, i) => (
-        <div key={i} style={{
-          position: 'absolute', left: c.x, top: c.y,
-          width: c.size, height: c.size, borderRadius: '50%',
-          background: c.color, opacity: 0.85 - i * 0.05,
-          boxShadow: `0 8px 32px ${c.color}40`,
-        }} />
-      ))}
-    </div>
+    </nav>
   )
 }
 
@@ -253,47 +44,38 @@ function PricingCard({ name, price, desc, features, highlighted, cta }: {
   features: string[]; highlighted?: boolean; cta: string;
 }) {
   return (
-    <div
-      className="glass-card"
-      style={
-        highlighted
-          ? { border: '1.5px solid var(--accent)', boxShadow: '0 0 60px var(--accent-glow)', position: 'relative' as const }
-          : { position: 'relative' as const }
-      }
-    >
-      {highlighted && (
-        <div style={{
-          position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)',
-          padding: '5px 14px', borderRadius: '999px',
-          background: 'var(--accent)', color: 'white',
-          fontSize: '11px', fontWeight: '700', whiteSpace: 'nowrap' as const, letterSpacing: '0.05em',
-        }}>
-          Most popular
-        </div>
-      )}
-      <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: 'var(--text-muted)', marginBottom: '12px' }}>
+    <div style={{
+      background: '#fff',
+      border: highlighted ? '1.5px solid #0A0A0A' : '1px solid #E5E5E3',
+      borderRadius: '12px', padding: '32px',
+      display: 'flex', flexDirection: 'column', gap: '0',
+    }}>
+      <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: '12px' }}>
         {name}
       </p>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '16px' }}>
-        <span style={{ fontSize: '48px', fontWeight: '800', color: 'var(--text-primary)', lineHeight: '1', letterSpacing: '-0.02em' }}>{price}</span>
-        <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>/mo</span>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '12px' }}>
+        <span style={{ fontSize: '44px', fontWeight: '800', color: '#0A0A0A', lineHeight: '1', letterSpacing: '-0.02em' }}>{price}</span>
+        <span style={{ fontSize: '14px', color: '#9B9B9B' }}>/mo</span>
       </div>
-      <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '28px', lineHeight: '1.6' }}>{desc}</p>
-      <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <p style={{ fontSize: '14px', color: '#555', marginBottom: '24px', lineHeight: '1.5' }}>{desc}</p>
+      <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
         {features.map(f => (
-          <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', color: 'var(--text-secondary)' }}>
+          <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', color: '#555' }}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
-              <path d="M3 8l3.5 3.5 6.5-7" stroke="var(--success)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 8l3.5 3.5 6.5-7" stroke="#16A34A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             {f}
           </li>
         ))}
       </ul>
-      <Link
-        href="/signup"
-        className={highlighted ? 'btn-glow' : 'btn-ghost'}
-        style={{ display: 'flex', justifyContent: 'center', fontSize: '15px', textDecoration: 'none', borderRadius: '999px' }}
-      >
+      <Link href="/signup" style={{
+        display: 'flex', justifyContent: 'center',
+        padding: '12px 24px', borderRadius: '8px',
+        fontSize: '14px', fontWeight: '600', textDecoration: 'none',
+        background: highlighted ? '#0A0A0A' : 'transparent',
+        color: highlighted ? '#fff' : '#0A0A0A',
+        border: highlighted ? 'none' : '1px solid #E5E5E3',
+      }}>
         {cta}
       </Link>
     </div>
@@ -303,374 +85,302 @@ function PricingCard({ name, price, desc, features, highlighted, cta }: {
 // ─── FAQ Item ───────────────────────────────────────────────────────
 function FaqItem({ question, answer }: { question: string; answer: string }) {
   return (
-    <details style={{
-      borderBottom: '1px solid var(--border)',
-      padding: '20px 0',
-      cursor: 'pointer',
-    }}>
+    <details style={{ borderBottom: '1px solid #E5E5E3', padding: '20px 0', cursor: 'pointer' }}>
       <summary style={{ listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
-        <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>{question}</span>
-        <svg className="faq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-          style={{ flexShrink: 0, color: 'var(--text-muted)', transition: 'transform 0.2s ease' }}>
+        <span style={{ fontSize: '15px', fontWeight: '600', color: '#0A0A0A' }}>{question}</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#9B9B9B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+          style={{ flexShrink: 0, transition: 'transform 0.2s' }} className="faq-chevron">
           <path d="M4 6l4 4 4-4"/>
         </svg>
       </summary>
-      <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: '1.7', marginTop: '12px' }}>{answer}</p>
-      <style>{`
-        details[open] .faq-chevron { transform: rotate(180deg); }
-      `}</style>
+      <p style={{ fontSize: '14px', color: '#555', lineHeight: '1.7', marginTop: '12px' }}>{answer}</p>
+      <style>{`details[open] .faq-chevron { transform: rotate(180deg); }`}</style>
     </details>
   )
 }
 
-// ─── Testimonial Card ───────────────────────────────────────────────
-function TestimonialCard({ quote, name, role, initials, bg }: { quote: string; name: string; role: string; initials: string; bg: string }) {
-  return (
-    <div className="glass-card">
-      <p style={{ fontSize: '16px', color: 'var(--text-secondary)', lineHeight: '1.7', marginBottom: '24px', fontStyle: 'italic' as const }}>{quote}</p>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{
-          width: '40px', height: '40px', borderRadius: '50%',
-          background: bg,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '13px', fontWeight: '700', color: 'white', flexShrink: 0,
-        }}>{initials}</div>
-        <div>
-          <p style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>{name}</p>
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{role}</p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 // ─── Data ───────────────────────────────────────────────────────────
-const FEATURE_CARDS = [
-  { gradient: 'linear-gradient(135deg, #3B82F6, #8B5CF6)', title: 'Track every student', desc: 'Log sessions, TCA hours, and progress. Auto-generate certificates when requirements are met.', wide: true },
-  { gradient: 'linear-gradient(135deg, #8B5CF6, #EC4899)', title: 'Schedule without friction', desc: 'Students book online. Parents pay upfront. No more phone tag — just show up.', wide: false },
-  { gradient: 'linear-gradient(135deg, #F59E0B, #EF4444)', title: 'Get paid and stay compliant', desc: 'Stripe handles payments. TCA tracking is automatic. Tennessee state compliance built in.', wide: false },
-  { gradient: 'linear-gradient(135deg, #06B6D4, #3B82F6)', title: 'Multi-tenant by design', desc: 'Each school gets their own isolated space. Data never leaks between schools.', wide: false },
-  { gradient: 'linear-gradient(135deg, #10B981, #3B82F6)', title: 'Automated reminders', desc: 'SMS and email reminders go out automatically. Fewer no-shows, less admin work.', wide: false },
-  { gradient: 'linear-gradient(135deg, #F97316, #8B5CF6)', title: 'Instructor management', desc: 'Invite instructors, set availability, track their schedules — all from one dashboard.', wide: false },
+const FEATURES = [
+  {
+    num: '01',
+    title: 'Students book online, instructors stay in sync',
+    desc: 'No more phone tag. Students pick a time that works, pay upfront, and get a confirmation. Instructors see their schedule in one place — no more double bookings.',
+  },
+  {
+    num: '02',
+    title: 'TCA tracking that actually works',
+    desc: 'Every session automatically counts toward Tennessee Certificate of Completion requirements. When a student completes their hours, the certificate generates automatically.',
+  },
+  {
+    num: '03',
+    title: 'Stripe handles the money',
+    desc: 'Accept payments online. No chasing checks. No cash in envelopes. Students pay when they book. You get paid directly to your bank.',
+  },
+  {
+    num: '04',
+    title: 'Instructor management',
+    desc: 'Invite your instructors, set their availability, assign students to them. Each instructor sees only their own schedule and students.',
+  },
+  {
+    num: '05',
+    title: 'SMS and email reminders',
+    desc: 'Automatic reminders go out 48 hours and 4 hours before each session. Fewer no-shows. Less time rescheduling on the phone.',
+  },
+  {
+    num: '06',
+    title: 'Multi-tenant from the ground up',
+    desc: 'Your data is completely isolated. Row-Level Security enforced at the database level — not just a soft filter. Each school only sees their own students.',
+  },
 ]
 
-const TESTIMONIALS = [
-  { quote: 'This platform cut my administrative work in half. I spend less time on the phone and more time teaching.', name: 'Matt Reedy', role: 'Driving Instructor, East Tennessee', initials: 'MR', bg: 'linear-gradient(135deg, #7ED4FD, #707BFF)' },
-  { quote: 'Finally, a tool that actually understands how a driving school works. TCA tracking alone is worth the price.', name: 'Mark Martin', role: 'CS Teacher & Mentor', initials: 'MM', bg: 'linear-gradient(135deg, #F97316, #EC4899)' },
+const HOW_IT_WORKS = [
+  { step: '1', title: 'Create your school profile', desc: 'Set your school name, add your instructors, and configure your session types and pricing.' },
+  { step: '2', title: 'Students sign up and book', desc: 'Share your school link. Students create an account, pick a session type, choose a time, and pay online.' },
+  { step: '3', title: 'Instructors teach, the platform handles the rest', desc: 'Instructors log in to see their schedule. Sessions are tracked. Reminders go out. Certificates generate.' },
 ]
 
 const PRICING_TIERS = [
-  { name: 'Starter', price: '$99', desc: 'For small schools getting started.', features: ['Up to 25 students', 'Unlimited sessions', 'Email + SMS reminders', 'Stripe payments', 'TCA tracking'], highlighted: false, cta: 'Get started' },
-  { name: 'Growth', price: '$199', desc: 'For growing schools that need more power.', features: ['Up to 100 students', 'Everything in Starter', 'Instructor management', 'Parent portal', 'Priority support'], highlighted: true, cta: 'Start free trial' },
+  { name: 'Starter', price: '$99', desc: 'For small schools getting started.', features: ['Up to 25 students', 'Unlimited sessions', 'Email + SMS reminders', 'Stripe payments', 'TCA tracking'], highlighted: false, cta: 'Start free trial' },
+  { name: 'Growth', price: '$199', desc: 'For schools ready to scale.', features: ['Up to 100 students', 'Everything in Starter', 'Instructor management', 'Parent portal', 'Priority support'], highlighted: true, cta: 'Start free trial' },
   { name: 'Enterprise', price: '$399', desc: 'For multi-location schools.', features: ['Unlimited students', 'Everything in Growth', 'Multi-location support', 'API access', 'Dedicated success manager'], highlighted: false, cta: 'Contact sales' },
 ]
 
 const FAQ_ITEMS = [
-  { question: 'Do I need a credit card to start?', answer: 'No. Start with a 14-day free trial — no payment info required. At the end of the trial, you choose a plan or your account pauses, no charges.' },
-  { question: 'Is my school data isolated from other schools?', answer: 'Yes. Multi-tenant Row-Level Security (RLS) enforced at the database level ensures complete data isolation. Your students never see another school\'s data.' },
-  { question: 'How does TCA tracking work?', answer: 'The platform automatically logs every driving session toward Tennessee Certificate of Completion (TCC) requirements. Instructors approve sessions, and progress is tracked live for both you and the student.' },
-  { question: 'What happens after the free trial?', answer: 'You choose a plan. Starter ($99/mo), Growth ($199/mo), or Enterprise ($399/mo). All plans include a 14-day free trial — no charges until you\'re ready.' },
-  { question: 'Can I bring my own instructor team?', answer: 'Yes. Invite unlimited instructors to your school. Set their availability, assign students, and track their session logs — all from the instructor dashboard.' },
-]
-
-const NAV_LINKS = [
-  { label: 'Features', href: '#features' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'FAQ', href: '#faq' },
+  { question: 'Do I need a credit card to start?', answer: 'No. Start with a 14-day free trial — no payment info required. At the end of the trial, you choose a plan or your account pauses.' },
+  { question: 'Is my school data isolated from other schools?', answer: 'Yes. Multi-tenant Row-Level Security (RLS) is enforced at the database level. Your students never see another school\'s data — ever.' },
+  { question: 'How does TCA tracking work?', answer: 'Every session you log counts toward Tennessee Certificate of Completion (TCC) requirements. When a student completes their required hours, the certificate generates automatically.' },
+  { question: 'What happens after the free trial?', answer: 'You choose a plan: Starter ($99/mo), Growth ($199/mo), or Enterprise ($399/mo). All plans include a 14-day free trial.' },
+  { question: 'Can I invite my existing instructor team?', answer: 'Yes. Invite unlimited instructors to your school. Set their availability, assign students, and track their session logs from the instructor dashboard.' },
 ]
 
 // ─── Main Page ──────────────────────────────────────────────────────
 export default function HomePage() {
-  useEffect(() => {
-    const els = document.querySelectorAll('.fade-up')
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          (e.target as HTMLElement).classList.add('visible')
-          observer.unobserve(e.target)
-        }
-      })
-    }, { threshold: 0.1 })
-    els.forEach(el => observer.observe(el))
-    return () => observer.disconnect()
-  }, [])
-
   return (
-    <main style={{ background: 'var(--bg-base)', color: 'var(--text-primary)', fontFamily: 'Inter, system-ui, sans-serif', overflowX: 'hidden' }}>
+    <main style={{ background: '#fff', color: '#0A0A0A', fontFamily: 'Inter, system-ui, sans-serif', overflowX: 'hidden' }}>
 
-      {/* ── NAVBAR ─────────────────────────────────────── */}
-      <nav className="navbar">
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '13px', fontWeight: '700', flexShrink: 0 }}>DC</div>
-            <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>The Driving Center</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            {NAV_LINKS.map(link => (
-              <Link key={link.label} href={link.href} style={{ fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none', padding: '8px 16px', fontWeight: '500' }}>
-                {link.label}
-              </Link>
-            ))}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Link href="/login" style={{ fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: '400' }}>Sign in</Link>
-            <Link href="/signup" className="btn-glow" style={{ padding: '10px 20px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', borderRadius: '12px' }}>See pricing</Link>
-            <ThemeToggle />
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
-      {/* ── SECTION 1: HERO ────────────────────────────── */}
-      <section style={{ padding: '100px 24px 80px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      {/* ── HERO ─────────────────────────────────────────── */}
+      <section style={{ padding: '80px 24px 72px' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center' }}>
-            {/* Left: headline + CTA */}
+            {/* Left */}
             <div>
-              <div className="fade-up" style={{ marginBottom: '32px' }}>
-                <span className="eyebrow">
-                  <span className="eyebrow-dot" />
-                  For driving schools across Tennessee
-                </span>
-              </div>
-              <div className="fade-up">
-                <h1 style={{
-                  fontSize: '72px',
-                  fontWeight: '800',
-                  lineHeight: '1.0',
-                  letterSpacing: '-0.03em',
-                  color: 'var(--text-primary)',
-                  marginBottom: '24px',
+              <p style={{ fontSize: '13px', fontWeight: '600', color: '#9B9B9B', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '20px' }}>
+                Scheduling and payment software
+              </p>
+              <h1 style={{
+                fontSize: '52px', fontWeight: '800', lineHeight: '1.05',
+                letterSpacing: '-0.025em', color: '#0A0A0A', marginBottom: '20px',
+              }}>
+                The easier way<br />to run your<br />driving school.
+              </h1>
+              <p style={{
+                fontSize: '18px', color: '#555', lineHeight: '1.6',
+                maxWidth: '440px', marginBottom: '36px',
+              }}>
+                Automate bookings, track student progress, get paid online. Built for driving schools in Tennessee.
+              </p>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                <Link href="/signup" style={{
+                  background: '#0A0A0A', color: '#fff',
+                  padding: '13px 24px', borderRadius: '8px',
+                  fontSize: '15px', fontWeight: '600', textDecoration: 'none',
                 }}>
-                  Run your driving school.<br />Not spreadsheets.
-                </h1>
-                <p style={{
-                  fontSize: '18px',
-                  color: 'var(--text-secondary)',
-                  lineHeight: '1.65',
-                  maxWidth: '460px',
-                  marginBottom: '40px',
-                  fontWeight: '400',
+                  Start free trial
+                </Link>
+                <Link href="#features" style={{
+                  border: '1px solid #E5E5E3', color: '#0A0A0A',
+                  padding: '13px 24px', borderRadius: '8px',
+                  fontSize: '15px', fontWeight: '600', textDecoration: 'none',
                 }}>
-                  Automate bookings, track progress, get paid. The all-in-one platform for driving schools in Tennessee.
-                </p>
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '40px' }}>
-                  <Link href="/signup" className="btn-glow" style={{ padding: '14px 28px', fontSize: '15px', fontWeight: '600', textDecoration: 'none' }}>
-                    Start free trial
-                  </Link>
-                  <Link href="#features" className="btn-ghost" style={{ padding: '14px 28px', fontSize: '15px', fontWeight: '600', textDecoration: 'none' }}>
-                    See how it works
-                  </Link>
-                </div>
-                <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No credit card required · 14-day free trial · Cancel anytime</p>
+                  See how it works
+                </Link>
               </div>
+              <p style={{ fontSize: '13px', color: '#9B9B9B', marginTop: '16px' }}>No credit card required · 14-day free trial</p>
             </div>
-            {/* Right: dashboard mockup */}
-            <div className="fade-up">
-              <DashboardMockup />
+            {/* Right — real UI screenshot, not fake browser chrome */}
+            <div style={{ background: '#F5F5F3', borderRadius: '12px', border: '1px solid #E5E5E3', overflow: 'hidden' }}>
+              <img
+                src="/demo-booking.png"
+                alt="Student booking flow — select session type, pick a date, pay online"
+                style={{ width: '100%', display: 'block' }}
+                onError={(e) => {
+                  // Fallback to text placeholder if image doesn't exist
+                  e.currentTarget.style.display = 'none'
+                  const parent = e.currentTarget.parentElement
+                  if (parent) {
+                    parent.style.cssText += 'display:flex;align-items:center;justify-content:center;min-height:320px;'
+                    parent.innerHTML = `
+                      <div style="text-align:center;padding:48px 32px;">
+                        <p style="font-size:14px;font-weight:600;color:#0A0A0A;margin-bottom:8px;">Student Booking Flow</p>
+                        <p style="font-size:13px;color:#9B9B9B;line-height:1.6;">Session type → Date picker → Payment → Confirmation</p>
+                        <div style="margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left;">
+                          <div style="background:#fff;border:1px solid #E5E5E3;border-radius:8px;padding:16px;">
+                            <p style="font-size:11px;font-weight:700;color:#9B9B9B;margin-bottom:4px;">SESSION TYPE</p>
+                            <p style="font-size:14px;font-weight:600;color:#0A0A0A;">1-Hour Lesson · $60</p>
+                          </div>
+                          <div style="background:#fff;border:1px solid #E5E5E3;border-radius:8px;padding:16px;">
+                            <p style="font-size:11px;font-weight:700;color:#9B9B9B;margin-bottom:4px;">NEXT AVAILABLE</p>
+                            <p style="font-size:14px;font-weight:600;color:#0A0A0A;">Thu, May 7 · 3pm</p>
+                          </div>
+                          <div style="background:#fff;border:1px solid #E5E5E3;border-radius:8px;padding:16px;">
+                            <p style="font-size:11px;font-weight:700;color:#9B9B9B;margin-bottom:4px;">STUDENT</p>
+                            <p style="font-size:14px;font-weight:600;color:#0A0A0A;">Jake Thompson</p>
+                          </div>
+                          <div style="background:#fff;border:1px solid #E5E5E3;border-radius:8px;padding:16px;">
+                            <p style="font-size:11px;font-weight:700;color:#9B9B9B;margin-bottom:4px;">STATUS</p>
+                            <p style="font-size:14px;font-weight:600;color:#16A34A;">Confirmed ✓</p>
+                          </div>
+                        </div>
+                      </div>
+                    `
+                  }
+                }}
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── SECTION 2: SOCIAL PROOF ─────────────────────── */}
-      <section style={{ borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', background: 'var(--bg-surface)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 24px', textAlign: 'center' }}>
-          <p style={{ fontSize: '12px', fontWeight: '600', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '24px' }}>
-            Trusted by driving schools in:
+      {/* ── SOCIAL PROOF ────────────────────────────────── */}
+      <section style={{ borderTop: '1px solid #E5E5E3', borderBottom: '1px solid #E5E5E3', background: '#FAFAF8' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '36px 24px', textAlign: 'center' }}>
+          <p style={{ fontSize: '12px', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: '20px' }}>
+            Built for Tennessee driving schools
           </p>
-          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
-            {['Knoxville', 'Nashville', 'Chattanooga', 'Memphis', 'Oneida', 'Cumberland'].map((city, i) => (
-              <>
-                <span key={city} style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: '500' }}>{city}</span>
-                {i < 5 && <span key={`dot-${city}`} style={{ color: 'var(--border)' }}>·</span>}
-              </>
+          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '32px', alignItems: 'center' }}>
+            {['Knoxville', 'Nashville', 'Chattanooga', 'Oneida', 'Cumberland'].map((city) => (
+              <span key={city} style={{ fontSize: '14px', color: '#555', fontWeight: '500' }}>{city}</span>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── SECTION 3: FEATURES ─────────────────────────── */}
-      <section id="features" style={{ padding: '96px 24px', background: 'var(--bg-base)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div className="fade-up" style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '16px' }}>The platform</p>
-            <h2 style={{
-              fontSize: '48px', fontWeight: '700',
-              color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: '1.1',
-            }}>
-              Everything you need.<br />Nothing you don&apos;t.
+      {/* ── FEATURES ─────────────────────────────────────── */}
+      <section id="features" style={{ padding: '80px 24px', background: '#fff' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: '14px' }}>Platform</p>
+            <h2 style={{ fontSize: '36px', fontWeight: '700', color: '#0A0A0A', letterSpacing: '-0.02em', lineHeight: '1.15' }}>
+              What you get
             </h2>
           </div>
-          <div className="bento-grid fade-up">
-            {FEATURE_CARDS.map((f, i) => (
-              <div key={f.title} className={`glass-card ${f.wide ? 'bento-large' : ''}`} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <div style={{
-                  width: f.wide ? '64px' : '48px',
-                  height: f.wide ? '64px' : '48px',
-                  borderRadius: f.wide ? '16px' : '12px',
-                  background: f.gradient,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.2)', flexShrink: 0,
-                }}>
-                  <svg width={f.wide ? 32 : 24} height={f.wide ? 32 : 24} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M9 11l3 3L22 4"/>
-                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-                  </svg>
-                </div>
-                <div>
-                  <h3 style={{ fontSize: '20px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '10px', letterSpacing: '-0.01em' }}>{f.title}</h3>
-                  <p style={{ fontSize: '15px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{f.desc}</p>
-                </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px 32px' }}>
+            {FEATURES.map(f => (
+              <div key={f.num}>
+                <p style={{ fontSize: '11px', fontWeight: '700', color: '#9B9B9B', letterSpacing: '0.08em', marginBottom: '10px' }}>{f.num}</p>
+                <h3 style={{ fontSize: '17px', fontWeight: '700', color: '#0A0A0A', marginBottom: '10px', lineHeight: '1.3', letterSpacing: '-0.01em' }}>{f.title}</h3>
+                <p style={{ fontSize: '14px', color: '#555', lineHeight: '1.65' }}>{f.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── SECTION 4: PRICING ──────────────────────────── */}
-      <section id="pricing" style={{ padding: '96px 24px', background: 'var(--bg-surface)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div className="fade-up" style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <h2 style={{
-              fontSize: '48px', fontWeight: '700',
-              color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '16px',
-            }}>
+      {/* ── HOW IT WORKS ─────────────────────────────────── */}
+      <section style={{ padding: '80px 24px', background: '#FAFAF8', borderTop: '1px solid #E5E5E3' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: '14px' }}>Setup</p>
+            <h2 style={{ fontSize: '36px', fontWeight: '700', color: '#0A0A0A', letterSpacing: '-0.02em', lineHeight: '1.15' }}>
+              Up and running in an afternoon
+            </h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0', border: '1px solid #E5E5E3', borderRadius: '12px', overflow: 'hidden', background: '#fff' }}>
+            {HOW_IT_WORKS.map((step, i) => (
+              <div key={step.step} style={{
+                padding: '32px',
+                borderRight: i < 2 ? '1px solid #E5E5E3' : 'none',
+              }}>
+                <p style={{ fontSize: '36px', fontWeight: '800', color: '#E5E5E3', lineHeight: '1', marginBottom: '16px', letterSpacing: '-0.02em' }}>{step.step}</p>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#0A0A0A', marginBottom: '10px', lineHeight: '1.3' }}>{step.title}</h3>
+                <p style={{ fontSize: '14px', color: '#555', lineHeight: '1.6' }}>{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PRICING ─────────────────────────────────────── */}
+      <section id="pricing" style={{ padding: '80px 24px', background: '#fff' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: '14px' }}>Pricing</p>
+            <h2 style={{ fontSize: '36px', fontWeight: '700', color: '#0A0A0A', letterSpacing: '-0.02em', lineHeight: '1.15', marginBottom: '12px' }}>
               Simple, transparent pricing
             </h2>
-            <p style={{ fontSize: '17px', color: 'var(--text-secondary)' }}>No setup fees. No per-seat charges. Cancel anytime.</p>
+            <p style={{ fontSize: '16px', color: '#555' }}>No setup fees. No per-seat surprises. Cancel anytime.</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', alignItems: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', alignItems: 'start' }}>
             {PRICING_TIERS.map(t => (
-              <div key={t.name} className="fade-up">
-                <PricingCard name={t.name} price={t.price} desc={t.desc} features={t.features} highlighted={t.highlighted} cta={t.cta} />
-              </div>
+              <PricingCard key={t.name} {...t} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── SECTION 5: TESTIMONIALS ─────────────────────── */}
-      <section style={{ padding: '96px 24px', background: 'var(--bg-base)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div className="fade-up" style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '16px' }}>What instructors say</p>
-            <h2 style={{
-              fontSize: '48px', fontWeight: '700',
-              color: 'var(--text-primary)', letterSpacing: '-0.02em',
-            }}>
-              Real feedback from<br />real schools.
+      {/* ── FAQ ─────────────────────────────────────────── */}
+      <section id="faq" style={{ padding: '80px 24px', background: '#FAFAF8', borderTop: '1px solid #E5E5E3' }}>
+        <div style={{ maxWidth: '680px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: '14px' }}>FAQ</p>
+            <h2 style={{ fontSize: '36px', fontWeight: '700', color: '#0A0A0A', letterSpacing: '-0.02em', lineHeight: '1.15' }}>
+              Common questions
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
-            {TESTIMONIALS.map(t => (
-              <TestimonialCard key={t.name} {...t} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── SECTION 6: BOOKING WIDGET (always dark) ──────── */}
-      <section style={{ padding: '96px 24px', background: '#0D1117', position: 'relative', overflow: 'hidden' }}>
-        <div className="bg-circle" style={{ width: '300px', height: '300px', left: '5%', top: '20%', background: '#38BDF8', filter: 'blur(120px)', opacity: 0.12 }} />
-        <div className="bg-circle" style={{ width: '250px', height: '250px', right: '5%', bottom: '20%', background: '#F472B6', filter: 'blur(100px)', opacity: 0.1 }} />
-        <div className="bg-circle" style={{ width: '200px', height: '200px', left: '40%', bottom: '10%', background: '#FB923C', filter: 'blur(100px)', opacity: 0.08 }} />
-
-        <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 45%) 1fr', gap: '80px', alignItems: 'center' }}>
-            {/* Left */}
-            <div className="fade-up">
-              <h2 style={{
-                fontSize: '48px', fontWeight: '700',
-                color: '#fff', letterSpacing: '-0.02em', lineHeight: '1.1', marginBottom: '16px',
-              }}>
-                Book a session.
-              </h2>
-              <p style={{ fontSize: '17px', color: '#94A3B8', lineHeight: '1.6', marginBottom: '32px' }}>
-                30 minutes. No pitch. Just a real walkthrough of the platform for your school.
-              </p>
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 40px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {['See the platform live with your workflow', 'Ask anything about TCA requirements', 'Get a custom setup plan for your school'].map(item => (
-                  <li key={item} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', color: '#94A3B8' }}>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
-                      <path d="M3 8l3.5 3.5 6.5-7" stroke="#4ADE80" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <DecorativeCircles />
-            </div>
-            {/* Right */}
-            <div className="fade-up">
-              <BookingCalendar />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── SECTION 7: FAQ ─────────────────────────────── */}
-      <section id="faq" style={{ padding: '96px 24px', background: 'var(--bg-surface)' }}>
-        <div style={{ maxWidth: '720px', margin: '0 auto' }}>
-          <div className="fade-up" style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '16px' }}>FAQ</p>
-            <h2 style={{
-              fontSize: '48px', fontWeight: '700',
-              color: 'var(--text-primary)', letterSpacing: '-0.02em',
-            }}>
-              Common questions,<br />straight answers.
-            </h2>
-          </div>
-          <div className="fade-up glass-card" style={{ padding: '8px 32px' }}>
+          <div style={{ background: '#fff', border: '1px solid #E5E5E3', borderRadius: '12px', padding: '8px 28px' }}>
             {FAQ_ITEMS.map(item => (
-              <FaqItem key={item.question} question={item.question} answer={item.answer} />
+              <FaqItem key={item.question} {...item} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── SECTION 8: CTA ─────────────────────────────── */}
-      <section style={{ padding: '96px 24px', background: 'var(--bg-base)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
-          <div className="fade-up">
-            <h2 style={{
-              fontSize: '48px', fontWeight: '700',
-              color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '16px',
+      {/* ── DARK CTA SECTION ─────────────────────────────── */}
+      <section style={{ padding: '80px 24px', background: '#0A0A0A' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{ fontSize: '36px', fontWeight: '700', color: '#fff', letterSpacing: '-0.02em', lineHeight: '1.15', marginBottom: '16px' }}>
+            Ready to set up your school?
+          </h2>
+          <p style={{ fontSize: '17px', color: '#9B9B9B', marginBottom: '40px' }}>
+            14-day free trial. No credit card required.
+          </p>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link href="/signup" style={{
+              background: '#fff', color: '#0A0A0A',
+              padding: '13px 28px', borderRadius: '8px',
+              fontSize: '15px', fontWeight: '600', textDecoration: 'none',
             }}>
-              Ready to grow your school?
-            </h2>
-            <p style={{ fontSize: '17px', color: 'var(--text-secondary)', marginBottom: '40px' }}>
-              14-day free trial. No credit card required.
-            </p>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <Link href="/signup" className="btn-glow" style={{ padding: '14px 28px', fontSize: '15px', fontWeight: '600', textDecoration: 'none' }}>
-                Start free trial
-              </Link>
-              <Link href="/signup" className="btn-ghost" style={{ padding: '14px 28px', fontSize: '15px', fontWeight: '600', textDecoration: 'none' }}>
-                Book a call
-              </Link>
-            </div>
+              Start free trial
+            </Link>
+            <Link href="/book" style={{
+              border: '1px solid #333', color: '#fff',
+              padding: '13px 28px', borderRadius: '8px',
+              fontSize: '15px', fontWeight: '600', textDecoration: 'none',
+            }}>
+              See a demo
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ── SECTION 9: FOOTER ───────────────────────────── */}
-      <footer style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-base)', padding: '32px 24px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '26px', height: '26px', borderRadius: '7px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '11px', fontWeight: '700' }}>DC</div>
-            <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>The Driving Center</span>
+      {/* ── FOOTER ───────────────────────────────────────── */}
+      <footer style={{ borderTop: '1px solid #E5E5E3', background: '#fff', padding: '28px 24px' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: '#0A0A0A', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '11px', fontWeight: '700' }}>DC</div>
+            <span style={{ fontSize: '13px', color: '#555' }}>The Driving Center</span>
           </div>
           <div style={{ display: 'flex', gap: '24px' }}>
-            <Link href="/legal/privacy" style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'none' }}>Privacy</Link>
-            <Link href="/legal/terms" style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'none' }}>Terms</Link>
-            <Link href="/login" style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'none' }}>Login</Link>
-            <Link href="/signup" style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'none' }}>Sign up</Link>
+            <Link href="/legal/privacy" style={{ fontSize: '13px', color: '#555', textDecoration: 'none' }}>Privacy</Link>
+            <Link href="/legal/terms" style={{ fontSize: '13px', color: '#555', textDecoration: 'none' }}>Terms</Link>
+            <Link href="/login" style={{ fontSize: '13px', color: '#555', textDecoration: 'none' }}>Sign in</Link>
           </div>
-          <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>© 2026 The Driving Center</span>
+          <span style={{ fontSize: '13px', color: '#9B9B9B' }}>© 2026 The Driving Center</span>
         </div>
       </footer>
 
-      <ScrollToTop />
     </main>
   )
 }
