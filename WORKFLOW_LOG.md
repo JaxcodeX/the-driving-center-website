@@ -186,3 +186,42 @@ Always read keys from `.env.local` at runtime, never hardcode them. The actual D
 - [ ] Migration 009 SQL (add session_id FK to bookings)
 - [ ] E2E test: demo PIN → add student → schedule session → booking confirmation
 
+---
+
+## Cycle 9 — Vibe Coding Protocol + CLAUDE.md Rewrite
+
+**Date:** 2026-04-27
+**Implemented by:** Everest
+**Result:** ✅ Passed — committed
+
+### Why this cycle happened
+Zax identified the core problem: building a polished website via chat-based CSS iteration takes 10x longer than it should. AI site builders (Bolt, Lovable, Base44) can generate the same quality frontend in 20 minutes, but Zax doesn't want to use those tools for a production-level system.
+
+Research into vibe coding best practices confirmed the real issue: **prompt context size is the bottleneck, not AI capability.** The anti-pattern is iterating on individual CSS properties via chat. The solution is full-section prompts with complete context.
+
+### What was changed
+
+**CLAUDE.md rewritten** to add:
+
+1. **Vibe Coding Protocol** — When prompting AI sub-agents, always give: (1) full design system, (2) 1-3 reference components, (3) complete SPEC.md, (4) constraints. Never iterate one CSS property at a time.
+
+2. **Context Package Template** — Every sub-agent prompt must include: design tokens + reference components + SPEC.md + tech stack. One-pass builds only.
+
+3. **50-line rule** — If a change requires more than ~50 lines of back-and-forth in chat, stop and write a new SPEC.md instead.
+
+4. **Updated file structure** — Removed stale SPEC_ONE_WEEK_SPRINT.md (merged into sprint tracking), added SPEC_LANDING_REDESIGN.md
+
+5. **Updated stack table** — Added `scripts/deepseek-claude` as the execution method
+
+6. **WORKFLOW_LOG.md format updated** — Now tracks context package given, build time, and prompt quality metrics
+
+### Root cause identified
+The slow iteration on The Driving Center website wasn't a workflow problem — it was a prompting problem. We were giving the AI partial context (just the spec) instead of complete context (design system + working examples + spec). The AI can generate complete sections in one pass when given everything it needs.
+
+### Demo login bug also fixed in this session
+`POST /api/auth/demo-login` was looking up school by user email input (not the demo school email), causing 404 on any non-demo email. Fixed to use fixed `DEMO_SCHOOL_ID` + `demoEmail` constant. Deployed as `2a80608`.
+
+### Key lesson
+**Full context → one pass → commit. Partial context → iteration → wasted time.**
+The discipline is in what we give the AI before we ask it to build, not in how we direct it during build.
+
