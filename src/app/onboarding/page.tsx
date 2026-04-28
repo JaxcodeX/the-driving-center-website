@@ -128,6 +128,13 @@ function OnboardingContent() {
     }
   }, [slugLoaded, schoolSlug, schoolData])
 
+  async function loadSchool() {
+    if (!schoolSlug) return
+    const supabase = createClient()
+    const { data } = await supabase.from('schools').select('*').eq('slug', schoolSlug).single()
+    setSchoolData(data)
+  }
+
   async function saveSchoolProfile(updates: any) {
     const supabase = createClient()
     await supabase.from('schools').update(updates).eq('slug', schoolSlug)
