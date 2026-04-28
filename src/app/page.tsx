@@ -610,7 +610,10 @@ export default function HomePage() {
       <section style={{ padding: '120px 24px', background: 'var(--bg-base)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div className="fade-up" style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <h2 style={{ fontSize: 'clamp(2rem, 5vw, 48px)', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '16px' }}>Simple, transparent pricing</h2>
+            <h2 style={{ fontSize: 'clamp(2rem, 5vw, 48px)', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '16px' }}>
+              Simple, transparent pricing
+              <span className="pricing-badge">New</span>
+            </h2>
             <p style={{ fontSize: '17px', color: 'var(--text-secondary)' }}>No setup fees. No per-seat charges. Cancel anytime.</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', alignItems: 'start' }}>
