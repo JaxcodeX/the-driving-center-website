@@ -174,29 +174,43 @@ export default function StudentsPage() {
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient()
-      let schoolId: string | null = null
-
+      // Check for demo mode via cookie
       const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
+
       if (demoCookie) {
+        // Demo mode: use server-side demo endpoint (bypasses RLS)
+        // The cookie is forwarded automatically; server reads it via cookies()
         try {
-          const payload = JSON.parse(atob(decodeURIComponent(demoCookie.split('=')[1])))
-          schoolId = payload.schoolId
-        } catch {}
+          const res = await fetch('/api/demo/students')
+          if (res.ok) {
+            const data = await res.json()
+            setStudents(data || [])
+            setLoading(false)
+            return
+          }
+        } catch { /* fall through to error state */ }
+        setStudents([])
+        setLoading(false)
+        return
       }
 
-      if (!schoolId) {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) { window.location.href = '/login'; return }
-        const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
-        if (!school) { setLoading(false); return }
-        schoolId = school.id
-      }
+      // Normal mode: use Supabase auth
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { window.location.href = '/login'; return }
+
+      const { data: school } = await supabase
+        .from('schools')
+        .select('id')
+        .eq('owner_user_id', user.id)
+        .single()
+      if (!school) { setLoading(false); return }
 
       const { data } = await supabase
         .from('students_driver_ed')
         .select('id, legal_name, parent_email, classroom_hours, driving_hours, certificate_issued_at, emergency_contact_phone, enrollment_date, created_at')
-        .eq('school_id', schoolId)
+        .eq('school_id', school.id)
+
       setStudents((data as any[]) || [])
       setLoading(false)
     }
