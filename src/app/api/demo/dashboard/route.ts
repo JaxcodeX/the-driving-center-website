@@ -73,6 +73,7 @@ export async function GET() {
       revenueDelta: monthlyRevenue > 0 ? '+15%' : '+0%',
       completionDelta: completionRate > 0 ? `+${Math.max(0, completionRate - 72)}%` : '+0%',
     },
+    schoolId,
     schoolName: (schoolData as any)?.name || '',
     upcomingSessions: sessionsData || [],
   })

@@ -43,7 +43,7 @@ export default function DashboardPage() {
           if (res.ok) {
             const data = await res.json()
             setStats(data.stats)
-            setSchoolId(data.schoolName)
+            setSchoolId(data.schoolId || '')
             setUpcomingSessions(data.upcomingSessions || [])
             setLoadingSessions(false)
             return
@@ -321,6 +321,23 @@ function RecentActivityTable({ schoolId }: { schoolId: string }) {
 
   useEffect(() => {
     async function load() {
+      // Check for demo mode
+      const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
+
+      if (demoCookie) {
+        try {
+          const res = await fetch('/api/demo/sessions')
+          if (res.ok) {
+            const data = await res.json()
+            setRows((data.sessions || []).slice(0, 6))
+            return
+          }
+        } catch { /* fall through */ }
+        setRows([])
+        return
+      }
+
+      // Normal mode
       const supabase = createClient()
       const { data } = await supabase
         .from('sessions')
