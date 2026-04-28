@@ -12,11 +12,11 @@ import { createClient } from '@/lib/supabase/client'
 const NAV_ITEMS = [
   { icon: LayoutDashboard, label: 'Dashboard',    href: '/school-admin' },
   { icon: Users,           label: 'Students',     href: '/school-admin/students' },
-  { icon: Calendar,        label: 'Sessions',     href: '/school-admin/sessions' },
-  { icon: Calendar,        label: 'Calendar',     href: '/school-admin/calendar' },
-  { icon: UserCheck,       label: 'Instructors',  href: '/school-admin/instructors' },
-  { icon: CreditCard,      label: 'Billing',      href: '/school-admin/billing' },
-  { icon: Upload,          label: 'Import',       href: '/school-admin/import' },
+  { icon: Calendar,        label: 'Sessions',      href: '/school-admin/sessions' },
+  { icon: Calendar,        label: 'Calendar',      href: '/school-admin/calendar' },
+  { icon: UserCheck,       label: 'Instructors',   href: '/school-admin/instructors' },
+  { icon: CreditCard,      label: 'Billing',        href: '/school-admin/billing' },
+  { icon: Upload,          label: 'Import',         href: '/school-admin/import' },
 ]
 
 function Sidebar({ schoolName, onClose }: { schoolName?: string; onClose?: () => void }) {
@@ -29,9 +29,7 @@ function Sidebar({ schoolName, onClose }: { schoolName?: string; onClose?: () =>
   }
 
   return (
-    <aside
-      className="flex flex-col h-full sidebar"
-    >
+    <aside className="flex flex-col h-full sidebar">
       {/* Logo */}
       <div className="logo-bar">
         <Link href="/" className="flex items-center gap-2.5">
@@ -48,13 +46,18 @@ function Sidebar({ schoolName, onClose }: { schoolName?: string; onClose?: () =>
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {NAV_ITEMS.map(({ icon: Icon, label, href }) => {
-          const active = pathname === href
+          // Check if current pathname matches href
+          // For /school-admin (dashboard), exact match; for others, startsWith
+          const isActive = href === '/school-admin'
+            ? pathname === '/school-admin' || pathname === '/school-admin/'
+            : pathname.startsWith(href)
+
           return (
             <Link
               key={href}
               href={href}
               onClick={onClose}
-              className={`nav-item ${active ? 'nav-item--active' : ''}`}
+              className={`nav-item ${isActive ? 'nav-item--active' : ''}`}
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
               {label}
@@ -76,7 +79,7 @@ function Sidebar({ schoolName, onClose }: { schoolName?: string; onClose?: () =>
             {schoolName ? schoolName[0].toUpperCase() : 'S'}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-xs font-medium truncate text-white">
+            <div className="text-xs font-medium truncate" style={{ color: '#ffffff' }}>
               {schoolName || 'Your School'}
             </div>
           </div>

@@ -7,23 +7,21 @@ import { createClient } from '@/lib/supabase/client'
 
 const T = {
   bg:        '#050505',
-  surface:   '#0D0D0D',
-  elevated:  '#18181b',
-  border:    '#1A1A1A',
-  borderLt:  '#27272a',
+  surface:   '#0F172A',
+  elevated:  '#141B2D',
+  border:    '#0F172A',
   text:      '#ffffff',
   secondary: '#94A3B8',
-  muted:     '#52525b',
+  muted:     '#64748B',
   cyan:      '#38BDF8',
   green:     '#10B981',
   amber:     '#f59e0b',
   grad:      'linear-gradient(135deg, #38BDF8 0%, #818CF8 100%)',
 }
 
-// Actual DB columns for students_driver_ed
 type Student = {
   id: string
-  legal_name: string           // encrypted — display [REDACTED] unless decrypt available
+  legal_name: string
   permit_number: string | null
   dob: string
   parent_email: string | null
@@ -36,37 +34,55 @@ type Student = {
   created_at: string
 }
 
-// Derive status from TCA completion
 function getStudentStatus(s: Student): string {
   if (s.certificate_issued_at) return 'certified'
   if (s.classroom_hours > 0 || s.driving_hours > 0) return 'in_progress'
   return 'pending'
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const map: Record<string, { color: string; bg: string }> = {
-    in_progress: { color: T.cyan, bg: `${T.cyan}15` },
-    pending:     { color: T.amber, bg: `${T.amber}15` },
-    certified:   { color: T.green, bg: `${T.green}15` },
-  }
-  const s = map[status] || map.pending
-  return (
-    <span className="text-xs px-2 py-0.5 rounded-full font-medium capitalize"
-      style={{ background: s.bg, color: s.color }}>
-      {status === 'in_progress' ? 'In Progress' : status}
-    </span>
-  )
+function getStatusPillClass(status: string): string {
+  if (status === 'certified') return 'status-completed'
+  if (status === 'in_progress') return 'status-active'
+  return 'status-pending'
 }
 
-// Display name — legal_name is encrypted, show placeholder for demo
-function StudentName({ name }: { name: string }) {
-  // Encrypted names show as [REDACTED] — decrypt available via /api/students
-  const display = name.startsWith('eyJ') ? 'Student Record' : name
-  return <span style={{ color: T.text }}>{display}</span>
+function getStatusLabel(status: string): string {
+  if (status === 'certified') return 'Certified'
+  if (status === 'in_progress') return 'In Progress'
+  return 'Pending'
+}
+
+// Gradient for avatar based on name
+function avatarGradient(name: string): string {
+  const gradients = [
+    'linear-gradient(135deg, #38BDF8, #818CF8)',
+    'linear-gradient(135deg, #4ADE80, #38BDF8)',
+    'linear-gradient(135deg, #818CF8, #F97316)',
+    'linear-gradient(135deg, #F97316, #FACC15)',
+    'linear-gradient(135deg, #38BDF8, #4ADE80)',
+  ]
+  let hash = 0
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  return gradients[Math.abs(hash) % gradients.length]
+}
+
+function getInitials(name: string): string {
+  const display = name.startsWith('eyJ') ? 'SR' : name
+  const parts = display.trim().split(' ')
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+  return display.slice(0, 2).toUpperCase()
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const cls = getStatusPillClass(status)
+  return <span className={`status-pill ${cls}`}>{getStatusLabel(status)}</span>
 }
 
 function AddStudentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: Partial<Student>) => void }) {
-  const [form, setForm] = useState({ legal_name: '', dob: '', parent_email: '', emergency_contact_name: '', emergency_contact_phone: '' })
+  const [form, setForm] = useState({
+    legal_name: '', dob: '', parent_email: '',
+    emergency_contact_name: '', emergency_contact_phone: '',
+  })
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
 
@@ -74,18 +90,29 @@ function AddStudentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: P
     e.preventDefault()
     setLoading(true)
     const { data: { user } } = await supabase.auth.getUser()
-    const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user!.id).single()
-    if (!school) { setLoading(false); return }
+    let schoolId: string | null = null
+    const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
+    if (demoCookie) {
+      try {
+        const payload = JSON.parse(atob(decodeURIComponent(demoCookie.split('=')[1])))
+        schoolId = payload.schoolId
+      } catch {}
+    }
+    if (!schoolId) {
+      const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user!.id).single()
+      if (!school) { setLoading(false); return }
+      schoolId = school.id
+    }
 
     const { data, error } = await supabase
       .from('students_driver_ed')
       .insert({
-        legal_name: form.legal_name,   // will be encrypted by API — pass raw for now
+        legal_name: form.legal_name,
         dob: form.dob,
         parent_email: form.parent_email || null,
         emergency_contact_name: form.emergency_contact_name || null,
         emergency_contact_phone: form.emergency_contact_phone || null,
-        school_id: school.id,
+        school_id: schoolId,
         enrollment_date: new Date().toISOString().split('T')[0],
         classroom_hours: 0,
         driving_hours: 0,
@@ -100,11 +127,17 @@ function AddStudentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: P
     setLoading(false)
   }
 
-  const inputStyle = { background: T.elevated, border: `1px solid ${T.borderLt}`, color: T.text, outline: 'none' as const, borderRadius: '12px' }
+  const inputStyle = {
+    background: T.elevated,
+    border: `1px solid rgba(255,255,255,0.08)`,
+    color: T.text,
+    outline: 'none' as const,
+    borderRadius: '12px',
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="w-full max-w-md rounded-2xl p-8" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
+      <div className="w-full max-w-md rounded-2xl p-8" style={{ background: T.surface, border: `1px solid rgba(255,255,255,0.08)` }}>
         <h2 className="text-lg font-semibold mb-6" style={{ color: T.text }}>Add Student</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {[
@@ -116,17 +149,27 @@ function AddStudentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: P
           ].map(({ key, label, placeholder, type = 'text' }) => (
             <div key={key}>
               <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: T.muted }}>{label}</label>
-              <input type={type} value={(form as any)[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-                placeholder={placeholder} required className="w-full px-4 py-3 text-sm" style={inputStyle}
+              <input
+                type={type}
+                value={(form as any)[key]}
+                onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+                placeholder={placeholder}
+                required
+                className="w-full px-4 py-3 text-sm"
+                style={inputStyle}
                 onFocus={e => (e.target.style.borderColor = `${T.cyan}60`)}
-                onBlur={e => (e.target.style.borderColor = T.borderLt)} />
+                onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
+              />
             </div>
           ))}
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="flex-1 py-3 rounded-xl text-sm font-medium"
-              style={{ background: T.elevated, color: T.secondary, border: `1px solid ${T.border}` }}>Cancel</button>
-            <button type="submit" disabled={loading} className="flex-1 py-3 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
-              style={{ background: T.grad }}>
+              style={{ background: T.elevated, color: T.secondary, border: `1px solid rgba(255,255,255,0.08)` }}>
+              Cancel
+            </button>
+            <button type="submit" disabled={loading}
+              className="flex-1 py-3 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
+              style={{ background: 'linear-gradient(135deg, #38BDF8, #818CF8)' }}>
               {loading ? 'Adding...' : 'Add Student'}
             </button>
           </div>
@@ -148,7 +191,6 @@ export default function StudentsPage() {
       const supabase = createClient()
       let schoolId: string | null = null
 
-      // Try demo_user cookie first (DEMO_MODE)
       const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
       if (demoCookie) {
         try {
@@ -157,7 +199,6 @@ export default function StudentsPage() {
         } catch {}
       }
 
-      // Fall back to Supabase auth
       if (!schoolId) {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) { window.location.href = '/login'; return }
@@ -176,7 +217,6 @@ export default function StudentsPage() {
     load()
   }, [])
 
-
   const filtered = students.filter(s =>
     s.legal_name.toLowerCase().includes(search.toLowerCase()) ||
     (s.parent_email || '').toLowerCase().includes(search.toLowerCase())
@@ -184,32 +224,48 @@ export default function StudentsPage() {
 
   return (
     <div className="max-w-5xl">
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold mb-1" style={{ color: T.text }}>Students</h1>
           <p className="text-sm" style={{ color: T.muted }}>{students.length} total</p>
         </div>
-        <button onClick={() => setShowModal(true)} className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl text-white"
-          style={{ background: T.grad }}>
-          <Plus className="w-4 h-4" /> Add Student
+        <button
+          onClick={() => setShowModal(true)}
+          className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-full text-white transition-opacity hover:opacity-90"
+          style={{ background: 'linear-gradient(135deg, #38BDF8, #818CF8)', boxShadow: '0 0 20px rgba(56,189,248,0.2)' }}
+        >
+          <Plus className="w-4 h-4" />
+          Add Student
         </button>
       </div>
 
-      <div className="relative mb-4">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: T.muted }} />
-        <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+      {/* Search bar — pill input */}
+      <div className="relative mb-6">
+        <Search
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4"
+          style={{ color: T.muted }}
+        />
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
           placeholder="Search by name or email..."
-          className="w-full rounded-xl pl-10 pr-4 py-2.5 text-sm"
-          style={{ background: T.surface, border: `1px solid ${T.border}`, color: T.text, outline: 'none' }}
-          onFocus={e => (e.target.style.borderColor = `${T.cyan}50`)}
-          onBlur={e => (e.target.style.borderColor = T.border)} />
+          className="input-pill w-full pl-11 pr-4 py-2.5 text-sm"
+          style={{ paddingLeft: '44px' }}
+        />
       </div>
 
+      {/* Table */}
       {loading ? (
-        <div className="text-center py-16"><p className="text-sm" style={{ color: T.muted }}>Loading students...</p></div>
+        <div className="glass-card text-center py-16">
+          <p className="text-sm" style={{ color: T.muted }}>Loading students...</p>
+        </div>
       ) : !filtered.length ? (
-        <div className="text-center py-16 rounded-2xl" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
-          <p className="text-sm mb-3" style={{ color: T.muted }}>{search ? 'No students match your search' : 'No students yet'}</p>
+        <div className="glass-card text-center py-16">
+          <p className="text-sm mb-3" style={{ color: T.muted }}>
+            {search ? 'No students match your search' : 'No students yet'}
+          </p>
           {!search && (
             <button onClick={() => setShowModal(true)} className="text-sm font-medium" style={{ color: T.cyan }}>
               Add your first student →
@@ -217,33 +273,73 @@ export default function StudentsPage() {
           )}
         </div>
       ) : (
-        <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${T.border}` }}>
-          <div className="grid grid-cols-5 gap-4 px-5 py-3 text-xs font-semibold uppercase tracking-wide"
-            style={{ background: T.surface, color: T.muted, borderBottom: `1px solid ${T.border}` }}>
-            <div className="col-span-2">Name</div>
+        <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+          {/* Table header */}
+          <div
+            className="grid px-6 py-3 text-xs font-semibold uppercase tracking-wider"
+            style={{
+              gridTemplateColumns: '2fr 1.5fr 1fr 1fr auto',
+              gap: '16px',
+              color: T.muted,
+              borderBottom: `1px solid rgba(255,255,255,0.06)`,
+            }}
+          >
+            <div>Name</div>
             <div>Contact</div>
+            <div>TCA Progress</div>
             <div>Status</div>
             <div className="text-right">Actions</div>
           </div>
+
+          {/* Rows */}
           {filtered.map(student => {
             const status = getStudentStatus(student)
             const displayName = student.legal_name.startsWith('eyJ') ? 'Student Record' : student.legal_name
+            const initials = getInitials(displayName)
+            const gradient = avatarGradient(displayName)
+
+            // TCA progress: total hours vs 60 (6 class + 6 drive)
+            const totalHours = student.classroom_hours + student.driving_hours
+            const tcaPct = Math.min(100, Math.round((totalHours / 60) * 100))
+
             return (
-              <div key={student.id}
-                className="grid grid-cols-5 gap-4 px-5 py-4 items-center text-sm"
-                style={{ borderBottom: `1px solid ${T.border}` }}
-                onMouseEnter={e => (e.currentTarget.style.background = `${T.elevated}50`)}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                <div className="col-span-2">
-                  <div className="font-medium" style={{ color: T.text }}>{displayName}</div>
-                  <div className="text-xs mt-0.5 flex items-center gap-1" style={{ color: T.muted }}>
-                    <Shield className="w-3 h-3" style={{ color: student.classroom_hours >= 6 && student.driving_hours >= 6 ? T.green : T.muted }} />
-                    {student.classroom_hours}h class · {student.driving_hours}h drive
+              <div
+                key={student.id}
+                className="grid px-6 py-4 items-center text-sm transition-colors"
+                style={{
+                  gridTemplateColumns: '2fr 1.5fr 1fr 1fr auto',
+                  gap: '16px',
+                  borderBottom: `1px solid rgba(255,255,255,0.04)`,
+                }}
+                onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.025)')}
+                onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
+              >
+                {/* Name + avatar */}
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                    style={{ background: gradient }}
+                  >
+                    {initials}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-medium truncate" style={{ color: T.text }}>{displayName}</div>
+                    <div className="text-xs flex items-center gap-1 mt-0.5" style={{ color: T.muted }}>
+                      <Shield
+                        className="w-3 h-3"
+                        style={{
+                          color: student.classroom_hours >= 6 && student.driving_hours >= 6 ? T.green : T.muted,
+                        }}
+                      />
+                      {student.classroom_hours}h class · {student.driving_hours}h drive
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-1">
+
+                {/* Contact */}
+                <div className="space-y-1.5">
                   {student.parent_email && (
-                    <div className="flex items-center gap-1.5 text-xs" style={{ color: T.secondary }}>
+                    <div className="flex items-center gap-1.5 text-xs truncate" style={{ color: T.secondary }}>
                       <Mail className="w-3 h-3 flex-shrink-0" style={{ color: T.muted }} />
                       {student.parent_email}
                     </div>
@@ -255,12 +351,40 @@ export default function StudentsPage() {
                     </div>
                   )}
                 </div>
-                <div><StatusBadge status={status} /></div>
-                <div className="flex items-center justify-end gap-2">
-                  <Link href={`/school-admin/students/${student.id}`}
-                    className="p-2 rounded-lg" style={{ color: T.muted }}
-                    onMouseEnter={e => (e.currentTarget.style.background = T.elevated)}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+
+                {/* TCA Progress Bar */}
+                <div className="flex items-center gap-2">
+                  <div
+                    className="h-1.5 rounded-full overflow-hidden flex-1"
+                    style={{ background: 'rgba(255,255,255,0.08)', minWidth: '60px' }}
+                  >
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${tcaPct}%`,
+                        background: 'linear-gradient(90deg, #38BDF8, #818CF8)',
+                      }}
+                    />
+                  </div>
+                  <span className="text-xs flex-shrink-0" style={{ color: T.muted }}>
+                    {tcaPct}%
+                  </span>
+                </div>
+
+                {/* Status */}
+                <div>
+                  <StatusBadge status={status} />
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center justify-end">
+                  <Link
+                    href={`/school-admin/students/${student.id}`}
+                    className="p-2 rounded-lg transition-colors"
+                    style={{ color: T.muted }}
+                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = T.elevated)}
+                    onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
+                  >
                     <Pencil className="w-4 h-4" />
                   </Link>
                 </div>
@@ -270,7 +394,12 @@ export default function StudentsPage() {
         </div>
       )}
 
-      {showModal && <AddStudentModal onClose={() => setShowModal(false)} onAdd={s => setStudents(prev => [s as Student, ...prev])} />}
+      {showModal && (
+        <AddStudentModal
+          onClose={() => setShowModal(false)}
+          onAdd={s => setStudents(prev => [s as Student, ...prev])}
+        />
+      )}
     </div>
   )
 }
