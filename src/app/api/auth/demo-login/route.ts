@@ -21,19 +21,19 @@ export async function POST(request: Request) {
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+  const DEMO_SCHOOL_ID = '0daea68b-06ed-445b-bf52-91d4f16b9e01'
 
-  // 1. Find school by owner_email
+  // 1. Get demo school by fixed ID (not email — demo mode ignores the email field)
   const schoolRes = await fetch(
-    `${supabaseUrl}/rest/v1/schools?owner_email=eq.${encodeURIComponent(email)}&limit=1&select=id,name`,
+    `${supabaseUrl}/rest/v1/schools?id=eq.${DEMO_SCHOOL_ID}&select=id,name,slug`,
     { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
   )
-  const schools: { id: string; name: string }[] = await schoolRes.json()
+  const schools: { id: string; name: string; slug: string }[] = await schoolRes.json()
   const school = schools?.[0]
-  if (!school) {
-    return NextResponse.json({ error: 'No school found for that email. Complete signup first.' }, { status: 404 })
-  }
+  if (!school) return NextResponse.json({ error: 'Demo school not found' }, { status: 500 })
 
-  // 2. Create or find auth user via Admin API
+  // 2. Create or find auth user via Admin API — use demo school email
+  const demoEmail = 'autotest1777248097@demo-test.com'
   let userId: string
   const createRes = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
     method: 'POST',
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
       'Content-Type': 'application/json',
       'Prefer': 'return=representation',
     },
-    body: JSON.stringify({ email, email_confirm: true, user_metadata: { school_id: school.id } }),
+    body: JSON.stringify({ email: demoEmail, email_confirm: true, user_metadata: { school_id: school.id } }),
   })
 
   if (createRes.ok) {
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey },
     })
     const listData = await listRes.json()
-    const existingUser: { id: string; email: string } | undefined = (listData?.users || []).find((u: any) => u.email === email)
+    const existingUser: { id: string; email: string } | undefined = (listData?.users || []).find((u: any) => u.email === demoEmail)
     if (!existingUser) return NextResponse.json({ error: 'Could not find or create user' }, { status: 500 })
     userId = existingUser.id
   }
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
   response.cookies.set('demo_session', Buffer.from(JSON.stringify({
     userId,
     schoolId: school.id,
-    email,
+    email: demoEmail,
     exp: Date.now() + 7 * 24 * 60 * 60 * 1000,
   })).toString('base64'), {
     httpOnly: true,
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
   response.cookies.set('demo_user', Buffer.from(JSON.stringify({
     userId,
     schoolId: school.id,
-    email,
+    email: demoEmail,
     exp: Date.now() + 7 * 24 * 60 * 60 * 1000,
   })).toString('base64'), {
     httpOnly: false,
