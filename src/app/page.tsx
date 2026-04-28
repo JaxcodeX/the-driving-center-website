@@ -1,89 +1,218 @@
 'use client'
 import Link from 'next/link'
 
-// ─── Bento Card ─────────────────────────────────────────────────────
-function BentoCard({ title, subtitle, value, change, changeType, wide }: {
-  title: string; subtitle?: string; value: string; change?: string; changeType?: 'up' | 'down'; wide?: boolean;
-}) {
+// ─── Dark mode tokens ───────────────────────────────────────────────
+const DARK = {
+  bg: '#0B0C0E',
+  surface: '#131316',
+  elevated: '#1C1D21',
+  border: 'rgba(255,255,255,0.07)',
+  borderLight: 'rgba(255,255,255,0.04)',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#8A8F98',
+  textMuted: '#555660',
+  accent: '#3B82F6',
+  accentDim: 'rgba(59,130,246,0.18)',
+}
+
+// ─── Nav ─────────────────────────────────────────────────────────────
+function Nav() {
+  return (
+    <nav style={{
+      position: 'sticky', top: 0, zIndex: 50,
+      height: '64px', display: 'flex', alignItems: 'center',
+      background: DARK.bg, borderBottom: `1px solid ${DARK.border}`,
+    }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {/* Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+          <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: DARK.accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width='16' height='16' viewBox='0 0 16 16' fill='none'>
+              <path d='M8 2L13 5.5H3L8 2Z' fill='white' />
+              <path d='M3 5.5V10.5L8 14V8.5H13V5.5H3Z' fill='white' fillOpacity='0.7' />
+            </svg>
+          </div>
+          <span style={{ fontSize: '14px', fontWeight: '600', color: DARK.textPrimary }}>The Driving Center</span>
+        </div>
+        {/* Links */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+          <Link href='#features' style={{ fontSize: '14px', color: DARK.textSecondary, textDecoration: 'none', fontWeight: '500' }}>Features</Link>
+          <Link href='#pricing' style={{ fontSize: '14px', color: DARK.textSecondary, textDecoration: 'none', fontWeight: '500' }}>Pricing</Link>
+          <Link href='#faq' style={{ fontSize: '14px', color: DARK.textSecondary, textDecoration: 'none', fontWeight: '500' }}>FAQ</Link>
+        </div>
+        {/* CTA */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Link href='/login' style={{ fontSize: '14px', color: DARK.textSecondary, textDecoration: 'none', fontWeight: '500' }}>Sign in</Link>
+          <Link href='/signup' style={{
+            background: DARK.textPrimary, color: '#000',
+            padding: '8px 16px', borderRadius: '100px',
+            fontSize: '13px', fontWeight: '600', textDecoration: 'none',
+          }}>Start free trial</Link>
+        </div>
+      </div>
+    </nav>
+  )
+}
+
+// ─── Dashboard Mockup (inside hero) ─────────────────────────────────
+function DashboardMockup() {
+  const labelStyle = { fontSize: '12px', color: DARK.textSecondary, fontWeight: '500' }
+  const valueStyle = { fontSize: '12px', color: DARK.textPrimary, fontWeight: '600' }
+  const mutedStyle = { fontSize: '11px', color: DARK.textMuted }
+  const rowStyle = { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: `1px solid ${DARK.borderLight}` as string }
+
   return (
     <div style={{
-      background: '#FFFFFF',
-      borderRadius: '24px',
-      padding: '32px',
-      gridColumn: wide ? 'span 2' : undefined,
-      boxShadow: '0px 4px 6px -2px rgba(16, 24, 40, 0.03), 0px 12px 16px -4px rgba(16, 24, 40, 0.08)',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '8px',
+      background: DARK.surface,
+      borderRadius: '12px',
+      border: `1px solid ${DARK.border}`,
+      overflow: 'hidden',
     }}>
-      <p style={{ fontSize: '12px', fontWeight: '600', color: '#667085', letterSpacing: '0.02em', textTransform: 'uppercase' }}>{title}</p>
-      {subtitle && <p style={{ fontSize: '13px', color: '#667085', margin: 0 }}>{subtitle}</p>}
-      <p style={{ fontSize: '40px', fontWeight: '700', color: '#101828', letterSpacing: '-0.02em', lineHeight: '1.1', margin: 0 }}>{value}</p>
-      {change && (
-        <p style={{
-          fontSize: '12px', fontWeight: '600',
-          color: changeType === 'up' ? '#12B76A' : '#F04438',
-          background: changeType === 'up' ? '#F2F7E8' : '#FFF0ED',
-          padding: '3px 8px', borderRadius: '6px', display: 'inline-block', width: 'fit-content', margin: 0,
-        }}>
-          {change}
-        </p>
-      )}
+      {/* Window chrome */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '11px 16px', borderBottom: `1px solid ${DARK.borderLight}` }}>
+        <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FF5F57' }} />
+        <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FFBD2E' }} />
+        <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#28CA41' }} />
+        <span style={{ fontSize: '11px', color: DARK.textMuted, marginLeft: '8px' }}>app.the-driving-center.com</span>
+      </div>
+      {/* App layout */}
+      <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr' }}>
+        {/* Sidebar */}
+        <div style={{ borderRight: `1px solid ${DARK.borderLight}`, padding: '14px 0' }}>
+          {[
+            { icon: '◈', label: 'Dashboard', active: true },
+            { icon: '◉', label: 'Students' },
+            { icon: '◎', label: 'Sessions' },
+            { icon: '◌', label: 'Billing' },
+          ].map(item => (
+            <div key={item.label} style={{
+              display: 'flex', alignItems: 'center', gap: '8px',
+              padding: '8px 14px',
+              background: item.active ? DARK.accentDim : 'transparent',
+              borderLeft: item.active ? `2px solid ${DARK.accent}` : '2px solid transparent',
+            }}>
+              <span style={{ fontSize: '13px', color: item.active ? DARK.accent : DARK.textMuted }}>{item.icon}</span>
+              <span style={{ fontSize: '12px', fontWeight: item.active ? '600' : '500', color: item.active ? DARK.textPrimary : DARK.textSecondary }}>{item.label}</span>
+            </div>
+          ))}
+        </div>
+        {/* Content */}
+        <div style={{ padding: '14px 18px' }}>
+          {/* KPI row */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '14px' }}>
+            {[
+              { label: 'Total Students', value: '24', sub: '+3 this week' },
+              { label: 'Hours Logged', value: '6.4h', sub: '+1.2h today' },
+              { label: 'Monthly Rev', value: '$840', sub: '+$120' },
+            ].map(kpi => (
+              <div key={kpi.label} style={{ background: DARK.elevated, borderRadius: '8px', padding: '10px 12px' }}>
+                <p style={{ ...labelStyle, marginBottom: '3px' }}>{kpi.label}</p>
+                <p style={{ ...valueStyle, fontSize: '17px', letterSpacing: '-0.02em', lineHeight: '1' }}>{kpi.value}</p>
+                <p style={{ fontSize: '10px', color: '#12B76A', fontWeight: '600' }}>{kpi.sub}</p>
+              </div>
+            ))}
+          </div>
+          {/* Sparkline chart */}
+          <div style={{ background: DARK.elevated, borderRadius: '8px', padding: '12px', marginBottom: '10px' }}>
+            <p style={{ ...labelStyle, marginBottom: '8px' }}>Weekly Sessions</p>
+            <svg width='100%' height='36' viewBox='0 0 200 36' preserveAspectRatio='none' style={{ display: 'block' }}>
+              <defs>
+                <linearGradient id='sg' x1='0' y1='0' x2='0' y2='1'>
+                  <stop offset='0%' stopColor='#3B82F6' stopOpacity='0.25' />
+                  <stop offset='100%' stopColor='#3B82F6' stopOpacity='0' />
+                </linearGradient>
+              </defs>
+              <path d='M0,30 L28,24 L56,26 L84,12 L112,19 L140,8 L168,16 L196,6 L200,6 L200,36 L0,36 Z' fill='url(#sg)' />
+              <path d='M0,30 L28,24 L56,26 L84,12 L112,19 L140,8 L168,16 L196,6' stroke='#3B82F6' strokeWidth='1.5' fill='none' strokeLinecap='round' strokeLinejoin='round' />
+            </svg>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
+              {['Mon','Tue','Wed','Thu','Fri','Sat'].map(d => <span key={d} style={{ fontSize: '9px', color: DARK.textMuted }}>{d}</span>)}
+            </div>
+          </div>
+          {/* Recent rows */}
+          <div>
+            {[
+              { name: 'Jake Thompson', action: 'completed session', time: '2h ago', pct: '78%' },
+              { name: 'Sarah Miller', action: 'booked May 12', time: '4h ago', pct: '45%' },
+              { name: 'Marcus Lee', action: 'TCA certified ✓', time: 'Yesterday', pct: '100%' },
+            ].map(r => (
+              <div key={r.name} style={rowStyle}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{
+                    width: '22px', height: '22px', borderRadius: '50%',
+                    background: DARK.accentDim, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '9px', fontWeight: '700', color: DARK.accent, flexShrink: 0,
+                  }}>
+                    {r.name.split(' ').map((n: string) => n[0]).join('')}
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '11px', fontWeight: '600', color: DARK.textPrimary }}>{r.name}</p>
+                    <p style={{ fontSize: '10px', color: DARK.textSecondary }}>{r.action}</p>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '36px', height: '3px', background: DARK.borderLight, borderRadius: '2px' }}>
+                    <div style={{ width: r.pct, height: '100%', background: DARK.accent, borderRadius: '2px' }} />
+                  </div>
+                  <span style={{ fontSize: '10px', color: DARK.textMuted, minWidth: '40px', textAlign: 'right' }}>{r.time}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
 
-// ─── Feature Item ────────────────────────────────────────────────────
+// ─── Feature Item ─────────────────────────────────────────────────────
 function FeatureItem({ num, title, desc }: { num: string; title: string; desc: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      <p style={{ fontSize: '11px', fontWeight: '700', color: '#9A9FA5', letterSpacing: '0.08em' }}>{num}</p>
-      <h3 style={{ fontSize: '17px', fontWeight: '700', color: '#101828', letterSpacing: '-0.01em', lineHeight: '1.3', margin: 0 }}>{title}</h3>
-      <p style={{ fontSize: '14px', color: '#667085', lineHeight: '1.65', margin: 0 }}>{desc}</p>
+      <p style={{ fontSize: '11px', fontWeight: '700', color: DARK.textMuted, letterSpacing: '0.08em' }}>{num}</p>
+      <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#0B0C0E', letterSpacing: '-0.01em', lineHeight: '1.3', margin: 0 }}>{title}</h3>
+      <p style={{ fontSize: '13px', color: '#667085', lineHeight: '1.65', margin: 0 }}>{desc}</p>
     </div>
   )
 }
 
-// ─── Pricing Card ───────────────────────────────────────────────────
+// ─── Pricing Card ─────────────────────────────────────────────────────
 function PricingCard({ name, price, desc, features, highlighted, cta }: {
   name: string; price: string; desc: string;
   features: string[]; highlighted?: boolean; cta: string;
 }) {
   return (
     <div style={{
-      background: highlighted ? '#101828' : '#FFFFFF',
-      borderRadius: '24px',
-      padding: '32px',
+      background: highlighted ? '#0B0C0E' : '#FFFFFF',
+      borderRadius: '20px',
+      padding: '28px',
       border: highlighted ? 'none' : '1px solid #E4E7EC',
-      boxShadow: highlighted
-        ? '0px 4px 6px -2px rgba(16, 24, 40, 0.03), 0px 12px 16px -4px rgba(16, 24, 40, 0.08)'
-        : 'none',
       display: 'flex', flexDirection: 'column',
     }}>
-      <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: highlighted ? '#667085' : '#667085', marginBottom: '12px' }}>
+      <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#667085', marginBottom: '12px' }}>
         {name}
       </p>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '12px' }}>
-        <span style={{ fontSize: '44px', fontWeight: '800', color: highlighted ? '#FFFFFF' : '#101828', lineHeight: '1', letterSpacing: '-0.02em' }}>{price}</span>
-        <span style={{ fontSize: '14px', color: highlighted ? '#667085' : '#9A9FA5' }}>/mo</span>
+        <span style={{ fontSize: '40px', fontWeight: '800', color: highlighted ? '#FFFFFF' : '#0B0C0E', lineHeight: '1', letterSpacing: '-0.02em' }}>{price}</span>
+        <span style={{ fontSize: '13px', color: '#9B9FA5' }}>/mo</span>
       </div>
-      <p style={{ fontSize: '14px', color: highlighted ? '#667085' : '#667085', marginBottom: '24px', lineHeight: '1.5' }}>{desc}</p>
+      <p style={{ fontSize: '13px', color: '#667085', marginBottom: '24px', lineHeight: '1.5' }}>{desc}</p>
       <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
         {features.map(f => (
-          <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', color: highlighted ? '#FFFFFF' : '#344054' }}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
-              <path d="M3 8l3.5 3.5 6.5-7" stroke={highlighted ? '#12B76A' : '#12B76A'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: highlighted ? '#8A8F98' : '#344054' }}>
+            <svg width='14' height='14' viewBox='0 0 16 16' fill='none' style={{ flexShrink: 0 }}>
+              <path d='M3 8l3.5 3.5 6.5-7' stroke={highlighted ? '#3B82F6' : '#12B76A'} strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
             </svg>
             {f}
           </li>
         ))}
       </ul>
-      <Link href="/signup" style={{
+      <Link href='/signup' style={{
         display: 'flex', justifyContent: 'center',
-        padding: '12px 24px', borderRadius: '12px',
-        fontSize: '14px', fontWeight: '600', textDecoration: 'none',
-        background: highlighted ? '#FFFFFF' : '#101828',
-        color: highlighted ? '#101828' : '#FFFFFF',
+        padding: '11px 20px', borderRadius: '10px',
+        fontSize: '13px', fontWeight: '600', textDecoration: 'none',
+        background: highlighted ? '#FFFFFF' : '#0B0C0E',
+        color: highlighted ? '#0B0C0E' : '#FFFFFF',
       }}>
         {cta}
       </Link>
@@ -91,24 +220,24 @@ function PricingCard({ name, price, desc, features, highlighted, cta }: {
   )
 }
 
-// ─── FAQ Item ───────────────────────────────────────────────────────
+// ─── FAQ Item ──────────────────────────────────────────────────────────
 function FaqItem({ question, answer }: { question: string; answer: string }) {
   return (
-    <details style={{ borderBottom: '1px solid #F2F4F7', padding: '20px 0', cursor: 'pointer' }}>
+    <details style={{ borderBottom: '1px solid #F2F4F7', padding: '18px 0', cursor: 'pointer' }}>
       <summary style={{ listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
-        <span style={{ fontSize: '15px', fontWeight: '600', color: '#101828' }}>{question}</span>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#667085" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-          style={{ flexShrink: 0, transition: 'transform 0.2s' }} className="faq-chevron">
-          <path d="M4 6l4 4 4-4"/>
+        <span style={{ fontSize: '14px', fontWeight: '600', color: '#101828' }}>{question}</span>
+        <svg width='14' height='14' viewBox='0 0 16 16' fill='none' stroke='#667085' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'
+          style={{ flexShrink: 0, transition: 'transform 0.2s' }} className='faq-chevron'>
+          <path d='M4 6l4 4 4-4'/>
         </svg>
       </summary>
-      <p style={{ fontSize: '14px', color: '#667085', lineHeight: '1.7', marginTop: '12px' }}>{answer}</p>
+      <p style={{ fontSize: '13px', color: '#667085', lineHeight: '1.7', marginTop: '10px' }}>{answer}</p>
       <style>{`details[open] .faq-chevron { transform: rotate(180deg); }`}</style>
     </details>
   )
 }
 
-// ─── Data ───────────────────────────────────────────────────────────
+// ─── Data ──────────────────────────────────────────────────────────────
 const FEATURES = [
   { num: '01', title: 'Students book online — no phone tag', desc: 'Students pick a time, pay upfront, get confirmed. Instructors see their schedule in one place.' },
   { num: '02', title: 'TCA tracking that actually works', desc: 'Every session counts toward Tennessee Certificate of Completion. Certificates generate automatically when requirements are met.' },
@@ -138,301 +267,192 @@ const FAQ_ITEMS = [
   { question: 'Can I invite my existing instructor team?', answer: 'Yes. Invite unlimited instructors to your school. Set their availability, assign students, and track their session logs from the instructor dashboard.' },
 ]
 
-// ─── Main Page ──────────────────────────────────────────────────────
+// ─── Main Page ─────────────────────────────────────────────────────────
 export default function HomePage() {
   return (
     <main style={{ background: '#F2F4F7', color: '#101828', fontFamily: 'Inter, system-ui, sans-serif', overflowX: 'hidden' }}>
 
-      {/* ── NAVBAR ───────────────────────────────────────── */}
-      <nav style={{
-        position: 'sticky', top: 0, zIndex: 50,
-        background: '#FFFFFF',
-        borderBottom: '1px solid #E4E7EC',
-      }}>
-        <div style={{
-          maxWidth: '1200px', margin: '0 auto', padding: '0 24px',
-          height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-            <div style={{
-              width: '32px', height: '32px', borderRadius: '8px',
-              background: '#101828', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', fontSize: '12px', fontWeight: '700', flexShrink: 0,
-            }}>DC</div>
-            <span style={{ fontSize: '14px', fontWeight: '600', color: '#101828' }}>The Driving Center</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-            <Link href="#features" style={{ fontSize: '14px', color: '#344054', textDecoration: 'none', fontWeight: '500' }}>Features</Link>
-            <Link href="#pricing" style={{ fontSize: '14px', color: '#344054', textDecoration: 'none', fontWeight: '500' }}>Pricing</Link>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Link href="/login" style={{ fontSize: '14px', color: '#344054', textDecoration: 'none', fontWeight: '500' }}>Sign in</Link>
-            <Link href="/signup" style={{
-              background: '#101828', color: '#FFFFFF',
-              padding: '10px 20px', borderRadius: '10px',
-              fontSize: '14px', fontWeight: '600', textDecoration: 'none',
-            }}>Get started</Link>
-          </div>
-        </div>
-      </nav>
+      {/* ── DARK NAV ───────────────────────────────────────── */}
+      <div style={{ background: DARK.bg }}><Nav /></div>
 
-      {/* ── HERO ───────────────────────────────────────── */}
-      <section style={{ padding: '80px 24px 72px', background: '#F2F4F7' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '56px', alignItems: 'center' }}>
-            {/* Left: headline + CTA */}
+      {/* ── HERO (Linear dark mode) ─────────────────────────── */}
+      <section style={{ background: DARK.bg, position: 'relative', overflow: 'hidden' }}>
+        {/* Top atmospheric glow */}
+        <div style={{
+          position: 'absolute', top: '-20%', left: '50%', transform: 'translateX(-50%)',
+          width: '700px', height: '400px',
+          background: 'radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.12) 0%, transparent 65%)',
+          pointerEvents: 'none',
+        }} />
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '72px 24px 88px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center' }}>
+
+            {/* Left: headline */}
             <div>
-              <p style={{ fontSize: '12px', fontWeight: '600', color: '#667085', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '20px' }}>
+              <p style={{ fontSize: '11px', fontWeight: '600', color: DARK.textMuted, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '18px' }}>
                 Scheduling and payment software
               </p>
               <h1 style={{
-                fontSize: '52px', fontWeight: '800', lineHeight: '1.05',
-                letterSpacing: '-0.025em', color: '#101828', marginBottom: '20px',
+                fontSize: 'clamp(38px, 5vw, 60px)',
+                fontWeight: '700',
+                lineHeight: '1.04',
+                letterSpacing: '-0.03em',
+                color: DARK.textPrimary,
+                marginBottom: '18px',
               }}>
                 The easier way<br />to run your<br />driving school.
               </h1>
               <p style={{
-                fontSize: '17px', color: '#667085', lineHeight: '1.65',
-                maxWidth: '420px', marginBottom: '36px',
+                fontSize: '16px',
+                color: DARK.textSecondary,
+                lineHeight: '1.65',
+                maxWidth: '390px',
+                marginBottom: '32px',
               }}>
                 Automate bookings, track student progress, get paid online. Built for driving schools in Tennessee.
               </p>
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                <Link href="/signup" style={{
-                  background: '#101828', color: '#FFFFFF',
-                  padding: '13px 24px', borderRadius: '12px',
-                  fontSize: '15px', fontWeight: '600', textDecoration: 'none',
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <Link href='/signup' style={{
+                  background: DARK.textPrimary, color: '#000',
+                  padding: '11px 22px', borderRadius: '100px',
+                  fontSize: '14px', fontWeight: '600', textDecoration: 'none',
                 }}>
                   Start free trial
                 </Link>
-                <Link href="#features" style={{
-                  border: '1px solid #E4E7EC', color: '#101828',
-                  padding: '13px 24px', borderRadius: '12px',
-                  fontSize: '15px', fontWeight: '600', textDecoration: 'none',
-                  background: '#FFFFFF',
+                <Link href='#features' style={{
+                  color: DARK.textSecondary,
+                  fontSize: '14px', fontWeight: '500', textDecoration: 'none',
+                  display: 'flex', alignItems: 'center', gap: '6px',
                 }}>
                   See how it works
+                  <svg width='14' height='14' viewBox='0 0 16 16' fill='none' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'>
+                    <path d='M3 8h10M9 4l4 4-4 4'/>
+                  </svg>
                 </Link>
               </div>
-              <p style={{ fontSize: '13px', color: '#9A9FA5', marginTop: '16px' }}>No credit card required · 14-day free trial</p>
+              <p style={{ fontSize: '12px', color: DARK.textMuted, marginTop: '14px' }}>No credit card required · 14-day free trial</p>
+              {/* State badge */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '24px', padding: '10px 14px', border: `1px solid ${DARK.border}`, borderRadius: '8px', width: 'fit-content' }}>
+                <svg width='14' height='14' viewBox='0 0 16 16' fill='none'>
+                  <path d='M8 1L2 4.5H14L8 1Z' fill={DARK.accent} />
+                  <path d='M2 4.5V8.5L8 12V7.5H14V4.5H2Z' fill={DARK.accent} fillOpacity='0.6' />
+                </svg>
+                <span style={{ fontSize: '12px', fontWeight: '600', color: DARK.textSecondary }}>Built for Tennessee</span>
+                <span style={{ fontSize: '11px', color: DARK.textMuted }}>Knoxville · Nashville · Chattanooga</span>
+              </div>
             </div>
 
-            {/* Right: Dashboard bento grid */}
-            <div style={{
-              background: '#FFFFFF',
-              borderRadius: '24px',
-              padding: '28px',
-              boxShadow: '0px 4px 6px -2px rgba(16, 24, 40, 0.03), 0px 12px 16px -4px rgba(16, 24, 40, 0.08)',
-              display: 'flex', flexDirection: 'column', gap: '20px',
-            }}>
-              {/* Stats row */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <p style={{ fontSize: '11px', fontWeight: '600', color: '#667085', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Students</p>
-                  <p style={{ fontSize: '28px', fontWeight: '700', color: '#101828', letterSpacing: '-0.02em', lineHeight: '1' }}>24</p>
-                  <p style={{ fontSize: '11px', color: '#12B76A', fontWeight: '600', background: '#F2F7E8', padding: '2px 6px', borderRadius: '4px', width: 'fit-content' }}>+3 this week</p>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <p style={{ fontSize: '11px', fontWeight: '600', color: '#667085', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hours</p>
-                  <p style={{ fontSize: '28px', fontWeight: '700', color: '#101828', letterSpacing: '-0.02em', lineHeight: '1' }}>6.4h</p>
-                  <p style={{ fontSize: '11px', color: '#12B76A', fontWeight: '600', background: '#F2F7E8', padding: '2px 6px', borderRadius: '4px', width: 'fit-content' }}>+1.2h today</p>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <p style={{ fontSize: '11px', fontWeight: '600', color: '#667085', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Revenue</p>
-                  <p style={{ fontSize: '28px', fontWeight: '700', color: '#101828', letterSpacing: '-0.02em', lineHeight: '1' }}>$840</p>
-                  <p style={{ fontSize: '11px', color: '#12B76A', fontWeight: '600', background: '#F2F7E8', padding: '2px 6px', borderRadius: '4px', width: 'fit-content' }}>+$120</p>
-                </div>
-              </div>
-              {/* Weekly sessions bar chart */}
-              <div style={{ background: '#F2F4F7', borderRadius: '16px', padding: '20px' }}>
-                <p style={{ fontSize: '12px', fontWeight: '600', color: '#667085', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Weekly Sessions</p>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', height: '60px' }}>
-                  {[
-                    { h: 0.5, label: 'Mon' },
-                    { h: 0.75, label: 'Tue' },
-                    { h: 0.55, label: 'Wed' },
-                    { h: 0.9, label: 'Thu' },
-                    { h: 0.65, label: 'Fri' },
-                    { h: 0.8, label: 'Sat' },
-                  ].map((bar) => (
-                    <div key={bar.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                      <div style={{
-                        width: '100%',
-                        height: `${bar.h * 100}%`,
-                        background: 'linear-gradient(180deg, #2E90FA 0%, #D1E3F8 100%)',
-                        borderRadius: '6px 6px 0 0',
-                        minHeight: '8px',
-                      }} />
-                      <p style={{ fontSize: '10px', color: '#667085', fontWeight: '500' }}>{bar.label}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {/* Recent activity */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <p style={{ fontSize: '12px', fontWeight: '600', color: '#667085', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Recent</p>
-                {[
-                  { name: 'Jake Thompson', action: 'completed a session', time: '2h ago', type: 'up' },
-                  { name: 'Sarah Miller', action: 'booked May 12', time: '4h ago', type: 'up' },
-                  { name: 'Marcus Lee', action: 'TCA certificate issued', time: 'Yesterday', type: 'up' },
-                ].map(item => (
-                  <div key={item.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={{
-                        width: '32px', height: '32px', borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #2E90FA 0%, #D1E3F8 100%)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '11px', fontWeight: '700', color: '#fff', flexShrink: 0,
-                      }}>{item.name.split(' ').map(n => n[0]).join('')}</div>
-                      <div>
-                        <p style={{ fontSize: '13px', fontWeight: '600', color: '#101828' }}>{item.name}</p>
-                        <p style={{ fontSize: '12px', color: '#667085' }}>{item.action}</p>
-                      </div>
-                    </div>
-                    <p style={{ fontSize: '11px', color: '#9A9FA5', fontWeight: '500' }}>{item.time}</p>
-                  </div>
-                ))}
-              </div>
+            {/* Right: mockup with glow */}
+            <div style={{ position: 'relative' }}>
+              <div style={{
+                position: 'absolute', inset: '-50px',
+                background: 'radial-gradient(ellipse at 50% 45%, rgba(59,130,246,0.14) 0%, transparent 65%)',
+                pointerEvents: 'none',
+              }} />
+              <DashboardMockup />
             </div>
+
           </div>
         </div>
       </section>
 
-      {/* ── SOCIAL PROOF ───────────────────────────────── */}
-      <section style={{ background: '#FFFFFF', borderTop: '1px solid #E4E7EC', borderBottom: '1px solid #E4E7EC' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px', textAlign: 'center' }}>
-          <p style={{ fontSize: '12px', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9A9FA5', marginBottom: '20px' }}>
-            Built for Tennessee driving schools
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
-            {['Knoxville', 'Nashville', 'Chattanooga', 'Oneida', 'Cumberland'].map((city, i) => (
-              <span key={city} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '14px', color: '#667085', fontWeight: '500' }}>{city}</span>
-                {i < 4 && <span style={{ color: '#E4E7EC' }}>·</span>}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── FEATURES ──────────────────────────────────── */}
-      <section id="features" style={{ padding: '80px 24px', background: '#F2F4F7' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ marginBottom: '56px' }}>
-            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#667085', marginBottom: '14px' }}>Platform</p>
-            <h2 style={{ fontSize: '36px', fontWeight: '700', color: '#101828', letterSpacing: '-0.02em', lineHeight: '1.15', margin: 0 }}>
-              What you get
-            </h2>
+      {/* ── FEATURES ────────────────────────────────────────── */}
+      <section id='features' style={{ padding: '80px 24px', background: '#FFFFFF' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ marginBottom: '48px' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9FA5', marginBottom: '12px' }}>Platform</p>
+            <h2 style={{ fontSize: '32px', fontWeight: '700', color: '#0B0C0E', letterSpacing: '-0.02em', lineHeight: '1.15', margin: 0 }}>What you get</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
-            {FEATURES.map(f => (
-              <FeatureItem key={f.num} {...f} />
-            ))}
+            {FEATURES.map(f => <FeatureItem key={f.num} {...f} />)}
           </div>
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ──────────────────────────────── */}
-      <section style={{ padding: '80px 24px', background: '#FFFFFF', borderTop: '1px solid #E4E7EC' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ marginBottom: '56px' }}>
-            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#667085', marginBottom: '14px' }}>Setup</p>
-            <h2 style={{ fontSize: '36px', fontWeight: '700', color: '#101828', letterSpacing: '-0.02em', lineHeight: '1.15', margin: 0 }}>
-              Up and running in an afternoon
-            </h2>
+      {/* ── HOW IT WORKS ────────────────────────────────────── */}
+      <section style={{ padding: '80px 24px', background: '#F2F4F7' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ marginBottom: '48px' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9FA5', marginBottom: '12px' }}>Setup</p>
+            <h2 style={{ fontSize: '32px', fontWeight: '700', color: '#0B0C0E', letterSpacing: '-0.02em', lineHeight: '1.15', margin: 0 }}>Up and running in an afternoon</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0', borderRadius: '24px', overflow: 'hidden', border: '1px solid #E4E7EC' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0', borderRadius: '16px', overflow: 'hidden', border: '1px solid #E4E7EC' }}>
             {HOW_IT_WORKS.map((step, i) => (
-              <div key={step.step} style={{
-                padding: '40px 32px',
-                borderRight: i < 2 ? '1px solid #E4E7EC' : 'none',
-                background: '#FFFFFF',
-              }}>
-                <p style={{ fontSize: '48px', fontWeight: '800', color: '#E4E7EC', lineHeight: '1', marginBottom: '20px', letterSpacing: '-0.03em' }}>{step.step}</p>
-                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#101828', marginBottom: '10px', lineHeight: '1.3' }}>{step.title}</h3>
-                <p style={{ fontSize: '14px', color: '#667085', lineHeight: '1.6' }}>{step.desc}</p>
+              <div key={step.step} style={{ padding: '36px 28px', borderRight: i < 2 ? '1px solid #E4E7EC' : 'none', background: '#FFFFFF' }}>
+                <p style={{ fontSize: '44px', fontWeight: '800', color: '#E4E7EC', lineHeight: '1', marginBottom: '16px', letterSpacing: '-0.03em' }}>{step.step}</p>
+                <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#0B0C0E', marginBottom: '10px', lineHeight: '1.3' }}>{step.title}</h3>
+                <p style={{ fontSize: '13px', color: '#667085', lineHeight: '1.6' }}>{step.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── PRICING ───────────────────────────────────── */}
-      <section id="pricing" style={{ padding: '80px 24px', background: '#F2F4F7' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ marginBottom: '48px' }}>
-            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#667085', marginBottom: '14px' }}>Pricing</p>
-            <h2 style={{ fontSize: '36px', fontWeight: '700', color: '#101828', letterSpacing: '-0.02em', lineHeight: '1.15', marginBottom: '12px' }}>
-              Simple, transparent pricing
-            </h2>
-            <p style={{ fontSize: '16px', color: '#667085' }}>No setup fees. No per-seat surprises. Cancel anytime.</p>
+      {/* ── PRICING ─────────────────────────────────────────── */}
+      <section id='pricing' style={{ padding: '80px 24px', background: '#FFFFFF' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ marginBottom: '40px' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9FA5', marginBottom: '12px' }}>Pricing</p>
+            <h2 style={{ fontSize: '32px', fontWeight: '700', color: '#0B0C0E', letterSpacing: '-0.02em', lineHeight: '1.15', marginBottom: '10px' }}>Simple, transparent pricing</h2>
+            <p style={{ fontSize: '14px', color: '#667085' }}>No setup fees. No per-seat surprises. Cancel anytime.</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', alignItems: 'start' }}>
-            {PRICING_TIERS.map(t => (
-              <PricingCard key={t.name} {...t} />
-            ))}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px', alignItems: 'start' }}>
+            {PRICING_TIERS.map(t => <PricingCard key={t.name} {...t} />)}
           </div>
         </div>
       </section>
 
-      {/* ── FAQ ──────────────────────────────────────── */}
-      <section id="faq" style={{ padding: '80px 24px', background: '#FFFFFF', borderTop: '1px solid #E4E7EC' }}>
+      {/* ── FAQ ─────────────────────────────────────────────── */}
+      <section id='faq' style={{ padding: '80px 24px', background: '#F2F4F7' }}>
         <div style={{ maxWidth: '680px', margin: '0 auto' }}>
-          <div style={{ marginBottom: '48px' }}>
-            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#667085', marginBottom: '14px' }}>FAQ</p>
-            <h2 style={{ fontSize: '36px', fontWeight: '700', color: '#101828', letterSpacing: '-0.02em', lineHeight: '1.15' }}>
-              Common questions
-            </h2>
+          <div style={{ marginBottom: '40px' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9FA5', marginBottom: '12px' }}>FAQ</p>
+            <h2 style={{ fontSize: '32px', fontWeight: '700', color: '#0B0C0E', letterSpacing: '-0.02em', lineHeight: '1.15' }}>Common questions</h2>
           </div>
-          <div style={{ padding: '0 4px' }}>
-            {FAQ_ITEMS.map(item => (
-              <FaqItem key={item.question} {...item} />
-            ))}
+          <div style={{ background: '#FFFFFF', borderRadius: '16px', padding: '4px 24px' }}>
+            {FAQ_ITEMS.map(item => <FaqItem key={item.question} {...item} />)}
           </div>
         </div>
       </section>
 
-      {/* ── DARK CTA ──────────────────────────────────── */}
-      <section style={{ padding: '80px 24px', background: '#101828' }}>
+      {/* ── DARK CTA ─────────────────────────────────────────── */}
+      <section style={{ padding: '72px 24px', background: '#0B0C0E' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: '36px', fontWeight: '700', color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: '1.15', marginBottom: '16px' }}>
-            Ready to set up your school?
-          </h2>
-          <p style={{ fontSize: '17px', color: '#667085', marginBottom: '40px' }}>
-            14-day free trial. No credit card required.
-          </p>
+          <h2 style={{ fontSize: '32px', fontWeight: '700', color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: '1.15', marginBottom: '14px' }}>Ready to set up your school?</h2>
+          <p style={{ fontSize: '15px', color: '#555660', marginBottom: '36px' }}>14-day free trial. No credit card required.</p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/signup" style={{
-              background: '#FFFFFF', color: '#101828',
-              padding: '13px 28px', borderRadius: '12px',
-              fontSize: '15px', fontWeight: '600', textDecoration: 'none',
-            }}>
-              Start free trial
-            </Link>
-            <Link href="/book" style={{
-              border: '1px solid #344054', color: '#FFFFFF',
-              padding: '13px 28px', borderRadius: '12px',
-              fontSize: '15px', fontWeight: '600', textDecoration: 'none',
-            }}>
-              See a demo
-            </Link>
+            <Link href='/signup' style={{
+              background: '#FFFFFF', color: '#0B0C0E',
+              padding: '12px 24px', borderRadius: '100px',
+              fontSize: '14px', fontWeight: '600', textDecoration: 'none',
+            }}>Start free trial</Link>
+            <Link href='/book' style={{
+              border: `1px solid ${DARK.border}`, color: '#8A8F98',
+              padding: '12px 24px', borderRadius: '100px',
+              fontSize: '14px', fontWeight: '600', textDecoration: 'none',
+            }}>See a demo</Link>
           </div>
         </div>
       </section>
 
-      {/* ── FOOTER ─────────────────────────────────────── */}
-      <footer style={{ borderTop: '1px solid #E4E7EC', background: '#FFFFFF', padding: '28px 24px' }}>
+      {/* ── FOOTER ────────────────────────────────────────────── */}
+      <footer style={{ borderTop: '1px solid #E4E7EC', background: '#FFFFFF', padding: '24px 24px' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: '#101828', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '11px', fontWeight: '700' }}>DC</div>
+            <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: '#0B0C0E', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width='12' height='12' viewBox='0 0 16 16' fill='none'>
+                <path d='M8 2L13 5.5H3L8 2Z' fill='white' />
+                <path d='M3 5.5V10.5L8 14V8.5H13V5.5H3Z' fill='white' fillOpacity='0.7' />
+              </svg>
+            </div>
             <span style={{ fontSize: '13px', color: '#667085' }}>The Driving Center</span>
           </div>
           <div style={{ display: 'flex', gap: '24px' }}>
-            <Link href="/legal/privacy" style={{ fontSize: '13px', color: '#667085', textDecoration: 'none' }}>Privacy</Link>
-            <Link href="/legal/terms" style={{ fontSize: '13px', color: '#667085', textDecoration: 'none' }}>Terms</Link>
-            <Link href="/login" style={{ fontSize: '13px', color: '#667085', textDecoration: 'none' }}>Sign in</Link>
+            <Link href='/legal/privacy' style={{ fontSize: '13px', color: '#667085', textDecoration: 'none' }}>Privacy</Link>
+            <Link href='/legal/terms' style={{ fontSize: '13px', color: '#667085', textDecoration: 'none' }}>Terms</Link>
+            <Link href='/login' style={{ fontSize: '13px', color: '#667085', textDecoration: 'none' }}>Sign in</Link>
           </div>
-          <span style={{ fontSize: '13px', color: '#9A9FA5' }}>© 2026 The Driving Center</span>
+          <span style={{ fontSize: '13px', color: '#9B9FA5' }}>© 2026 The Driving Center</span>
         </div>
       </footer>
 
