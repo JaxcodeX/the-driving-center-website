@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Car, Clock, BookOpen, CheckCircle, Calendar as CalendarIcon,
   ChevronLeft, User, Mail, Phone, Hash, AlertCircle, GraduationCap, Route,
+  Star, Shield, ArrowRight
 } from 'lucide-react'
 
 type SessionType = {
@@ -28,11 +29,11 @@ function ft(time: string) {
   const hour = h > 12 ? h - 12 : h === 0 ? 12 : h
   return `${hour}:${m.toString().padStart(2, '0')} ${ampm}`
 }
-function fd(dateStr: string) {
-  return new Date(`${dateStr}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
-}
 function ffd(dateStr: string) {
   return new Date(`${dateStr}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+}
+function fd(dateStr: string) {
+  return new Date(`${dateStr}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
 }
 function iconFor(name: string) {
   if (name.toLowerCase().includes('traffic')) return <Car className="w-5 h-5" />
@@ -77,32 +78,36 @@ function ServiceSelection({ sessionTypes, selectedType, onSelect, loading }: {
       <p className="text-sm mb-6" style={{ color: '#94A3B8' }}>Choose the service that fits your needs.</p>
 
       {loading ? (
-        <div className="grid gap-3">
-          {[1, 2, 3].map(i => <div key={i} className="rounded-xl p-5 h-28 animate-pulse" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }} />)}
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-28 rounded-2xl animate-pulse" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }} />
+          ))}
         </div>
       ) : sessionTypes.length === 0 ? (
-        <div className="text-center py-16 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="rounded-2xl p-12 text-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
           <CalendarIcon className="w-10 h-10 mx-auto mb-3" style={{ color: '#64748B' }} />
           <p style={{ color: '#94A3B8' }}>No services available right now.</p>
         </div>
       ) : (
-        <div className="grid gap-3">
+        <div className="space-y-3">
           {sessionTypes.map(type => {
             const sel = selectedType?.id === type.id
             return (
               <button key={type.id} onClick={() => onSelect(type)}
-                className="rounded-xl p-5 text-left transition-all duration-300 group"
+                className="glass-card w-full text-left relative group cursor-pointer"
                 style={{
-                  background: sel ? 'rgba(0,102,255,0.1)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${sel ? '#0066FF' : 'rgba(255,255,255,0.08)'}`,
+                  background: sel ? 'rgba(0,102,255,0.12)' : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${sel ? 'rgba(0,102,255,0.6)' : 'rgba(255,255,255,0.08)'}`,
                 }}>
                 {sel && (
-                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-4 right-4 w-6 h-6 rounded-full flex items-center justify-center" style={{ background: '#0066FF' }}>
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
+                    className="absolute top-4 right-4 w-6 h-6 rounded-full flex items-center justify-center"
+                    style={{ background: '#0066FF' }}>
                     <CheckCircle className="w-4 h-4 text-white" />
                   </motion.div>
                 )}
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-colors"
                     style={{ background: sel ? 'rgba(0,102,255,0.2)' : 'rgba(255,255,255,0.06)', color: sel ? '#7ED4FD' : '#94A3B8' }}>
                     {iconFor(type.name)}
                   </div>
@@ -110,19 +115,20 @@ function ServiceSelection({ sessionTypes, selectedType, onSelect, loading }: {
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className="font-semibold" style={{ color: '#ffffff' }}>{type.name}</span>
                       {type.tca_hours_credit && (
-                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(0,102,255,0.15)', color: '#7ED4FD' }}>
+                        <span className="text-xs px-2.5 py-0.5 rounded-full" style={{ background: 'rgba(126,212,253,0.12)', color: '#7ED4FD', border: '1px solid rgba(126,212,253,0.2)' }}>
                           {type.tca_hours_credit}h TCA Credit
                         </span>
                       )}
                     </div>
-                    <p className="text-sm mb-2" style={{ color: '#94A3B8' }}>{type.description}</p>
-                    <span className="flex items-center gap-1 text-xs" style={{ color: '#64748B' }}>
-                      <Clock className="w-3 h-3" />{type.duration_minutes} min
-                    </span>
+                    <p className="text-sm mb-3" style={{ color: '#94A3B8' }}>{type.description}</p>
+                    <div className="flex items-center gap-1 text-xs" style={{ color: '#64748B' }}>
+                      <Clock className="w-3.5 h-3.5" />{type.duration_minutes} min
+                      {type.deposit_cents > 0 && <span>· {fp(type.deposit_cents)} deposit</span>}
+                    </div>
                   </div>
                   <div className="shrink-0 text-right ml-2">
-                    <div className="font-bold text-lg" style={{ color: sel ? '#7ED4FD' : '#ffffff' }}>{fp(type.price_cents)}</div>
-                    {type.deposit_cents > 0 && <div className="text-xs" style={{ color: '#64748B' }}>{fp(type.deposit_cents)} deposit</div>}
+                    <div className="font-bold text-xl" style={{ color: sel ? '#7ED4FD' : '#ffffff' }}>{fp(type.price_cents)}</div>
+                    <div className="text-xs mt-0.5" style={{ color: '#64748B' }}>per session</div>
                   </div>
                 </div>
               </button>
@@ -135,9 +141,9 @@ function ServiceSelection({ sessionTypes, selectedType, onSelect, loading }: {
 }
 
 // ─── STEP 2: Date & Time ─────────────────────────────────────────────────────
-function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingSlots, schoolId, onBack }: {
+function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingSlots, onBack }: {
   selectedType: SessionType; slots: Slot[]; selectedSlot: Slot | null
-  onSelectSlot: (s: Slot) => void; loadingSlots: boolean; schoolId: string; onBack: () => void
+  onSelectSlot: (s: Slot) => void; loadingSlots: boolean; onBack: () => void
 }) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const days = Array.from({ length: 7 }, (_, i) => {
@@ -153,19 +159,20 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
   return (
     <motion.div key="step-slot" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3, ease: 'easeInOut' }}>
-      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors" style={{ color: '#94A3B8' }}>
+      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white" style={{ color: '#94A3B8' }}>
         <ChevronLeft className="w-4 h-4" /> Back
       </button>
       <h1 className="text-2xl font-bold mb-1" style={{ color: '#ffffff' }}>{selectedType.name}</h1>
-      <p className="text-sm mb-6" style={{ color: '#94A3B8' }}>{selectedType.duration_minutes} min{selectedType.deposit_cents > 0 ? ` · ${fp(selectedType.deposit_cents)} deposit` : ''}</p>
+      <p className="text-sm mb-6" style={{ color: '#94A3B8' }}>{selectedType.duration_minutes} min · {fp(selectedType.price_cents)}</p>
 
-      <div className="mb-6">
+      {/* Calendar strip */}
+      <div className="glass-card mb-5" style={{ padding: '16px' }}>
         <div className="flex gap-2 overflow-x-auto pb-1">
           {days.map(({ dateStr, label, dayNum, month, isToday }) => {
             const hasSlots = !!slotsByDate[dateStr]; const sel = selectedDate === dateStr
             return (
               <button key={dateStr} onClick={() => setSelectedDate(sel ? null : dateStr)}
-                className="flex-shrink-0 flex flex-col items-center rounded-xl px-3 py-3 min-w-[64px] transition-all duration-200"
+                className="flex-shrink-0 flex flex-col items-center rounded-2xl px-3 py-3 min-w-[64px] transition-all duration-200 cursor-pointer"
                 style={{
                   background: sel ? 'rgba(0,102,255,0.15)' : hasSlots ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)',
                   border: `1px solid ${sel ? '#0066FF' : hasSlots ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)'}`,
@@ -174,7 +181,7 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
                 <span className="text-xs" style={{ color: isToday ? '#7ED4FD' : undefined }}>{label}</span>
                 <span className="text-lg font-bold mt-0.5">{dayNum}</span>
                 <span className="text-xs" style={{ opacity: 0.6 }}>{month}</span>
-                {hasSlots && !sel && <div className="w-1 h-1 rounded-full mt-1" style={{ background: '#7ED4FD' }} />}
+                {hasSlots && !sel && <div className="w-1.5 h-1.5 rounded-full mt-1" style={{ background: '#7ED4FD' }} />}
               </button>
             )
           })}
@@ -183,10 +190,12 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
 
       {loadingSlots ? (
         <div className="space-y-2">
-          {[1, 2, 3, 4].map(i => <div key={i} className="rounded-xl h-14 animate-pulse" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }} />)}
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="h-14 rounded-2xl animate-pulse" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }} />
+          ))}
         </div>
       ) : selectedDateSlots.length === 0 ? (
-        <div className="text-center py-12 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="rounded-2xl p-10 text-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
           <CalendarIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#64748B' }} />
           <p className="text-sm" style={{ color: '#94A3B8' }}>No available times{selectedDate ? ' on this day' : ''}.</p>
         </div>
@@ -203,7 +212,7 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
                     const sel = selectedSlot?.session_date === slot.session_date && selectedSlot?.start_time === slot.start_time && selectedSlot?.instructor_id === slot.instructor_id
                     return (
                       <button key={i} onClick={() => onSelectSlot(slot)}
-                        className="rounded-xl py-3 px-4 text-left transition-all duration-200"
+                        className="glass-card py-3 px-4 text-left cursor-pointer"
                         style={{
                           background: sel ? 'rgba(0,102,255,0.15)' : 'rgba(255,255,255,0.04)',
                           border: `1px solid ${sel ? '#0066FF' : 'rgba(255,255,255,0.08)'}`,
@@ -232,56 +241,74 @@ function StudentDetails({ selectedType, selectedSlot, studentName, setStudentNam
   permitNumber: string; setPermitNumber: (v: string) => void
   formError: string; submitting: boolean; onSubmit: (e: React.FormEvent) => void; onBack: () => void
 }) {
-  const inputStyle = { height: '52px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#ffffff', outline: 'none', padding: '0 16px', fontSize: '14px', width: '100%' as const }
   return (
     <motion.div key="step-details" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3, ease: 'easeInOut' }}>
-      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors" style={{ color: '#94A3B8' }}>
+      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white" style={{ color: '#94A3B8' }}>
         <ChevronLeft className="w-4 h-4" /> Back
       </button>
-      <div className="rounded-xl p-4 mb-6" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(0,102,255,0.2)' }}>
+
+      {/* Session summary */}
+      <div className="glass-card mb-6" style={{ padding: '16px 20px' }}>
         <div className="flex items-start justify-between gap-2">
           <div>
-            <div className="font-semibold" style={{ color: '#ffffff' }}>{selectedType.name}</div>
-            <div className="text-sm" style={{ color: '#94A3B8' }}>{selectedSlot && ffd(selectedSlot.session_date)} at {selectedSlot && ft(selectedSlot.start_time)}</div>
+            <div className="font-semibold text-sm" style={{ color: '#ffffff' }}>{selectedType.name}</div>
+            <div className="text-xs mt-0.5" style={{ color: '#94A3B8' }}>{selectedSlot && ffd(selectedSlot.session_date)} at {selectedSlot && ft(selectedSlot.start_time)}</div>
             <div className="text-xs" style={{ color: '#64748B' }}>with {selectedSlot.instructor_name}</div>
           </div>
           <div className="text-right shrink-0">
-            <div className="font-bold" style={{ color: '#7ED4FD' }}>{fp(selectedType.price_cents)}</div>
+            <div className="font-bold text-lg" style={{ color: '#7ED4FD' }}>{fp(selectedType.price_cents)}</div>
             {selectedType.deposit_cents > 0 && <div className="text-xs" style={{ color: '#64748B' }}>{fp(selectedType.deposit_cents)} deposit</div>}
           </div>
         </div>
       </div>
+
       <h1 className="text-2xl font-bold mb-6" style={{ color: '#ffffff' }}>Your Information</h1>
       <form onSubmit={onSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm mb-2" style={{ color: '#94A3B8' }}><User className="w-3.5 h-3.5 inline mr-1.5" />Full Name *</label>
-          <input type="text" value={studentName} onChange={e => setStudentName(e.target.value)} placeholder="Jane Smith" required style={inputStyle} />
+          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: '#64748B' }}>
+            <User className="w-3.5 h-3.5 inline mr-1.5" />Full Name *
+          </label>
+          <input type="text" value={studentName} onChange={e => setStudentName(e.target.value)} placeholder="Jane Smith"
+            required className="input-pill" style={{ height: '52px', width: '100%' }} />
         </div>
         <div>
-          <label className="block text-sm mb-2" style={{ color: '#94A3B8' }}><Mail className="w-3.5 h-3.5 inline mr-1.5" />Email *</label>
-          <input type="email" value={studentEmail} onChange={e => setStudentEmail(e.target.value)} placeholder="jane@example.com" required style={inputStyle} />
+          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: '#64748B' }}>
+            <Mail className="w-3.5 h-3.5 inline mr-1.5" />Email *
+          </label>
+          <input type="email" value={studentEmail} onChange={e => setStudentEmail(e.target.value)} placeholder="jane@example.com"
+            required className="input-pill" style={{ height: '52px', width: '100%' }} />
         </div>
         <div>
-          <label className="block text-sm mb-2" style={{ color: '#94A3B8' }}><Phone className="w-3.5 h-3.5 inline mr-1.5" />Phone (optional)</label>
-          <input type="tel" value={studentPhone} onChange={e => setStudentPhone(e.target.value)} placeholder="(555) 867-5309" style={inputStyle} />
+          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: '#64748B' }}>
+            <Phone className="w-3.5 h-3.5 inline mr-1.5" />Phone
+          </label>
+          <input type="tel" value={studentPhone} onChange={e => setStudentPhone(e.target.value)} placeholder="(555) 867-5309"
+            className="input-pill" style={{ height: '52px', width: '100%' }} />
         </div>
         <div>
-          <label className="block text-sm mb-2" style={{ color: '#94A3B8' }}><Hash className="w-3.5 h-3.5 inline mr-1.5" />Permit / License Number</label>
-          <input type="text" value={permitNumber} onChange={e => setPermitNumber(e.target.value)} placeholder="Optional" style={inputStyle} />
+          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: '#64748B' }}>
+            <Hash className="w-3.5 h-3.5 inline mr-1.5" />Permit / License Number
+          </label>
+          <input type="text" value={permitNumber} onChange={e => setPermitNumber(e.target.value)} placeholder="Optional"
+            className="input-pill" style={{ height: '52px', width: '100%' }} />
         </div>
+
         {formError && (
-          <div className="rounded-xl px-4 py-3 text-sm flex items-start gap-2" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444' }}>
+          <div className="rounded-2xl px-4 py-3 text-sm flex items-start gap-2" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444' }}>
             <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />{formError}
           </div>
         )}
+
         <button type="submit" disabled={submitting}
-          className="w-full font-semibold py-4 rounded-xl transition-opacity disabled:opacity-50 mt-2"
-          style={{ background: '#0066FF', color: '#ffffff', boxShadow: '0 0 30px rgba(0,102,255,0.3)' }}>
+          className="btn-glow w-full justify-center text-base py-4 mt-2 disabled:opacity-50"
+          style={{ padding: '16px 28px' }}>
           {submitting ? 'Processing...' : selectedType.deposit_cents > 0 ? `Pay ${fp(selectedType.deposit_cents)} Deposit` : 'Confirm Booking'}
         </button>
+
         <p className="text-center text-xs px-2" style={{ color: '#64748B' }}>
-          By booking, you agree to our cancellation policy. {selectedType.deposit_cents > 0 ? `Your ${fp(selectedType.deposit_cents)} deposit is credited toward your total.` : 'You will receive a confirmation email with your booking details.'}
+          By booking, you agree to our cancellation policy.
+          {selectedType.deposit_cents > 0 ? ` Your ${fp(selectedType.deposit_cents)} deposit is credited toward your total.` : ' You will receive a confirmation email.'}
         </p>
       </form>
     </motion.div>
@@ -289,22 +316,21 @@ function StudentDetails({ selectedType, selectedSlot, studentName, setStudentNam
 }
 
 // ─── STEP 4: Confirmation ────────────────────────────────────────────────────
-function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, bookingId, checkoutUrl, step, setStep }: {
+function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, bookingId, checkoutUrl }: {
   selectedType: SessionType; selectedSlot: Slot; studentName: string; studentEmail: string
-  bookingId: string | null; checkoutUrl: string | null; step: string; setStep: (s: string) => void
+  bookingId: string | null; checkoutUrl: string | null
 }) {
-  if (step === 'payment' && checkoutUrl) {
+  if (checkoutUrl) {
     return (
-      <motion.div key="step-payment" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-12">
+      <motion.div key="step-payment" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-8">
         <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(126,212,253,0.12)' }}>
           <BookOpen className="w-8 h-8" style={{ color: '#7ED4FD' }} />
         </div>
         <h1 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>Secure Checkout</h1>
         <p className="mb-8" style={{ color: '#94A3B8' }}>Complete your payment to confirm your booking.</p>
         <a href={checkoutUrl}
-          className="inline-block font-semibold px-8 py-4 rounded-xl transition-opacity hover:opacity-90"
-          style={{ background: '#0066FF', color: '#ffffff', boxShadow: '0 0 30px rgba(0,102,255,0.3)' }}>
-          Pay Now →
+          className="btn-glow inline-flex items-center gap-2 px-8 py-4">
+          Pay Now <ArrowRight className="w-4 h-4" />
         </a>
       </motion.div>
     )
@@ -320,7 +346,8 @@ function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, b
       <p className="mb-1" style={{ color: '#94A3B8' }}>You're all set for <span className="font-medium" style={{ color: '#ffffff' }}>{selectedType.name}</span>.</p>
       {selectedSlot && <p className="mb-1" style={{ color: '#94A3B8' }}>{ffd(selectedSlot.session_date)} at {ft(selectedSlot.start_time)}</p>}
       <p className="mb-8" style={{ color: '#64748B' }}>with {selectedSlot.instructor_name}</p>
-      <div className="rounded-xl p-5 text-left mb-6 max-w-sm mx-auto" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+
+      <div className="glass-card text-left mb-5" style={{ maxWidth: '360px', margin: '0 auto 20px' }}>
         <div className="text-xs mb-3 uppercase tracking-wider" style={{ color: '#64748B' }}>Booking Summary</div>
         <div className="space-y-2.5 text-sm">
           {[
@@ -341,16 +368,79 @@ function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, b
           </div>
         </div>
       </div>
-      <div className="rounded-xl p-4 text-left mb-6 max-w-sm mx-auto" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+
+      <div className="glass-card text-left" style={{ maxWidth: '360px', margin: '0 auto', padding: '16px 20px' }}>
         <div className="text-xs mb-2 uppercase tracking-wider" style={{ color: '#64748B' }}>What happens next?</div>
-        <ul className="space-y-2 text-sm" style={{ color: '#94A3B8' }}>
-          <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 shrink-0" style={{ color: '#4ADE80' }} />Confirmation email to <span style={{ color: '#ffffff' }}>{studentEmail}</span></li>
-          <li className="flex items-center gap-2"><Clock className="w-4 h-4 shrink-0" style={{ color: '#7ED4FD' }} />SMS reminder 48 hours before</li>
-          <li className="flex items-center gap-2"><Clock className="w-4 h-4 shrink-0" style={{ color: '#7ED4FD' }} />Final reminder 4 hours before</li>
+        <ul className="space-y-2.5 text-sm" style={{ color: '#94A3B8' }}>
+          <li className="flex items-center gap-2.5"><CheckCircle className="w-4 h-4 shrink-0" style={{ color: '#4ADE80' }} />Confirmation email to <span style={{ color: '#ffffff' }}>{studentEmail}</span></li>
+          <li className="flex items-center gap-2.5"><Clock className="w-4 h-4 shrink-0" style={{ color: '#7ED4FD' }} />SMS reminder 48 hours before</li>
+          <li className="flex items-center gap-2.5"><Clock className="w-4 h-4 shrink-0" style={{ color: '#7ED4FD' }} />Final reminder 4 hours before</li>
         </ul>
       </div>
-      <p className="text-xs" style={{ color: '#64748B' }}>Confirmation #{bookingId?.slice(0, 8).toUpperCase() ?? '—'}</p>
+
+      <p className="text-xs mt-6" style={{ color: '#64748B' }}>Confirmation #{bookingId?.slice(0, 8).toUpperCase() ?? '—'}</p>
     </motion.div>
+  )
+}
+
+// ─── Confirmation Sidebar ───────────────────────────────────────────────────
+function BookingSidebar({ selectedType, selectedSlot, studentName, step }: {
+  selectedType: SessionType | null; selectedSlot: Slot | null; studentName: string; step: number
+}) {
+  return (
+    <div className="hidden lg:block">
+      <div className="glass-card sticky top-24">
+        <div className="text-sm font-semibold mb-4 uppercase tracking-wider" style={{ color: '#64748B' }}>Booking Summary</div>
+
+        {selectedType ? (
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(126,212,253,0.12)' }}>
+                {iconFor(selectedType.name)}
+              </div>
+              <div>
+                <div className="font-semibold text-sm" style={{ color: '#ffffff' }}>{selectedType.name}</div>
+                <div className="text-xs mt-0.5" style={{ color: '#94A3B8' }}>{selectedType.duration_minutes} min session</div>
+              </div>
+              <div className="ml-auto font-bold" style={{ color: '#7ED4FD' }}>{fp(selectedType.price_cents)}</div>
+            </div>
+
+            {selectedSlot && (
+              <div className="rounded-xl p-3.5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div className="text-xs mb-1.5" style={{ color: '#64748B' }}>Date & Time</div>
+                <div className="text-sm font-medium" style={{ color: '#ffffff' }}>{ffd(selectedSlot.session_date)}</div>
+                <div className="text-xs" style={{ color: '#94A3B8' }}>{ft(selectedSlot.start_time)} — {ft(selectedSlot.end_time)}</div>
+                <div className="text-xs mt-1" style={{ color: '#64748B' }}>with {selectedSlot.instructor_name}</div>
+              </div>
+            )}
+
+            {studentName && step >= 2 && (
+              <div className="rounded-xl p-3.5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div className="text-xs mb-1.5" style={{ color: '#64748B' }}>Student</div>
+                <div className="text-sm font-medium" style={{ color: '#ffffff' }}>{studentName}</div>
+              </div>
+            )}
+
+            {selectedType.deposit_cents > 0 && (
+              <div className="flex items-center gap-2 p-3 rounded-xl" style={{ background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.15)' }}>
+                <Shield className="w-4 h-4 shrink-0" style={{ color: '#F97316' }} />
+                <span className="text-xs" style={{ color: '#94A3B8' }}>{fp(selectedType.deposit_cents)} deposit secures your spot</span>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="rounded-xl p-6 text-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <BookOpen className="w-8 h-8 mx-auto mb-2" style={{ color: '#64748B' }} />
+            <p className="text-sm" style={{ color: '#64748B' }}>Select a service to see your booking summary</p>
+          </div>
+        )}
+
+        <div className="mt-5 pt-4 flex items-center gap-2" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <Star className="w-4 h-4 shrink-0" style={{ color: '#F97316' }} />
+          <span className="text-xs" style={{ color: '#64748B' }}>Trusted by 2,400+ student drivers</span>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -374,7 +464,6 @@ function BookContent() {
   const [loadingSlots, setLoadingSlots] = useState(false)
   const [loadingTypes, setLoadingTypes] = useState(true)
   const [bookingId, setBookingId] = useState<string | null>(null)
-  const [confirmationToken, setConfirmationToken] = useState<string | null>(null)
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null)
   const [studentName, setStudentName] = useState('')
   const [studentEmail, setStudentEmail] = useState('')
@@ -420,7 +509,7 @@ function BookContent() {
     })
     const bookData = await bookRes.json()
     if (!bookRes.ok) { setFormError(bookData.error ?? 'Booking failed'); setSubmitting(false); return }
-    setBookingId(bookData.booking_id); setConfirmationToken(bookData.confirmation_token)
+    setBookingId(bookData.booking_id)
     if (bookData.status === 'pending_payment' && selectedType!.deposit_cents > 0) {
       const cr = await fetch(`/api/bookings/${bookData.booking_id}/checkout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ booking_id: bookData.booking_id }) })
       const cd = await cr.json()
@@ -431,7 +520,10 @@ function BookContent() {
 
   if (!schoolId) {
     return (
-      <div className="min-h-screen flex items-center justify-center starfield" style={{ background: '#000000' }}>
+      <div className="min-h-screen flex items-center justify-center starfield relative" style={{ background: '#000000' }}>
+        {/* decorative circles */}
+        <div className="bg-circle w-96 h-96 -top-20 -left-20" style={{ background: '#0066FF' }} />
+        <div className="bg-circle w-64 h-64 top-40 -right-10" style={{ background: '#707BFF' }} />
         <div className="text-center">
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(126,212,253,0.12)', border: '1px solid rgba(126,212,253,0.3)' }}>
             <Car className="w-8 h-8" style={{ color: '#7ED4FD' }} />
@@ -450,27 +542,41 @@ function BookContent() {
   }
 
   return (
-    <div className="min-h-screen starfield" style={{ background: '#000000' }}>
+    <div className="min-h-screen starfield relative" style={{ background: '#000000' }}>
+      {/* decorative background circles */}
+      <div className="bg-circle w-[500px] h-[500px] -top-40 -left-40" style={{ background: 'radial-gradient(circle, rgba(0,102,255,0.3) 0%, transparent 70%)' }} />
+      <div className="bg-circle w-[400px] h-[400px] bottom-20 -right-40" style={{ background: 'radial-gradient(circle, rgba(112,123,255,0.2) 0%, transparent 70%)' }} />
+
       {/* Header */}
-      <div className="border-b px-6 py-4" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
-        <div className="max-w-xl mx-auto flex items-center gap-2">
+      <div className="border-b relative z-10" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold" style={{ background: 'linear-gradient(135deg, #7ED4FD, #707BFF)' }}>DC</div>
             <span className="font-semibold text-sm" style={{ color: '#ffffff' }}>The Driving Center</span>
           </Link>
         </div>
       </div>
-      <div className="max-w-xl mx-auto p-6">
-        {step < 3 && <StepIndicator current={step} />}
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.div key={step} custom={direction} variants={variants} initial="enter" animate="center" exit="exit"
-            transition={{ duration: 0.3, ease: 'easeInOut' }}>
-            {step === 0 && <ServiceSelection sessionTypes={sessionTypes} selectedType={selectedType} onSelect={handleSelectType} loading={loadingTypes} />}
-            {step === 1 && selectedType && <DateAndTime selectedType={selectedType} slots={slots} selectedSlot={selectedSlot} onSelectSlot={handleSelectSlot} loadingSlots={loadingSlots} schoolId={schoolId} onBack={handleBack} />}
-            {step === 2 && selectedType && selectedSlot && <StudentDetails selectedType={selectedType} selectedSlot={selectedSlot} studentName={studentName} setStudentName={setStudentName} studentEmail={studentEmail} setStudentEmail={setStudentEmail} studentPhone={studentPhone} setStudentPhone={setStudentPhone} permitNumber={permitNumber} setPermitNumber={setPermitNumber} formError={formError} submitting={submitting} onSubmit={handleSubmit} onBack={handleBack} />}
-            {step === 3 && selectedType && selectedSlot && <Confirmation selectedType={selectedType} selectedSlot={selectedSlot} studentName={studentName} studentEmail={studentEmail} bookingId={bookingId} checkoutUrl={checkoutUrl} step={checkoutUrl ? 'payment' : 'confirmation'} setStep={setStep as any} />}
-          </motion.div>
-        </AnimatePresence>
+
+      {/* Content: 2-column on desktop */}
+      <div className="max-w-5xl mx-auto px-6 py-8 relative z-10">
+        <div className="flex gap-8 items-start">
+          {/* Left: form */}
+          <div className="flex-1 min-w-0">
+            {step < 3 && <StepIndicator current={step} />}
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div key={step} custom={direction} variants={variants} initial="enter" animate="center" exit="exit"
+                transition={{ duration: 0.3, ease: 'easeInOut' }}>
+                {step === 0 && <ServiceSelection sessionTypes={sessionTypes} selectedType={selectedType} onSelect={handleSelectType} loading={loadingTypes} />}
+                {step === 1 && selectedType && <DateAndTime selectedType={selectedType} slots={slots} selectedSlot={selectedSlot} onSelectSlot={handleSelectSlot} loadingSlots={loadingSlots} onBack={handleBack} />}
+                {step === 2 && selectedType && selectedSlot && <StudentDetails selectedType={selectedType} selectedSlot={selectedSlot} studentName={studentName} setStudentName={setStudentName} studentEmail={studentEmail} setStudentEmail={setStudentEmail} studentPhone={studentPhone} setStudentPhone={setStudentPhone} permitNumber={permitNumber} setPermitNumber={setPermitNumber} formError={formError} submitting={submitting} onSubmit={handleSubmit} onBack={handleBack} />}
+                {step === 3 && selectedType && selectedSlot && <Confirmation selectedType={selectedType} selectedSlot={selectedSlot} studentName={studentName} studentEmail={studentEmail} bookingId={bookingId} checkoutUrl={checkoutUrl} />}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Right: confirmation sidebar */}
+          <BookingSidebar selectedType={selectedType} selectedSlot={selectedSlot} studentName={studentName} step={step} />
+        </div>
       </div>
     </div>
   )
