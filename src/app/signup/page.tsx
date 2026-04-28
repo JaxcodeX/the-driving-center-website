@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, AlertCircle, User, Mail, Lock } from 'lucide-react'
 
+const STEPS = ['Account', 'School', 'Ready']
+
 export default function SignupPage() {
   const router = useRouter()
   const [form, setForm] = useState({ schoolName: '', ownerName: '', email: '' })
@@ -42,24 +44,82 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center starfield" style={{ background: '#000000' }}>
+    <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden" style={{ background: '#080809' }}>
+      {/* Decorative gradient circles */}
+      <div
+        className="bg-circle"
+        style={{
+          width: 600,
+          height: 600,
+          top: -200,
+          left: -150,
+          background: 'radial-gradient(circle, rgba(26,86,255,0.5) 0%, transparent 70%)',
+          opacity: 0.12,
+        }}
+      />
+      <div
+        className="bg-circle"
+        style={{
+          width: 500,
+          height: 500,
+          bottom: -150,
+          right: -100,
+          background: 'radial-gradient(circle, rgba(112,123,255,0.5) 0%, transparent 70%)',
+          opacity: 0.1,
+        }}
+      />
+
       {/* Logo */}
       <Link href="/" className="flex items-center gap-3 mb-12 absolute top-8 left-1/2 -translate-x-1/2">
         <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold" style={{ background: 'linear-gradient(135deg, #7ED4FD, #707BFF)' }}>DC</div>
         <span className="text-sm font-semibold tracking-tight" style={{ color: '#ffffff' }}>The Driving Center</span>
       </Link>
 
-      {/* Card */}
+      {/* Glassmorphism card */}
       <div
-        className="w-full max-w-[440px] mx-auto px-8 py-12"
+        className="relative w-full max-w-[480px] mx-auto px-8 py-10"
         style={{
-          background: 'rgba(255,255,255,0.05)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: '24px',
+          background: 'rgba(255,255,255,0.04)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: '16px',
         }}
       >
+        {/* Step indicator */}
+        <div className="flex items-center justify-center mb-10">
+          {STEPS.map((step, i) => (
+            <div key={step} className="flex items-center">
+              {i > 0 && (
+                <div
+                  className="w-12 h-px mx-2"
+                  style={{
+                    background: i <= 0 ? 'rgba(255,255,255,0.15)' : 'rgba(26,86,255,0.5)',
+                  }}
+                />
+              )}
+              <div className="flex flex-col items-center gap-1">
+                <div
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold"
+                  style={{
+                    background: i === 0 ? '#1A56FF' : 'rgba(255,255,255,0.06)',
+                    color: i === 0 ? '#ffffff' : '#64748B',
+                    border: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.12)',
+                  }}
+                >
+                  {i + 1}
+                </div>
+                <span
+                  className="text-[10px] font-medium"
+                  style={{ color: i === 0 ? '#94A3B8' : '#64748B' }}
+                >
+                  {step}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>Create your school account</h1>
@@ -78,15 +138,15 @@ export default function SignupPage() {
               onChange={e => set('ownerName', e.target.value)}
               placeholder="Your full name"
               required
-              className="w-full h-[52px] rounded-xl pl-11 pr-4 text-sm"
+              className="w-full h-[50px] rounded-[999px] pl-11 pr-4 text-sm"
               style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
                 color: '#ffffff',
                 outline: 'none',
               }}
-              onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(0,102,255,0.6)')}
-              onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.1)')}
+              onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(26,86,255,0.6)')}
+              onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.08)')}
             />
           </div>
 
@@ -101,15 +161,15 @@ export default function SignupPage() {
               onChange={e => set('email', e.target.value)}
               placeholder="you@yourdrivingschool.com"
               required
-              className="w-full h-[52px] rounded-xl pl-11 pr-4 text-sm"
+              className="w-full h-[50px] rounded-[999px] pl-11 pr-4 text-sm"
               style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
                 color: '#ffffff',
                 outline: 'none',
               }}
-              onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(0,102,255,0.6)')}
-              onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.1)')}
+              onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(26,86,255,0.6)')}
+              onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.08)')}
             />
           </div>
 
@@ -121,15 +181,15 @@ export default function SignupPage() {
             <input
               type="password"
               placeholder="Create a password (optional)"
-              className="w-full h-[52px] rounded-xl pl-11 pr-4 text-sm"
+              className="w-full h-[50px] rounded-[999px] pl-11 pr-4 text-sm"
               style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
                 color: '#ffffff',
                 outline: 'none',
               }}
-              onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(0,102,255,0.6)')}
-              onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.1)')}
+              onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(26,86,255,0.6)')}
+              onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.08)')}
             />
           </div>
 
@@ -143,10 +203,10 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-[52px] rounded-xl text-sm font-semibold text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full h-[50px] rounded-[999px] text-sm font-semibold text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             style={{
-              background: '#0066FF',
-              boxShadow: '0 0 30px rgba(0,102,255,0.3)',
+              background: '#1A56FF',
+              boxShadow: '0 0 20px rgba(26,86,255,0.25)',
             }}
           >
             {loading ? 'Creating school...' : 'Create school account'}

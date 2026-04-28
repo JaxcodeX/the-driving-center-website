@@ -73,26 +73,50 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center starfield" style={{ background: '#000000' }}>
+    <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden" style={{ background: '#080809' }}>
+      {/* Decorative gradient circles */}
+      <div
+        className="bg-circle"
+        style={{
+          width: 600,
+          height: 600,
+          top: -200,
+          right: -150,
+          background: 'radial-gradient(circle, rgba(26,86,255,0.5) 0%, transparent 70%)',
+          opacity: 0.12,
+        }}
+      />
+      <div
+        className="bg-circle"
+        style={{
+          width: 500,
+          height: 500,
+          bottom: -150,
+          left: -100,
+          background: 'radial-gradient(circle, rgba(112,123,255,0.5) 0%, transparent 70%)',
+          opacity: 0.1,
+        }}
+      />
+
       {/* Logo */}
       <Link href="/" className="flex items-center gap-3 mb-12 absolute top-8 left-1/2 -translate-x-1/2">
         <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold" style={{ background: 'linear-gradient(135deg, #7ED4FD, #707BFF)' }}>DC</div>
         <span className="text-sm font-semibold tracking-tight" style={{ color: '#ffffff' }}>The Driving Center</span>
       </Link>
 
-      {/* Card */}
+      {/* Glassmorphism card */}
       <div
-        className="w-full max-w-[440px] mx-auto px-8 py-12 rounded-3xl text-center"
+        className="relative w-full max-w-[480px] mx-auto px-8 py-10"
         style={{
-          background: 'rgba(255,255,255,0.05)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: '24px',
+          background: 'rgba(255,255,255,0.04)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: '16px',
         }}
       >
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>Sign in to your account</h1>
           <p className="text-sm" style={{ color: '#94A3B8' }}>Enter your credentials to access your school dashboard</p>
         </div>
@@ -112,15 +136,15 @@ export default function LoginPage() {
                   onChange={e => setEmail(e.target.value)}
                   placeholder="you@yourdrivingschool.com"
                   required
-                  className="w-full h-[52px] rounded-xl pl-11 pr-4 text-sm transition-all"
+                  className="w-full h-[50px] rounded-[999px] pl-11 pr-4 text-sm"
                   style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.08)',
                     color: '#ffffff',
                     outline: 'none',
                   }}
-                  onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(0,102,255,0.6)')}
-                  onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.1)')}
+                  onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(26,86,255,0.6)')}
+                  onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.08)')}
                 />
               </div>
 
@@ -131,13 +155,13 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-[52px] rounded-xl text-sm font-semibold text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full h-[50px] rounded-[999px] text-sm font-semibold text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 style={{
-                  background: '#0066FF',
-                  boxShadow: '0 0 30px rgba(0,102,255,0.3)',
+                  background: '#1A56FF',
+                  boxShadow: '0 0 20px rgba(26,86,255,0.25)',
                 }}
               >
-                {loading ? 'Sending...' : 'Sign in with magic link'}
+                {loading ? 'Sending...' : 'Send login link'}
                 {!loading && <ArrowRight className="w-4 h-4" />}
               </button>
             </form>
@@ -150,9 +174,9 @@ export default function LoginPage() {
             </div>
           </>
         ) : (
-          <div className="mb-6">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(126,212,253,0.12)', border: '1px solid rgba(126,212,253,0.3)' }}>
-              <CheckCircle className="w-6 h-6" style={{ color: '#7ED4FD' }} />
+          <div className="mb-6 text-center">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(74,222,128,0.12)', border: '1px solid rgba(74,222,128,0.2)' }}>
+              <CheckCircle className="w-6 h-6" style={{ color: '#4ADE80' }} />
             </div>
             <h2 className="text-xl font-semibold mb-2" style={{ color: '#ffffff' }}>Check your inbox</h2>
             <p className="text-sm mb-1" style={{ color: '#94A3B8' }}>Magic link sent to <span className="font-medium" style={{ color: '#ffffff' }}>{email}</span></p>
@@ -160,18 +184,20 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* DEMO_MODE Quick Login */}
+        {/* DEMO_MODE Quick Login — glassmorphism inner panel */}
         {isDemoMode && (
           <div
-            className="rounded-2xl p-5 mb-4 text-left"
+            className="rounded-[16px] p-5"
             style={{
-              background: 'rgba(126,212,253,0.06)',
-              border: '1px solid rgba(126,212,253,0.2)',
+              background: 'rgba(255,255,255,0.04)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255,255,255,0.08)',
             }}
           >
-            <div className="flex items-center gap-2 mb-1">
-              <Zap className="w-4 h-4" style={{ color: '#7ED4FD' }} />
-              <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#7ED4FD' }}>Demo Mode</span>
+            <div className="flex items-center gap-2 mb-4">
+              <Zap className="w-4 h-4" style={{ color: '#F97316' }} />
+              <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#F97316' }}>Demo Mode</span>
             </div>
             <p className="text-xs mb-4" style={{ color: '#64748B' }}>Use PIN <span className="font-mono text-white">0000</span> after entering any email</p>
 
@@ -186,15 +212,15 @@ export default function LoginPage() {
                   onChange={e => setDemoEmail(e.target.value)}
                   placeholder="school owner email"
                   required
-                  className="w-full h-[52px] rounded-xl pl-11 pr-4 text-sm"
+                  className="w-full h-[50px] rounded-[999px] pl-11 pr-4 text-sm"
                   style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.08)',
                     color: '#ffffff',
                     outline: 'none',
                   }}
-                  onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(0,102,255,0.6)')}
-                  onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.1)')}
+                  onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(26,86,255,0.6)')}
+                  onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.08)')}
                 />
               </div>
 
@@ -210,15 +236,15 @@ export default function LoginPage() {
                   placeholder="Demo PIN"
                   required
                   pattern="\d{4}"
-                  className="w-full h-[52px] rounded-xl pl-11 pr-12 text-sm text-center font-mono"
+                  className="w-full h-[50px] rounded-[999px] pl-11 pr-12 text-sm text-center font-mono"
                   style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.08)',
                     color: '#ffffff',
                     outline: 'none',
                   }}
-                  onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(0,102,255,0.6)')}
-                  onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.1)')}
+                  onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(26,86,255,0.6)')}
+                  onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.08)')}
                 />
                 <button
                   type="button"
@@ -237,10 +263,10 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={demoLoading}
-                className="w-full h-[52px] rounded-xl text-sm font-semibold text-white disabled:opacity-50"
+                className="w-full h-[50px] rounded-[999px] text-sm font-semibold text-white disabled:opacity-50"
                 style={{
-                  background: '#0066FF',
-                  boxShadow: '0 0 30px rgba(0,102,255,0.3)',
+                  background: '#1A56FF',
+                  boxShadow: '0 0 20px rgba(26,86,255,0.25)',
                 }}
               >
                 {demoLoading ? 'Logging in...' : 'Demo Login'}
@@ -251,18 +277,10 @@ export default function LoginPage() {
       </div>
 
       {/* Sign up link */}
-      {!isDemoMode && (
-        <p className="text-sm mt-6" style={{ color: '#94A3B8' }}>
-          Don&apos;t have an account?{' '}
-          <Link href="/signup" className="font-semibold" style={{ color: '#7ED4FD' }}>Sign up</Link>
-        </p>
-      )}
-      {isDemoMode && (
-        <p className="text-sm mt-6" style={{ color: '#94A3B8' }}>
-          Don&apos;t have an account?{' '}
-          <Link href="/signup" className="font-semibold" style={{ color: '#7ED4FD' }}>Sign up</Link>
-        </p>
-      )}
+      <p className="text-sm mt-6" style={{ color: '#94A3B8' }}>
+        Don&apos;t have an account?{' '}
+        <Link href="/signup" className="font-semibold" style={{ color: '#7ED4FD' }}>Sign up</Link>
+      </p>
     </div>
   )
 }

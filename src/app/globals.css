@@ -493,9 +493,9 @@ details summary::-webkit-details-marker { display: none; }
   border-color: var(--accent);
 }
 
-/* ── Updated card/btn-glow/btn-ghost pill shape ──────────────── */
+/* ── Updated card/btn-glow/btn-ghost ─────────────────────────── */
 .card {
-  border-radius: 999px;
+  border-radius: 16px;
 }
 .btn-glow {
   border-radius: 999px;
