@@ -218,6 +218,20 @@ details summary::-webkit-details-marker { display: none; }
   border-color: var(--text-muted);
 }
 
+/* ── Hero badge ────────────────────────────────────────────────── */
+.hero-badge {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  margin-bottom: 24px;
+}
+
 /* ── Eyebrow badge ─────────────────────────────────────────────── */
 .eyebrow {
   display: inline-flex;

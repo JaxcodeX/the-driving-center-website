@@ -471,6 +471,7 @@ export default function HomePage() {
             </span>
           </div>
           <div className="fade-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <span className="hero-badge">Built for Tennessee driving schools</span>
             <h1 style={{
               fontSize: 'clamp(2.5rem, 7vw, 64px)',
               fontWeight: '800', lineHeight: '1.0', letterSpacing: '-0.03em',
