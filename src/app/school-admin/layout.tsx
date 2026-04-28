@@ -99,24 +99,24 @@ export default function SchoolAdminLayout({ children }: { children: React.ReactN
 
   useEffect(() => {
     async function loadSchool() {
-      const demoUserCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
-      if (demoUserCookie) {
+      const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
+
+      if (demoCookie) {
+        // Demo mode: use server-side endpoint (service role, bypasses RLS)
         try {
-          const payload = JSON.parse(atob(decodeURIComponent(demoUserCookie.split('=')[1])))
-          if (payload.schoolId) {
-            const supabase = createClient()
-            const { data: school } = await supabase
-              .from('schools')
-              .select('name')
-              .eq('id', payload.schoolId)
-              .single()
-            setSchoolName(school?.name || '')
+          const res = await fetch('/api/demo/school')
+          if (res.ok) {
+            const data = await res.json()
+            setSchoolName(data.name || '')
             setLoading(false)
             return
           }
         } catch { /* fall through */ }
+        setLoading(false)
+        return
       }
 
+      // Normal mode: use Supabase auth
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {

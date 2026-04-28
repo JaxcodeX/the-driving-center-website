@@ -33,26 +33,34 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient()
-      let schoolId: string | null = null
-
+      // Check for demo mode
       const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
+
       if (demoCookie) {
+        // Demo mode: use server-side endpoint with service role
         try {
-          const payload = JSON.parse(atob(demoCookie.split('=')[1]))
-          schoolId = payload.schoolId
-        } catch {}
+          const res = await fetch('/api/demo/dashboard')
+          if (res.ok) {
+            const data = await res.json()
+            setStats(data.stats)
+            setSchoolId(data.schoolName)
+            setUpcomingSessions(data.upcomingSessions || [])
+            setLoadingSessions(false)
+            return
+          }
+        } catch { /* fall through to error state */ }
+        setLoadingSessions(false)
+        return
       }
 
-      if (!schoolId) {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
-        const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
-        if (!school) return
-        schoolId = school.id
-      }
-
-      setSchoolId(schoolId ?? '')
+      // Normal mode: use Supabase auth
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
+      if (!school) return
+      const schoolId = school.id
+      setSchoolId(schoolId)
 
       const [
         { count: students },
@@ -75,12 +83,9 @@ export default function DashboardPage() {
       const activeSessions = sessions || 0
       const monthlyRevenue = (revenueData as any)?.monthly_revenue || 0
 
-      // Completion rate: sessions completed / total sessions
       const { count: completedSessions } = await supabase
-        .from('sessions')
-        .select('*', { count: 'exact', head: true })
-        .eq('school_id', schoolId)
-        .eq('status', 'completed')
+        .from('sessions').select('*', { count: 'exact', head: true })
+        .eq('school_id', schoolId).eq('status', 'completed')
 
       const totalSess = (sessions || 0) + (completedSessions || 0)
       const completionRate = totalSess > 0 ? Math.round(((completedSessions || 0) / totalSess) * 100) : 0
@@ -95,7 +100,6 @@ export default function DashboardPage() {
         revenueDelta: monthlyRevenue > 0 ? '+15%' : '+0%',
         completionDelta: completionRate > 0 ? `+${completionRate - 72}%` : '+0%',
       })
-
       setUpcomingSessions((sessionsData as UpcomingSession[]) || [])
       setLoadingSessions(false)
     }

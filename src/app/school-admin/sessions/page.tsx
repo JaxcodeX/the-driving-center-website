@@ -43,24 +43,31 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient()
-      let schoolId: string | null = null
-
       const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
+
       if (demoCookie) {
+        // Demo mode: use server-side endpoint
         try {
-          const payload = JSON.parse(atob(decodeURIComponent(demoCookie.split('=')[1])))
-          schoolId = payload.schoolId
-        } catch {}
+          const res = await fetch('/api/demo/sessions')
+          if (res.ok) {
+            const data = await res.json()
+            setInstructors(data.instructors || [])
+            setSessionTypes(data.sessionTypes || [])
+            setLoading(false)
+            return
+          }
+        } catch { /* fall through */ }
+        setLoading(false)
+        return
       }
 
-      if (!schoolId) {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) { window.location.href = '/login'; return }
-        const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
-        if (!school) { setLoading(false); return }
-        schoolId = school.id
-      }
+      // Normal mode
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { window.location.href = '/login'; return }
+      const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
+      if (!school) { setLoading(false); return }
+      const schoolId = school.id
 
       const [i, st] = await Promise.all([
         supabase.from('instructors').select('id, name').eq('school_id', schoolId).eq('active', true),
@@ -211,23 +218,30 @@ export default function SessionsPage() {
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser()
-      let schoolId: string | null = null
-
       const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
+
       if (demoCookie) {
+        // Demo mode: use server-side endpoint (service role)
         try {
-          const payload = JSON.parse(atob(decodeURIComponent(demoCookie.split('=')[1])))
-          schoolId = payload.schoolId
-        } catch {}
+          const res = await fetch('/api/demo/sessions')
+          if (res.ok) {
+            const data = await res.json()
+            setSessions(data.sessions || [])
+            setLoading(false)
+            return
+          }
+        } catch { /* fall through */ }
+        setSessions([])
+        setLoading(false)
+        return
       }
 
-      if (!schoolId) {
-        if (!user) return
-        const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
-        if (!school) { setLoading(false); return }
-        schoolId = school.id
-      }
+      // Normal mode: use Supabase auth
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
+      if (!school) { setLoading(false); return }
+      const schoolId = school.id
 
       const { data } = await supabase
         .from('sessions')
