@@ -22,7 +22,9 @@ export async function POST(request: Request) {
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-  const jwtSecret = process.env.SUPABASE_JWT_SECRET!
+  // SUPABASE_JWT_SECRET is the HMAC secret for signing client JWTs.
+  // Fall back to service role key if not set (e.g. old Vercel deployments).
+  const jwtSecret = process.env.SUPABASE_JWT_SECRET ?? serviceKey!
   const DEMO_SCHOOL_ID = '0daea68b-06ed-445b-bf52-91d4f16b9e01'
   const projectRef = supabaseUrl.split('//')[1]!.split('.')[0]!
 
