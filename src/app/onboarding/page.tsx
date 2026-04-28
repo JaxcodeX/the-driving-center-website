@@ -98,9 +98,10 @@ function OnboardingContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [step, setStep] = useState(1)
-  const [schoolSlug, setSchoolSlug] = useState('')
+  const [schoolSlug, setSchoolSlug] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [schoolData, setSchoolData] = useState<any>(null)
+  const [slugLoaded, setSlugLoaded] = useState(false)
 
   const [phone, setPhone] = useState('')
   const [address, setAddress] = useState('')
@@ -112,17 +113,20 @@ function OnboardingContent() {
 
   useEffect(() => {
     const slug = searchParams.get('school')
-    if (slug) setSchoolSlug(slug)
+    setSchoolSlug(slug || null)
+    setSlugLoaded(true)
   }, [searchParams])
 
-  async function loadSchool() {
-    if (!schoolSlug) return
-    const supabase = createClient()
-    const { data } = await supabase.from('schools').select('*').eq('slug', schoolSlug).single()
-    setSchoolData(data)
-  }
+  useEffect(() => {
+    if (!slugLoaded || !schoolSlug) return
+    loadSchool()
+  }, [slugLoaded, schoolSlug])
 
-  useEffect(() => { loadSchool() }, [schoolSlug])
+  useEffect(() => {
+    if (slugLoaded && !schoolSlug && !schoolData) {
+      router.replace('/')
+    }
+  }, [slugLoaded, schoolSlug, schoolData])
 
   async function saveSchoolProfile(updates: any) {
     const supabase = createClient()
@@ -192,7 +196,7 @@ function OnboardingContent() {
               <div className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: '#64748B' }}>Step 1 of 4</div>
               <h2 className="text-2xl font-bold mb-1.5" style={{ color: T.text }}>School information</h2>
               <p className="text-sm mb-7" style={{ color: '#94A3B8' }}>
-                Setting up <span className="font-medium" style={{ color: T.text }}>{schoolData?.name || schoolSlug}</span>
+                Setting up <span className="font-medium" style={{ color: T.text }}>{!schoolData && schoolSlug ? 'Loading...' : schoolData?.name || schoolSlug || '—'}</span>
               </p>
               <div className="space-y-4">
                 <div>
