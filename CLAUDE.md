@@ -1,6 +1,21 @@
 # CLAUDE.md — The Driving Center SaaS
-**Mode: Vibe Coding Protocol + FSO Workflow**
-**Updated: 2026-04-27**
+**Mode: Vibe Coding Protocol + FSO Workflow + Frontend Design Skill**
+**Updated: 2026-04-28**
+
+---
+
+## Critical — Frontend Design Skill (ALWAYS INVOKE FIRST)
+
+**Before writing ANY frontend code, ALWAYS invoke the frontend-design skill.**
+
+The `frontend-design` skill is installed at `.claude/skills/frontend-design/SKILL.md`.
+
+In every session that involves UI:
+```
+Before writing code: Read .claude/skills/frontend-design/SKILL.md and follow it exactly.
+```
+
+The skill overrides generic AI aesthetics with premium, distinctive design. Do not skip this.
 
 ---
 
@@ -9,204 +24,145 @@
 **Rule 1 — Always write SPEC.md first.**
 Plans live in project files. Discord is for coordination only.
 
-**Rule 2 — One-pass builds, no chat iteration.**
-Give the AI the full context in one prompt: design system + reference components + complete spec. Ask for the whole section or page in one pass. If it takes more than 2-3 back-and-forth rounds to get it right, the approach is wrong — write a new SPEC and try again.
+**Rule 2 — Invoke frontend-design skill first, then build.**
+Read the skill → read SPEC.md → assemble context package → build. Not the other way around.
 
-**Rule 3 — Log everything.** Every build cycle goes into WORKFLOW_LOG.md.
+**Rule 3 — One-pass builds, no chat iteration.**
+Give the AI full context: skill + design tokens + reference components + spec. Ask for the whole section in one pass. If it takes more than 2 rounds, stop and write a new SPEC.
+
+**Rule 4 — Log everything.** Every cycle goes in WORKFLOW_LOG.md.
 
 ---
 
-## Vibe Coding Protocol (How to Prompt)
+## Design Tokens (Current — Light Theme)
 
-The bottleneck is never AI capability — it's prompt context. Follow this pattern every time:
+| Token | Hex | Usage |
+|---|---|---|
+| bg-base | `#F2F4F7` | Page background (warm gray) |
+| bg-surface | `#FFFFFF` | Card backgrounds |
+| bg-dark | `#0A0A0A` | Dark sections |
+| text-primary | `#101828` | Headlines, important text |
+| text-secondary | `#344054` | Card titles, labels |
+| text-muted | `#667085` | Body, secondary text |
+| text-faint | `#9A9FA5` | Placeholders, captions |
+| border | `#E4E7EC` | Card borders, dividers |
+| accent-blue | `#2E90FA` | Charts, interactive |
+| success | `#12B76A` | Positive metrics |
+| error | `#F04438` | Negative metrics |
+| card-radius | `24px` | Cards, panels |
+| btn-radius | `12px` | Buttons, inputs |
+| shadow | `0px 4px 6px -2px rgba(16,24,40,0.03), 0px 12px 16px -4px rgba(16,24,40,0.08)` | Card shadow (two-layer) |
+
+**Font:** Inter via `next/font/google`
+**Display:** 52px / 800 weight / -0.025em tracking
+**H2:** 36px / 700 / -0.02em
+**Body:** 16-17px / 400 / #667085 / 1.6 line-height
+
+---
+
+## Screenshot Workflow (Nate Herk Protocol)
+
+For every UI build, use this iteration loop:
+
+1. Build the component/page
+2. Take a screenshot of what was built
+3. Compare to reference screenshot
+4. Fix the specific mismatches
+5. Repeat until satisfied
+
+```bash
+# Puppeteer screenshot setup (run once in project)
+npx @anthropic-ai/puppeteer-screenshot
+```
+
+After every build, check: does this match the reference? If not, what's different? Fix that specific thing.
+
+---
+
+## Vibe Coding Context Package Template
+
+For every sub-agent task:
 
 ```
 CONTEXT GIVEN TO AI EVERY TIME:
-├── 1. Design system     → globals.css (copy full content)
-├── 2. Reference example → 1-2 similar working components from the project
-├── 3. Complete spec     → full SPEC.md for the feature
-└── 4. Constraints       → tech stack version, patterns to follow
+├── 1. Frontend Design Skill  → .claude/skills/frontend-design/SKILL.md
+├── 2. Design tokens          → from CLAUDE.md (above)
+├── 3. Reference example       → 1-2 similar working components from src/
+├── 4. Complete spec           → full SPEC.md for the feature
+└── 5. Constraints            → Next.js 16, React 19, TailwindCSS 4
 
 PROMPT STRUCTURE:
-"Follow the patterns in [existing component]. Use the design tokens from globals.css.
-Build [complete feature] matching SPEC.md. Do it in one pass — no partial commits."
+"Invoke the frontend-design skill. Follow the design tokens in CLAUDE.md.
+Use [existing component] as reference. Build [feature] matching SPEC.md.
+Take screenshots of the output and compare to [reference screenshot].
+Fix any deviations. One-pass build — no partial commits."
 ```
-
-**Never do this:**
-- "Change the button color to blue" → "now make it rounded" → "now add a shadow"
-- Iterating CSS via chat one property at a time
-- Giving partial context and adding more in follow-up messages
-
-**Always do this:**
-- "Here is globals.css, here are 3 working glassmorphism components, here is the full SPEC. Build the entire redesigned landing page in one pass."
-
-**The 50-line rule:** If a change requires more than ~50 lines of back-and-forth in a chat, stop and write a new SPEC.md instead. The SPEC is the work order, not the chat.
 
 ---
 
 ## Feature Build Sequence
 
-Every feature follows this sequence:
-
 ```
 Zax: "Build [feature]"
         ↓
-Everest: Write SPEC.md (blueprint first, full context)
+Everest: Write SPEC.md
         ↓
-Everest: Assemble context package (design tokens + reference components + spec)
+Everest: Read .claude/skills/frontend-design/SKILL.md
         ↓
-Everest: Spawn DeepSeek-Claude sub-agent with complete context package
+Everest: Assemble context package (skill + tokens + reference + spec)
         ↓
-Sub-agent: reads context → builds complete feature in one pass → commits → pushes
+Everest: Spawn DeepSeek-Claude with complete context package
         ↓
-Everest: Verify build passes + report back
+Sub-agent: reads skill → reads context → builds → screenshots → compares → fixes
+        ↓
+Everest: Verify build passes + screenshot comparison
         ↓
 Log result in WORKFLOW_LOG.md
 ```
 
-**If there's no SPEC.md, there's no implementation.**
-
 ---
 
-## Context Package Template
+## Stack
 
-For every sub-agent task, include this in the prompt:
-
-```
-## Design System
-[copy full content of globals.css]
-
-## Reference Components (1-3 examples of similar working code)
-[copy-paste working components from the project that demonstrate the pattern]
-
-## Tech Stack
-- Next.js 16 + React 19 + TailwindCSS 4
-- Supabase auth + PostgreSQL + RLS
-- API routes in src/app/api/
-
-## SPEC.md
-[paste complete spec]
-
-## Task
-[describe what to build — reference the SPEC above, do not re-explain]
-```
-
----
-
-## Who Does What
-
-| Role | What |
+| Layer | Tool |
 |---|---|
-| **Zax** | Directs, reviews output, approves or rejects |
-| **Everest** | Writes specs, assembles context, spawns coding agents, reviews output |
-| **DeepSeek-Claude** | Claude Code CLI routed through DeepSeek V4 Flash — one-pass build from context package |
-| **Mark** | Reviews architecture decisions, not code implementation |
-
----
-
-## Current Stack
-
-| Role | Tool |
-|---|---|
-| Primary AI | MiniMax-M2.7 (daily driver, planning, review) |
-| Code generation | DeepSeek V4 Flash (deepseek-v4-flash model) via `scripts/deepseek-claude` |
-| Web app | Next.js 16 + React 19 + TailwindCSS 4 |
+| AI (planning) | MiniMax-M2.7 |
+| AI (code) | DeepSeek V4 Flash via `scripts/deepseek-claude` |
+| Web | Next.js 16 + React 19 + TailwindCSS 4 |
 | Database | Supabase (PostgreSQL + RLS + Magic Links) |
-| Payments | Stripe ($99/mo subscription, DEMO_MODE bypass for demo) |
-| Email | Resend (live — `re_ZwCTERGk_8eesZtYHGkR32GPv6YAgEs2P`) |
-| SMS | Twilio (stub — not needed for MVP) |
+| Payments | Stripe (DEMO_MODE bypass for demo) |
+| Email | Resend |
 | Hosting | Vercel |
-| Automation | OpenClaw cron |
 
 ---
 
-## File Structure (Source of Truth)
+## File Structure
 
 ```
 the-driving-center-website/
-├── CLAUDE.md              ← THIS FILE
-├── STATUS.md              ← current state: works / broken / next
-├── WORKFLOW_LOG.md        ← every build cycle logged
-├── SPEC_FULL_REDESIGN.md ← active UI redesign spec
-├── SPEC_LANDING_REDESIGN.md ← landing page spec (pending)
-├── SPEC.md                ← phase specs (archived after use)
-├── src/app/               ← all routes + pages
-├── src/lib/
-│   ├── supabase/          ← client + server helpers
-│   ├── migrations/        ← SQL (run in Supabase SQL Editor)
-│   ├── email-templates/   ← Resend email templates
-│   └── security.ts        ← encryption, validation
-└── tests/e2e/            ← automated tests
+├── CLAUDE.md
+├── STATUS.md
+├── WORKFLOW_LOG.md
+├── SPEC*.md
+├── brand_assets/            ← logo, brand guidelines (reference these!)
+├── .claude/skills/
+│   └── frontend-design/
+│       └── SKILL.md         ← Frontend Design Skill (ALWAYS READ FIRST)
+├── src/app/
+│   ├── page.tsx             ← Landing page
+│   ├── globals.css
+│   └── ...
+└── src/lib/migrations/       ← SQL (run in Supabase SQL Editor)
 ```
-
----
-
-## Design Tokens (Locked — Every Page Uses These)
-
-| Token | Hex | Usage |
-|---|---|---|
-| bg | `#050505` | Page background |
-| surface | `#0D0D0D` | Cards, panels |
-| elevated | `#18181b` | Inputs, hover |
-| border | `#1A1A1A` | Card borders |
-| borderLt | `#27272a` | Hover borders |
-| text | `#FFFFFF` | Primary text |
-| secondary | `#94A3B8` | Secondary text |
-| muted | `#52525b` | Placeholders |
-| body | `#5C6370` | Body text |
-| blue | `#006FFF` | Primary accent |
-| cyan | `#38BDF8` | Secondary accent |
-| purple | `#818CF8` | Gradient |
-| green | `#10B981` | Success |
-| amber | `#f59e0b` | Warnings |
-
-**Glassmorphism card:** `background: rgba(255,255,255,0.04)`, `backdrop-filter: blur(12px)`, `border: 1px solid rgba(255,255,255,0.08)`, `border-radius: 16px`
-
-**Primary button:** `background: #006FFF`, `border-radius: 999px`, `box-shadow: 0 4px 30px rgba(0,111,255,0.25)`
-
-**Typography:** Inter via `next/font/google`, H1 60-72px bold -0.02em tracking, body 16-18px 1.6 line-height
 
 ---
 
 ## Security Rules (Non-Negotiable)
 
-Every API route must have:
-- [ ] Auth check (`getUser()`)
-- [ ] Ownership check (does this school own this data?)
-- [ ] `school_id` in every WHERE clause
-- [ ] Input validation
-- [ ] PII encrypted at write, stripped at read
-
-**Never:** skip ownership check, log PII, allow cross-tenant access, pass real keys to client.
+Every API route: auth check + ownership check + `school_id` in WHERE + input validation.
 
 ---
 
-## WORKFLOW_LOG.md Format
+## Migration 009 Pending
 
-```
-## Cycle N — [Feature]
-Date: YYYY-MM-DD
-SPEC: [file name + link]
-Context package: [what design tokens + reference components were given]
-Implemented by: DeepSeek-Claude (scripts/deepseek-claude)
-Result: passed / failed / partial
-Build time: [approximate]
-Failures: [what went wrong]
-Next action: [what we do next]
-```
-
----
-
-## Current Sprint — Mark Martin Demo
-
-| Day | Goal |
-|---|---|
-| 1 | Migrations, RLS test, subscription middleware |
-| 2 | End-to-end flow test |
-| 3 | UI polish — one-pass coding agent, consistent design tokens |
-| 4 | CSV import + school profile editor |
-| 5 | Demo script + 5 dry runs |
-| 6 | Buffer — fix anything from dry runs |
-| 7 | **DEMO TO MARK** |
-
-**Migration 009 pending:** `src/lib/migrations/009_bookings_missing_columns.sql` — Zax runs in Supabase SQL Editor
+`src/lib/migrations/009_bookings_missing_columns.sql` — Zax runs in Supabase SQL Editor.
