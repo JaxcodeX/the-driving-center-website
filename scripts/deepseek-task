@@ -1,0 +1,282 @@
+#!/usr/bin/env python3
+"""
+DeepSeek Surgical Edit Agent for The Driving Center.
+Uses DeepSeek V4 Flash to generate code changes.
+
+Usage:
+  python3 deepseek-task "Add scroll-to-top button" [spec_file]
+"""
+
+import sys, os, json, shutil, subprocess, re
+
+DEEPSEEK_API_KEY = "sk-7c4c86239406412ba3385f32db8b959d"
+DEEPSEEK_MODEL = "deepseek-v4-flash"
+PROJECT_DIR = "/Users/cayden/Projects/the-driving-center-website"
+
+SYSTEM_PROMPT = """You are a senior Next.js/React/TypeScript engineer on The Driving Center SaaS project.
+
+RULES:
+- FOR NEW FILES: Start with // FILE: <filepath> then the full file content
+- FOR EXISTING FILES YOU ARE MODIFYING: Start with ## EDIT: <filepath> then the full new file content, then ## END on its own line
+- Never modify files not explicitly mentioned in the task
+- Build must pass before commit — fix errors yourself if they occur
+- Tag commits: 'prov: everest prov: deepseek'
+- Keep all existing functionality intact
+
+STACK: Next.js 16, React 19, TypeScript, Tailwind CSS v4, CSS custom properties for dark/light theming.
+
+OUTPUT FORMAT EXAMPLES:
+
+New file:
+```javascript
+// FILE: src/components/ScrollToTop.tsx
+'use client'
+import { useState, useEffect } from 'react'
+export default function ScrollToTop() {
+  ...
+}
+```
+
+Existing file (full replacement):
+```javascript
+## EDIT: src/app/page.tsx
+// ... full file content ...
+## END
+```
+
+IMPORTANT: For existing files, include the COMPLETE file — we replace the whole file with your output.
+For new files, include the complete file.
+"""
+
+def call_ds(system: str, user: str, max_tokens: int = 4000) -> str:
+    import urllib.request
+    payload = {
+        "model": DEEPSEEK_MODEL,
+        "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+        "max_tokens": max_tokens, "temperature": 0.3,
+    }
+    req = urllib.request.Request(
+        "https://api.deepseek.com/v1/chat/completions",
+        data=json.dumps(payload).encode(),
+        headers={"Authorization": f"Bearer {DEEPSEEK_API_KEY}", "Content-Type": "application/json"},
+        method="POST"
+    )
+    with urllib.request.urlopen(req, timeout=180) as resp:
+        return json.loads(resp.read())["choices"][0]["message"]["content"]
+
+def run(cmd: str) -> tuple:
+    r = subprocess.run(cmd, shell=True, cwd=PROJECT_DIR, capture_output=True, text=True)
+    return r.returncode, r.stdout, r.stderr
+
+def build() -> bool:
+    code, out, err = run("npm run build 2>&1")
+    if code != 0:
+        output = out + err
+        lines = [l.strip() for l in output.split("\n") if l.strip()]
+        errors = [l for l in lines if l.startswith(("error", "Error:", "./"))][:8]
+        print(f"BUILD FAILED: {errors}")
+        return False
+    print("Build PASSED")
+    return True
+
+def parse_response(content: str) -> tuple:
+    """
+    Parse DeepSeek response.
+    Returns (edits dict, new_files dict).
+    Edits = {filepath: full_file_content} for existing files (full replacement)
+    New_files = {filepath: full_file_content} for brand new files
+    """
+    edits = {}
+    new_files = {}
+
+    # Split into blocks by // FILE: and ## EDIT: markers
+    parts = re.split(r'(?=// FILE:|^## EDIT:)', content, flags=re.MULTILINE)
+
+    current_filepath = None
+    current_content = None
+    current_type = None  # 'new' or 'edit'
+    buf = []
+
+    for part in parts:
+        part = part.strip()
+        if not part:
+            continue
+
+        if part.startswith("// FILE:"):
+            # Save previous block
+            if current_filepath and current_content:
+                if current_type == 'new':
+                    new_files[current_filepath] = current_content.strip()
+                elif current_type == 'edit':
+                    edits[current_filepath] = current_content.strip()
+
+            # Start new new file block
+            lines = part.replace("// FILE:", "", 1).strip().split("\n", 1)
+            current_filepath = lines[0].strip()
+            current_content = lines[1] if len(lines) > 1 else ""
+            current_type = 'new'
+
+        elif part.startswith("## EDIT:"):
+            # Save previous block
+            if current_filepath and current_content:
+                if current_type == 'new':
+                    new_files[current_filepath] = current_content.strip()
+                elif current_type == 'edit':
+                    edits[current_filepath] = current_content.strip()
+
+            # Find filepath and content
+            # Format: ## EDIT: <filepath>\n<content>\n## END
+            end_marker_match = re.search(r'\n## END', part)
+            if end_marker_match:
+                rest = part.replace("## EDIT:", "", 1).strip()
+                end_idx = rest.find("\n## END")
+                filepath = rest[:end_idx].strip()
+                file_content = rest[end_idx + 6:].strip()  # 6 = len("\n## END")
+            else:
+                # No ## END — treat as filepath only, no content yet
+                filepath = part.replace("## EDIT:", "").strip()
+                file_content = ""
+                # Keep reading from subsequent parts
+                continue
+
+            if filepath:
+                # Check if existing
+                full_path = os.path.join(PROJECT_DIR, filepath)
+                if os.path.exists(full_path):
+                    edits[filepath] = file_content
+                else:
+                    new_files[filepath] = file_content
+
+            current_filepath = None
+            current_content = None
+            current_type = None
+        else:
+            # Accumulate content for current block
+            if current_filepath:
+                current_content += "\n" + part
+
+    # Save last block
+    if current_filepath and current_content:
+        if current_type == 'new':
+            new_files[current_filepath] = current_content.strip()
+        elif current_type == 'edit':
+            edits[current_filepath] = current_content.strip()
+
+    return edits, new_files
+
+def apply_and_build(edits: dict, new_files: dict) -> bool:
+    # Backup existing files
+    for filepath in edits:
+        full = os.path.join(PROJECT_DIR, filepath)
+        if os.path.exists(full):
+            shutil.copy(full, full + ".bak")
+            print(f"Backed up: {filepath}")
+
+    # Write edits (full replacement)
+    for filepath, content in edits.items():
+        full = os.path.join(PROJECT_DIR, filepath)
+        with open(full, "w") as f:
+            f.write(content.strip() + "\n")
+        print(f"Updated: {filepath} ({len(content)} chars)")
+
+    # Write new files
+    for filepath, content in new_files.items():
+        full = os.path.join(PROJECT_DIR, filepath)
+        os.makedirs(os.path.dirname(full), exist_ok=True)
+        with open(full, "w") as f:
+            f.write(content.strip() + "\n")
+        print(f"Created: {filepath} ({len(content)} chars)")
+
+    print("\nBuilding...")
+    ok = build()
+
+    if not ok:
+        print("\nReverting...")
+        for filepath in edits:
+            bak = os.path.join(PROJECT_DIR, filepath) + ".bak"
+            if os.path.exists(bak):
+                shutil.move(bak, os.path.join(PROJECT_DIR, filepath))
+        for filepath in new_files:
+            fp = os.path.join(PROJECT_DIR, filepath)
+            if os.path.exists(fp):
+                os.remove(fp)
+        return False
+
+    return True
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: deepseek-task <task> [spec_file]")
+        sys.exit(1)
+
+    task = sys.argv[1]
+    spec_path = sys.argv[2] if len(sys.argv) > 2 else None
+
+    print(f"Task: {task}")
+    spec_content = ""
+    if spec_path and os.path.exists(spec_path):
+        with open(spec_path) as f:
+            spec_content = f.read()
+        print(f"Spec: {spec_path} ({len(spec_content)} chars)")
+
+    # Load context from relevant existing files
+    context = []
+    task_lower = task.lower()
+
+    files_to_read = set()
+    if any(k in task_lower for k in ['page', 'home', 'landing', 'hero', 'pricing', 'faq', 'booking']):
+        files_to_read.add("src/app/page.tsx")
+    if any(k in task_lower for k in ['style', 'css', 'theme', 'color', 'animation', 'transition']):
+        files_to_read.add("src/app/globals.css")
+    if any(k in task_lower for k in ['layout', 'root']):
+        files_to_read.add("src/app/layout.tsx")
+    if any(k in task_lower for k in ['navbar', 'nav', 'header']):
+        files_to_read.add("src/components/NavBar.tsx")
+    if any(k in task_lower for k in ['dashboard', 'admin', 'school']):
+        files_to_read.add("src/app/school-admin/page.tsx")
+
+    for rel_path in files_to_read:
+        full = os.path.join(PROJECT_DIR, rel_path)
+        if os.path.exists(full):
+            with open(full) as f:
+                content = f.read()
+            context.append(f"# EXISTING FILE: {rel_path} ({len(content)} bytes, first 4000 chars shown)\n{content[:4000]}")
+            print(f"Loaded: {rel_path} ({len(content)} bytes)")
+
+    user_msg = f"Task: {task}\n\n"
+    if spec_content:
+        user_msg += f"## SPEC:\n{spec_content}\n\n"
+    if context:
+        user_msg += "\n\n".join(context) + "\n\n"
+    user_msg += "Output your changes using // FILE: for new files and ## EDIT: + ## END for existing files."
+
+    print(f"Context: {len(context)} files, ~{sum(len(c) for c in context)} chars")
+    print("Calling DeepSeek...")
+
+    try:
+        response = call_ds(SYSTEM_PROMPT, user_msg)
+    except Exception as e:
+        print(f"API error: {e}")
+        sys.exit(1)
+
+    print(f"Response: {len(response)} chars")
+
+    edits, new_files = parse_response(response)
+    print(f"Edits (existing files): {list(edits.keys())}")
+    print(f"New files: {list(new_files.keys())}")
+
+    if not edits and not new_files:
+        print("Nothing parsed. First 800 chars of response:")
+        print(response[:800])
+        return
+
+    if apply_and_build(edits, new_files):
+        run("git add -A")
+        run(f'git commit -m "feat: {task[:80]} [prov: everest] [prov: deepseek]"')
+        run("git push")
+        print("Done!")
+    else:
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

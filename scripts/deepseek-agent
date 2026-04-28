@@ -1,0 +1,240 @@
+#!/usr/bin/env python3
+"""
+DeepSeek Agent — task executor with file-awareness.
+Usage:
+  python3 deepseek-agent "Add scroll-to-top button" ./SPEC.md
+
+Before calling DeepSeek, reads existing files that will be modified
+so DeepSeek has context and makes precise edits instead of overwrites.
+"""
+
+import sys
+import os
+import json
+import shutil
+import subprocess
+
+DEEPSEEK_API_KEY = "sk-7c4c86239406412ba3385f32db8b959d"
+DEEPSEEK_MODEL = "deepseek-chat"
+PROJECT_DIR = "/Users/cayden/Projects/the-driving-center-website"
+
+SYSTEM_PROMPT = """You are a senior Next.js/React/TypeScript engineer at The Driving Center project.
+
+RULES:
+- Only modify files explicitly requested by the task
+- READ existing files before making changes — this is mandatory
+- When modifying an existing file, REPLACE only the relevant section, preserve the rest
+- Never overwrite an entire file with boilerplate — make surgical edits
+- Tag commits with 'prov: everest prov: deepseek'
+- Build must pass before commit
+- If build fails, fix the errors — do not revert and abandon
+- Keep all existing functionality intact
+
+STACK: Next.js 16, React 19, TypeScript, Tailwind CSS v4, CSS custom properties for theming.
+CONTEXT: This project uses a dark/light theme system with CSS variables (--bg-base, --bg-surface, etc.)
+"""
+
+def call_deepseek(system: str, user: str, max_tokens: int = 3500) -> str:
+    import urllib.request
+    payload = {
+        "model": DEEPSEEK_MODEL,
+        "messages": [
+            {"role": "system", "content": system},
+            {"role": "user", "content": user}
+        ],
+        "max_tokens": max_tokens,
+        "temperature": 0.3,
+    }
+    req = urllib.request.Request(
+        "https://api.deepseek.com/v1/chat/completions",
+        data=json.dumps(payload).encode(),
+        headers={
+            "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+            "Content-Type": "application/json"
+        },
+        method="POST"
+    )
+    with urllib.request.urlopen(req, timeout=180) as resp:
+        return json.loads(resp.read())["choices"][0]["message"]["content"]
+
+def run(cmd: str) -> tuple:
+    result = subprocess.run(cmd, shell=True, cwd=PROJECT_DIR, capture_output=True, text=True)
+    return result.returncode, result.stdout, result.stderr
+
+def build() -> bool:
+    code, out, err = run("npm run build 2>&1")
+    if code != 0:
+        lines = (out + err).split("\n")
+        errors = [l.strip() for l in lines if l.strip().startswith(('error', 'Error:', 'Type error', './'))]
+        print(f"BUILD FAILED: {errors[:8]}")
+        return False
+    print("Build PASSED")
+    return True
+
+def parse_files(content: str) -> dict:
+    files = {}
+    current = None
+    buf = []
+    for line in content.split("\n"):
+        if line.startswith("// FILE:"):
+            if current:
+                files[current] = "\n".join(buf).strip()
+            current = line.replace("// FILE:", "").strip()
+            buf = []
+        elif current:
+            buf.append(line)
+    if current:
+        files[current] = "\n".join(buf).strip()
+    return files
+
+def read_existing_files(task: str) -> str:
+    """Inspect the task and read relevant existing files so DeepSeek has context."""
+    task_lower = task.lower()
+
+    # Always include globals.css if relevant
+    relevant = []
+    relevant_paths = []
+
+    if any(kw in task_lower for kw in ['style', 'css', 'theme', 'color', 'fade', 'transition', 'animation', 'scroll', 'button']):
+        path = os.path.join(PROJECT_DIR, "src/app/globals.css")
+        if os.path.exists(path):
+            with open(path) as f:
+                relevant.append(f"# EXISTING: src/app/globals.css (do not replace, only append/modify)\n{f.read()[:3000]}")
+            relevant_paths.append(path)
+
+    if any(kw in task_lower for kw in ['page', 'landing', 'home', 'hero', 'section', 'navbar', 'pricing', 'faq', 'booking']):
+        path = os.path.join(PROJECT_DIR, "src/app/page.tsx")
+        if os.path.exists(path):
+            with open(path) as f:
+                relevant.append(f"# EXISTING: src/app/page.tsx (do not replace, make surgical edits)\n{f.read()[:4000]}")
+            relevant_paths.append(path)
+
+    return "\n\n".join(relevant)
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: deepseek-agent <task> [spec_file]")
+        sys.exit(1)
+
+    task = sys.argv[1]
+    spec_path = sys.argv[2] if len(sys.argv) > 2 else None
+
+    print(f"Task: {task}")
+    spec_content = ""
+    if spec_path and os.path.exists(spec_path):
+        with open(spec_path) as f:
+            spec_content = f.read()
+        print(f"Spec: {spec_path} ({len(spec_content)} chars)")
+
+    print("Reading existing files for context...")
+    existing_context = read_existing_files(task)
+    if existing_context:
+        print(f"Context loaded: {len(existing_context)} chars from existing files")
+
+    # Build user message
+    user_msg = f"Task: {task}\n\n"
+    if spec_content:
+        user_msg += f"Spec:\n{spec_content}\n\n"
+    if existing_context:
+        user_msg += existing_context + "\n\n"
+        user_msg += "IMPORTANT: Read the existing file content above. Make surgical edits — do not replace entire files with boilerplate. Output only the specific files you are changing with // FILE: markers.\n\n"
+    user_msg += "Execute the task now."
+
+    print("\nCalling DeepSeek...")
+    try:
+        response = call_deepseek(SYSTEM_PROMPT, user_msg)
+    except Exception as e:
+        print(f"API error: {e}")
+        sys.exit(1)
+
+    print(f"Response: {len(response)} chars")
+    files = parse_files(response)
+    print(f"Files to write: {list(files.keys())}")
+
+    if not files:
+        print("No files in response — printing first 500 chars:")
+        print(response[:500])
+        return
+
+    # Separate new files from existing file modifications
+    new_files = {}   # files that don't exist yet — DeepSeek can create
+    edit_requests = {}  # existing files — we edit ourselves, not via DeepSeek output
+
+    # Check which files are new vs existing
+    for filename, content in files.items():
+        filepath = os.path.join(PROJECT_DIR, filename)
+        if os.path.exists(filepath):
+            edit_requests[filename] = content
+        else:
+            new_files[filename] = content
+
+    print(f"New files to create: {list(new_files.keys())}")
+    print(f"Existing files to edit: {list(edit_requests.keys())}")
+
+    # Write new files with backup
+    for filename, content in new_files.items():
+        filepath = os.path.join(PROJECT_DIR, filename)
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        with open(filepath, "w") as f:
+            f.write(content + "\n")
+        print(f"Created: {filename}")
+
+    # For existing files: apply surgical edits myself based on DeepSeek's guidance
+    # DeepSeek's output becomes the "instruction" rather than the file to write
+    if edit_requests:
+        print(f"\nApplying edits to existing files manually...")
+        for filename, suggested_content in edit_requests.items():
+            # Check if this is a full replacement or surgical edit instruction
+            existing_path = os.path.join(PROJECT_DIR, filename)
+            with open(existing_path) as f:
+                existing_content = f.read()
+
+            # If DeepSeek's content is shorter than existing, it's probably a partial overwrite
+            # — treat it as a failure and revert
+            if len(suggested_content) < len(existing_content) * 0.5:
+                print(f"DEEPSEEK OVERWRITE WARN: {filename} — {len(existing_content)} existing vs {len(suggested_content)} suggested. Reverting to original.")
+                print("DeepSeek should have described WHAT to add, not replaced the file.")
+                # Don't write — keep original
+            else:
+                # Back up and write — DeepSeek gave a full file replacement
+                shutil.copy(existing_path, existing_path + ".bak")
+                with open(existing_path, "w") as f:
+                    f.write(suggested_content + "\n")
+                print(f"Updated: {filename}")
+
+    # Build
+    print("\nBuilding...")
+    if build():
+        run("git add -A")
+        run('git commit -m "feat: ' + task[:80] + ' [prov: everest] [prov: deepseek]"')
+        run("git push")
+        print("Done!")
+    else:
+        print("\nAttempting fix...")
+        fix_resp = call_deepseek(
+            SYSTEM_PROMPT,
+            f"Build failed. Fix the errors in these files: {list(files.keys())}\n\nPrevious output:\n{response[:4000]}\n\nOutput corrected files with // FILE: markers.",
+            max_tokens=4000
+        )
+        fix_files = parse_files(fix_resp)
+        for fn, content in fix_files.items():
+            fp = os.path.join(PROJECT_DIR, fn)
+            if os.path.exists(fp + ".bak"):
+                shutil.copy(fp + ".bak", fp)
+            with open(fp, "w") as f:
+                f.write(content + "\n")
+        if build():
+            run("git add -A")
+            run('git commit -m "fix: build errors [prov: everest] [prov: deepseek]"')
+            run("git push")
+            print("Fixed!")
+        else:
+            print("Reverting...")
+            for fn in files.keys():
+                bak = os.path.join(PROJECT_DIR, fn) + ".bak"
+                if os.path.exists(bak):
+                    shutil.move(bak, os.path.join(PROJECT_DIR, fn))
+            sys.exit(1)
+
+if __name__ == "__main__":
+    main()

@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import ScrollToTop from '@/components/ScrollToTop'
 
 // ─── Theme Toggle ───────────────────────────────────────────────────
 function ThemeToggle() {
@@ -679,6 +680,7 @@ export default function HomePage() {
         </div>
       </footer>
 
+      <ScrollToTop />
     </main>
   )
 }
