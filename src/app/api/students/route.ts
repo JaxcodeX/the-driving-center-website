@@ -43,7 +43,6 @@ export async function GET(request: Request) {
     .from('students_driver_ed')
     .select('id, legal_name, created_at, driving_hours, classroom_hours, certificate_issued_at, parent_email')
     .eq('school_id', schoolId)
-    .is('deleted_at', null)
     .order('created_at', { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

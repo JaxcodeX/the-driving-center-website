@@ -32,33 +32,42 @@ export async function GET() {
 
   const admin = getSupabaseAdmin()
 
-  // Run all queries in parallel with service role
+  // Query actual column names from actual DB schema
   const [
     studentsResult,
     sessionsResult,
     completedResult,
-    schoolDataRaw,
-    sessionsDataRaw,
+    schoolResult,
+    sessionsDataResult,
+    revenueResult,
   ] = await Promise.all([
     admin.from('students_driver_ed').select('*', { count: 'exact', head: true }).eq('school_id', schoolId),
     admin.from('sessions').select('*', { count: 'exact', head: true }).eq('school_id', schoolId).eq('status', 'scheduled'),
     admin.from('sessions').select('*', { count: 'exact', head: true }).eq('school_id', schoolId).eq('status', 'completed'),
-    (admin.from('schools').select('monthly_revenue, name').eq('id', schoolId).single()) as any,
+    (admin.from('schools').select('name').eq('id', schoolId).single()) as any,
     admin
       .from('sessions')
       .select('*, instructor:instructors(name), session_type:session_types(name)')
       .eq('school_id', schoolId)
       .order('start_date', { ascending: true })
       .limit(8),
+    admin.from('bookings').select('deposit_amount_cents').eq('school_id', schoolId).eq('status', 'confirmed').gte('created_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
   ])
 
   const totalStudents = (studentsResult as any)?.count ?? 0
   const activeSessions = (sessionsResult as any)?.count ?? 0
   const completedSessions = (completedResult as any)?.count ?? 0
-  const schoolData = schoolDataRaw as any
-  const sessionsData = (sessionsDataRaw as any)?.data ?? []
+  const schoolData = schoolResult as any
+  const sessionsData = (sessionsDataResult as any)?.data ?? []
 
-  const monthlyRevenue = (schoolData as any)?.monthly_revenue || 0
+  // Sum confirmed booking deposits for current month (actual revenue calculation)
+  const revenueRows = (revenueResult as any)?.data ?? []
+  const monthlyRevenue = revenueRows.reduce(
+    (sum: number, b: { deposit_amount_cents: number | null }) =>
+      sum + (b.deposit_amount_cents ?? 0),
+    0
+  ) / 100
+
   const totalSess = (activeSessions || 0) + (completedSessions || 0)
   const completionRate = totalSess > 0 ? Math.round(((completedSessions || 0) / totalSess) * 100) : 0
 

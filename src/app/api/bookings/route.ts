@@ -84,6 +84,7 @@ export async function POST(request: Request) {
     session_time,
     status: depositAmount > 0 ? 'pending' : 'confirmed',
     booking_token: bookingToken,
+    confirmation_token: bookingToken,  // FIX: was missing — confirmations looked up by confirmation_token
     payment_status: depositAmount > 0 ? 'pending' : 'paid',
   }
   if (session_id) insertPayload.session_id = session_id
