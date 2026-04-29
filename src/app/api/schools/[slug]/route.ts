@@ -66,23 +66,28 @@ export async function PUT(
   // Resolve school: if slug looks like a UUID, find by id; otherwise by slug
   const isUuid = slug && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug)
 
-  let school: { id: string } | null = null
+  let school: { id: string; owner_email?: string } | null = null
 
   if (isUuid) {
     const result = await (supabaseAdmin.from('schools') as any)
-      .select('id')
+      .select('id, owner_email')
       .eq('id', slug)
       .single()
     school = result.data
   } else {
     const result = await (supabaseAdmin.from('schools') as any)
-      .select('id')
+      .select('id, owner_email')
       .eq('slug', slug)
       .single()
     school = result.data
   }
 
   if (!school) return new NextResponse('School not found', { status: 404 })
+
+  // Ownership check: user must own this school
+  if (process.env.DEMO_MODE !== 'true' && user?.email !== school.owner_email) {
+    return new NextResponse('Forbidden', { status: 403 })
+  }
 
   const { data: profile, error } = await (supabaseAdmin
     .from('school_profiles') as any)

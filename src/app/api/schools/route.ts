@@ -12,6 +12,8 @@ export async function GET() {
 }
 
 // ── POST /api/schools ──────────────────────────────────────────────────
+// POST /api/schools — create a new school
+// Auth: DEMO_MODE skips auth (open demo signups). Non-demo REQUIRES Bearer token.
 export async function POST(request: Request) {
   const body = await request.json()
   const { schoolName, ownerName, email, phone, state } = body
@@ -20,10 +22,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'schoolName and email required' }, { status: 400 })
   }
 
-  // DEMO_MODE: skip auth — school creation is open for demo signups
-  // The auth link is sent after school creation via magic link
   const admin: any = getSupabaseAdmin()
   const slug = schoolName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) + '-' + Date.now().toString(36)
+
+  // Non-demo: require authentication
+  if (process.env.DEMO_MODE !== 'true') {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    }
+    const token = authHeader.slice(7)
+    const { data: { user }, error: authError } = await admin.auth.getUser(token)
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    }
+    // Use authenticated user's email as owner_email
+    if (email !== user.email) {
+      return NextResponse.json({ error: 'Email must match authenticated account' }, { status: 403 })
+    }
+  }
 
   // Check if email already owns a school
   const { data: existing } = await admin
@@ -54,7 +71,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: schoolError?.message ?? 'Failed to create school' }, { status: 500 })
   }
 
-  // DEMO_MODE: skip Stripe
+  // DEMO_MODE: skip Stripe, return onboarding URL
   if (process.env.DEMO_MODE === 'true') {
     const origin = process.env.NEXT_PUBLIC_APP_URL ?? 'https://the-driving-center-website.vercel.app'
     return NextResponse.json({

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
 import { auditLog } from '@/lib/security'
 
 // ── GET /api/sessions?school_id=X ──────────────────────────────────────
@@ -9,23 +10,20 @@ export async function GET(request: Request) {
   const schoolId = searchParams.get('school_id')
   if (!schoolId) return new NextResponse('Missing school_id', { status: 400 })
 
-  const admin: any = getSupabaseAdmin()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return new NextResponse('Unauthorized', { status: 401 })
 
-  // Auth check
-  const authHeader = request.headers.get('Authorization')
-  if (!authHeader?.startsWith('Bearer ')) {
-    const cookieAuth = await createClient()
-    const { data: { user } } = await cookieAuth.auth.getUser()
-    if (!user) return new NextResponse('Unauthorized', { status: 401 })
-  }
-
-  const { data: school } = await admin
+  // Ownership check: user must own this school
+  const { data: school } = await supabase
     .from('schools')
     .select('id')
     .eq('id', schoolId)
+    .eq('owner_email', user.email)
     .single()
   if (!school) return new NextResponse('Forbidden', { status: 403 })
 
+  const admin: any = getSupabaseAdmin()
   const { data: sessions, error } = await admin
     .from('sessions')
     .select('*, instructor:instructors(id, name)')
@@ -46,13 +44,23 @@ export async function POST(request: Request) {
   }
 
   const admin: any = getSupabaseAdmin()
-  const schoolId = request.headers.get('x-school-id')
-  if (!schoolId) return new NextResponse('Missing x-school-id', { status: 400 })
+  let schoolId = request.headers.get('x-school-id')
 
-  const authHeader = request.headers.get('Authorization')
-
-  // DEMO_MODE: skip full auth
+  // DEMO_MODE: derive school_id from demo cookie — do NOT trust x-school-id header
   if (process.env.DEMO_MODE === 'true') {
+    const cookieStore = await cookies()
+    const demoUserCookie = cookieStore.get('demo_user')
+    if (!demoUserCookie?.value) {
+      return NextResponse.json({ error: 'No demo session' }, { status: 401 })
+    }
+    try {
+      const payload = JSON.parse(Buffer.from(demoUserCookie.value, 'base64').toString('utf8'))
+      schoolId = payload?.schoolId
+    } catch {
+      return NextResponse.json({ error: 'Invalid demo session' }, { status: 401 })
+    }
+    if (!schoolId) return NextResponse.json({ error: 'No school in demo session' }, { status: 400 })
+
     const { data: session, error } = await admin
       .from('sessions')
       .insert({
@@ -74,7 +82,9 @@ export async function POST(request: Request) {
     return NextResponse.json(session, { status: 201 })
   }
 
-  // Non-demo: full auth
+  // Non-demo: require auth + ownership
+  if (!schoolId) return NextResponse.json({ error: 'Missing x-school-id' }, { status: 400 })
+  const authHeader = request.headers.get('Authorization')
   if (!authHeader?.startsWith('Bearer ')) return new NextResponse('Unauthorized', { status: 401 })
   const token = authHeader.slice(7)
   const { data: { user } } = await admin.auth.getUser(token)
