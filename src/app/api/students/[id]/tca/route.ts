@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
+import type { StudentsDriverEd } from '@/lib/supabase/types'
 
 // Tennessee T.C.A. § 40-35-102 requires 6 hours classroom + 6 hours behind-the-wheel for initial driver education
 
@@ -53,31 +54,26 @@ export async function GET(
   const { id } = await params
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) return new NextResponse('Unauthorized', { status: 401 })
 
   const schoolId = request.headers.get('x-school-id')
-  const supabaseAdmin = await createClient()
+  const supabaseAdmin = getSupabaseAdmin()!
 
   const { data: student, error } = await supabaseAdmin
     .from('students_driver_ed')
     .select('*')
     .eq('id', id)
-    .eq('school_id', schoolId)
-    .single()
+    .eq('school_id', schoolId as string)
+    .single() as any
 
   if (error || !student) {
     return new NextResponse('Student not found', { status: 404 })
   }
 
-  const progress = calculateTCAProgress(student)
+  const progress = calculateTCAProgress(student as StudentProgress)
 
-  return NextResponse.json({
-    student_id: id,
-    progress,
-  })
+  return NextResponse.json({ student_id: id, progress })
 }
 
 export async function POST(
@@ -87,24 +83,22 @@ export async function POST(
   const { id } = await params
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) return new NextResponse('Unauthorized', { status: 401 })
 
   const schoolId = request.headers.get('x-school-id')
   const body = await request.json()
   const { classroom_hours, driving_hours } = body
 
-  const supabaseAdmin = await createClient()
+  const supabaseAdmin = getSupabaseAdmin()!
 
   // Get current student
   const { data: student } = await supabaseAdmin
     .from('students_driver_ed')
     .select('*')
     .eq('id', id)
-    .eq('school_id', schoolId)
-    .single()
+    .eq('school_id', schoolId as string)
+    .single() as any
 
   if (!student) return new NextResponse('Student not found', { status: 404 })
 
@@ -128,31 +122,31 @@ export async function POST(
     updates.certificate_issued_at = new Date().toISOString()
   }
 
-  const { data: updated, error } = await supabaseAdmin
+  const { data: updated, error } = await (supabaseAdmin as any)
     .from('students_driver_ed')
-    .update(updates)
+    .update(updates as any)
     .eq('id', id)
-    .eq('school_id', schoolId)
+    .eq('school_id', schoolId as string)
     .select()
-    .single()
+    .single() as any
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: (error as { message?: string }).message }, { status: 500 })
 
-  const progress = calculateTCAProgress(updated)
+  const progress = calculateTCAProgress(updated as StudentProgress)
 
-  await supabaseAdmin.from('audit_logs').insert(
-    auditLog(
-      body.issue_certificate ? 'CERTIFICATE_ISSUED' : 'STUDENT_HOURS_UPDATED',
-      user.id,
-      {
-        student_id: id,
-        school_id: schoolId,
-        classroom_hours: newClassroom,
-        driving_hours: newDriving,
-        certificate_issued: !!updates.certificate_issued_at,
-      }
-    )
+  const logEntry = auditLog(
+    body.issue_certificate ? 'CERTIFICATE_ISSUED' : 'STUDENT_HOURS_UPDATED',
+    user.id,
+    {
+      student_id: id,
+      school_id: schoolId as string,
+      classroom_hours: newClassroom,
+      driving_hours: newDriving,
+      certificate_issued: !!updates.certificate_issued_at,
+    }
   )
+
+  await (supabaseAdmin.from('audit_logs') as any).insert(logEntry as any)
 
   return NextResponse.json({ student_id: id, progress })
 }

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
+import { auditLog } from '@/lib/security'
+import type { BookingFull, BookingWithSession } from '@/lib/supabase/types'
 
 export async function GET(
   _request: Request,
@@ -39,14 +41,14 @@ export async function GET(
       )
     `)
     .eq('confirmation_token', token)
-    .single()
+    .single() as { data: BookingFull; error: any }
 
   if (error || !booking) {
     return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
   }
 
   // Never expose the token in responses
-  const { confirmation_token: _, ...safeBooking } = booking as any
+  const { confirmation_token: _, ...safeBooking } = booking
   return NextResponse.json(safeBooking)
 }
 
@@ -63,14 +65,14 @@ export async function POST(
   }
 
   const supabase = await createClient()
-  const supabaseAdmin = await createClient()
+  const supabaseAdmin = getSupabaseAdmin() as any
 
   // Get booking with session info
   const { data: booking, error: fetchError } = await supabase
     .from('bookings')
     .select('*, session:session_id(id, school_id, start_date, start_time, seats_booked)')
     .eq('confirmation_token', token)
-    .single()
+    .single() as { data: BookingWithSession; error: any }
 
   if (fetchError || !booking) {
     return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
@@ -98,16 +100,16 @@ export async function POST(
     if (booking.session) {
       await supabaseAdmin
         .from('sessions')
-        .update({ seats_booked: Math.max(0, (booking.session as any).seats_booked - 1) })
-        .eq('id', (booking.session as any).id)
+        .update({ seats_booked: Math.max(0, booking.session.seats_booked - 1) })
+        .eq('id', booking.session.id)
     }
 
-    await supabaseAdmin.from('audit_logs').insert({
-      action: 'BOOKING_CANCELLED',
-      actor_id: booking.student_email,
-      timestamp: new Date().toISOString(),
-      details: { booking_id: booking.id, reason: body.reason ?? 'Customer cancelled' },
-    })
+    await supabaseAdmin.from('audit_logs').insert(
+      auditLog('BOOKING_CANCELLED', booking.student_email, {
+        booking_id: booking.id,
+        reason: body.reason ?? 'Customer cancelled',
+      })
+    )
 
     return NextResponse.json({ success: true, message: 'Booking cancelled' })
   }

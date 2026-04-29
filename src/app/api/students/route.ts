@@ -1,7 +1,22 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 import { encryptField, decryptField, validateDOB, validatePermitNumber, validateEmail, validatePhone, auditLog } from '@/lib/security'
 import { isLikelyValidEmail } from '@/lib/email'
+import type { StudentsDriverEd, AuditLog } from '@/lib/supabase/types'
+
+// Workaround: Supabase-generated types only include tables known at codegen time.
+// For admin operations on tables not in generated types, we fall back to untyped .from()
+// and use type assertions to keep TypeScript happy.
+type AdminFrom = {
+  from(table: 'students_driver_ed'): {
+    insert(values: StudentsDriverEd): {
+      select(): { single(): Promise<{ data: StudentsDriverEd | null; error: unknown }> }
+    }
+  }
+  from(table: 'audit_logs'): {
+    insert(values: AuditLog): Promise<unknown>
+  }
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -58,12 +73,10 @@ export async function POST(request: Request) {
   // Production: derive from authenticated session metadata
   let schoolId = request.headers.get('x-school-id')
   if (!schoolId) {
-    // Non-demo: get from user's authenticated session
     schoolId = user.user_metadata?.school_id
   }
   if (!schoolId) return new NextResponse('Missing school_id', { status: 400 })
 
-  // Verify ownership (always verify — DEMO_MODE middleware is trusted but defense-in-depth)
   const { data: school } = await supabase
     .from('schools')
     .select('id')
@@ -97,28 +110,34 @@ export async function POST(request: Request) {
   const encryptedPermit = permit_number ? await encryptField(permit_number) : 'PENDING'
   const encryptedPhone = emergency_contact_phone ? await encryptField(emergency_contact_phone) : null
 
-  const supabaseAdmin = await createClient()
-  const { data: student, error } = await supabaseAdmin
+  // Cast admin client to typed interface that covers our tables
+  const admin = getSupabaseAdmin() as unknown as AdminFrom
+
+  const studentData = {
+    school_id: schoolId,
+    legal_name: encryptedName,
+    dob,
+    permit_number: encryptedPermit,
+    parent_email: parent_email ?? '',
+    emergency_contact_name: emergency_contact_name ?? '',
+    emergency_contact_phone: encryptedPhone,
+  }
+
+  const { data: student, error } = await admin
     .from('students_driver_ed')
-    .insert({
-      school_id: schoolId,
-      legal_name: encryptedName,
-      dob,
-      permit_number: encryptedPermit,
-      parent_email: parent_email ?? '',
-      emergency_contact_name: emergency_contact_name ?? '',
-      emergency_contact_phone: encryptedPhone,
-    })
-    .select('id')
+    .insert(studentData as StudentsDriverEd)
+    .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: (error as { message?: string }).message ?? 'Insert failed' }, { status: 500 })
 
-  await supabaseAdmin.from('audit_logs').insert(
-    auditLog('STUDENT_CREATED', user.id, {
-      student_id: student.id, school_id: schoolId, has_permit: Boolean(permit_number),
-    })
-  )
+  const logEntry = auditLog('STUDENT_CREATED', user.id, {
+    student_id: (student as StudentsDriverEd).id,
+    school_id: schoolId,
+    has_permit: Boolean(permit_number),
+  })
 
-  return NextResponse.json({ id: student.id, legal_name }, { status: 201 })
+  await admin.from('audit_logs').insert(logEntry as AuditLog)
+
+  return NextResponse.json({ id: (student as StudentsDriverEd).id, legal_name }, { status: 201 })
 }

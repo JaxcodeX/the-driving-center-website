@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
+import type { CheckoutBookingData } from '@/lib/supabase/types'
 
 function getStripe(): Stripe {
   if (!process.env.STRIPE_SECRET_KEY) {
@@ -19,10 +20,9 @@ export async function POST(request: Request) {
   }
 
   const supabase = await createClient()
-  const supabaseAdmin = await createClient()
+  const supabaseAdmin = getSupabaseAdmin() as any
 
-  // Get booking + session info
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // Get booking + session info (admin to bypass RLS on bookings table)
   const { data: booking, error: bookingError } = await supabaseAdmin
     .from('bookings')
     .select(`
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
       )
     `)
     .eq('id', booking_id)
-    .single() as { data: any; error: any }
+    .single() as { data: CheckoutBookingData; error: any }
 
   if (bookingError || !booking) {
     return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
@@ -69,11 +69,11 @@ export async function POST(request: Request) {
   const { data: school } = await supabaseAdmin
     .from('schools')
     .select('name')
-    .eq('id', (booking.session as any).school_id)
+    .eq('id', booking.session.school_id)
     .single()
 
-  const sessionTypeName = (booking.session as any).session_type?.name ?? 'Lesson'
-  const dateStr = new Date(`${(booking.session as any).start_date}T12:00:00`).toLocaleDateString('en-US', {
+  const sessionTypeName = booking.session.session_type?.name ?? 'Lesson'
+  const dateStr = new Date(`${booking.session.start_date}T12:00:00`).toLocaleDateString('en-US', {
     weekday: 'long', month: 'long', day: 'numeric',
   })
 
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `${sessionTypeName} — ${dateStr} at ${(booking.session as any).start_time}`,
+            name: `${sessionTypeName} — ${dateStr} at ${booking.session.start_time}`,
             description: `${school?.name ?? 'Driving Lesson'} deposit — credited toward total`,
           },
           unit_amount: booking.deposit_amount_cents,
@@ -95,8 +95,8 @@ export async function POST(request: Request) {
     customer_email: booking.student_email,
     metadata: {
       booking_id: booking.id,
-      session_id: (booking.session as any).id,
-      school_id: (booking.session as any).school_id,
+      session_id: booking.session.id,
+      school_id: booking.session.school_id,
       student_email: booking.student_email,
       student_name: booking.student_name,
     },

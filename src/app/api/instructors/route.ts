@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
+import type { Instructor } from '@/lib/supabase/types'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -11,15 +12,16 @@ export async function GET(request: Request) {
   }
 
   const supabase = await createClient()
-  const { data: instructors, error } = await supabase
+  // Cast through any to bypass Supabase schema inference (no generated Database type)
+  const { data: instructors, error } = await (supabase as any)
     .from('instructors')
     .select('*')
     .eq('school_id', schoolId)
     .eq('active', true)
-    .order('created_at', { ascending: true })
+    .order('created_at', { ascending: true }) as { data: Instructor[] | null, error: unknown }
 
   if (error) {
-    return NextResponse.json({ error: error?.message ?? String(error) }, { status: 500 })
+    return NextResponse.json({ error: (error as { message?: string }).message ?? String(error) }, { status: 500 })
   }
 
   return NextResponse.json(instructors ?? [])
@@ -41,8 +43,8 @@ export async function POST(request: Request) {
 
   if (!name) return new NextResponse('Name required', { status: 400 })
 
-  const supabaseAdmin = await createClient()
-  const { data: instructor, error } = await supabaseAdmin
+  const supabaseAdmin = getSupabaseAdmin()
+  const { data: instructor, error } = await (supabaseAdmin as any)
     .from('instructors')
     .insert({
       school_id: schoolId,
@@ -54,11 +56,11 @@ export async function POST(request: Request) {
       active: true,
     })
     .select()
-    .single()
+    .single() as { data: Instructor, error: unknown }
 
-  if (error) return NextResponse.json({ error: error?.message ?? String(error) }, { status: 500 })
+  if (error) return NextResponse.json({ error: (error as { message?: string }).message ?? String(error) }, { status: 500 })
 
-  await supabaseAdmin.from('audit_logs').insert(
+  await (supabaseAdmin as any).from('audit_logs').insert(
     auditLog('INSTRUCTOR_CREATED', user.id, {
       instructor_id: instructor.id,
       school_id: schoolId,
