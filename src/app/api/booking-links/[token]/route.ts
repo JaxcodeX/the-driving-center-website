@@ -21,7 +21,6 @@ export async function GET(
       student_email,
       status,
       deposit_amount_cents,
-      deposit_paid_at,
       created_at,
       confirmation_token,
       session:session_id (
