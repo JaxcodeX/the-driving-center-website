@@ -24,16 +24,12 @@ export async function GET(
       student_phone,
       status,
       deposit_amount_cents,
-      deposit_paid_at,
       created_at,
       confirmation_token,
       session:session_id (
         id,
         start_date,
-        start_time,
-        end_time,
         location,
-        cancelled,
         session_type:session_type_id (
           name,
           duration_minutes,

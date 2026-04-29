@@ -57,8 +57,6 @@ export async function POST(
     inserts.push({
       school_id: schoolId,
       start_date: newDate.toISOString().split('T')[0],
-      start_time: original.start_time,
-      end_time: original.end_time,
       instructor_id: original.instructor_id,
       session_type_id: original.session_type_id,
       max_seats: original.max_seats,

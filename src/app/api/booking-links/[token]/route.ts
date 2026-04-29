@@ -26,7 +26,6 @@ export async function GET(
       session:session_id (
         id,
         start_date,
-        start_time,
         location,
         session_type:session_type_id (
           name,
@@ -69,7 +68,7 @@ export async function POST(
   // Get booking with session info
   const { data: booking, error: fetchError } = await supabase
     .from('bookings')
-    .select('*, session:session_id(id, school_id, start_date, start_time, seats_booked)')
+    .select('*, session:session_id(id, school_id, start_date, seats_booked)')
     .eq('confirmation_token', token)
     .single() as { data: BookingWithSession; error: any }
 

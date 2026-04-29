@@ -35,7 +35,6 @@ export async function POST(request: Request) {
         id,
         school_id,
         start_date,
-        start_time,
         location,
         session_type:session_type_id (
           name
@@ -57,7 +56,7 @@ export async function POST(request: Request) {
     // No deposit needed — confirm directly
     await supabaseAdmin
       .from('bookings')
-      .update({ status: 'confirmed', deposit_paid_at: new Date().toISOString() })
+      .update({ status: 'confirmed' })
       .eq('id', booking_id)
 
     return NextResponse.json({ confirmed: true })
@@ -84,7 +83,7 @@ export async function POST(request: Request) {
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `${sessionTypeName} — ${dateStr} at ${booking.session.start_time}`,
+            name: `${sessionTypeName} — ${dateStr}`,
             description: `${school?.name ?? 'Driving Lesson'} deposit — credited toward total`,
           },
           unit_amount: booking.deposit_amount_cents,

@@ -55,8 +55,6 @@ export async function PUT(
     .from('sessions')
     .update({
       start_date: body.start_date,
-      start_time: body.start_time,
-      end_time: body.end_time,
       instructor_id: body.instructor_id,
       max_seats: body.max_seats,
       price_cents: body.price_cents,
