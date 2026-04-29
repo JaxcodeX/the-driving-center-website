@@ -23,9 +23,10 @@
 | `GET /api/sessions` ownership check | ✅ FIXED — now verifies user owns school_id |
 | `POST /api/sessions` demo auth | ✅ FIXED — school_id from demo cookie, NOT x-school-id header |
 | Stripe webhook signature verification | ✅ EXISTS |
-| `schools.owner_email` UNIQUE constraint | ❌ MISSING — needs migration (run in Supabase SQL Editor) |
+| `schools.owner_email` UNIQUE constraint | ✅ APPLIED via Supabase Management API |
+| `bookings` new columns | ✅ APPLIED via Supabase Management API |
 
----
+---|
 
 ## What Was Fixed Today (2026-04-29)
 
@@ -100,8 +101,7 @@
 
 | Item | Impact | Status |
 |---|---|---|
-| `schools.owner_email` UNIQUE constraint | Security — duplicate emails allowed | Needs SQL migration (run in Supabase SQL Editor) |
-| `booking-links/[token]/route.ts` selects `deposit_paid_at` | Non-breaking — field silently returns null | Low priority |
+| None — all items resolved | — | — |
 
 ---
 
@@ -177,14 +177,9 @@ scripts/
 
 ## What Zax Needs to Do (Action Items)
 
-### Run in Supabase SQL Editor (now)
-```sql
--- Migration 010: Add UNIQUE constraint on schools.owner_email
-ALTER TABLE schools ADD CONSTRAINT schools_owner_email_key UNIQUE (owner_email);
-```
+**All manual tasks complete.** Migration 009 + 010 applied via API. `SUPABASE_JWT_SECRET` added to Vercel.
 
-### Get from Supabase Dashboard → Settings → API
-- **`SUPABASE_JWT_SECRET`** — copy the JWT Secret value → add to Vercel env vars. This fixes the dashboard revenue + completion stats showing $0/0%.
+Vercel is redeploying now — takes ~2-3 minutes to go live.
 
 ---
 
