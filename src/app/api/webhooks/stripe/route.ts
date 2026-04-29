@@ -70,7 +70,6 @@ export async function POST(req: Request) {
           .from('bookings')
           .update({
             status: 'confirmed',
-            deposit_paid_at: new Date().toISOString(),
             stripe_payment_intent_id: session.payment_intent as string,
           })
           .eq('id', bookingId)
@@ -211,7 +210,7 @@ export async function POST(req: Request) {
       .eq('stripe_customer_id', customerId)
 
     await supabaseAdmin.from('audit_logs').insert(
-      auditLog('SUBSCRIPTION_CANCELLED', 'stripe-webline', {
+      auditLog('SUBSCRIPTION_CANCELLED', 'stripe-webhook', {
         stripe_subscription_id: sub.id,
       })
     )

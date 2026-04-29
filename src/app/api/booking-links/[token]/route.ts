@@ -119,7 +119,6 @@ export async function POST(
       .from('bookings')
       .update({
         status: 'confirmed',
-        deposit_paid_at: new Date().toISOString(),
       })
       .eq('confirmation_token', token)
       .eq('status', 'pending')
