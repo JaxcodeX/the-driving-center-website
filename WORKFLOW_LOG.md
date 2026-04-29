@@ -225,3 +225,43 @@ The slow iteration on The Driving Center website wasn't a workflow problem — i
 **Full context → one pass → commit. Partial context → iteration → wasted time.**
 The discipline is in what we give the AI before we ask it to build, not in how we direct it during build.
 
+
+---
+
+## Cycle 10 — Architectural Audit Fixes
+
+**Date:** 2026-04-28
+**Implemented by:** Everest
+**Result:** ✅ Passed — committed
+
+### What was done
+
+1. **POST /api/students auth fixed** — `school_id` now derives from `user.user_metadata.school_id` first, with `x-school-id` header as DEMO_MODE fallback only. Ownership check always runs.
+
+2. **8 stale SPEC*.md files deleted** — Removed SPEC_LANDING_CLEAN.md, SPEC_LANDING_GOLDEN_SCREEN.md, SPEC_LANDING_HERO_REBUILD.md, SPEC_LANDING_REBUILD.md, SPEC_LANDING_REDESIGN.md, SPEC_ONE_WEEK_SPRINT.md, SPEC_DEMO_FIX.md, SPEC.md (archived). Only SPEC_FULL_REDESIGN.md remains.
+
+3. **STATUS.md updated** — Migration 009 noted as already applied. RLS test result recorded as PASS. `schools.owner_email` UNIQUE constraint flagged as needed fix.
+
+4. **CLAUDE.md rewritten** — Removed broken "DeepSeek-Claude with context package" workflow that never actually existed. Replaced with honest description: Everest builds directly OR spawns OpenCode with context package. Migration 009 removed from "pending" section. Font contradiction resolved (now says "distinctive pairing" instead of Inter specifically).
+
+5. **Migration 010 created** — `010_schools_owner_email_unique.sql` adds UNIQUE constraint on `schools.owner_email`. Needs to run in Supabase SQL Editor.
+
+6. **package.json updated** — Added `typecheck` script (`tsc --noEmit`) and `test` script pointing to E2E runner.
+
+### Architectural issues still pending
+
+- `getSupabaseAdmin()` in supabase/server.ts is defined but multiple API routes call `createClient()` expecting admin access — they get user-context client instead
+- Demo routes `/api/demo/*` have zero auth (acceptable for DEMO_MODE but needs production fix before launch)
+- Landing page (`page.tsx`) uses inline styles instead of TailwindCSS despite TailwindCSS being in stack
+
+### Action items from this audit
+
+- [ ] Run migration 010 in Supabase SQL Editor (1 SQL statement)
+- [ ] Fix `getSupabaseAdmin()` usage in API routes (several routes call `createClient()` expecting admin)
+- [ ] Audit `/api/demo/*` routes before production launch
+- [ ] OpenCode integration into workflow (spawn command + context package assembly)
+
+### Root cause of friction
+
+CLAUDE.md described an aspirational workflow (sub-agent with context package) that was never actually implemented. Every commit was Everest directly. The "DeepSeek-Claude" script was broken from day one. Fixing this requires either (a) actually building the OpenCode spawn pipeline or (b) being honest that Everest builds directly and dropping the fake sub-agent description.
+

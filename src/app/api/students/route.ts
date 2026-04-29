@@ -54,10 +54,16 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return new NextResponse('Unauthorized', { status: 401 })
 
-  const schoolId = request.headers.get('x-school-id')
-  if (!schoolId) return new NextResponse('Missing x-school-id', { status: 400 })
+  // DEMO_MODE: school_id validated by middleware via demo_session cookie
+  // Production: derive from authenticated session metadata
+  let schoolId = request.headers.get('x-school-id')
+  if (!schoolId) {
+    // Non-demo: get from user's authenticated session
+    schoolId = user.user_metadata?.school_id
+  }
+  if (!schoolId) return new NextResponse('Missing school_id', { status: 400 })
 
-  // Verify ownership
+  // Verify ownership (always verify — DEMO_MODE middleware is trusted but defense-in-depth)
   const { data: school } = await supabase
     .from('schools')
     .select('id')

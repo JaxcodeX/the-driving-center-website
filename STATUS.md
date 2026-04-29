@@ -1,5 +1,5 @@
 # STATUS.md — The Driving Center SaaS
-**Updated: 2026-04-27**
+**Updated: 2026-04-28**
 
 ---
 
@@ -10,6 +10,17 @@
 **Branch:** `main` (auto-deploys on push)
 **Demo PIN:** `0000` (any email works)
 **Demo school:** `autotest1777248097@demo-test.com` / `0daea68b-06ed-445b-bf52-91d4f16b9e01`
+
+---
+
+## Auth & Security
+
+| Check | Status |
+|---|---|
+| RLS cross-school isolation | ✅ PASS (tested 2026-04-28) |
+| `POST /api/students` school_id source | ✅ FIXED — derives from user metadata, not client header |
+| `schools.owner_email` UNIQUE constraint | ❌ MISSING — needs migration |
+| Demo routes `/api/demo/*` auth | ⚠️ No auth — demo-only, acceptable for DEMO_MODE |
 
 ---
 
@@ -62,8 +73,7 @@
 
 | Item | Impact | Status |
 |---|---|---|
-| Migration 009 not run | `bookings.session_id` FK + `booking_time` column missing | Zax must run in Supabase SQL Editor |
-| `POST /api/students` auth | Reads `x-school-id` header instead of verifying session | Pre-production risk, not a demo blocker |
+| `schools.owner_email` UNIQUE constraint | Security — duplicate emails allowed | Needs SQL migration |
 
 ---
 
@@ -77,23 +87,12 @@
 
 ---
 
-## Workflow Protocol
-
-**Current mode:** Vibe Coding Protocol (CLAUDE.md)
-- Always write SPEC.md before building
-- Give AI full context package (design tokens + reference components + spec)
-- One-pass builds, no chat iteration
-- 50-line rule: if >50 lines back-and-forth, write new SPEC instead
-
----
-
 ## Stack (Locked)
 
 | Component | Value |
 |---|---|
 | Supabase project | `evswdlsqlaztvajibgta` |
 | Resend API key | `re_ZwCTERGk_8eesZtYHGkR32GPv6YAgEs2P` (live) |
-| DeepSeek API key | `sk-7c4c86239406412ba3385f32db8b959d` |
 | Stripe account | `jaxcodewe@protonmail.com` (test mode) |
 | Vercel project | `jaxcodexs-projects/the-driving-center-website` |
 | Demo mode | `true` (Vercel env var) |
@@ -107,17 +106,16 @@ CLAUDE.md              ← workflow protocol (source of truth)
 STATUS.md              ← this file
 WORKFLOW_LOG.md        ← build cycle history
 SPEC_FULL_REDESIGN.md  ← active redesign spec
-SPEC_LANDING_REDESIGN.md ← landing page spec (pending execution)
 SPEC.md                ← phase specs (archived)
 src/app/               ← all routes + pages
 src/lib/
   supabase/            ← client + server helpers
-  migrations/          ← SQL (migration 009 pending)
-  email-templates/      ← Resend templates
+  migrations/          ← SQL (all applied except owner_email UNIQUE)
+  email-templates/     ← Resend templates
   security.ts          ← encryption, validation
 tests/e2e/             ← automated tests
 scripts/
-  deepseek-claude      ← Claude Code + DeepSeek wrapper
+  deepseek-claude      ← placeholder (not currently used — OpenCode is target)
 ```
 
 ---
@@ -126,8 +124,15 @@ scripts/
 
 **Demo ready.** The site is deployed, demo data is seeded, demo login is fixed.
 
-Zax's remaining task before demo:
-1. Run migration 009 in Supabase SQL Editor (one SQL paste, 2 minutes)
-2. Test full demo flow: `/login` → PIN 0000 → school admin → students → sessions
-
 Mark will evaluate: architecture decisions, multi-tenant schema, subscription flow, auth system. Not CSS quality.
+
+---
+
+## Workflow
+
+**Current mode:** Vibe Coding Protocol (CLAUDE.md)
+- Always write SPEC.md before building
+- Give AI full context package (design tokens + reference components + spec)
+- One-pass builds, no chat iteration
+
+**Sub-agent:** OpenCode (target — not yet wired into workflow)

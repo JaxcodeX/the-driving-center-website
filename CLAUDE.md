@@ -1,5 +1,5 @@
 # CLAUDE.md — The Driving Center SaaS
-**Mode: Vibe Coding Protocol + FSO Workflow + Frontend Design Skill**
+**Mode: Vibe Coding Protocol + FSO Workflow**
 **Updated: 2026-04-28**
 
 ---
@@ -34,33 +34,27 @@ Give the AI full context: skill + design tokens + reference components + spec. A
 
 ---
 
-## Design Tokens (Current — Light Theme)
+## Design Tokens (Current — Dark Theme Landing)
 
 | Token | Hex | Usage |
 |---|---|---|
-| bg-base | `#F2F4F7` | Page background (warm gray) |
-| bg-surface | `#FFFFFF` | Card backgrounds |
-| bg-dark | `#0A0A0A` | Dark sections |
-| text-primary | `#101828` | Headlines, important text |
-| text-secondary | `#344054` | Card titles, labels |
-| text-muted | `#667085` | Body, secondary text |
-| text-faint | `#9A9FA5` | Placeholders, captions |
-| border | `#E4E7EC` | Card borders, dividers |
-| accent-blue | `#2E90FA` | Charts, interactive |
-| success | `#12B76A` | Positive metrics |
-| error | `#F04438` | Negative metrics |
-| card-radius | `24px` | Cards, panels |
-| btn-radius | `12px` | Buttons, inputs |
-| shadow | `0px 4px 6px -2px rgba(16,24,40,0.03), 0px 12px 16px -4px rgba(16,24,40,0.08)` | Card shadow (two-layer) |
+| bg | `#0B0C0E` | Page background |
+| surface | `#131316` | Card backgrounds |
+| elevated | `#1C1D21` | Elevated surfaces |
+| border | `rgba(255,255,255,0.07)` | Card borders |
+| text-primary | `#FFFFFF` | Headlines |
+| text-secondary | `#8A8F98` | Subheadings |
+| text-muted | `#555660` | Captions |
+| accent | `#3B82F6` | Interactive elements |
 
-**Font:** Inter via `next/font/google`
+**Font:** Distinctive display + body pairing (NOT Inter/Roboto/Arial — see frontend-design SKILL for guidance)
 **Display:** 52px / 800 weight / -0.025em tracking
 **H2:** 36px / 700 / -0.02em
 **Body:** 16-17px / 400 / #667085 / 1.6 line-height
 
 ---
 
-## Screenshot Workflow (Nate Herk Protocol)
+## Screenshot Workflow
 
 For every UI build, use this iteration loop:
 
@@ -73,29 +67,6 @@ For every UI build, use this iteration loop:
 ```bash
 # Puppeteer screenshot setup (run once in project)
 npx @anthropic-ai/puppeteer-screenshot
-```
-
-After every build, check: does this match the reference? If not, what's different? Fix that specific thing.
-
----
-
-## Vibe Coding Context Package Template
-
-For every sub-agent task:
-
-```
-CONTEXT GIVEN TO AI EVERY TIME:
-├── 1. Frontend Design Skill  → .claude/skills/frontend-design/SKILL.md
-├── 2. Design tokens          → from CLAUDE.md (above)
-├── 3. Reference example       → 1-2 similar working components from src/
-├── 4. Complete spec           → full SPEC.md for the feature
-└── 5. Constraints            → Next.js 16, React 19, TailwindCSS 4
-
-PROMPT STRUCTURE:
-"Invoke the frontend-design skill. Follow the design tokens in CLAUDE.md.
-Use [existing component] as reference. Build [feature] matching SPEC.md.
-Take screenshots of the output and compare to [reference screenshot].
-Fix any deviations. One-pass build — no partial commits."
 ```
 
 ---
@@ -111,14 +82,23 @@ Everest: Read .claude/skills/frontend-design/SKILL.md
         ↓
 Everest: Assemble context package (skill + tokens + reference + spec)
         ↓
-Everest: Spawn DeepSeek-Claude with complete context package
+Everest: Build directly OR spawn OpenCode sub-agent with context package
         ↓
-Sub-agent: reads skill → reads context → builds → screenshots → compares → fixes
+Sub-agent (if spawned): reads skill → reads context → builds → screenshots → compares → fixes
         ↓
 Everest: Verify build passes + screenshot comparison
         ↓
 Log result in WORKFLOW_LOG.md
 ```
+
+### Spawning OpenCode (when used as sub-agent)
+
+```bash
+cd ~/Projects/the-driving-center-website
+opencode agent --provider deepseek --model deepseek-v4-flash --cwd ~/Projects/the-driving-center-website
+```
+
+OpenCode runs in PTY mode — interactive terminal required. Pass the full context package as a prompt file or heredoc.
 
 ---
 
@@ -126,8 +106,7 @@ Log result in WORKFLOW_LOG.md
 
 | Layer | Tool |
 |---|---|
-| AI (planning) | MiniMax-M2.7 |
-| AI (code) | DeepSeek V4 Flash via `scripts/deepseek-claude` |
+| AI (planning + code) | MiniMax-M2.7 (Everest) + OpenCode (sub-agent, when used) |
 | Web | Next.js 16 + React 19 + TailwindCSS 4 |
 | Database | Supabase (PostgreSQL + RLS + Magic Links) |
 | Payments | Stripe (DEMO_MODE bypass for demo) |
@@ -140,19 +119,21 @@ Log result in WORKFLOW_LOG.md
 
 ```
 the-driving-center-website/
-├── CLAUDE.md
-├── STATUS.md
-├── WORKFLOW_LOG.md
-├── SPEC*.md
-├── brand_assets/            ← logo, brand guidelines (reference these!)
+├── CLAUDE.md              ← this file (workflow source of truth)
+├── STATUS.md              ← project state (updated 2026-04-28)
+├── WORKFLOW_LOG.md        ← build cycle history
+├── SPEC_FULL_REDESIGN.md  ← active redesign spec
+├── SPEC.md                ← phase specs (archived)
+├── brand_assets/          ← logo, brand guidelines
 ├── .claude/skills/
 │   └── frontend-design/
-│       └── SKILL.md         ← Frontend Design Skill (ALWAYS READ FIRST)
-├── src/app/
-│   ├── page.tsx             ← Landing page
-│   ├── globals.css
-│   └── ...
-└── src/lib/migrations/       ← SQL (run in Supabase SQL Editor)
+│       └── SKILL.md       ← Frontend Design Skill (ALWAYS READ FIRST)
+├── src/app/               ← all routes + pages
+└── src/lib/
+    ├── supabase/          ← client + server helpers
+    ├── migrations/        ← SQL migrations
+    ├── email-templates/   ← Resend templates
+    └── security.ts        ← encryption, validation
 ```
 
 ---
@@ -161,8 +142,13 @@ the-driving-center-website/
 
 Every API route: auth check + ownership check + `school_id` in WHERE + input validation.
 
+**school_id always comes from `user.user_metadata.school_id` or middleware headers — never from client-supplied headers alone.**
+
 ---
 
-## Migration 009 Pending
+## Current State
 
-`src/lib/migrations/009_bookings_missing_columns.sql` — Zax runs in Supabase SQL Editor.
+- RLS: PASS (tested 2026-04-28)
+- `POST /api/students` auth: FIXED (derives from session, not client header)
+- Migration 009: APPLIED (columns already exist in DB)
+- OpenCode: installed at `/usr/local/bin/opencode` v1.14.29, not yet wired into workflow
