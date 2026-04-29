@@ -1,13 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
-
-function getSupabaseAdmin() {
-  return createSupabaseAdmin(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
+import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 
 export async function GET() {
   const supabase = await createClient()
@@ -23,7 +15,7 @@ export async function GET() {
     // Probe: count records in key tables
     const [schools, students, sessions, bookings, instructors] = await Promise.all([
       supabaseAdmin.from('schools').select('id', { count: 'exact', head: true }),
-      supabaseAdmin.from('students').select('id', { count: 'exact', head: true }),
+      supabaseAdmin.from('students_driver_ed').select('id', { count: 'exact', head: true }),
       supabaseAdmin.from('sessions').select('id', { count: 'exact', head: true }),
       supabaseAdmin.from('bookings').select('id', { count: 'exact', head: true }),
       supabaseAdmin.from('instructors').select('id', { count: 'exact', head: true }),

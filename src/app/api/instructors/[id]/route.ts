@@ -1,14 +1,6 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
+import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
-
-function getSupabaseAdmin() {
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY required')
-  }
-  return createSupabaseAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY)
-}
 
 export async function GET(
   _request: Request,
@@ -59,7 +51,7 @@ export async function PUT(
 
   const supabaseAdmin = getSupabaseAdmin()
 
-  const { data: updated, error } = await supabaseAdmin
+  const { data: updated, error } = await (supabaseAdmin as any)
     .from('instructors')
     .update({
       name: body.name,
@@ -77,7 +69,7 @@ export async function PUT(
     return NextResponse.json({ error: error?.message ?? 'Update failed' }, { status: 500 })
   }
 
-  await supabaseAdmin.from('audit_logs').insert(
+  await (supabaseAdmin as any).from('audit_logs').insert(
     auditLog('INSTRUCTOR_UPDATED', user.id, {
       instructor_id: id,
       school_id: schoolId,
@@ -116,7 +108,7 @@ export async function DELETE(
 
   const supabaseAdmin = getSupabaseAdmin()
 
-  const { error } = await supabaseAdmin
+  const { error } = await (supabaseAdmin as any)
     .from('instructors')
     .update({ active: false })
     .eq('id', id)
@@ -125,7 +117,7 @@ export async function DELETE(
     return NextResponse.json({ error: error?.message ?? String(error) }, { status: 500 })
   }
 
-  await supabaseAdmin.from('audit_logs').insert(
+  await (supabaseAdmin as any).from('audit_logs').insert(
     auditLog('INSTRUCTOR_DEACTIVATED', user.id, { instructor_id: id, school_id: schoolId })
   )
 

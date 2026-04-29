@@ -1,14 +1,6 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
+import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
-
-function getSupabaseAdmin() {
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY required')
-  }
-  return createSupabaseAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY)
-}
 
 export async function GET(
   _request: Request,
@@ -59,7 +51,7 @@ export async function PUT(
 
   const supabaseAdmin = getSupabaseAdmin()
 
-  const { data: updated, error } = await supabaseAdmin
+  const { data: updated, error } = await (supabaseAdmin as any)
     .from('sessions')
     .update({
       start_date: body.start_date,
@@ -69,7 +61,7 @@ export async function PUT(
       max_seats: body.max_seats,
       price_cents: body.price_cents,
       location: body.location,
-      cancelled: body.cancelled ?? false,
+      status: body.cancelled ? 'cancelled' : 'scheduled',
     })
     .eq('id', id)
     .select()
@@ -79,7 +71,7 @@ export async function PUT(
     return NextResponse.json({ error: error?.message ?? 'Update failed' }, { status: 500 })
   }
 
-  await supabaseAdmin.from('audit_logs').insert(
+  await (supabaseAdmin as any).from('audit_logs').insert(
     auditLog(body.cancelled ? 'SESSION_CANCELLED' : 'SESSION_UPDATED', user.id, {
       session_id: id,
       school_id: schoolId,
@@ -117,16 +109,16 @@ export async function DELETE(
 
   const supabaseAdmin = getSupabaseAdmin()
 
-  const { error } = await supabaseAdmin
+  const { error } = await (supabaseAdmin as any)
     .from('sessions')
-    .update({ cancelled: true })
+    .update({ status: 'cancelled' })
     .eq('id', id)
 
   if (error) {
     return NextResponse.json({ error: error?.message ?? String(error) }, { status: 500 })
   }
 
-  await supabaseAdmin.from('audit_logs').insert(
+  await (supabaseAdmin as any).from('audit_logs').insert(
     auditLog('SESSION_CANCELLED', user.id, { session_id: id, school_id: schoolId })
   )
 
