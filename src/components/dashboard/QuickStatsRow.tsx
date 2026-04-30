@@ -32,15 +32,15 @@ export default function QuickStatsRow({ schoolId }: { schoolId?: string }) {
       let certs = 0
 
       if (schoolId) {
-        // Revenue: sum of paid payments this calendar month
-        const { data: paymentData } = await supabase
-          .from('payments')
-          .select('amount')
-          .eq('status', 'paid')
+        // Revenue: sum of confirmed booking deposits this calendar month
+        const { data: bookingData } = await supabase
+          .from('bookings')
+          .select('deposit_amount_cents')
           .eq('school_id', schoolId)
+          .eq('status', 'confirmed')
           .gte('created_at', startOfMonth.toISOString())
 
-        revenue = (paymentData ?? []).reduce((sum, p) => sum + (p.amount ?? 0), 0) / 100
+        revenue = (bookingData ?? []).reduce((sum, b) => sum + (b.deposit_amount_cents ?? 0), 0) / 100
 
         // Drives: students with at least some driving hours logged
         const { count: driveCount } = await supabase
@@ -61,13 +61,13 @@ export default function QuickStatsRow({ schoolId }: { schoolId?: string }) {
         certs = certCount ?? 0
       } else {
         // Fallback: global counts if no school_id (dev mode)
-        const { data: paymentData } = await supabase
-          .from('payments')
-          .select('amount')
-          .eq('status', 'paid')
+        const { data: bookingData } = await supabase
+          .from('bookings')
+          .select('deposit_amount_cents')
+          .eq('status', 'confirmed')
           .gte('created_at', startOfMonth.toISOString())
 
-        revenue = (paymentData ?? []).reduce((sum, p) => sum + (p.amount ?? 0), 0) / 100
+        revenue = (bookingData ?? []).reduce((sum, b) => sum + (b.deposit_amount_cents ?? 0), 0) / 100
 
         const { count: driveCount } = await supabase
           .from('students_driver_ed')

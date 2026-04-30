@@ -48,7 +48,7 @@ export async function POST(req: Request) {
   }
   await supabaseAdmin
     .from('processed_stripe_events')
-    .insert({ event_id: event.id })
+    .insert({ event_id: event.id, processed_at: new Date().toISOString() })
 
   // ── School subscription checkout completed ─────────────────────────
   if (event.type === 'checkout.session.completed') {
