@@ -17,7 +17,6 @@ export interface StudentsDriverEd {
   driving_hours: number
   certificate_issued_at: string | null
   created_at: string
-  deleted_at: string | null
 }
 
 export interface Instructor {
@@ -38,21 +37,21 @@ export interface Session {
   session_type_id: string
   instructor_id: string
   start_date: string
-  start_time: string
   location: string
   max_seats: number
   seats_booked: number
   status: string
+  created_at: string
 }
 
 export interface Booking {
   id: string
-  session_id: string
+  session_id: string | null
   student_name: string
   student_email: string
+  student_phone: string | null
   status: string
   deposit_amount_cents: number
-  deposit_paid_at: string | null
   confirmation_token: string | null
   cancellation_reason: string | null
   cancelled_at: string | null
@@ -140,14 +139,13 @@ export interface Database {
 // ─── Joined/extended types used in route handlers ─────────────────────────────
 
 export interface BookingWithSession extends Booking {
-  session: Pick<Session, 'id' | 'school_id' | 'start_date' | 'start_time' | 'seats_booked'>
+  session: Pick<Session, 'id' | 'school_id' | 'start_date' | 'seats_booked'> | null
 }
 
 export interface BookingFull extends Booking {
   session: {
     id: string
     start_date: string
-    start_time: string
     location: string
     session_type: Pick<SessionType, 'name' | 'duration_minutes' | 'price_cents' | 'deposit_cents'>
     instructor: Pick<Instructor, 'name'>
@@ -159,7 +157,6 @@ export interface CheckoutBookingData extends Booking {
     id: string
     school_id: string
     start_date: string
-    start_time: string
     location: string
     session_type: Pick<SessionType, 'name'>
   }
