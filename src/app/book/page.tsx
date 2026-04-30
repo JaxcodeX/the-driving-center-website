@@ -409,7 +409,7 @@ function BookingSidebar({ selectedType, selectedSlot, studentName, step }: {
               <div className="rounded-xl p-3.5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
                 <div className="text-xs mb-1.5" style={{ color: '#64748B' }}>Date & Time</div>
                 <div className="text-sm font-medium" style={{ color: '#ffffff' }}>{ffd(selectedSlot.session_date)}</div>
-                <div className="text-xs" style={{ color: '#94A3B8' }}>{ft(selectedSlot.start_time)} — {ft(selectedSlot.end_time)}</div>
+                <div className="text-xs" style={{ color: '#94A3B8' }}>{ft(selectedSlot.start_time)}</div>
                 <div className="text-xs mt-1" style={{ color: '#64748B' }}>with {selectedSlot.instructor_name}</div>
               </div>
             )}

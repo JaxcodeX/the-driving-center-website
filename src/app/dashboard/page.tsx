@@ -23,7 +23,6 @@ export default async function DashboardPage() {
     .select('*, session_types(name, color), instructors(name)')
     .gte('start_date', new Date().toISOString().split('T')[0])
     .order('start_date')
-    .order('start_time')
     .limit(3)
 
   // Mock progress data (in production, pull from enrollments/progress)
