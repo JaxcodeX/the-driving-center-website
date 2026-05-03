@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { CreditCard, CheckCircle, ExternalLink, AlertCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
@@ -14,7 +13,6 @@ export default function BillingPage() {
       const supabase = createClient()
       let schoolId: string | null = null
 
-      // Try demo_user cookie first (DEMO_MODE)
       const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
       if (demoCookie) {
         try {
@@ -23,7 +21,6 @@ export default function BillingPage() {
         } catch {}
       }
 
-      // Fall back to Supabase auth
       if (!schoolId) {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) { window.location.href = '/login'; return }
@@ -41,7 +38,6 @@ export default function BillingPage() {
     }
     load()
   }, [])
-
 
   async function openBillingPortal() {
     const res = await fetch('/api/schools/billing-portal')
@@ -67,20 +63,14 @@ export default function BillingPage() {
       </div>
 
       {/* Status banner */}
-      <div
-        className="flex items-start gap-4 p-5 rounded-2xl mb-6"
-        style={{
-          background: status === 'active' ? `rgba(74,222,128,0.10)` : status === 'past_due' ? `rgba(245,158,11,0.10)` : `rgba(56,189,248,0.10)`,
-          border: `1px solid ${status === 'active' ? `rgba(74,222,128,0.30)` : status === 'past_due' ? `rgba(245,158,11,0.30)` : `rgba(56,189,248,0.30)`}`,
-        }}
-      >
+      <div className="glass-card flex items-start gap-4 p-5 mb-6">
         <div className="mt-0.5">
           {status === 'active' ? (
             <CheckCircle className="w-5 h-5" style={{ color: 'var(--success)' }} />
           ) : status === 'past_due' ? (
-            <AlertCircle className="w-5 h-5" style={{ color: '#f59e0b' }} />
+            <AlertCircle className="w-5 h-5" style={{ color: 'var(--accent-secondary)' }} />
           ) : (
-            <CreditCard className="w-5 h-5" style={{ color: '#38BDF8' }} />
+            <CreditCard className="w-5 h-5" style={{ color: 'var(--accent)' }} />
           )}
         </div>
         <div>
@@ -98,25 +88,17 @@ export default function BillingPage() {
       </div>
 
       {/* Plan card */}
-      <div
-        className="rounded-2xl p-6 mb-6"
-        style={{ background: 'var(--bg-surface)', border: `1px solid var(--card-border)` }}
-      >
+      <div className="glass-card p-6 mb-6">
         <div className="flex items-start justify-between mb-4">
           <div>
             <div className="text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>Current Plan</div>
-            <div className="text-2xl font-bold" style={{ color: '#38BDF8' }}>Starter</div>
+            <div className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>Starter</div>
             <div className="text-sm" style={{ color: 'var(--text-muted)' }}>$99/month</div>
           </div>
-          <div
-            className="text-xs px-3 py-1 rounded-full font-medium capitalize"
-            style={{ background: `rgba(74,222,128,0.15)`, color: 'var(--success)' }}
-          >
-            {status}
-          </div>
+          <span className="status-pill status-active">{status}</span>
         </div>
 
-        <div className="space-y-2 mb-6 pt-4 border-t" style={{ borderColor: 'var(--card-border)' }}>
+        <div className="space-y-2 mb-6 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
           {[
             'Unlimited bookings',
             'SMS + email reminders',
@@ -134,8 +116,7 @@ export default function BillingPage() {
 
         <button
           onClick={openBillingPortal}
-          className="w-full py-3 rounded-xl text-sm font-semibold text-white"
-          style={{ background: 'var(--bg-elevated)', border: `1px solid var(--card-border)` }}
+          className="btn-ghost w-full text-center py-3 text-sm font-semibold"
         >
           Manage subscription
         </button>
@@ -143,10 +124,7 @@ export default function BillingPage() {
 
       {/* Payment method */}
       {subscription?.stripe_customer_id && (
-        <div
-          className="rounded-2xl p-6"
-          style={{ background: 'var(--bg-surface)', border: `1px solid var(--card-border)` }}
-        >
+        <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Payment method</div>
             <CreditCard className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
