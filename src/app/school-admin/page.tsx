@@ -70,7 +70,12 @@ export default function DashboardPage() {
       ] = await Promise.all([
         supabase.from('students_driver_ed').select('*', { count: 'exact', head: true }).eq('school_id', schoolId),
         supabase.from('sessions').select('*', { count: 'exact', head: true }).eq('school_id', schoolId).eq('status', 'scheduled'),
-        supabase.from('schools').select('monthly_revenue').eq('id', schoolId).single(),
+        supabase
+          .from('bookings')
+          .select('deposit_amount_cents')
+          .eq('school_id', schoolId)
+          .eq('status', 'confirmed')
+          .gte('created_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
         supabase
           .from('sessions')
           .select('*, instructor:instructors(name), session_type:session_types(name)')
@@ -79,9 +84,14 @@ export default function DashboardPage() {
           .limit(8),
       ])
 
+
       const totalStudents = students || 0
       const activeSessions = sessions || 0
-      const monthlyRevenue = (revenueData as any)?.monthly_revenue || 0
+      // Sum confirmed booking deposits for current month (actual revenue calculation)
+      const monthlyRevenue = Array.isArray(revenueData)
+        ? revenueData.reduce((sum: number, b: { deposit_amount_cents: number | null }) =>
+            sum + (b.deposit_amount_cents ?? 0), 0) / 100
+        : 0
 
       const { count: completedSessions } = await supabase
         .from('sessions').select('*', { count: 'exact', head: true })

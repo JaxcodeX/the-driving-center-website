@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   const supabase = await createClient()
   const { data: types, error } = await supabase
     .from('session_types')
-    .select('id, name, description, duration_minutes, price_cents, deposit_cents, color, tca_hours_credit, requires_permit')
+    .select('id, name, description, duration_minutes, price_cents, deposit_cents, color, tca_hours_credit')
     .eq('school_id', schoolId)
     .eq('active', true)
     .order('price_cents', { ascending: true })

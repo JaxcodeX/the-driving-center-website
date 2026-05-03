@@ -1,4 +1,31 @@
-# WORKFLOW_LOG.md — FSO Cycle Log
+## Cycle 11 — Booking Confirmation Fix
+
+**Date:** 2026-05-02
+**SPEC.md:** `SPEC_BOOKING_FIX.md`
+**Implemented by:** Everest
+**Result:** ✅ Passed — committed + pushed
+
+### What was wrong
+Confirmation page at `/book/confirmation` called the wrong API endpoint:
+- **Broken:** `GET /api/bookings/${token}` — requires `school_id` + authenticated user, always 404'd
+- **Correct:** `GET /api/booking-links/${token}` — looks up by `confirmation_token`, no auth needed
+
+Also: the page checked `data.status === 'pending'` and showed a false "pending payment" error even when the booking-link endpoint returned a real confirmed booking.
+
+### What was fixed
+1. `src/app/book/confirmation/page.tsx` — fetch URL changed to `/api/booking-links/${token}`
+2. Removed stale `data.status === 'pending'` check — booking-links endpoint returns the actual booking on success
+3. Build passes with 0 errors, deployed to Vercel
+
+### Root cause
+The booking flow has two parallel confirmation paths:
+- `/api/bookings` (authenticated, school-scoped)
+- `/api/booking-links/${token}` (token-based, public)
+
+The confirmation page was wired to the wrong one from day one.
+
+### Lesson
+Public token-based lookups need public endpoints. Never mix authenticated and public token-based flows.
 
 **Following Mark Martin's FSO workflow. Every cycle logged honestly.**
 **Format: What we tried → What failed → What fixed it → Root cause**

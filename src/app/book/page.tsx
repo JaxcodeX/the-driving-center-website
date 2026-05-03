@@ -501,7 +501,10 @@ function BookContent() {
     setFormError(''); setSubmitting(true)
     const sessionRes = await fetch(`/api/sessions?school_id=${schoolId}`)
     const sessions = await sessionRes.json()
-    const matched = sessions.find((s: any) => s.start_date === selectedSlot!.session_date && s.start_time === selectedSlot!.start_time && s.instructor_id === selectedSlot!.instructor_id)
+    const matched = sessions.find((s: any) =>
+      s.start_date === selectedSlot!.session_date &&
+      s.instructor_id === selectedSlot!.instructor_id
+    )
     if (!matched) { setFormError('This slot is no longer available. Please go back and select another time.'); setSubmitting(false); return }
     const bookRes = await fetch('/api/bookings', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
