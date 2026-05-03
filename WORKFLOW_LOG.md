@@ -324,3 +324,58 @@ The discipline is in what we give the AI before we ask it to build, not in how w
 
 CLAUDE.md described an aspirational workflow (sub-agent with context package) that was never actually implemented. Every commit was Everest directly. The "DeepSeek-Claude" script was broken from day one. Fixing this requires either (a) actually building the OpenCode spawn pipeline or (b) being honest that Everest builds directly and dropping the fake sub-agent description.
 
+
+---
+
+## Cycle 13 — E2E Booking Flow Audit + Demo Mode Hardening
+
+**Date:** 2026-05-03  
+**Result:** ✅ Passed — committed + pushed
+
+### What was wrong
+
+**1. Conflicting Next.js dynamic route**  
+`src/app/api/bookings/[token]/route.ts` conflicted with `src/app/api/bookings/[booking_id]/route.ts` — Next.js requires same slug name for all segments at the same level. Build failed on `npm run dev` with: `Error: You cannot use different slug names for the same dynamic path ('booking_id' !== 'token')`.
+
+**2. Sessions had null session_type_id** — 4 of 6 demo sessions had no session_type_id, causing `/api/slots` to return empty arrays for all session types. Students clicking the booking page would see no available slots.
+
+**3. All demo sessions were in the past** — sessions were seeded in late April with dates in late April and early May 2026. By May 3rd, all were in the past, making the booking page appear broken.
+
+**4. Duplicate session_types** — Traffic Court Awareness and Behind-the-Wheel each appeared twice in the DB with different UUIDs.
+
+**5. Demo-mode artifacts visible in UI** — Login page explicitly labeled "Demo Mode" with PIN:0000 instructions; billing page said "DEMO_MODE: No Stripe subscription required."
+
+### What was fixed
+
+1. Deleted `bookings/[token]/route.ts` — the [booking_id]/checkout route handles token-based checkout; the [token] route was orphaned and conflicting
+2. Removed 4 duplicate session_type records via Supabase REST API
+3. Assigned session_type_id to all 6 remaining sessions (was null on 4)
+4. Created 2 new sessions for 2026-05-03 (today) so booking page shows live slots
+5. Login page: removed "Demo Mode" badge, Zap icon, PIN:0000 instruction text — demo login still works but unlabeled as "quick login"
+6. Billing page: replaced "DEMO_MODE: No Stripe subscription required" with neutral "Free plan — upgrade anytime to unlock all features"
+
+### E2E flow test results
+
+```
+POST /api/auth/demo-login → 200 ✅ (sets 4 cookies including demo_session)
+GET /api/session-types?school_id=... → returns 4 session types ✅
+GET /api/slots?school_id=...&session_type_id=... → returns slots with start_time ✅
+POST /api/bookings (valid email) → 201 { booking_id, booking_token, status: pending_payment } ✅
+POST /api/bookings/[id]/checkout → { confirmed: true } ✅
+Booking confirmed in DB with booking_token = confirmation_token ✅
+```
+
+### Remaining artifacts (cosmetic — not blocking)
+
+- Email templates still reference `${schoolName}` and `${schoolPhone}` from the school data (correct), not hardcoded values. ✅ This was already fixed.
+- `reminder-48h.ts` footer: `"Powered by The Driving Center SaaS"` — this is acceptable branding, not demo-specific
+
+### Pre-existing issues still open
+
+| Issue | Status |
+|---|---|
+| Migration 010 (UNIQUE on schools.owner_email) | Not run in Supabase SQL Editor yet |
+| `/api/demo/*` routes have zero auth | Not audited for production |
+| Sessions table has no `start_time` column | Slot times default to '09:00' — needs schema change |
+| Email templates hardcoded "The Driving Center SaaS" in footer | Cosmetic — not blocking |
+
