@@ -163,7 +163,6 @@ export default function DashboardPage() {
     { icon: Calendar, label: 'Schedule Session', href: '/school-admin/sessions', color: 'var(--success)' },
     { icon: Mail, label: 'Send Reminder', href: '/school-admin/sessions', color: 'var(--accent-secondary)' },
     { icon: Calendar, label: 'View Calendar', href: '/school-admin/calendar', color: '#818CF8' },
-    { icon: BarChart2, label: 'Import CSV', href: '/school-admin/import', color: 'var(--accent)' },
   ]
 
   const sessionStatusMap: Record<string, string> = {
@@ -174,7 +173,7 @@ export default function DashboardPage() {
 
   const sessionBorderMap: Record<string, string> = {
     scheduled: 'var(--accent)',
-    completed: 'var(--success)',
+    completed: '#FACC15',
     canceled: '#F97316',
   }
 
@@ -199,10 +198,10 @@ export default function DashboardPage() {
             key={label}
             href={href}
             className="glass-card block group"
-            style={{ borderLeft: `3px solid ${color}` }}
+            style={{ borderLeft: `3px solid ${color}`, padding: '20px 24px' }}
           >
             <div className="flex items-start justify-between mb-3">
-              <p className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{label}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{label}</p>
               <div
                 className="w-9 h-9 rounded-xl flex items-center justify-center"
                 style={{ background: `${color}15` }}
@@ -210,9 +209,9 @@ export default function DashboardPage() {
                 <Icon className="w-4 h-4" style={{ color }} />
               </div>
             </div>
-            <div className="kpi-value mb-1" style={{ color: 'var(--text-primary)' }}>{value}</div>
-            <span className={`kpi-delta ${positive ? 'positive' : 'negative'}`}>
-              {positive ? '↑' : '↓'} {delta}
+            <div className="kpi-value mb-1" style={{ color: 'var(--text-primary)', fontSize: '36px', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>{value}</div>
+            <span className="kpi-delta" style={{ color: positive ? '#4ADE80' : '#F87171', fontSize: '13px', fontWeight: 600 }}>
+              {delta}
             </span>
           </Link>
         ))}
@@ -297,19 +296,20 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Activity Table */}
-      <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-        <div className="flex items-center justify-between px-6 pt-5 pb-4">
-          <h2 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>Recent Activity</h2>
+      <div>
+        <h2 className="text-base font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Recent Activity</h2>
+        <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+          {schoolId ? <RecentActivityTable schoolId={schoolId} /> : (
+            <div className="text-center py-10 px-6">
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading recent activity...</p>
+            </div>
+          )}
+        </div>
+        <div className="flex justify-end mt-3">
           <Link href="/school-admin/students" className="text-xs font-medium flex items-center gap-1" style={{ color: 'var(--accent)' }}>
             View all <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
-
-        {schoolId ? <RecentActivityTable schoolId={schoolId} /> : (
-          <div className="text-center py-10 px-6">
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading recent activity...</p>
-          </div>
-        )}
       </div>
     </div>
   )
@@ -367,7 +367,7 @@ function RecentActivityTable({ schoolId }: { schoolId: string }) {
     <table className="w-full" style={{ borderCollapse: 'collapse' }}>
       <thead>
         <tr style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          {['Student / Session', 'Last Session', 'Progress', 'Status', ''].map((h, i) => (
+          {['Student / Session', 'Session Date', 'Progress', 'Status', ''].map((h, i) => (
             <th
               key={i}
               className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider"
@@ -386,9 +386,8 @@ function RecentActivityTable({ schoolId }: { schoolId: string }) {
           return (
             <tr
               key={row.id}
-              style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
-              className="transition-colors"
-              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)')}
+              style={{ borderTop: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.15s' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.02)')}
               onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
             >
               <td className="px-6 py-4">
@@ -414,10 +413,10 @@ function RecentActivityTable({ schoolId }: { schoolId: string }) {
                     style={{ width: '80px', background: 'rgba(255,255,255,0.08)' }}
                   >
                     <div
-                      className="h-full rounded-full"
+                      className="h-full rounded-full transition-all"
                       style={{
                         width: `${progress}%`,
-                        background: row.status === 'completed' ? 'var(--success)' : 'var(--accent)',
+                        background: row.status === 'completed' ? '#FACC15' : 'var(--accent)',
                       }}
                     />
                   </div>
