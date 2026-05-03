@@ -9,8 +9,11 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // Only allow access for the demo school owner
-  const DEMO_OWNER_EMAIL = process.env.DEMO_OWNER_EMAIL ?? 'zax@the-driving-center.com'
+  // Only allow access if DEMO_OWNER_EMAIL is configured — fail if missing
+  const DEMO_OWNER_EMAIL = process.env.DEMO_OWNER_EMAIL
+  if (!DEMO_OWNER_EMAIL) {
+    return NextResponse.json({ error: 'DEMO_OWNER_EMAIL environment variable not configured' }, { status: 500 })
+  }
   if (user.email !== DEMO_OWNER_EMAIL) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }

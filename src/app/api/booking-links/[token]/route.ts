@@ -3,15 +3,25 @@ import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
 import type { BookingFull, BookingWithSession } from '@/lib/supabase/types'
 
-// Look up a booking by token, checking both booking_token and confirmation_token.
-// This handles both legacy bookings (stored as booking_token) and new bookings
-// (stored as confirmation_token, which equals booking_token at creation time).
+// Look up a booking by token without string concatenation in .or().
+// Tries booking_token first, falls back to confirmation_token.
 function lookupByToken(supabase: any, token: string) {
+  // Use two separate queries — avoids .or() string concatenation entirely.
+  // Both columns are TEXT, both indexed via primary/unique constraints.
   return supabase
     .from('bookings')
     .select('*, session:session_id(id, school_id, start_date, seats_booked)')
-    .or('booking_token.eq.' + token + ',confirmation_token.eq.' + token)
+    .eq('booking_token', token)
     .single()
+    .then(({ data, error }: any) => {
+      if (data) return { data, error: null }
+      // Not found by booking_token — try confirmation_token
+      return supabase
+        .from('bookings')
+        .select('*, session:session_id(id, school_id, start_date, seats_booked)')
+        .eq('confirmation_token', token)
+        .single()
+    })
 }
 
 export async function GET(
@@ -58,7 +68,7 @@ export async function POST(
   const supabase = await createClient()
   const supabaseAdmin = getSupabaseAdmin() as any
 
-  // Get booking with session info — check both token columns
+  // Get booking with session info — no string concatenation, no SQL injection risk
   const { data: booking, error: fetchError } = await lookupByToken(supabase, token) as { data: BookingWithSession; error: any }
 
   if (fetchError || !booking) {
@@ -70,7 +80,6 @@ export async function POST(
   }
 
   if (action === 'cancel') {
-    // Update by booking ID, not token — avoids .or() ambiguity on UPDATE
     const { error: cancelError } = await supabaseAdmin
       .from('bookings')
       .update({

@@ -7,15 +7,15 @@ import { reminder4hEmail } from '@/lib/email-templates/reminder-4h'
 // ── GET /api/reminders ─────────────────────────────────────────────────
 // Cron hits this every hour. Fires 48h + 4h email reminders.
 // Uses service role (getSupabaseAdmin) — bypasses RLS.
-export async function GET(request: Request) {
+export async function GET(_request: Request) {
   const supabase = getSupabaseAdmin() as any
   const now = new Date()
   const today = now.toISOString().split('T')[0]
 
-  // Fetch confirmed bookings with session_time set (denormalized field)
+  // Fetch confirmed bookings — include school_id for school name/phone lookup
   const { data: confirmedBookings, error: bookingsError } = await supabase
     .from('bookings')
-    .select('id, student_name, student_email, student_phone, reminder_48h_sent, reminder_4h_sent, status, session_time')
+    .select('id, school_id, student_name, student_email, student_phone, reminder_48h_sent, reminder_4h_sent, status, session_time')
     .eq('status', 'confirmed')
     .not('session_time', 'is', null)
 
@@ -25,18 +25,39 @@ export async function GET(request: Request) {
   if (bookings.length === 0) {
     return NextResponse.json({
       checked: 0, sent_48h: { sms: 0, email: 0 }, sent_4h: { sms: 0, email: 0 },
-      skipped: 0, strategy: '48h + 4h email (DEMO_MODE)',
+      skipped: 0, strategy: '48h + 4h email',
+    })
+  }
+
+  // Collect all school_ids and fetch school info once
+  const schoolIds = [...new Set(bookings.map((b: any) => b.school_id).filter(Boolean))]
+  let schoolsById: Record<string, { name: string; phone: string }> = {}
+
+  if (schoolIds.length > 0) {
+    const { data: schools } = await supabase
+      .from('schools')
+      .select('id, name, phone')
+      .in('id', schoolIds)
+
+    schools?.forEach((s: any) => {
+      schoolsById[s.id] = { name: s.name ?? 'Driving School', phone: s.phone ?? '' }
     })
   }
 
   // Fetch today's sessions for location lookup
   const { data: sessions } = await supabase
     .from('sessions')
-    .select('id, start_date, location, school_id, max_seats')
-    .in('start_date', [today])
+    .select('id, start_date, location, school_id')
 
-  const sessionsByStartDate: Record<string, any> = {}
-  sessions?.forEach((s: any) => { sessionsByStartDate[s.start_date] = s })
+  const sessionsById: Record<string, any> = {}
+  sessions?.forEach((s: any) => { sessionsById[s.id] = s })
+
+  // Index sessions by school_id + start_date for quick lookup
+  const sessionsBySchoolDate: Record<string, any> = {}
+  sessions?.forEach((s: any) => {
+    const key = `${s.school_id}::${s.start_date}`
+    sessionsBySchoolDate[key] = s
+  })
 
   let sent48hEmail = 0, sent48hSMS = 0
   let sent4hEmail = 0, sent4hSMS = 0
@@ -45,7 +66,8 @@ export async function GET(request: Request) {
   for (const booking of bookings) {
     // Derive session date from session_time (format: 'YYYY-MM-DD' or 'YYYY-MM-DDTHH:mm')
     const sessionDateStr = (booking.session_time || '').split('T')[0]
-    const session = sessionsByStartDate[sessionDateStr]
+    const schoolId = booking.school_id
+    const session = schoolId ? sessionsBySchoolDate[`${schoolId}::${sessionDateStr}`] : null
 
     if (!session) { skipped++; continue }
 
@@ -56,11 +78,15 @@ export async function GET(request: Request) {
     // Skip if in the past or more than 72h away
     if (hoursUntil < 0 || hoursUntil > 72) { skipped++; continue }
 
+    const school = schoolsById[schoolId] ?? { name: 'Driving School', phone: '' }
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://the-driving-center-website.vercel.app'
+    const lessonType = 'Driving Lesson'
+
     // ── 48h reminder ─────────────────────────────────────────────────
     if (hoursUntil <= 48 && hoursUntil > 4 && !booking.reminder_48h_sent) {
-      const didSMS = await sendReminder(booking, session, 'Driving Lesson', 'sms', '48h')
+      const didSMS = await sendReminder(booking, session, lessonType, 'sms', '48h', school, appUrl)
       if (didSMS) sent48hSMS++
-      const didEmail = await sendReminder(booking, session, 'Driving Lesson', 'email', '48h')
+      const didEmail = await sendReminder(booking, session, lessonType, 'email', '48h', school, appUrl)
       if (didEmail) sent48hEmail++
       if (didSMS || didEmail) {
         await supabase.from('bookings').update({ reminder_48h_sent: true }).eq('id', booking.id)
@@ -68,9 +94,9 @@ export async function GET(request: Request) {
 
     // ── 4h reminder ──────────────────────────────────────────────────
     } else if (hoursUntil <= 4 && hoursUntil > 0 && !booking.reminder_4h_sent) {
-      const didSMS = await sendReminder(booking, session, 'Driving Lesson', 'sms', '4h')
+      const didSMS = await sendReminder(booking, session, lessonType, 'sms', '4h', school, appUrl)
       if (didSMS) sent4hSMS++
-      const didEmail = await sendReminder(booking, session, 'Driving Lesson', 'email', '4h')
+      const didEmail = await sendReminder(booking, session, lessonType, 'email', '4h', school, appUrl)
       if (didEmail) sent4hEmail++
       if (didSMS || didEmail) {
         await supabase.from('bookings').update({ reminder_4h_sent: true }).eq('id', booking.id)
@@ -86,7 +112,7 @@ export async function GET(request: Request) {
     sent_4h: { sms: sent4hSMS, email: sent4hEmail },
     skipped,
     email_configured: isEmailConfigured(),
-    strategy: '48h + 4h two-touch SMS + email (DEMO_MODE)',
+    strategy: '48h + 4h two-touch SMS + email',
   })
 }
 
@@ -103,7 +129,9 @@ async function sendReminder(
   session: Record<string, unknown>,
   lessonType: string,
   channel: 'sms' | 'email',
-  type: '48h' | '4h'
+  type: '48h' | '4h',
+  school: { name: string; phone: string },
+  appUrl: string,
 ): Promise<boolean> {
   const studentPhone = String(booking.student_phone ?? '')
   const studentEmail = String(booking.student_email ?? '')
@@ -119,24 +147,31 @@ async function sendReminder(
     const formattedDate = new Date(`${date}T12:00:00`).toLocaleDateString('en-US', {
       weekday: 'long', month: 'long', day: 'numeric',
     })
+    const timeStr = String(booking.session_time ?? '12:00 PM').slice(0, 5)
+    const [h, m] = timeStr.split(':').map(Number)
+    const ampm = h >= 12 ? 'PM' : 'AM'
+    const hour = h > 12 ? h - 12 : h === 0 ? 12 : h
+    const formattedTime = `${hour}:${m.toString().padStart(2, '0')} ${ampm}`
+
+    const bookingId = String(booking.id ?? '')
     const email = type === '48h'
       ? reminder48hEmail({
           studentName: String(booking.student_name ?? 'Student'),
           lessonType,
-          schoolName: 'The Driving Center',
+          schoolName: school.name,
           date: formattedDate,
-          time: '12:00 PM',
+          time: formattedTime,
           location,
-          confirmUrl: `https://the-driving-center-website.vercel.app/book/confirmation?token=${booking.id}`,
-          rescheduleUrl: `https://the-driving-center-website.vercel.app/book?session=${session.id}`,
+          confirmUrl: `${appUrl}/book/confirmation?token=${bookingId}`,
+          rescheduleUrl: `${appUrl}/book`,
         })
       : reminder4hEmail({
           studentName: String(booking.student_name ?? 'Student'),
           lessonType,
-          schoolName: 'The Driving Center',
-          schoolPhone: '865-555-0100',
+          schoolName: school.name,
+          schoolPhone: school.phone,
           date: formattedDate,
-          time: '12:00 PM',
+          time: formattedTime,
           location,
         })
     const { sendEmail } = await import('@/lib/email')
