@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { getSupabaseAdmin } from '@/lib/supabase/server'
+import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 
 /**
  * GET /api/slots — get available session slots for a school + session type.
  *
- * NOTE: The SQL function get_available_slots() references non-existent columns
- * (sessions.cancelled, sessions.start_time). Replaced with direct query using
- * actual schema: sessions.status TEXT, sessions.start_date DATE.
+ * Uses service role (admin) for session type lookup in DEMO_MODE so RLS
+ * doesn't block the public booking page.
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -24,14 +22,15 @@ export async function GET(request: Request) {
     )
   }
 
-  const supabase = await createClient()
+  const isDemo = process.env.DEMO_MODE === 'true'
   const admin = getSupabaseAdmin()
+  const supabase = await createClient()
 
   const start = startDate ?? new Date().toISOString().split('T')[0]
   const end = endDate ?? new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
 
-  // Get session type details
-  const { data: sessionType } = await (supabase as any)
+  // Get session type details — use admin in DEMO_MODE to bypass RLS
+  const { data: sessionType } = await (isDemo ? admin : supabase as any)
     .from('session_types')
     .select('*')
     .eq('id', sessionTypeId)
