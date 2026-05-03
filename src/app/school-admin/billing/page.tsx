@@ -82,7 +82,7 @@ export default function BillingPage() {
               ? 'Your subscription is active and billing is up to date.'
               : status === 'past_due'
               ? 'Please update your payment method to avoid service interruption.'
-              : 'DEMO_MODE: No Stripe subscription required.'}
+              : 'Free plan — upgrade anytime to unlock all features.'}
           </div>
         </div>
       </div>
