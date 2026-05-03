@@ -45,13 +45,13 @@ function StepIndicator({ current }: { current: number }) {
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-sm" style={{ color: '#94A3B8' }}>
-          Step {current + 1} of {STEPS.length} — <span className="font-semibold" style={{ color: '#ffffff' }}>{STEP_LABELS[current]}</span>
+        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+          Step {current + 1} of {STEPS.length} — <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{STEP_LABELS[current]}</span>
         </span>
       </div>
       <div className="flex gap-1.5">
         {STEPS.map((_, i) => (
-          <div key={i} className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+          <div key={i} className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{
@@ -74,19 +74,19 @@ function ServiceSelection({ sessionTypes, selectedType, onSelect, loading }: {
   return (
     <motion.div key="step-type" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3, ease: 'easeInOut' }}>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: '#ffffff' }}>Book a Lesson</h1>
-      <p className="text-sm mb-6" style={{ color: '#94A3B8' }}>Choose the service that fits your needs.</p>
+      <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Book a Lesson</h1>
+      <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Choose the service that fits your needs.</p>
 
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-28 rounded-2xl animate-pulse" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }} />
+            <div key={i} className="h-28 rounded-2xl animate-pulse" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }} />
           ))}
         </div>
       ) : sessionTypes.length === 0 ? (
-        <div className="rounded-2xl p-12 text-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <CalendarIcon className="w-10 h-10 mx-auto mb-3" style={{ color: '#64748B' }} />
-          <p style={{ color: '#94A3B8' }}>No services available right now.</p>
+        <div className="rounded-2xl p-12 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <CalendarIcon className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--text-muted)' }} />
+          <p style={{ color: 'var(--text-secondary)' }}>No services available right now.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -96,39 +96,39 @@ function ServiceSelection({ sessionTypes, selectedType, onSelect, loading }: {
               <button key={type.id} onClick={() => onSelect(type)}
                 className="glass-card w-full text-left relative group cursor-pointer"
                 style={{
-                  background: sel ? 'rgba(0,102,255,0.12)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${sel ? 'rgba(0,102,255,0.6)' : 'rgba(255,255,255,0.08)'}`,
+                  background: sel ? 'var(--accent-dim)' : 'var(--card-bg)',
+                  border: `1px solid ${sel ? 'var(--accent)' : 'var(--border)'}`,
                 }}>
                 {sel && (
                   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
                     className="absolute top-4 right-4 w-6 h-6 rounded-full flex items-center justify-center"
-                    style={{ background: '#0066FF' }}>
+                    style={{ background: 'var(--accent)' }}>
                     <CheckCircle className="w-4 h-4 text-white" />
                   </motion.div>
                 )}
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-colors"
-                    style={{ background: sel ? 'rgba(0,102,255,0.2)' : 'rgba(255,255,255,0.06)', color: sel ? '#7ED4FD' : '#94A3B8' }}>
+                    style={{ background: sel ? 'var(--accent-dim)' : 'var(--card-bg)', color: sel ? 'var(--accent)' : 'var(--text-secondary)' }}>
                     {iconFor(type.name)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="font-semibold" style={{ color: '#ffffff' }}>{type.name}</span>
+                      <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{type.name}</span>
                       {type.tca_hours_credit && (
-                        <span className="text-xs px-2.5 py-0.5 rounded-full" style={{ background: 'rgba(126,212,253,0.12)', color: '#7ED4FD', border: '1px solid rgba(126,212,253,0.2)' }}>
+                        <span className="text-xs px-2.5 py-0.5 rounded-full" style={{ background: 'var(--accent-dim)', color: 'var(--accent)', border: '1px solid rgba(126,212,253,0.2)' }}>
                           {type.tca_hours_credit}h TCA Credit
                         </span>
                       )}
                     </div>
-                    <p className="text-sm mb-3" style={{ color: '#94A3B8' }}>{type.description}</p>
-                    <div className="flex items-center gap-1 text-xs" style={{ color: '#64748B' }}>
+                    <p className="text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>{type.description}</p>
+                    <div className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
                       <Clock className="w-3.5 h-3.5" />{type.duration_minutes} min
                       {type.deposit_cents > 0 && <span>· {fp(type.deposit_cents)} deposit</span>}
                     </div>
                   </div>
                   <div className="shrink-0 text-right ml-2">
-                    <div className="font-bold text-xl" style={{ color: sel ? '#7ED4FD' : '#ffffff' }}>{fp(type.price_cents)}</div>
-                    <div className="text-xs mt-0.5" style={{ color: '#64748B' }}>per session</div>
+                    <div className="font-bold text-xl" style={{ color: sel ? 'var(--accent)' : 'var(--text-primary)' }}>{fp(type.price_cents)}</div>
+                    <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>per session</div>
                   </div>
                 </div>
               </button>
@@ -159,11 +159,11 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
   return (
     <motion.div key="step-slot" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3, ease: 'easeInOut' }}>
-      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white" style={{ color: '#94A3B8' }}>
+      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white" style={{ color: 'var(--text-secondary)' }}>
         <ChevronLeft className="w-4 h-4" /> Back
       </button>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: '#ffffff' }}>{selectedType.name}</h1>
-      <p className="text-sm mb-6" style={{ color: '#94A3B8' }}>{selectedType.duration_minutes} min · {fp(selectedType.price_cents)}</p>
+      <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>{selectedType.name}</h1>
+      <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>{selectedType.duration_minutes} min · {fp(selectedType.price_cents)}</p>
 
       {/* Calendar strip */}
       <div className="glass-card mb-5" style={{ padding: '16px' }}>
@@ -174,14 +174,14 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
               <button key={dateStr} onClick={() => setSelectedDate(sel ? null : dateStr)}
                 className="flex-shrink-0 flex flex-col items-center rounded-2xl px-3 py-3 min-w-[64px] transition-all duration-200 cursor-pointer"
                 style={{
-                  background: sel ? 'rgba(0,102,255,0.15)' : hasSlots ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)',
-                  border: `1px solid ${sel ? '#0066FF' : hasSlots ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)'}`,
-                  color: hasSlots ? '#ffffff' : '#64748B',
+                  background: sel ? 'var(--accent-dim)' : hasSlots ? 'var(--card-bg)' : 'var(--card-bg)',
+                  border: `1px solid ${sel ? 'var(--accent)' : hasSlots ? 'var(--border)' : 'var(--border)'}`,
+                  color: hasSlots ? 'var(--text-primary)' : 'var(--text-muted)',
                 }}>
-                <span className="text-xs" style={{ color: isToday ? '#7ED4FD' : undefined }}>{label}</span>
+                <span className="text-xs" style={{ color: isToday ? 'var(--accent)' : undefined }}>{label}</span>
                 <span className="text-lg font-bold mt-0.5">{dayNum}</span>
                 <span className="text-xs" style={{ opacity: 0.6 }}>{month}</span>
-                {hasSlots && !sel && <div className="w-1.5 h-1.5 rounded-full mt-1" style={{ background: '#7ED4FD' }} />}
+                {hasSlots && !sel && <div className="w-1.5 h-1.5 rounded-full mt-1" style={{ background: 'var(--accent)' }} />}
               </button>
             )
           })}
@@ -191,13 +191,13 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
       {loadingSlots ? (
         <div className="space-y-2">
           {[1, 2, 3, 4].map(i => (
-            <div key={i} className="h-14 rounded-2xl animate-pulse" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }} />
+            <div key={i} className="h-14 rounded-2xl animate-pulse" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }} />
           ))}
         </div>
       ) : selectedDateSlots.length === 0 ? (
-        <div className="rounded-2xl p-10 text-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <CalendarIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#64748B' }} />
-          <p className="text-sm" style={{ color: '#94A3B8' }}>No available times{selectedDate ? ' on this day' : ''}.</p>
+        <div className="rounded-2xl p-10 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <CalendarIcon className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--text-muted)' }} />
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>No available times{selectedDate ? ' on this day' : ''}.</p>
         </div>
       ) : (
         <div className="space-y-5">
@@ -206,7 +206,7 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
             if (!ss.length) return null
             return (
               <div key={sec}>
-                <div className="text-xs font-medium mb-2 uppercase tracking-wider" style={{ color: '#64748B' }}>{sec}</div>
+                <div className="text-xs font-medium mb-2 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{sec}</div>
                 <div className="grid grid-cols-2 gap-2">
                   {ss.map((slot, i) => {
                     const sel = selectedSlot?.session_date === slot.session_date && selectedSlot?.start_time === slot.start_time && selectedSlot?.instructor_id === slot.instructor_id
@@ -214,11 +214,11 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
                       <button key={i} onClick={() => onSelectSlot(slot)}
                         className="glass-card py-3 px-4 text-left cursor-pointer"
                         style={{
-                          background: sel ? 'rgba(0,102,255,0.15)' : 'rgba(255,255,255,0.04)',
-                          border: `1px solid ${sel ? '#0066FF' : 'rgba(255,255,255,0.08)'}`,
+                          background: sel ? 'var(--accent-dim)' : 'var(--card-bg)',
+                          border: `1px solid ${sel ? 'var(--accent)' : 'var(--border)'}`,
                         }}>
-                        <div className="font-semibold text-sm" style={{ color: sel ? '#7ED4FD' : '#ffffff' }}>{ft(slot.start_time)}</div>
-                        <div className="text-xs mt-0.5" style={{ color: '#64748B' }}>{slot.instructor_name} · {slot.seats_available} seat{slot.seats_available !== 1 ? 's' : ''}</div>
+                        <div className="font-semibold text-sm" style={{ color: sel ? 'var(--accent)' : 'var(--text-primary)' }}>{ft(slot.start_time)}</div>
+                        <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{slot.instructor_name} · {slot.seats_available} seat{slot.seats_available !== 1 ? 's' : ''}</div>
                       </button>
                     )
                   })}
@@ -244,7 +244,7 @@ function StudentDetails({ selectedType, selectedSlot, studentName, setStudentNam
   return (
     <motion.div key="step-details" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3, ease: 'easeInOut' }}>
-      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white" style={{ color: '#94A3B8' }}>
+      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white" style={{ color: 'var(--text-secondary)' }}>
         <ChevronLeft className="w-4 h-4" /> Back
       </button>
 
@@ -252,42 +252,42 @@ function StudentDetails({ selectedType, selectedSlot, studentName, setStudentNam
       <div className="glass-card mb-6" style={{ padding: '16px 20px' }}>
         <div className="flex items-start justify-between gap-2">
           <div>
-            <div className="font-semibold text-sm" style={{ color: '#ffffff' }}>{selectedType.name}</div>
-            <div className="text-xs mt-0.5" style={{ color: '#94A3B8' }}>{selectedSlot && ffd(selectedSlot.session_date)} at {selectedSlot && ft(selectedSlot.start_time)}</div>
-            <div className="text-xs" style={{ color: '#64748B' }}>with {selectedSlot.instructor_name}</div>
+            <div className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{selectedType.name}</div>
+            <div className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{selectedSlot && ffd(selectedSlot.session_date)} at {selectedSlot && ft(selectedSlot.start_time)}</div>
+            <div className="text-xs" style={{ color: 'var(--text-muted)' }}>with {selectedSlot.instructor_name}</div>
           </div>
           <div className="text-right shrink-0">
-            <div className="font-bold text-lg" style={{ color: '#7ED4FD' }}>{fp(selectedType.price_cents)}</div>
-            {selectedType.deposit_cents > 0 && <div className="text-xs" style={{ color: '#64748B' }}>{fp(selectedType.deposit_cents)} deposit</div>}
+            <div className="font-bold text-lg" style={{ color: 'var(--accent)' }}>{fp(selectedType.price_cents)}</div>
+            {selectedType.deposit_cents > 0 && <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{fp(selectedType.deposit_cents)} deposit</div>}
           </div>
         </div>
       </div>
 
-      <h1 className="text-2xl font-bold mb-6" style={{ color: '#ffffff' }}>Your Information</h1>
+      <h1 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>Your Information</h1>
       <form onSubmit={onSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: '#64748B' }}>
+          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
             <User className="w-3.5 h-3.5 inline mr-1.5" />Full Name *
           </label>
           <input type="text" value={studentName} onChange={e => setStudentName(e.target.value)} placeholder="Jane Smith"
             required className="input-pill" style={{ height: '52px', width: '100%' }} />
         </div>
         <div>
-          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: '#64748B' }}>
+          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
             <Mail className="w-3.5 h-3.5 inline mr-1.5" />Email *
           </label>
           <input type="email" value={studentEmail} onChange={e => setStudentEmail(e.target.value)} placeholder="jane@example.com"
             required className="input-pill" style={{ height: '52px', width: '100%' }} />
         </div>
         <div>
-          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: '#64748B' }}>
+          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
             <Phone className="w-3.5 h-3.5 inline mr-1.5" />Phone
           </label>
           <input type="tel" value={studentPhone} onChange={e => setStudentPhone(e.target.value)} placeholder="(555) 867-5309"
             className="input-pill" style={{ height: '52px', width: '100%' }} />
         </div>
         <div>
-          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: '#64748B' }}>
+          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
             <Hash className="w-3.5 h-3.5 inline mr-1.5" />Permit / License Number
           </label>
           <input type="text" value={permitNumber} onChange={e => setPermitNumber(e.target.value)} placeholder="Optional"
@@ -295,7 +295,7 @@ function StudentDetails({ selectedType, selectedSlot, studentName, setStudentNam
         </div>
 
         {formError && (
-          <div className="rounded-2xl px-4 py-3 text-sm flex items-start gap-2" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444' }}>
+          <div className="rounded-2xl px-4 py-3 text-sm flex items-start gap-2" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-secondary)' }}>
             <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />{formError}
           </div>
         )}
@@ -306,7 +306,7 @@ function StudentDetails({ selectedType, selectedSlot, studentName, setStudentNam
           {submitting ? 'Processing...' : selectedType.deposit_cents > 0 ? `Pay ${fp(selectedType.deposit_cents)} Deposit` : 'Confirm Booking'}
         </button>
 
-        <p className="text-center text-xs px-2" style={{ color: '#64748B' }}>
+        <p className="text-center text-xs px-2" style={{ color: 'var(--text-muted)' }}>
           By booking, you agree to our cancellation policy.
           {selectedType.deposit_cents > 0 ? ` Your ${fp(selectedType.deposit_cents)} deposit is credited toward your total.` : ' You will receive a confirmation email.'}
         </p>
@@ -323,11 +323,11 @@ function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, b
   if (checkoutUrl) {
     return (
       <motion.div key="step-payment" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-8">
-        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(126,212,253,0.12)' }}>
-          <BookOpen className="w-8 h-8" style={{ color: '#7ED4FD' }} />
+        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--accent-dim)' }}>
+          <BookOpen className="w-8 h-8" style={{ color: 'var(--accent)' }} />
         </div>
-        <h1 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>Secure Checkout</h1>
-        <p className="mb-8" style={{ color: '#94A3B8' }}>Complete your payment to confirm your booking.</p>
+        <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Secure Checkout</h1>
+        <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>Complete your payment to confirm your booking.</p>
         <a href={checkoutUrl}
           className="btn-glow inline-flex items-center gap-2 px-8 py-4">
           Pay Now <ArrowRight className="w-4 h-4" />
@@ -340,15 +340,15 @@ function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, b
       transition={{ duration: 0.4, ease: 'easeOut' }} className="text-center">
       <motion.div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
         style={{ background: 'rgba(74,222,128,0.12)' }} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}>
-        <CheckCircle className="w-10 h-10" style={{ color: '#4ADE80' }} />
+        <CheckCircle className="w-10 h-10" style={{ color: 'var(--success)' }} />
       </motion.div>
-      <h1 className="text-3xl font-bold mb-2" style={{ color: '#ffffff' }}>Booking Confirmed!</h1>
-      <p className="mb-1" style={{ color: '#94A3B8' }}>You're all set for <span className="font-medium" style={{ color: '#ffffff' }}>{selectedType.name}</span>.</p>
-      {selectedSlot && <p className="mb-1" style={{ color: '#94A3B8' }}>{ffd(selectedSlot.session_date)} at {ft(selectedSlot.start_time)}</p>}
-      <p className="mb-8" style={{ color: '#64748B' }}>with {selectedSlot.instructor_name}</p>
+      <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Booking Confirmed!</h1>
+      <p className="mb-1" style={{ color: 'var(--text-secondary)' }}>You're all set for <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{selectedType.name}</span>.</p>
+      {selectedSlot && <p className="mb-1" style={{ color: 'var(--text-secondary)' }}>{ffd(selectedSlot.session_date)} at {ft(selectedSlot.start_time)}</p>}
+      <p className="mb-8" style={{ color: 'var(--text-muted)' }}>with {selectedSlot.instructor_name}</p>
 
       <div className="glass-card text-left mb-5" style={{ maxWidth: '360px', margin: '0 auto 20px' }}>
-        <div className="text-xs mb-3 uppercase tracking-wider" style={{ color: '#64748B' }}>Booking Summary</div>
+        <div className="text-xs mb-3 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Booking Summary</div>
         <div className="space-y-2.5 text-sm">
           {[
             ['Service', selectedType.name],
@@ -358,27 +358,27 @@ function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, b
             ['Student', studentName],
           ].map(([k, v]) => (
             <div key={k} className="flex justify-between">
-              <span style={{ color: '#94A3B8' }}>{k}</span>
-              <span style={{ color: '#ffffff' }}>{v}</span>
+              <span style={{ color: 'var(--text-secondary)' }}>{k}</span>
+              <span style={{ color: 'var(--text-primary)' }}>{v}</span>
             </div>
           ))}
-          <div className="flex justify-between border-t pt-2.5" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
-            <span style={{ color: '#94A3B8' }}>Total</span>
-            <span className="font-bold" style={{ color: '#7ED4FD' }}>{fp(selectedType.price_cents)}</span>
+          <div className="flex justify-between border-t pt-2.5" style={{ borderColor: 'var(--border)' }}>
+            <span style={{ color: 'var(--text-secondary)' }}>Total</span>
+            <span className="font-bold" style={{ color: 'var(--accent)' }}>{fp(selectedType.price_cents)}</span>
           </div>
         </div>
       </div>
 
       <div className="glass-card text-left" style={{ maxWidth: '360px', margin: '0 auto', padding: '16px 20px' }}>
-        <div className="text-xs mb-2 uppercase tracking-wider" style={{ color: '#64748B' }}>What happens next?</div>
-        <ul className="space-y-2.5 text-sm" style={{ color: '#94A3B8' }}>
-          <li className="flex items-center gap-2.5"><CheckCircle className="w-4 h-4 shrink-0" style={{ color: '#4ADE80' }} />Confirmation email to <span style={{ color: '#ffffff' }}>{studentEmail}</span></li>
-          <li className="flex items-center gap-2.5"><Clock className="w-4 h-4 shrink-0" style={{ color: '#7ED4FD' }} />SMS reminder 48 hours before</li>
-          <li className="flex items-center gap-2.5"><Clock className="w-4 h-4 shrink-0" style={{ color: '#7ED4FD' }} />Final reminder 4 hours before</li>
+        <div className="text-xs mb-2 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>What happens next?</div>
+        <ul className="space-y-2.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
+          <li className="flex items-center gap-2.5"><CheckCircle className="w-4 h-4 shrink-0" style={{ color: 'var(--success)' }} />Confirmation email to <span style={{ color: 'var(--text-primary)' }}>{studentEmail}</span></li>
+          <li className="flex items-center gap-2.5"><Clock className="w-4 h-4 shrink-0" style={{ color: 'var(--accent)' }} />SMS reminder 48 hours before</li>
+          <li className="flex items-center gap-2.5"><Clock className="w-4 h-4 shrink-0" style={{ color: 'var(--accent)' }} />Final reminder 4 hours before</li>
         </ul>
       </div>
 
-      <p className="text-xs mt-6" style={{ color: '#64748B' }}>Confirmation #{bookingId?.slice(0, 8).toUpperCase() ?? '—'}</p>
+      <p className="text-xs mt-6" style={{ color: 'var(--text-muted)' }}>Confirmation #{bookingId?.slice(0, 8).toUpperCase() ?? '—'}</p>
     </motion.div>
   )
 }
@@ -390,54 +390,54 @@ function BookingSidebar({ selectedType, selectedSlot, studentName, step }: {
   return (
     <div className="hidden lg:block">
       <div className="glass-card sticky top-24">
-        <div className="text-sm font-semibold mb-4 uppercase tracking-wider" style={{ color: '#64748B' }}>Booking Summary</div>
+        <div className="text-sm font-semibold mb-4 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Booking Summary</div>
 
         {selectedType ? (
           <div className="space-y-4">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(126,212,253,0.12)' }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'var(--accent-dim)' }}>
                 {iconFor(selectedType.name)}
               </div>
               <div>
-                <div className="font-semibold text-sm" style={{ color: '#ffffff' }}>{selectedType.name}</div>
-                <div className="text-xs mt-0.5" style={{ color: '#94A3B8' }}>{selectedType.duration_minutes} min session</div>
+                <div className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{selectedType.name}</div>
+                <div className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{selectedType.duration_minutes} min session</div>
               </div>
-              <div className="ml-auto font-bold" style={{ color: '#7ED4FD' }}>{fp(selectedType.price_cents)}</div>
+              <div className="ml-auto font-bold" style={{ color: 'var(--accent)' }}>{fp(selectedType.price_cents)}</div>
             </div>
 
             {selectedSlot && (
-              <div className="rounded-xl p-3.5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                <div className="text-xs mb-1.5" style={{ color: '#64748B' }}>Date & Time</div>
-                <div className="text-sm font-medium" style={{ color: '#ffffff' }}>{ffd(selectedSlot.session_date)}</div>
-                <div className="text-xs" style={{ color: '#94A3B8' }}>{ft(selectedSlot.start_time)}</div>
-                <div className="text-xs mt-1" style={{ color: '#64748B' }}>with {selectedSlot.instructor_name}</div>
+              <div className="rounded-xl p-3.5" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+                <div className="text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>Date & Time</div>
+                <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{ffd(selectedSlot.session_date)}</div>
+                <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>{ft(selectedSlot.start_time)}</div>
+                <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>with {selectedSlot.instructor_name}</div>
               </div>
             )}
 
             {studentName && step >= 2 && (
-              <div className="rounded-xl p-3.5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                <div className="text-xs mb-1.5" style={{ color: '#64748B' }}>Student</div>
-                <div className="text-sm font-medium" style={{ color: '#ffffff' }}>{studentName}</div>
+              <div className="rounded-xl p-3.5" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+                <div className="text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>Student</div>
+                <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{studentName}</div>
               </div>
             )}
 
             {selectedType.deposit_cents > 0 && (
               <div className="flex items-center gap-2 p-3 rounded-xl" style={{ background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.15)' }}>
-                <Shield className="w-4 h-4 shrink-0" style={{ color: '#F97316' }} />
-                <span className="text-xs" style={{ color: '#94A3B8' }}>{fp(selectedType.deposit_cents)} deposit secures your spot</span>
+                <Shield className="w-4 h-4 shrink-0" style={{ color: 'var(--accent-secondary)' }} />
+                <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{fp(selectedType.deposit_cents)} deposit secures your spot</span>
               </div>
             )}
           </div>
         ) : (
-          <div className="rounded-xl p-6 text-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <BookOpen className="w-8 h-8 mx-auto mb-2" style={{ color: '#64748B' }} />
-            <p className="text-sm" style={{ color: '#64748B' }}>Select a service to see your booking summary</p>
+          <div className="rounded-xl p-6 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+            <BookOpen className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--text-muted)' }} />
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Select a service to see your booking summary</p>
           </div>
         )}
 
-        <div className="mt-5 pt-4 flex items-center gap-2" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-          <Star className="w-4 h-4 shrink-0" style={{ color: '#F97316' }} />
-          <span className="text-xs" style={{ color: '#64748B' }}>Trusted by 2,400+ student drivers</span>
+        <div className="mt-5 pt-4 flex items-center gap-2" style={{ borderTop: '1px solid var(--border)' }}>
+          <Star className="w-4 h-4 shrink-0" style={{ color: 'var(--accent-secondary)' }} />
+          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Trusted by 2,400+ student drivers</span>
         </div>
       </div>
     </div>
@@ -447,7 +447,7 @@ function BookingSidebar({ selectedType, selectedSlot, studentName, step }: {
 // ─── Main Page ───────────────────────────────────────────────────────────────
 export default function BookPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen" style={{ background: '#000000' }} />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ background: 'var(--bg-base)' }} />}>
       <BookContent />
     </Suspense>
   )
@@ -523,16 +523,16 @@ function BookContent() {
 
   if (!schoolId) {
     return (
-      <div className="min-h-screen flex items-center justify-center starfield relative" style={{ background: '#000000' }}>
+      <div className="min-h-screen flex items-center justify-center starfield relative" style={{ background: 'var(--bg-base)' }}>
         {/* decorative circles */}
-        <div className="bg-circle w-96 h-96 -top-20 -left-20" style={{ background: '#0066FF' }} />
-        <div className="bg-circle w-64 h-64 top-40 -right-10" style={{ background: '#707BFF' }} />
+        <div className="bg-circle w-96 h-96 -top-20 -left-20" style={{ background: 'var(--accent)' }} />
+        <div className="bg-circle w-64 h-64 top-40 -right-10" style={{ background: 'var(--accent-secondary)' }} />
         <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(126,212,253,0.12)', border: '1px solid rgba(126,212,253,0.3)' }}>
-            <Car className="w-8 h-8" style={{ color: '#7ED4FD' }} />
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--accent-dim)', border: '1px solid rgba(126,212,253,0.3)' }}>
+            <Car className="w-8 h-8" style={{ color: 'var(--accent)' }} />
           </div>
-          <h1 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>No school selected</h1>
-          <p style={{ color: '#94A3B8' }}>Ask your school for their booking link.</p>
+          <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>No school selected</h1>
+          <p style={{ color: 'var(--text-secondary)' }}>Ask your school for their booking link.</p>
         </div>
       </div>
     )
@@ -545,17 +545,17 @@ function BookContent() {
   }
 
   return (
-    <div className="min-h-screen starfield relative" style={{ background: '#000000' }}>
+    <div className="min-h-screen starfield relative" style={{ background: 'var(--bg-base)' }}>
       {/* decorative background circles */}
       <div className="bg-circle w-[500px] h-[500px] -top-40 -left-40" style={{ background: 'radial-gradient(circle, rgba(0,102,255,0.3) 0%, transparent 70%)' }} />
       <div className="bg-circle w-[400px] h-[400px] bottom-20 -right-40" style={{ background: 'radial-gradient(circle, rgba(112,123,255,0.2) 0%, transparent 70%)' }} />
 
       {/* Header */}
-      <div className="border-b relative z-10" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+      <div className="border-b relative z-10" style={{ borderColor: 'var(--border)' }}>
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold" style={{ background: 'linear-gradient(135deg, #7ED4FD, #707BFF)' }}>DC</div>
-            <span className="font-semibold text-sm" style={{ color: '#ffffff' }}>The Driving Center</span>
+            <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>The Driving Center</span>
           </Link>
         </div>
       </div>
