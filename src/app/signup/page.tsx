@@ -75,17 +75,8 @@ export default function SignupPage() {
         <span className="text-sm font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>The Driving Center</span>
       </Link>
 
-      {/* Glassmorphism card */}
-      <div
-        className="relative w-full max-w-[480px] mx-auto px-8 py-10"
-        style={{
-          background: 'var(--card-bg)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid var(--card-border)',
-          borderRadius: '16px',
-        }}
-      >
+      {/* Glassmorphism card — use glass-card class */}
+      <div className="glass-card relative w-full max-w-[480px] mx-auto px-8 py-10">
         {/* Step indicator */}
         <div className="flex items-center justify-center mb-10">
           {STEPS.map((step, i) => (
@@ -94,7 +85,7 @@ export default function SignupPage() {
                 <div
                   className="w-12 h-px mx-2"
                   style={{
-                    background: i <= 0 ? 'rgba(255,255,255,0.15)' : 'rgba(26,86,255,0.5)',
+                    background: i <= 0 ? 'var(--border)' : 'var(--accent)',
                   }}
                 />
               )}
@@ -102,9 +93,9 @@ export default function SignupPage() {
                 <div
                   className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold"
                   style={{
-                    background: i === 0 ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
+                    background: i === 0 ? 'var(--accent)' : 'var(--card-bg)',
                     color: i === 0 ? 'var(--text-primary)' : 'var(--text-muted)',
-                    border: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.12)',
+                    border: i === 0 ? 'none' : '1px solid var(--border)',
                   }}
                 >
                   {i + 1}
@@ -145,7 +136,7 @@ export default function SignupPage() {
                 color: 'var(--text-primary)',
                 outline: 'none',
               }}
-              onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(26,86,255,0.6)')}
+              onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--accent)')}
               onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--card-border)')}
             />
           </div>
@@ -168,7 +159,7 @@ export default function SignupPage() {
                 color: 'var(--text-primary)',
                 outline: 'none',
               }}
-              onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(26,86,255,0.6)')}
+              onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--accent)')}
               onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--card-border)')}
             />
           </div>
@@ -188,13 +179,13 @@ export default function SignupPage() {
                 color: 'var(--text-primary)',
                 outline: 'none',
               }}
-              onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(26,86,255,0.6)')}
+              onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--accent)')}
               onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--card-border)')}
             />
           </div>
 
           {error && (
-            <div className="flex items-start gap-2 text-sm" style={{ color: '#ef4444' }}>
+            <div className="flex items-start gap-2 text-sm" style={{ color: 'var(--accent-secondary)' }}>
               <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
               {error}
             </div>
@@ -205,7 +196,7 @@ export default function SignupPage() {
             disabled={loading}
             className="btn-glow w-full h-[50px] rounded-[999px] text-sm font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            {loading ? 'Creating school...' : 'Create school account'}
+            {loading ? 'Creating school...' : 'Create school account →'}
             {!loading && <ArrowRight className="w-4 h-4" />}
           </button>
         </form>
@@ -214,7 +205,7 @@ export default function SignupPage() {
       {/* Sign in link */}
       <p className="text-sm mt-6" style={{ color: 'var(--text-secondary)' }}>
         Already have an account?{' '}
-        <Link href="/login" className="font-semibold" style={{ color: '#7ED4FD' }}>Sign in</Link>
+        <Link href="/login" className="font-semibold" style={{ color: 'var(--accent)' }}>Sign in</Link>
       </p>
     </div>
   )

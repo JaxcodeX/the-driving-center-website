@@ -104,17 +104,8 @@ export default function LoginPage() {
         <span className="text-sm font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>The Driving Center</span>
       </Link>
 
-      {/* Glassmorphism card */}
-      <div
-        className="relative w-full max-w-[480px] mx-auto px-8 py-10"
-        style={{
-          background: 'var(--card-bg)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid var(--card-border)',
-          borderRadius: '16px',
-        }}
-      >
+      {/* Glassmorphism card — use glass-card class */}
+      <div className="glass-card relative w-full max-w-[480px] mx-auto px-8 py-10">
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Sign in to your account</h1>
@@ -143,13 +134,13 @@ export default function LoginPage() {
                     color: 'var(--text-primary)',
                     outline: 'none',
                   }}
-                  onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(26,86,255,0.6)')}
+                  onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--accent)')}
                   onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--card-border)')}
                 />
               </div>
 
               {error && (
-                <p className="text-xs text-center" style={{ color: '#ef4444' }}>{error}</p>
+                <p className="text-xs text-center" style={{ color: 'var(--accent-secondary)' }}>{error}</p>
               )}
 
               <button
@@ -157,7 +148,7 @@ export default function LoginPage() {
                 disabled={loading}
                 className="btn-glow w-full h-[50px] rounded-[999px] text-sm font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                {loading ? 'Sending...' : 'Send login link'}
+                {loading ? 'Sending...' : 'Send login link →'}
                 {!loading && <ArrowRight className="w-4 h-4" />}
               </button>
             </form>
@@ -180,20 +171,12 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* DEMO_MODE Quick Login — glassmorphism inner panel */}
+        {/* DEMO_MODE Quick Login — glass-card */}
         {isDemoMode && (
-          <div
-            className="rounded-[16px] p-5"
-            style={{
-              background: 'var(--card-bg)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              border: '1px solid var(--card-border)',
-            }}
-          >
+          <div className="glass-card rounded-[16px] p-5">
             <div className="flex items-center gap-2 mb-4">
-              <Zap className="w-4 h-4" style={{ color: '#F97316' }} />
-              <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#F97316' }}>Demo Mode</span>
+              <Zap className="w-4 h-4" style={{ color: 'var(--accent-secondary)' }} />
+              <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--accent-secondary)' }}>Demo Mode</span>
             </div>
             <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>Use PIN <span className="font-mono" style={{ color: 'var(--text-primary)' }}>0000</span> after entering any email</p>
 
@@ -215,7 +198,7 @@ export default function LoginPage() {
                     color: 'var(--text-primary)',
                     outline: 'none',
                   }}
-                  onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(26,86,255,0.6)')}
+                  onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--accent)')}
                   onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--card-border)')}
                 />
               </div>
@@ -239,7 +222,7 @@ export default function LoginPage() {
                     color: 'var(--text-primary)',
                     outline: 'none',
                   }}
-                  onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'rgba(26,86,255,0.6)')}
+                  onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--accent)')}
                   onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--card-border)')}
                 />
                 <button
@@ -253,7 +236,7 @@ export default function LoginPage() {
               </div>
 
               {demoError && (
-                <p className="text-xs" style={{ color: '#ef4444' }}>{demoError}</p>
+                <p className="text-xs" style={{ color: 'var(--accent-secondary)' }}>{demoError}</p>
               )}
 
               <button
@@ -261,7 +244,7 @@ export default function LoginPage() {
                 disabled={demoLoading}
                 className="btn-glow w-full h-[50px] rounded-[999px] text-sm font-semibold disabled:opacity-50"
               >
-                {demoLoading ? 'Logging in...' : 'Demo Login'}
+                {demoLoading ? 'Logging in...' : 'Demo Login →'}
               </button>
             </form>
           </div>
@@ -271,7 +254,7 @@ export default function LoginPage() {
       {/* Sign up link */}
       <p className="text-sm mt-6" style={{ color: 'var(--text-secondary)' }}>
         Don&apos;t have an account?{' '}
-        <Link href="/signup" className="font-semibold" style={{ color: '#7ED4FD' }}>Sign up</Link>
+        <Link href="/signup" className="font-semibold" style={{ color: 'var(--accent)' }}>Sign up</Link>
       </p>
     </div>
   )
