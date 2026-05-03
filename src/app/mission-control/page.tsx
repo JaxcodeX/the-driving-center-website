@@ -1,45 +1,82 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Database } from '@/lib/supabase/database.types'
 
-type McTask = Database['public']['Tables']['mc_tasks']['Row']
-type McCalendarEvent = Database['public']['Tables']['mc_calendar_events']['Row']
+// mc_tasks and mc_calendar_events are Everest's personal task/calendar tables
+// — not part of the Driving Center SaaS schema.
+type McTask = {
+  id: string
+  title: string
+  project: 'saas' | 'fso' | 'personal' | 'admin'
+  assigned_to: 'me' | 'everest' | 'subagent'
+  status: 'todo' | 'in_progress' | 'done'
+  last_activity: string | null
+  created_at: string
+  updated_at: string
+}
 
-async function getTasks() {
-  const supabase = createClient()
+type McCalendarEvent = {
+  id: string
+  title: string
+  event_type: 'work_window' | 'cron' | 'deadline'
+  start_time: string
+  end_time: string | null
+  recurring: boolean
+  created_at: string
+}
+
+async function getTasks(supabase: ReturnType<typeof createClient>) {
   const { data, error } = await supabase
     .from('mc_tasks')
     .select('*')
     .order('updated_at', { ascending: false })
 
-  if (error) {
-    console.error('Error fetching tasks:', error)
-    return []
-  }
-  return data as McTask[]
+  if (error) return []
+  return (data as McTask[]) ?? []
 }
 
-async function getCalendarEvents() {
-  const supabase = createClient()
+async function getCalendarEvents(supabase: ReturnType<typeof createClient>) {
   const { data, error } = await supabase
     .from('mc_calendar_events')
     .select('*')
     .order('start_time', { ascending: true })
 
-  if (error) {
-    console.error('Error fetching calendar events:', error)
-    return []
-  }
-  return data as McCalendarEvent[]
+  if (error) return []
+  return (data as McCalendarEvent[]) ?? []
 }
 
-export default async function MissionControlPage() {
-  const [tasks, events] = await Promise.all([
-    getTasks(),
-    getCalendarEvents()
-  ])
+export default function MissionControlPage() {
+  const [tasks, setTasks] = useState<McTask[]>([])
+  const [events, setEvents] = useState<McCalendarEvent[]>([])
+  const [loading, setLoading] = useState(true)
+  const supabase = createClient()
+
+  useEffect(() => {
+    async function load() {
+      const [tasksData, eventsData] = await Promise.all([
+        getTasks(supabase),
+        getCalendarEvents(supabase),
+      ])
+      setTasks(tasksData)
+      setEvents(eventsData)
+      setLoading(false)
+    }
+    load()
+  }, [])
 
   const myTasks = tasks.filter(t => t.assigned_to === 'me')
   const everestTasks = tasks.filter(t => t.assigned_to !== 'me')
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#050505] text-white p-6">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-[#5C6370]">Loading mission control...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-[#050505] text-white p-6">
@@ -151,10 +188,10 @@ export default async function MissionControlPage() {
 }
 
 function TaskCard({ task }: { task: McTask }) {
-  const statusColors = {
+  const statusColors: Record<string, string> = {
     todo: 'bg-[#18181b] text-[#5C6370]',
     in_progress: 'bg-[#006FFF]/10 text-[#006FFF]',
-    done: 'bg-[#10B981]/10 text-[#10B981]'
+    done: 'bg-[#10B981]/10 text-[#10B981]',
   }
 
   return (
@@ -166,7 +203,7 @@ function TaskCard({ task }: { task: McTask }) {
             <p className="text-xs text-[#5C6370] mt-1 line-clamp-1">{task.last_activity}</p>
           )}
         </div>
-        <span className={`text-xs px-2 py-1 rounded-full ${statusColors[task.status as keyof typeof statusColors]}`}>
+        <span className={`text-xs px-2 py-1 rounded-full ${statusColors[task.status] ?? ''}`}>
           {task.status.replace('_', ' ')}
         </span>
       </div>

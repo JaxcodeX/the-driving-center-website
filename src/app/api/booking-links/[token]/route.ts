@@ -3,6 +3,17 @@ import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
 import type { BookingFull, BookingWithSession } from '@/lib/supabase/types'
 
+// Look up a booking by token, checking both booking_token and confirmation_token.
+// This handles both legacy bookings (stored as booking_token) and new bookings
+// (stored as confirmation_token, which equals booking_token at creation time).
+function lookupByToken(supabase: any, token: string) {
+  return supabase
+    .from('bookings')
+    .select('*, session:session_id(id, school_id, start_date, seats_booked)')
+    .or('booking_token.eq.' + token + ',confirmation_token.eq.' + token)
+    .single()
+}
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ token: string }> }
@@ -13,40 +24,22 @@ export async function GET(
   }
 
   const supabase = await createClient()
-  const { data: booking, error } = await supabase
-    .from('bookings')
-    .select(`
-      id,
-      student_name,
-      student_email,
-      status,
-      deposit_amount_cents,
-      created_at,
-      confirmation_token,
-      session:session_id (
-        id,
-        start_date,
-        location,
-        session_type:session_type_id (
-          name,
-          duration_minutes,
-          price_cents,
-          deposit_cents
-        ),
-        instructor:instructor_id (
-          name
-        )
-      )
-    `)
-    .eq('confirmation_token', token)
-    .single() as { data: BookingFull; error: any }
+  const { data: booking, error } = await lookupByToken(supabase, token) as { data: BookingFull; error: any }
 
   if (error || !booking) {
     return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
   }
 
-  // Never expose the token in responses
-  const { confirmation_token: _, ...safeBooking } = booking
+  // Strip token fields from response — never expose raw tokens
+  const safeBooking = {
+    id: booking.id,
+    student_name: booking.student_name,
+    student_email: booking.student_email,
+    status: booking.status,
+    deposit_amount_cents: booking.deposit_amount_cents,
+    created_at: booking.created_at,
+    session: booking.session,
+  }
   return NextResponse.json(safeBooking)
 }
 
@@ -65,12 +58,8 @@ export async function POST(
   const supabase = await createClient()
   const supabaseAdmin = getSupabaseAdmin() as any
 
-  // Get booking with session info
-  const { data: booking, error: fetchError } = await supabase
-    .from('bookings')
-    .select('*, session:session_id(id, school_id, start_date, seats_booked)')
-    .eq('confirmation_token', token)
-    .single() as { data: BookingWithSession; error: any }
+  // Get booking with session info — check both token columns
+  const { data: booking, error: fetchError } = await lookupByToken(supabase, token) as { data: BookingWithSession; error: any }
 
   if (fetchError || !booking) {
     return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
@@ -81,6 +70,7 @@ export async function POST(
   }
 
   if (action === 'cancel') {
+    // Update by booking ID, not token — avoids .or() ambiguity on UPDATE
     const { error: cancelError } = await supabaseAdmin
       .from('bookings')
       .update({
@@ -88,7 +78,7 @@ export async function POST(
         cancelled_at: new Date().toISOString(),
         cancellation_reason: body.reason ?? 'Customer cancelled',
       })
-      .eq('confirmation_token', token)
+      .eq('id', booking.id)
 
     if (cancelError) {
       return NextResponse.json({ error: cancelError.message }, { status: 500 })
@@ -98,8 +88,8 @@ export async function POST(
     if (booking.session) {
       await supabaseAdmin
         .from('sessions')
-        .update({ seats_booked: Math.max(0, booking.session.seats_booked - 1) })
-        .eq('id', booking.session.id)
+        .update({ seats_booked: Math.max(0, (booking.session as any).seats_booked - 1) })
+        .eq('id', (booking.session as any).id)
     }
 
     await supabaseAdmin.from('audit_logs').insert(
@@ -115,10 +105,8 @@ export async function POST(
   if (action === 'confirm') {
     const { error: confirmError } = await supabaseAdmin
       .from('bookings')
-      .update({
-        status: 'confirmed',
-      })
-      .eq('confirmation_token', token)
+      .update({ status: 'confirmed' })
+      .eq('id', booking.id)
       .eq('status', 'pending')
 
     if (confirmError) {
