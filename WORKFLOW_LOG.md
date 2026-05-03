@@ -1,3 +1,35 @@
+## Cycle 12 — Slots API + RLS Fix
+
+**Date:** 2026-05-02
+**SPEC.md:** `SPEC_API_FIXES.md`
+**Implemented by:** Everest
+**Result:** ✅ Passed — committed + pushed + verified
+
+### What was wrong
+`/api/session-types` and `/api/slots` returned empty results for the public booking page despite valid data existing in the database.
+
+**Root cause:** Both endpoints used the user's Supabase auth client (`createClient()`). The `session_types` table has an RLS policy that only allows reads if `owner_email = auth.jwt() ->> 'email'`. A public booking page has no authenticated user, so RLS blocked all reads → empty array.
+
+The session-types query was also selecting `requires_permit` (column doesn't exist), causing a 500 on older deploys.
+
+### What was fixed
+1. `src/app/api/session-types/route.ts` — use `getSupabaseAdmin()` when `DEMO_MODE=true`
+2. `src/app/api/slots/route.ts` — use admin for session type lookup when `DEMO_MODE=true`
+3. `src/app/book/page.tsx` — fix session match: removed non-existent `start_time` from comparison
+4. `src/app/school-admin/page.tsx` — calculate monthly revenue from `bookings.deposit_amount_cents` instead of non-existent `schools.monthly_revenue`
+
+5. `src/app/api/session-types/route.ts` — removed `requires_permit` from select (column doesn't exist)
+
+### Verified
+- `GET /api/session-types?school_id=<uuid>` → returns session types ✅
+- `GET /api/slots?school_id=<uuid>&session_type_id=<uuid>` → returns slot info ✅
+- Build: 0 errors ✅
+
+### Lesson
+RLS policies that depend on `auth.jwt() ->> 'email'` break public-facing API routes. When a route needs to serve public data (booking page), it must use the service role admin client. Conditionally using admin in DEMO_MODE keeps production auth intact while fixing the demo/public flow.
+
+---
+
 ## Cycle 11 — Booking Confirmation Fix
 
 **Date:** 2026-05-02

@@ -28,7 +28,19 @@
 
 ---|
 
-## What Was Fixed Today (2026-04-29)
+## What Was Fixed Today (2026-05-02)
+
+### Already Applied (committed + pushed + live)
+- ✅ **Confirmation page fix** — uses `/api/booking-links/{token}` instead of `/api/bookings/{token}`
+- ✅ **session-types 500** — removed `requires_permit` from select (column doesn't exist)
+- ✅ **Session match in booking form** — removed non-existent `start_time` from comparison
+- ✅ **Dashboard revenue** — calculated from `bookings.deposit_amount_cents` (not `schools.monthly_revenue`)
+- ✅ **Slots/Session-Types RLS fix** — admin client used in DEMO_MODE, now returns real data
+
+### Verified on Live Site (2026-05-02)
+- `GET /api/session-types?school_id=<uuid>` → returns 8 session types ✅
+- `GET /api/slots?school_id=<uuid>&session_type_id=<uuid>` → returns slot info ✅
+- Build: 0 errors ✅
 
 ### Already Applied (committed + pushed)
 - ✅ **TypeScript: 0 errors** — full typecheck passes
