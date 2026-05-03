@@ -161,7 +161,7 @@ export default function DashboardPage() {
   const quickActions = [
     { icon: Plus, label: 'Add Student', href: '/school-admin/students', color: 'var(--accent)' },
     { icon: Calendar, label: 'Schedule Session', href: '/school-admin/sessions', color: 'var(--success)' },
-    { icon: Mail, label: 'Send Reminder', href: '/school-admin/sessions', color: '#F59E0B' },
+    { icon: Mail, label: 'Send Reminder', href: '/school-admin/sessions', color: 'var(--accent-secondary)' },
     { icon: Calendar, label: 'View Calendar', href: '/school-admin/calendar', color: '#818CF8' },
     { icon: BarChart2, label: 'Import CSV', href: '/school-admin/import', color: 'var(--accent)' },
   ]
@@ -190,13 +190,6 @@ export default function DashboardPage() {
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
         </div>
-        <Link
-          href="/school-admin/students"
-          className="btn-glow inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-full"
-        >
-          <Plus className="w-4 h-4" />
-          Add Student
-        </Link>
       </div>
 
       {/* KPI Row */}
@@ -206,6 +199,7 @@ export default function DashboardPage() {
             key={label}
             href={href}
             className="glass-card block group"
+            style={{ borderLeft: `3px solid ${color}` }}
           >
             <div className="flex items-start justify-between mb-3">
               <p className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{label}</p>
@@ -225,23 +219,18 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions Strip */}
-      <div
-        className="glass-card"
-        style={{ padding: '16px 20px' }}
-      >
-        <div className="flex items-center gap-3 overflow-x-auto scroll-smooth pb-1" style={{ scrollSnapType: 'x mandatory' }}>
-          {quickActions.map(({ icon: Icon, label, href, color }) => (
-            <Link
-              key={label}
-              href={href}
-              className="btn-ghost flex items-center gap-2 text-sm flex-shrink-0 transition-all hover:opacity-80"
-              style={{ padding: '10px 18px', borderRadius: '999px', fontSize: '13px' }}
-            >
-              <Icon className="w-4 h-4" style={{ color }} />
-              {label}
-            </Link>
-          ))}
-        </div>
+      <div className="glass-card flex items-center gap-3 overflow-x-auto scroll-smooth pb-1" style={{ scrollSnapType: 'x mandatory', padding: '12px 16px' }}>
+        {quickActions.map(({ icon: Icon, label, href, color }) => (
+          <Link
+            key={label}
+            href={href}
+            className="quick-action"
+          >
+            <Icon className="w-4 h-4" style={{ color }} />
+            {label}
+            <ArrowRight className="w-3 h-3 arrow" style={{ color }} />
+          </Link>
+        ))}
       </div>
 
       {/* Upcoming Sessions Strip */}
@@ -266,8 +255,8 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div
-            className="flex gap-3 overflow-x-auto pb-2"
-            style={{ scrollSnapType: 'x mandatory', scrollPaddingLeft: '4px' }}
+            className="flex gap-3 overflow-x-auto pb-2 session-strip"
+            style={{ scrollPaddingLeft: '4px' }}
           >
             {upcomingSessions.map(session => {
               const date = new Date(session.start_date + 'T12:00:00')
@@ -276,7 +265,7 @@ export default function DashboardPage() {
               return (
                 <div
                   key={session.id}
-                  className="glass-card flex-shrink-0"
+                  className="glass-card session-card"
                   style={{
                     minWidth: '220px',
                     borderLeft: `3px solid ${borderColor}`,
