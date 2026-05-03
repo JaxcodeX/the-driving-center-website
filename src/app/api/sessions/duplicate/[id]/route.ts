@@ -54,9 +54,21 @@ export async function POST(
   for (let i = 1; i <= weeks; i++) {
     const newDate = new Date(original.start_date)
     newDate.setDate(newDate.getDate() + i * 7)
+    // Compute new end_date if original has one (preserve duration)
+    let newEndDate: string | null = null
+    if (original.end_date) {
+      const origEnd = new Date(original.end_date)
+      const origStart = new Date(original.start_date)
+      const durationDays = Math.round((origEnd.getTime() - origStart.getTime()) / (1000 * 60 * 60 * 24))
+      const newEnd = new Date(newDate)
+      newEnd.setDate(newEnd.getDate() + durationDays)
+      newEndDate = newEnd.toISOString().split('T')[0]
+    }
+
     inserts.push({
       school_id: schoolId,
       start_date: newDate.toISOString().split('T')[0],
+      end_date: newEndDate,
       instructor_id: original.instructor_id,
       session_type_id: original.session_type_id,
       max_seats: original.max_seats,

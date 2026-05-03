@@ -35,6 +35,7 @@ export async function POST(request: Request) {
   const admin: any = getSupabaseAdmin()
   let sessionSchoolId: string | null = null
   let sessionTypeId: string | null = null
+  let sessionInstructorId: string | null = null
   let depositAmount = 2500
 
   if (session_id) {
@@ -52,6 +53,7 @@ export async function POST(request: Request) {
 
     sessionSchoolId = rawSession.school_id
     sessionTypeId = rawSession.session_type_id
+    sessionInstructorId = rawSession.instructor_id ?? null
 
     if (sessionTypeId) {
       const { data: st } = await admin
@@ -90,6 +92,7 @@ export async function POST(request: Request) {
   if (session_id) insertPayload.session_id = session_id
   if (sessionSchoolId) insertPayload.school_id = sessionSchoolId
   if (sessionTypeId) insertPayload.session_type_id = sessionTypeId
+  if (sessionInstructorId) insertPayload.instructor_id = sessionInstructorId
 
   const { data: booking, error: bookingError } = await admin
     .from('bookings')
