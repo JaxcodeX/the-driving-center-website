@@ -1,6 +1,6 @@
 export default function DemoPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white">
+    <div className="min-h-screen bg-[var(--bg-base)] text-white">
       {/* Hero */}
       <section className="relative py-24 px-6 text-center border-b border-white/5">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,210,255,0.08)_0%,transparent_70%)]" />
@@ -111,7 +111,7 @@ export default function DemoPage() {
             <div className="rounded-xl border border-white/10 bg-white/5 p-5 relative">
               <div className="absolute -top-3 left-5 bg-cyan-500 text-black text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">1</div>
               <div className="text-xs text-cyan-400 mb-2 mt-1 font-semibold">Choose Date & Time</div>
-              <div className="bg-[#0f0f1a] rounded-lg p-4 text-sm space-y-1.5">
+              <div className="bg-[var(--bg-elevated)] rounded-lg p-4 text-sm space-y-1.5">
                 <div className="flex justify-between text-white/60 text-xs">
                   <span>Mon Apr 28</span><span className="text-cyan-400">Available</span>
                 </div>
@@ -129,7 +129,7 @@ export default function DemoPage() {
             <div className="rounded-xl border border-white/10 bg-white/5 p-5 relative">
               <div className="absolute -top-3 left-5 bg-cyan-500 text-black text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">2</div>
               <div className="text-xs text-cyan-400 mb-2 mt-1 font-semibold">Confirm Details</div>
-              <div className="bg-[#0f0f1a] rounded-lg p-4">
+              <div className="bg-[var(--bg-elevated)] rounded-lg p-4">
                 <div className="space-y-2 text-xs text-white/60">
                   <div className="flex justify-between"><span>Session</span><span className="text-white">Driving Lesson</span></div>
                   <div className="flex justify-between"><span>Date</span><span className="text-white">Tue Apr 29 · 2:00 PM</span></div>
@@ -145,7 +145,7 @@ export default function DemoPage() {
             <div className="rounded-xl border border-white/10 bg-white/5 p-5 relative">
               <div className="absolute -top-3 left-5 bg-cyan-500 text-black text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">3</div>
               <div className="text-xs text-cyan-400 mb-2 mt-1 font-semibold">SMS Confirmation</div>
-              <div className="bg-[#0f0f1a] rounded-lg p-4 font-mono text-xs text-white/70 space-y-2">
+              <div className="bg-[var(--bg-elevated)] rounded-lg p-4 font-mono text-xs text-white/70 space-y-2">
                 <div className="text-cyan-400">📱 Your phone — instantly</div>
                 <div className="border-l-2 border-cyan-500/40 pl-3 text-white/50 leading-relaxed">
                   "Booking confirmed! 🎉<br/>
@@ -179,7 +179,7 @@ export default function DemoPage() {
                 <div className="px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold">48h before</div>
                 <span className="text-xs text-white/40">First reminder sent automatically</span>
               </div>
-              <div className="bg-[#111119] rounded-2xl p-5 border border-white/10">
+              <div className="bg-[var(--bg-elevated)] rounded-2xl p-5 border border-white/10">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
                     <span className="text-cyan-400 text-lg">💬</span>
@@ -208,7 +208,7 @@ export default function DemoPage() {
                 <div className="px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold">4h before</div>
                 <span className="text-xs text-white/40">Final reminder — morning of</span>
               </div>
-              <div className="bg-[#111119] rounded-2xl p-5 border border-white/10">
+              <div className="bg-[var(--bg-elevated)] rounded-2xl p-5 border border-white/10">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
                     <span className="text-cyan-400 text-lg">💬</span>
