@@ -85,10 +85,7 @@ export async function GET(request: Request) {
     id: session.id,
     start_date: session.start_date,
     end_date: session.end_date,
-    // sessions table has no start_time column — derive from session_time if available,
-    // otherwise use the default slot time (set per-session-type or default 09:00).
-    // TODO (architect): add start_time column to sessions table for accurate slot times.
-    start_time: session.session_time ?? '09:00',
+    start_time: session.start_time ?? '09:00',
     location: session.location,
     instructor: session.instructor,
     max_seats: session.max_seats,

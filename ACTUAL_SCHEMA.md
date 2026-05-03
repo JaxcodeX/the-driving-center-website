@@ -11,7 +11,8 @@
 | Column | Type (inferred) | Notes |
 |---|---|---|
 | `id` | uuid | PK |
-| `start_date` | date | No `start_time` field exists |
+| `start_date` | date | |
+| `start_time` | text | Added via Migration 011 (2026-05-03) — default '09:00' |
 | `end_date` | date | |
 | `max_seats` | integer | |
 | `seats_booked` | integer | |
@@ -22,7 +23,7 @@
 | `status` | text | EXISTS — no separate `cancelled` boolean column |
 | `location` | text | |
 
-**No `cancelled` column. No `start_time` column. No `deleted_at` column.**
+**No `cancelled` column. No `deleted_at` column.**
 
 ---
 
