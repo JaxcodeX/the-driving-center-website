@@ -30,10 +30,10 @@ function ConfirmationContent() {
       setLoading(false)
       return
     }
-    fetch(`/api/bookings/${token}`)
+    fetch(`/api/booking-links/${token}`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (!data || data.status === 'pending') {
+        if (!data) {
           setError('Your booking is still pending payment. Complete payment to confirm.')
         } else {
           setBooking(data)
