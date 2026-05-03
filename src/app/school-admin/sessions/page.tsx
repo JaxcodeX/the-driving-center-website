@@ -120,7 +120,7 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
 
   const inputStyle = {
     background: 'var(--bg-elevated)',
-    border: `1px solid rgba(255,255,255,0.08)`,
+    border: '1px solid var(--border)',
     color: 'var(--text-primary)',
     outline: 'none' as const,
     borderRadius: '12px',
@@ -128,7 +128,7 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="w-full max-w-md rounded-2xl p-8" style={{ background: 'var(--bg-surface)', border: `1px solid rgba(255,255,255,0.08)` }}>
+      <div className="w-full max-w-md rounded-2xl p-8 glass-card">
         <h2 className="text-lg font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Schedule Session</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -140,8 +140,8 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
               required
               className="w-full px-4 py-3 text-sm"
               style={inputStyle}
-              onFocus={e => (e.target.style.borderColor = `rgba(56,189,248,0.6)`)}
-              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
+              onFocus={e => (e.target.style.borderColor = `var(--accent)`)}
+              onBlur={e => (e.target.style.borderColor = 'var(--border)')}
             />
           </div>
           <div>
@@ -177,8 +177,8 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
               placeholder="e.g. 123 Main St"
               className="w-full px-4 py-3 text-sm"
               style={inputStyle}
-              onFocus={e => (e.target.style.borderColor = `rgba(56,189,248,0.6)`)}
-              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
+              onFocus={e => (e.target.style.borderColor = `var(--accent)`)}
+              onBlur={e => (e.target.style.borderColor = 'var(--border)')}
             />
           </div>
           <div>
@@ -193,14 +193,11 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
             />
           </div>
           <div className="flex gap-3 pt-1">
-            <button type="button" onClick={onClose} className="flex-1 py-3 rounded-xl text-sm font-medium"
-              style={{ background: 'var(--bg-elevated)', color: 'var(--text-secondary)', border: `1px solid rgba(255,255,255,0.08)` }}>
+            <button type="button" onClick={onClose} className="btn-ghost flex-1 text-center py-3 text-sm font-medium">
               Cancel
             </button>
-            <button type="submit" disabled={loading}
-              className="flex-1 py-3 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
-              style={{ background: 'linear-gradient(135deg, #38BDF8, #818CF8)' }}>
-              {loading ? 'Scheduling...' : 'Schedule'}
+            <button type="submit" disabled={loading} className="btn-glow flex-1 text-center py-3 text-sm font-semibold disabled:opacity-50">
+              {loading ? 'Scheduling...' : 'Schedule Session →'}
             </button>
           </div>
         </form>
@@ -283,8 +280,7 @@ export default function SessionsPage() {
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-full text-white transition-opacity hover:opacity-90"
-          style={{ background: 'linear-gradient(135deg, #38BDF8, #818CF8)', boxShadow: '0 0 20px rgba(56,189,248,0.2)' }}
+          className="btn-glow inline-flex items-center gap-2 text-sm"
         >
           <Plus className="w-4 h-4" />
           New Session
@@ -301,13 +297,14 @@ export default function SessionsPage() {
             style={
               activeFilter === key
                 ? {
-                    background: 'rgba(26,86,255,0.15)',
-                    color: '#60A5FA',
+                    background: 'var(--accent-dim)',
+                    color: 'var(--accent)',
+                    border: '1px solid var(--accent)',
                   }
                 : {
-                    background: 'rgba(255,255,255,0.04)',
+                    background: 'var(--card-bg)',
                     color: 'var(--text-muted)',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    border: '1px solid var(--border)',
                   }
             }
           >
@@ -342,7 +339,7 @@ export default function SessionsPage() {
               gridTemplateColumns: '80px 1fr 120px 100px 80px',
               gap: '16px',
               color: 'var(--text-muted)',
-              borderBottom: `1px solid rgba(255,255,255,0.06)`,
+              borderBottom: '1px solid var(--border)',
             }}
           >
             <div>Date</div>
@@ -368,7 +365,7 @@ export default function SessionsPage() {
                     gap: '16px',
                     borderLeft: `3px solid ${leftColor}`,
                   }}
-                  onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.025)')}
+                  onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'var(--card-bg)')}
                   onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                 >
                   {/* Date */}
