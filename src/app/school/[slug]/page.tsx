@@ -107,10 +107,10 @@ function SchoolContent() {
     )
   }
 
-  // Mock instructors + reviews for display purposes
+  // Instructors — pulled from seeded data (Matt Reedy + Jim Woofter)
   const instructors = [
     { name: 'Matt Reedy', initials: 'MR', sessions: 412, rating: 4.9 },
-    { name: 'Sarah Chen', initials: 'SC', sessions: 287, rating: 4.8 },
+    { name: 'Jim Woofter', initials: 'JW', sessions: 287, rating: 4.8 },
   ]
   const reviews = [
     { name: 'James W.', text: 'Absolutely the best driving school. Matt was patient and thorough.', rating: 5 },

@@ -94,10 +94,15 @@ function ServiceSelection({ sessionTypes, selectedType, onSelect, loading }: {
             const sel = selectedType?.id === type.id
             return (
               <button key={type.id} onClick={() => onSelect(type)}
-                className="glass-card w-full text-left relative group cursor-pointer"
                 style={{
-                  background: sel ? 'var(--accent-dim)' : 'var(--card-bg)',
-                  border: `1px solid ${sel ? 'var(--accent)' : 'var(--border)'}`,
+                  background: sel ? 'rgba(126,212,253,0.08)' : '#0F1117',
+                  border: `1px solid ${sel ? '#7ED4FD' : '#1A1A1A'}`,
+                  borderRadius: '16px',
+                  padding: '20px',
+                  width: '100%',
+                  textAlign: 'left' as const,
+                  position: 'relative' as const,
+                  cursor: 'pointer',
                 }}>
                 {sel && (
                   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
@@ -166,7 +171,7 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
       <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>{selectedType.duration_minutes} min · {fp(selectedType.price_cents)}</p>
 
       {/* Calendar strip */}
-      <div className="glass-card mb-5" style={{ padding: '16px' }}>
+      <div style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '16px', marginBottom: '20px' }}>
         <div className="flex gap-2 overflow-x-auto pb-1">
           {days.map(({ dateStr, label, dayNum, month, isToday }) => {
             const hasSlots = !!slotsByDate[dateStr]; const sel = selectedDate === dateStr
@@ -212,10 +217,14 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
                     const sel = selectedSlot?.session_date === slot.session_date && selectedSlot?.start_time === slot.start_time && selectedSlot?.instructor_id === slot.instructor_id
                     return (
                       <button key={i} onClick={() => onSelectSlot(slot)}
-                        className="glass-card py-3 px-4 text-left cursor-pointer"
                         style={{
-                          background: sel ? 'var(--accent-dim)' : 'var(--card-bg)',
-                          border: `1px solid ${sel ? 'var(--accent)' : 'var(--border)'}`,
+                          background: sel ? 'rgba(126,212,253,0.08)' : '#0F1117',
+                          border: `1px solid ${sel ? '#7ED4FD' : '#1A1A1A'}`,
+                          borderRadius: '16px',
+                          padding: '12px 16px',
+                          textAlign: 'left' as const,
+                          cursor: 'pointer',
+                          width: '100%',
                         }}>
                         <div className="font-semibold text-sm" style={{ color: sel ? 'var(--accent)' : 'var(--text-primary)' }}>{ft(slot.start_time)}</div>
                         <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{slot.instructor_name} · {slot.seats_available} seat{slot.seats_available !== 1 ? 's' : ''}</div>
@@ -249,7 +258,7 @@ function StudentDetails({ selectedType, selectedSlot, studentName, setStudentNam
       </button>
 
       {/* Session summary */}
-      <div className="glass-card mb-6" style={{ padding: '16px 20px' }}>
+      <div style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '16px 20px', marginBottom: '24px' }}>
         <div className="flex items-start justify-between gap-2">
           <div>
             <div className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{selectedType.name}</div>
@@ -301,8 +310,8 @@ function StudentDetails({ selectedType, selectedSlot, studentName, setStudentNam
         )}
 
         <button type="submit" disabled={submitting}
-          className="btn-glow w-full justify-center text-base py-4 mt-2 disabled:opacity-50"
-          style={{ padding: '16px 28px' }}>
+          style={{ background: '#4ADE80', color: '#000', padding: '16px 28px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: 'pointer', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', fontSize: '16px', marginTop: '8px' }}
+          className="disabled:opacity-50">
           {submitting ? 'Processing...' : selectedType.deposit_cents > 0 ? `Pay ${fp(selectedType.deposit_cents)} Deposit` : 'Confirm Booking'}
         </button>
 
@@ -329,7 +338,7 @@ function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, b
         <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Secure Checkout</h1>
         <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>Complete your payment to confirm your booking.</p>
         <a href={checkoutUrl}
-          className="btn-glow inline-flex items-center gap-2 px-8 py-4">
+          style={{ background: '#4ADE80', color: '#000', padding: '16px 32px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '16px', textDecoration: 'none' }}>
           Pay Now <ArrowRight className="w-4 h-4" />
         </a>
       </motion.div>
@@ -347,7 +356,7 @@ function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, b
       {selectedSlot && <p className="mb-1" style={{ color: 'var(--text-secondary)' }}>{ffd(selectedSlot.session_date)} at {ft(selectedSlot.start_time)}</p>}
       <p className="mb-8" style={{ color: 'var(--text-muted)' }}>with {selectedSlot.instructor_name}</p>
 
-      <div className="glass-card text-left mb-5" style={{ maxWidth: '360px', margin: '0 auto 20px' }}>
+      <div style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '20px', textAlign: 'left' as const, maxWidth: '360px', margin: '0 auto 20px' }}>
         <div className="text-xs mb-3 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Booking Summary</div>
         <div className="space-y-2.5 text-sm">
           {[
@@ -369,7 +378,7 @@ function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, b
         </div>
       </div>
 
-      <div className="glass-card text-left" style={{ maxWidth: '360px', margin: '0 auto', padding: '16px 20px' }}>
+      <div style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '16px 20px', textAlign: 'left' as const, maxWidth: '360px', margin: '0 auto' }}>
         <div className="text-xs mb-2 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>What happens next?</div>
         <ul className="space-y-2.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
           <li className="flex items-center gap-2.5"><CheckCircle className="w-4 h-4 shrink-0" style={{ color: 'var(--success)' }} />Confirmation email to <span style={{ color: 'var(--text-primary)' }}>{studentEmail}</span></li>
@@ -389,7 +398,7 @@ function BookingSidebar({ selectedType, selectedSlot, studentName, step }: {
 }) {
   return (
     <div className="hidden lg:block">
-      <div className="glass-card sticky top-24">
+      <div style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', position: 'sticky', top: '96px', maxWidth: '340px' }}>
         <div className="text-sm font-semibold mb-4 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Booking Summary</div>
 
         {selectedType ? (

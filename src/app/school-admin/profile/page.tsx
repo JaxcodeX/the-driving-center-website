@@ -2,11 +2,14 @@
 
 import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import Link from 'next/link'
+import { Save, Globe, Mail } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 export default function SchoolProfilePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-950" />}>
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#050505', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ fontSize: '14px', color: '#6B7280' }}>Loading...</p>
+    </div>}>
       <ProfileContent />
     </Suspense>
   )
@@ -51,153 +54,263 @@ function ProfileContent() {
     setSaving(false)
   }
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    background: '#0D0D0D',
+    border: '1px solid #1A1A1A',
+    borderRadius: '12px',
+    padding: '12px 16px',
+    fontSize: '14px',
+    color: '#FFFFFF',
+    outline: 'none',
+    fontFamily: 'Inter, sans-serif',
+  }
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '12px',
+    fontWeight: '600',
+    color: '#9CA3AF',
+    marginBottom: '6px',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.05em',
+  }
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50">
-      <div className="border-b border-white/10 px-6 py-4">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center text-sm font-bold">DC</div>
-            <span className="font-semibold">School Profile</span>
-          </div>
-          <Link href="/school-admin" className="text-sm text-gray-400 hover:text-white">← Back</Link>
+    <div style={{ maxWidth: '720px' }}>
+      {/* Header */}
+      <div style={{ marginBottom: '32px' }}>
+        <h1 style={{
+          fontFamily: 'Outfit, sans-serif',
+          fontSize: '28px',
+          fontWeight: '700',
+          color: '#FFFFFF',
+          marginBottom: '4px',
+        }}>
+          School Profile
+        </h1>
+        <p style={{ fontSize: '14px', color: '#6B7280' }}>
+          Customize your public booking page.
+        </p>
+      </div>
+
+      {/* Public URL preview */}
+      <div style={{
+        padding: '16px 20px',
+        background: '#0F1117',
+        border: '1px solid rgba(74,222,128,0.2)',
+        borderRadius: '16px',
+        marginBottom: '24px',
+      }}>
+        <div style={{
+          fontSize: '11px',
+          color: '#6B7280',
+          marginBottom: '6px',
+          fontWeight: '600',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+        }}>
+          Your booking URL
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <code style={{
+            fontSize: '13px',
+            color: '#4ADE80',
+            flex: 1,
+            fontFamily: 'monospace',
+          }}>
+            {typeof window !== 'undefined' ? window.location.origin : ''}/school/{slug || '[your-slug]'}
+          </code>
+          <input
+            type="text"
+            value={slug}
+            onChange={e => setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+            placeholder="your-school-name"
+            style={{ ...inputStyle, width: '160px' }}
+            onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+            onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+          />
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto p-6">
-        <div className="mb-6">
-          <h1 className="text-xl font-bold">Your Public Page</h1>
-          <p className="text-gray-400 text-sm mt-1">
-            This is what students see when they visit your booking page.
-          </p>
+      <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {/* Tagline */}
+        <div>
+          <label style={labelStyle}>Tagline</label>
+          <input
+            value={form.tagline}
+            onChange={e => handleChange('tagline', e.target.value)}
+            placeholder="Build confidence. Drive safe."
+            style={inputStyle}
+            onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+            onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+          />
         </div>
 
-        {/* Public URL preview */}
-        <div className="bg-white/5 border border-cyan-500/20 rounded-xl p-4 mb-6">
-          <div className="text-xs text-gray-500 mb-1">Your booking URL</div>
-          <div className="flex items-center gap-2">
-            <code className="text-cyan-400 text-sm flex-1">
-              {typeof window !== 'undefined' ? window.location.origin : ''}/school/{slug || '[your-slug]'}
-            </code>
+        {/* About */}
+        <div>
+          <label style={labelStyle}>About Your School</label>
+          <textarea
+            value={form.about}
+            onChange={e => handleChange('about', e.target.value)}
+            placeholder="Tell students who you are, what makes your school different..."
+            rows={4}
+            style={{ ...inputStyle, resize: 'vertical' }}
+            onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+            onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+          />
+        </div>
+
+        {/* Address row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px' }}>
+          <div>
+            <label style={labelStyle}>Street Address</label>
             <input
-              type="text"
-              value={slug}
-              onChange={e => setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
-              placeholder="your-school-name"
-              className="bg-white/5 border border-white/10 rounded px-3 py-1.5 text-white text-sm w-40 focus:outline-none focus:border-cyan-500"
+              value={form.address}
+              onChange={e => handleChange('address', e.target.value)}
+              placeholder="123 Main St"
+              style={inputStyle}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>City</label>
+            <input
+              value={form.city}
+              onChange={e => handleChange('city', e.target.value)}
+              placeholder="Oak Ridge"
+              style={inputStyle}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
             />
           </div>
         </div>
 
-        <form onSubmit={handleSave} className="space-y-4">
+        {/* State + ZIP row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Tagline</label>
+            <label style={labelStyle}>State</label>
             <input
-              value={form.tagline}
-              onChange={e => handleChange('tagline', e.target.value)}
-              placeholder="Build confidence. Drive safe."
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500"
+              value={form.state}
+              onChange={e => handleChange('state', e.target.value)}
+              placeholder="TN"
+              maxLength={2}
+              style={inputStyle}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
             />
           </div>
-
           <div>
-            <label className="block text-sm text-gray-400 mb-1">About Your School</label>
-            <textarea
-              value={form.about}
-              onChange={e => handleChange('about', e.target.value)}
-              placeholder="Tell students who you are, what makes your school different..."
-              rows={4}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500 resize-y"
-            />
-          </div>
-
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-2">
-              <label className="block text-sm text-gray-400 mb-1">Street Address</label>
-              <input
-                value={form.address}
-                onChange={e => handleChange('address', e.target.value)}
-                placeholder="123 Main St"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">City</label>
-              <input
-                value={form.city}
-                onChange={e => handleChange('city', e.target.value)}
-                placeholder="Oak Ridge"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">State</label>
-              <input
-                value={form.state}
-                onChange={e => handleChange('state', e.target.value)}
-                placeholder="TN"
-                maxLength={2}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">ZIP</label>
-              <input
-                value={form.zip}
-                onChange={e => handleChange('zip', e.target.value)}
-                placeholder="37830"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Contact Email</label>
+            <label style={labelStyle}>ZIP</label>
             <input
-              type="email"
-              value={form.email}
-              onChange={e => handleChange('email', e.target.value)}
-              placeholder="matt@thedrivingcenter.com"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500"
+              value={form.zip}
+              onChange={e => handleChange('zip', e.target.value)}
+              placeholder="37830"
+              style={inputStyle}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
             />
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">Website</label>
-              <input
-                value={form.website}
-                onChange={e => handleChange('website', e.target.value)}
-                placeholder="https://..."
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">Facebook</label>
-              <input
-                value={form.facebook}
-                onChange={e => handleChange('facebook', e.target.value)}
-                placeholder="https://facebook.com/..."
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500"
-              />
-            </div>
+        {/* Contact Email */}
+        <div>
+          <label style={labelStyle}>
+            <Mail className="w-3 h-3" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
+            Contact Email
+          </label>
+          <input
+            type="email"
+            value={form.email}
+            onChange={e => handleChange('email', e.target.value)}
+            placeholder="matt@thedrivingcenter.com"
+            style={inputStyle}
+            onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+            onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+          />
+        </div>
+
+        {/* Website + Facebook */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div>
+            <label style={labelStyle}>
+              <Globe className="w-3 h-3" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
+              Website
+            </label>
+            <input
+              value={form.website}
+              onChange={e => handleChange('website', e.target.value)}
+              placeholder="https://..."
+              style={inputStyle}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+            />
           </div>
+          <div>
+            <label style={labelStyle}>Facebook</label>
+            <input
+              value={form.facebook}
+              onChange={e => handleChange('facebook', e.target.value)}
+              placeholder="https://facebook.com/..."
+              style={inputStyle}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+            />
+          </div>
+        </div>
 
-          {saved && (
-            <div className="text-center text-green-400 text-sm py-2">✓ Profile saved</div>
-          )}
+        {/* Saved message */}
+        {saved && (
+          <div style={{
+            textAlign: 'center',
+            padding: '10px',
+            borderRadius: '8px',
+            fontSize: '13px',
+            fontWeight: '600',
+            color: '#4ADE80',
+            background: 'rgba(74,222,128,0.1)',
+          }}>
+            ✓ Profile saved
+          </div>
+        )}
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold py-3 rounded-xl hover:opacity-90 disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : 'Save Profile'}
-          </button>
-        </form>
-      </div>
+        {/* Save button */}
+        <button
+          type="submit"
+          disabled={saving}
+          style={{
+            width: '100%',
+            padding: '14px',
+            background: '#4ADE80',
+            border: 'none',
+            borderRadius: '12px',
+            color: '#000000',
+            fontSize: '14px',
+            fontWeight: '700',
+            cursor: saving ? 'not-allowed' : 'pointer',
+            opacity: saving ? 0.5 : 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            transition: 'transform 0.15s, box-shadow 0.15s',
+          }}
+          onMouseEnter={e => {
+            if (!saving) {
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+              ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px rgba(74,222,128,0.3)'
+            }
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
+            ;(e.currentTarget as HTMLElement).style.boxShadow = 'none'
+          }}
+        >
+          <Save className="w-4 h-4" />
+          {saving ? 'Saving...' : 'Save Profile'}
+        </button>
+      </form>
     </div>
   )
 }

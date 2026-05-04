@@ -1,91 +1,172 @@
+'use client'
+
+import Link from 'next/link'
+
 export default function DemoPage() {
   return (
-    <div className="min-h-screen bg-[var(--bg-base)] text-white">
+    <div style={{ minHeight: '100vh', background: '#050505', color: '#FFFFFF' }}>
+
       {/* Hero */}
-      <section className="relative py-24 px-6 text-center border-b border-white/5">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,210,255,0.08)_0%,transparent_70%)]" />
-        <div className="relative max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-xs font-medium mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+      <section style={{
+        position: 'relative', padding: '96px 24px', textAlign: 'center',
+        borderBottom: '1px solid rgba(255,255,255,0.05)',
+      }}>
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'radial-gradient(ellipse at center, rgba(74,222,128,0.06) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+        <div style={{ position: 'relative', maxWidth: '768px', margin: '0 auto' }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            padding: '6px 14px', borderRadius: '100px',
+            border: '1px solid rgba(74,222,128,0.3)',
+            background: 'rgba(74,222,128,0.08)',
+            fontSize: '11px', fontWeight: '600', color: '#4ADE80',
+            textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '24px',
+          }}>
+            <span style={{
+              width: '6px', height: '6px', borderRadius: '50%',
+              background: '#4ADE80',
+            }} />
             Live Demo
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            See The Driving Center in Action
+          <h1 style={{
+            fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: '800',
+            fontFamily: 'Outfit, sans-serif', letterSpacing: '-0.02em',
+            lineHeight: '1.1', marginBottom: '20px',
+          }}>
+            See The Driving Center<br />in Action
           </h1>
-          <p className="text-lg text-white/60 max-w-xl mx-auto">
-            Here's what your school dashboard looks like after 2 minutes of setup.
+          <p style={{
+            fontSize: '18px', color: '#9CA3AF', maxWidth: '560px',
+            margin: '0 auto', lineHeight: '1.6',
+          }}>
+            Here&apos;s what your school dashboard looks like after 2 minutes of setup.
             No credit card required.
           </p>
         </div>
       </section>
 
       {/* School Admin Preview */}
-      <section className="py-20 px-6 border-b border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-cyan-400 text-sm font-semibold uppercase tracking-wider">01</span>
-            <h2 className="text-2xl font-bold">School Admin Dashboard</h2>
+      <section style={{
+        padding: '80px 24px',
+        borderBottom: '1px solid rgba(255,255,255,0.05)',
+      }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            <span style={{
+              fontSize: '12px', fontWeight: '600', color: '#4ADE80',
+              textTransform: 'uppercase', letterSpacing: '0.08em',
+            }}>01</span>
+            <h2 style={{
+              fontSize: '24px', fontWeight: '700',
+              fontFamily: 'Outfit, sans-serif', color: '#FFFFFF',
+            }}>School Admin Dashboard</h2>
           </div>
-          <p className="text-white/50 mb-10 ml-8 max-w-lg">
+          <p style={{
+            fontSize: '15px', color: '#9CA3AF', maxWidth: '480px',
+            marginLeft: '36px', marginBottom: '40px',
+          }}>
             A clean, focused view of your entire operation — students, schedules, and revenue at a glance.
           </p>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
-            {/* Mock Dashboard Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-white/5">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-cyan-500 flex items-center justify-center text-black font-bold text-sm">DC</div>
+          <div style={{
+            borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)',
+            background: 'rgba(255,255,255,0.03)', overflow: 'hidden',
+          }}>
+            {/* Header */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)',
+              background: 'rgba(255,255,255,0.02)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  width: '32px', height: '32px', borderRadius: '8px',
+                  background: '#4ADE80', display: 'flex',
+                  alignItems: 'center', justifyContent: 'center',
+                  fontWeight: '700', fontSize: '12px', color: '#000000',
+                }}>DC</div>
                 <div>
-                  <div className="text-sm font-semibold">Metro Driving School</div>
-                  <div className="text-xs text-white/40">Admin Dashboard</div>
+                  <div style={{ fontSize: '13px', fontWeight: '600', color: '#FFFFFF' }}>Metro Driving School</div>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>Admin Dashboard</div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="h-7 w-7 rounded-full bg-white/10 flex items-center justify-center text-xs text-white/60">12</div>
-                <div className="text-xs text-white/40">Instructor count</div>
-                <div className="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-medium border border-green-500/30">Active</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  width: '28px', height: '28px', borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.06)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '11px', color: 'rgba(255,255,255,0.5)',
+                }}>12</div>
+                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>Instructors</span>
+                <div style={{
+                  padding: '4px 12px', borderRadius: '100px',
+                  background: 'rgba(74,222,128,0.15)',
+                  border: '1px solid rgba(74,222,128,0.3)',
+                  fontSize: '11px', fontWeight: '600', color: '#4ADE80',
+                }}>Active</div>
               </div>
             </div>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-4 divide-x divide-white/5">
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+              borderBottom: '1px solid rgba(255,255,255,0.05)',
+            }}>
               {[
-                { label: 'Active Students', value: '84', change: '+3 today' },
-                { label: 'Scheduled This Week', value: '127', change: '+12 vs last wk' },
-                { label: 'Revenue MTD', value: '$4,820', change: '+18%' },
-                { label: 'Completion Rate', value: '73%', change: '+5%' },
+                { label: 'Active Students', value: '84', change: '+3 today', accent: '#4ADE80' },
+                { label: 'Scheduled This Week', value: '127', change: '+12 vs last wk', accent: '#4ADE80' },
+                { label: 'Revenue MTD', value: '$4,820', change: '+18%', accent: '#4ADE80' },
+                { label: 'Completion Rate', value: '73%', change: '+5%', accent: '#4ADE80' },
               ].map((stat) => (
-                <div key={stat.label} className="px-6 py-5 text-center">
-                  <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
-                  <div className="text-xs text-white/40 mb-1">{stat.label}</div>
-                  <div className="text-xs text-green-400/70">{stat.change}</div>
+                <div key={stat.label} style={{
+                  padding: '24px 20px', textAlign: 'center',
+                  borderRight: '1px solid rgba(255,255,255,0.05)',
+                }}>
+                  <div style={{ fontSize: '28px', fontWeight: '700', color: '#FFFFFF', marginBottom: '4px' }}>{stat.value}</div>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>{stat.label}</div>
+                  <div style={{ fontSize: '11px', color: stat.accent }}>{stat.change}</div>
                 </div>
               ))}
             </div>
 
             {/* Table Preview */}
-            <div className="border-t border-white/5 px-5 py-4">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-semibold text-white/70">Recent Student Activity</span>
-                <span className="text-xs text-cyan-400 cursor-pointer hover:underline">View all →</span>
+            <div style={{ padding: '20px' }}>
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                marginBottom: '16px',
+              }}>
+                <span style={{ fontSize: '13px', fontWeight: '600', color: 'rgba(255,255,255,0.6)' }}>
+                  Recent Student Activity
+                </span>
+                <span style={{ fontSize: '12px', color: '#4ADE80', cursor: 'pointer' }}>View all →</span>
               </div>
-              <div className="space-y-2">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {[
-                  { name: 'Jessica M.', hrs: '4/6 cls · 2/6 drv', status: 'On Track', statusColor: 'text-green-400' },
-                  { name: 'Tyler R.', hrs: '3/6 cls · 0/6 drv', status: 'Needs Driving', statusColor: 'text-yellow-400' },
-                  { name: 'Naomi P.', hrs: '6/6 cls · 5/6 drv', status: 'Near Complete', statusColor: 'text-cyan-400' },
-                  { name: 'Brandon L.', hrs: '1/6 cls · 0/6 drv', status: 'Just Started', statusColor: 'text-white/40' },
+                  { name: 'Jessica M.', hrs: '4/6 cls · 2/6 drv', status: 'On Track', color: '#4ADE80' },
+                  { name: 'Tyler R.', hrs: '3/6 cls · 0/6 drv', status: 'Needs Driving', color: '#FBBF24' },
+                  { name: 'Naomi P.', hrs: '6/6 cls · 5/6 drv', status: 'Near Complete', color: '#78E4FF' },
+                  { name: 'Brandon L.', hrs: '1/6 cls · 0/6 drv', status: 'Just Started', color: 'rgba(255,255,255,0.4)' },
                 ].map((row) => (
-                  <div key={row.name} className="flex items-center justify-between px-4 py-2.5 rounded-lg bg-white/[0.03]">
-                    <div className="flex items-center gap-3">
-                      <div className="w-7 h-7 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-xs font-semibold">
-                        {row.name[0]}
-                      </div>
-                      <span className="text-sm font-medium">{row.name}</span>
+                  <div key={row.name} style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '10px 16px', borderRadius: '10px',
+                    background: 'rgba(255,255,255,0.02)',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{
+                        width: '28px', height: '28px', borderRadius: '50%',
+                        background: 'rgba(74,222,128,0.15)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '11px', fontWeight: '600', color: '#4ADE80',
+                      }}>{row.name[0]}</div>
+                      <span style={{ fontSize: '13px', fontWeight: '500' }}>{row.name}</span>
                     </div>
-                    <div className="flex items-center gap-6">
-                      <span className="text-xs text-white/40">{row.hrs}</span>
-                      <span className={`text-xs font-medium ${row.statusColor}`}>{row.status}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                      <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>{row.hrs}</span>
+                      <span style={{ fontSize: '12px', fontWeight: '600', color: row.color }}>{row.status}</span>
                     </div>
                   </div>
                 ))}
@@ -96,209 +177,275 @@ export default function DemoPage() {
       </section>
 
       {/* Booking Flow */}
-      <section className="py-20 px-6 border-b border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-cyan-400 text-sm font-semibold uppercase tracking-wider">02</span>
-            <h2 className="text-2xl font-bold">Student Booking Flow</h2>
+      <section style={{
+        padding: '80px 24px',
+        borderBottom: '1px solid rgba(255,255,255,0.05)',
+      }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ADE80', textTransform: 'uppercase', letterSpacing: '0.08em' }}>02</span>
+            <h2 style={{ fontSize: '24px', fontWeight: '700', fontFamily: 'Outfit, sans-serif', color: '#FFFFFF' }}>Student Booking Flow</h2>
           </div>
-          <p className="text-white/50 mb-10 ml-8 max-w-lg">
+          <p style={{ fontSize: '15px', color: '#9CA3AF', maxWidth: '480px', marginLeft: '36px', marginBottom: '40px' }}>
             Students pick a time slot in under 60 seconds. No phone calls. No back-and-forth.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Step 1 */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-5 relative">
-              <div className="absolute -top-3 left-5 bg-cyan-500 text-black text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">1</div>
-              <div className="text-xs text-cyan-400 mb-2 mt-1 font-semibold">Choose Date & Time</div>
-              <div className="bg-[var(--bg-elevated)] rounded-lg p-4 text-sm space-y-1.5">
-                <div className="flex justify-between text-white/60 text-xs">
-                  <span>Mon Apr 28</span><span className="text-cyan-400">Available</span>
-                </div>
-                <div className="flex justify-between text-white/60 text-xs">
-                  <span>Tue Apr 29</span><span className="text-green-400">3 slots open</span>
-                </div>
-                <div className="flex justify-between text-white/60 text-xs">
-                  <span>Wed Apr 30</span><span className="text-yellow-400">1 slot left</span>
-                </div>
-              </div>
-              <div className="mt-3 text-xs text-white/40">Pick from live availability across all instructors</div>
-            </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+            {[
+              {
+                num: '1', title: 'Choose Date & Time',
+                content: [
+                  { left: 'Mon Apr 28', right: 'Available', color: '#4ADE80' },
+                  { left: 'Tue Apr 29', right: '3 slots open', color: '#4ADE80' },
+                  { left: 'Wed Apr 30', right: '1 slot left', color: '#FBBF24' },
+                ],
+                footer: 'Pick from live availability across all instructors',
+              },
+              {
+                num: '2', title: 'Confirm Details',
+                content: [
+                  { left: 'Session', right: 'Driving Lesson', color: '#FFFFFF' },
+                  { left: 'Date', right: 'Tue Apr 29 · 2:00 PM', color: '#FFFFFF' },
+                  { left: 'Instructor', right: 'Coach Mike', color: '#FFFFFF' },
+                  { left: 'Total', right: '$75.00', color: '#4ADE80', bold: true },
+                ],
+                footer: 'Transparent pricing — no hidden fees',
+              },
+              {
+                num: '3', title: 'SMS Confirmation',
+                content: [
+                  { left: 'Your phone', right: '📱 Instantly', color: '#4ADE80' },
+                ],
+                sms: 'Booking confirmed! 🎉\nDriving Lesson\nTue Apr 29 at 2:00 PM\nwith Coach Mike\nSee you soon!',
+                footer: 'Instant SMS confirmation sent to student',
+              },
+            ].map((step) => (
+              <div key={step.num} style={{
+                position: 'relative', borderRadius: '16px',
+                border: '1px solid rgba(255,255,255,0.08)',
+                background: 'rgba(255,255,255,0.03)', padding: '20px',
+              }}>
+                <div style={{
+                  position: 'absolute', top: '-14px', left: '20px',
+                  width: '24px', height: '24px', borderRadius: '50%',
+                  background: '#4ADE80',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '11px', fontWeight: '700', color: '#000000',
+                }}>{step.num}</div>
+                <div style={{
+                  fontSize: '11px', fontWeight: '600', color: '#4ADE80',
+                  marginTop: '4px', marginBottom: '12px',
+                }}>{step.title}</div>
 
-            {/* Step 2 */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-5 relative">
-              <div className="absolute -top-3 left-5 bg-cyan-500 text-black text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">2</div>
-              <div className="text-xs text-cyan-400 mb-2 mt-1 font-semibold">Confirm Details</div>
-              <div className="bg-[var(--bg-elevated)] rounded-lg p-4">
-                <div className="space-y-2 text-xs text-white/60">
-                  <div className="flex justify-between"><span>Session</span><span className="text-white">Driving Lesson</span></div>
-                  <div className="flex justify-between"><span>Date</span><span className="text-white">Tue Apr 29 · 2:00 PM</span></div>
-                  <div className="flex justify-between"><span>Instructor</span><span className="text-white">Coach Mike</span></div>
-                  <div className="h-px bg-white/10 my-2" />
-                  <div className="flex justify-between font-semibold"><span>Total</span><span className="text-cyan-400">$75.00</span></div>
-                </div>
-              </div>
-              <div className="mt-3 text-xs text-white/40">Transparent pricing — no hidden fees</div>
-            </div>
+                {step.sms ? (
+                  <div style={{
+                    background: '#13161F', borderRadius: '10px',
+                    padding: '14px', fontFamily: 'monospace',
+                    fontSize: '12px', color: 'rgba(255,255,255,0.6)',
+                    lineHeight: '1.7', marginBottom: '12px',
+                    borderLeft: '2px solid rgba(74,222,128,0.3)',
+                    paddingLeft: '16px',
+                  }}>
+                    {step.sms}
+                  </div>
+                ) : (
+                  <div style={{
+                    background: '#13161F', borderRadius: '10px',
+                    padding: '14px', marginBottom: '12px',
+                  }}>
+                    {step.content.map((row, i) => (
+                      <div key={i} style={{
+                        display: 'flex', justifyContent: 'space-between',
+                        fontSize: '12px', marginBottom: '6px',
+                      }}>
+                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>{row.left}</span>
+                    <span style={{ color: row.color, fontWeight: '700' }}>{row.right}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-            {/* Step 3 */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-5 relative">
-              <div className="absolute -top-3 left-5 bg-cyan-500 text-black text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">3</div>
-              <div className="text-xs text-cyan-400 mb-2 mt-1 font-semibold">SMS Confirmation</div>
-              <div className="bg-[var(--bg-elevated)] rounded-lg p-4 font-mono text-xs text-white/70 space-y-2">
-                <div className="text-cyan-400">📱 Your phone — instantly</div>
-                <div className="border-l-2 border-cyan-500/40 pl-3 text-white/50 leading-relaxed">
-                  "Booking confirmed! 🎉<br/>
-                  Driving Lesson<br/>
-                  Tue Apr 29 at 2:00 PM<br/>
-                  with Coach Mike<br/>
-                  <span className="text-cyan-400">See you soon!</span>"
-                </div>
+                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>{step.footer}</div>
               </div>
-              <div className="mt-3 text-xs text-white/40">Instant SMS confirmation sent to student</div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* SMS Reminders */}
-      <section className="py-20 px-6 border-b border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-cyan-400 text-sm font-semibold uppercase tracking-wider">03</span>
-            <h2 className="text-2xl font-bold">Automated SMS Reminders</h2>
+      <section style={{
+        padding: '80px 24px',
+        borderBottom: '1px solid rgba(255,255,255,0.05)',
+      }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ADE80', textTransform: 'uppercase', letterSpacing: '0.08em' }}>03</span>
+            <h2 style={{ fontSize: '24px', fontWeight: '700', fontFamily: 'Outfit, sans-serif', color: '#FFFFFF' }}>Automated SMS Reminders</h2>
           </div>
-          <p className="text-white/50 mb-10 ml-8 max-w-lg">
+          <p style={{ fontSize: '15px', color: '#9CA3AF', maxWidth: '480px', marginLeft: '36px', marginBottom: '40px' }}>
             Two reminders fire automatically — 48 hours and 4 hours before every session. No-shows drop to near zero.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* 48h Reminder */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold">48h before</div>
-                <span className="text-xs text-white/40">First reminder sent automatically</span>
-              </div>
-              <div className="bg-[var(--bg-elevated)] rounded-2xl p-5 border border-white/10">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-cyan-400 text-lg">💬</span>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-semibold text-white">The Driving Center</span>
-                      <div className="flex gap-1">
-                        {[1,2,3].map(i => (
-                          <div key={i} className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                        ))}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+            {[
+              {
+                time: '48h before',
+                sub: 'First reminder sent automatically',
+                msg: 'Hi Jessica! Just a heads up — you have a driving lesson tomorrow (Tue Apr 29) at 2:00 PM with Coach Mike. Reply CANCEL to reschedule.',
+                delivered: 'Delivered · Apr 27 10:00 AM',
+              },
+              {
+                time: '4h before',
+                sub: 'Final reminder — morning of',
+                msg: 'Hey Jessica 👋 Your lesson is in 4 hours (2:00 PM today). Make sure you bring your permit & comfortable shoes. See you soon!',
+                delivered: 'Delivered · Apr 29 10:00 AM',
+              },
+            ].map((reminder, i) => (
+              <div key={i}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <div style={{
+                    padding: '4px 12px', borderRadius: '100px',
+                    background: 'rgba(74,222,128,0.1)',
+                    border: '1px solid rgba(74,222,128,0.2)',
+                    fontSize: '11px', fontWeight: '600', color: '#4ADE80',
+                  }}>{reminder.time}</div>
+                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>{reminder.sub}</span>
+                </div>
+                <div style={{
+                  background: '#0F1117', borderRadius: '16px', padding: '20px',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                    <div style={{
+                      width: '40px', height: '40px', borderRadius: '50%',
+                      background: 'rgba(74,222,128,0.1)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0, fontSize: '16px',
+                    }}>💬</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '600', color: '#FFFFFF' }}>The Driving Center</span>
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                          {[1, 2, 3].map(d => (
+                            <div key={d} style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ADE80' }} />
+                          ))}
+                        </div>
                       </div>
+                      <div style={{
+                        fontSize: '13px', color: 'rgba(255,255,255,0.65)',
+                        lineHeight: '1.6', fontFamily: 'monospace',
+                      }}>{reminder.msg}</div>
+                      <div style={{ marginTop: '12px', fontSize: '11px', color: 'rgba(255,255,255,0.25)' }}>{reminder.delivered}</div>
                     </div>
-                    <div className="text-white/70 text-sm leading-relaxed font-mono">
-                      Hi Jessica! Just a heads up — you have a driving lesson tomorrow (Tue Apr 29) at 2:00 PM with Coach Mike. Reply CANCEL to reschedule.
-                    </div>
-                    <div className="mt-3 text-xs text-white/30">Delivered · Apr 27 10:00 AM</div>
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* 4h Reminder */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold">4h before</div>
-                <span className="text-xs text-white/40">Final reminder — morning of</span>
-              </div>
-              <div className="bg-[var(--bg-elevated)] rounded-2xl p-5 border border-white/10">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-cyan-400 text-lg">💬</span>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-semibold text-white">The Driving Center</span>
-                      <div className="flex gap-1">
-                        {[1,2,3].map(i => (
-                          <div key={i} className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                        ))}
-                      </div>
-                    </div>
-                    <div className="text-white/70 text-sm leading-relaxed font-mono">
-                      Hey Jessica 👋 Your lesson is in 4 hours (2:00 PM today). Make sure you bring your permit &amp; comfortable shoes. See you soon!
-                    </div>
-                    <div className="mt-3 text-xs text-white/30">Delivered · Apr 29 10:00 AM</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
 
-          <div className="mt-8 px-5 py-4 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center gap-3 max-w-md ml-0 md:ml-8">
-            <span className="text-green-400 text-lg">✓</span>
-            <span className="text-sm text-green-400/80">SMS costs are included in your plan — no per-message billing</span>
+          <div style={{
+            marginTop: '32px', padding: '16px 20px', borderRadius: '12px',
+            background: 'rgba(74,222,128,0.08)',
+            border: '1px solid rgba(74,222,128,0.15)',
+            display: 'flex', alignItems: 'center', gap: '12px',
+            maxWidth: '480px',
+          }}>
+            <span style={{ fontSize: '16px' }}>✓</span>
+            <span style={{ fontSize: '13px', color: 'rgba(74,222,128,0.8)' }}>
+              SMS costs are included in your plan — no per-message billing
+            </span>
           </div>
         </div>
       </section>
 
       {/* TCA Tracking */}
-      <section className="py-20 px-6 border-b border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-cyan-400 text-sm font-semibold uppercase tracking-wider">04</span>
-            <h2 className="text-2xl font-bold">TCA Compliance Tracking</h2>
+      <section style={{
+        padding: '80px 24px',
+        borderBottom: '1px solid rgba(255,255,255,0.05)',
+      }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ADE80', textTransform: 'uppercase', letterSpacing: '0.08em' }}>04</span>
+            <h2 style={{ fontSize: '24px', fontWeight: '700', fontFamily: 'Outfit, sans-serif', color: '#FFFFFF' }}>TCA Compliance Tracking</h2>
           </div>
-          <p className="text-white/50 mb-10 ml-8 max-w-lg">
+          <p style={{ fontSize: '15px', color: '#9CA3AF', maxWidth: '480px', marginLeft: '36px', marginBottom: '40px' }}>
             State-required hour tracking handled automatically. Students see their progress. You stay compliant.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px' }}>
             {/* Student Card */}
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-lg font-bold">JM</div>
-                <div>
-                  <div className="font-semibold text-white">Jessica Martinez</div>
-                  <div className="text-sm text-white/40">Permit #D-4892011 · Started Mar 3</div>
+            <div style={{
+              borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)',
+              background: 'rgba(255,255,255,0.03)', padding: '24px',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+                <div style={{
+                  width: '48px', height: '48px', borderRadius: '50%',
+                  background: 'rgba(74,222,128,0.15)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '16px', fontWeight: '700', color: '#4ADE80',
+                }}>JM</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '15px', fontWeight: '600', color: '#FFFFFF' }}>Jessica Martinez</div>
+                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>Permit #D-4892011 · Started Mar 3</div>
                 </div>
-                <div className="ml-auto px-3 py-1 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-xs font-medium">In Progress</div>
+                <div style={{
+                  padding: '4px 12px', borderRadius: '100px',
+                  background: 'rgba(251,191,36,0.1)',
+                  border: '1px solid rgba(251,191,36,0.2)',
+                  fontSize: '11px', fontWeight: '600', color: '#FBBF24',
+                }}>In Progress</div>
               </div>
 
               {/* Classroom Hours */}
-              <div className="mb-5">
-                <div className="flex items-center justify-between text-xs text-white/50 mb-2">
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
                   <span>Classroom Hours</span>
-                  <span className="text-white font-medium">4 / 6 hrs</span>
+                  <span style={{ color: '#FFFFFF', fontWeight: '600' }}>4 / 6 hrs</span>
                 </div>
-                <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                  <div className="h-full bg-cyan-500 rounded-full" style={{ width: '66%' }} />
+                <div style={{ height: '6px', borderRadius: '100px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: '66%', borderRadius: '100px', background: '#4ADE80' }} />
                 </div>
               </div>
 
               {/* Driving Hours */}
-              <div className="mb-5">
-                <div className="flex items-center justify-between text-xs text-white/50 mb-2">
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
                   <span>Behind-the-Wheel Hours</span>
-                  <span className="text-white font-medium">2 / 6 hrs</span>
+                  <span style={{ color: '#FFFFFF', fontWeight: '600' }}>2 / 6 hrs</span>
                 </div>
-                <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                  <div className="h-full bg-cyan-500 rounded-full" style={{ width: '33%' }} />
+                <div style={{ height: '6px', borderRadius: '100px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: '33%', borderRadius: '100px', background: '#4ADE80' }} />
                 </div>
               </div>
 
-              {/* Progress indicator */}
-              <div className="flex items-center gap-3 pt-2 border-t border-white/5">
-                <div className="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden flex">
-                  <div className="h-full bg-cyan-500" style={{ width: '50%' }} />
-                  <div className="h-full bg-yellow-500/50 w-0.5 -ml-0.5" />
-                  <div className="h-full bg-white/10 flex-1" />
+              {/* Progress */}
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '12px',
+                paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.05)',
+              }}>
+                <div style={{
+                  flex: 1, height: '6px', borderRadius: '100px',
+                  background: 'rgba(255,255,255,0.08)', overflow: 'hidden',
+                  display: 'flex',
+                }}>
+                  <div style={{ height: '100%', width: '50%', background: '#4ADE80' }} />
+                  <div style={{ height: '100%', width: '2px', background: 'rgba(251,191,36,0.5)', marginLeft: '-1px' }} />
+                  <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)' }} />
                 </div>
-                <span className="text-xs text-cyan-400 font-medium">50% complete</span>
+                <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ADE80' }}>50% complete</span>
               </div>
             </div>
 
             {/* Admin View */}
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-              <div className="text-sm font-semibold text-white/70 mb-4">TCA Completion Summary · Last 30 days</div>
-              <div className="space-y-3">
+            <div style={{
+              borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)',
+              background: 'rgba(255,255,255,0.03)', padding: '24px',
+            }}>
+              <div style={{ fontSize: '13px', fontWeight: '600', color: 'rgba(255,255,255,0.6)', marginBottom: '16px' }}>
+                TCA Completion Summary · Last 30 days
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {[
                   { name: 'Jessica M.', cls: true, drv: false, label: '2 sessions left' },
                   { name: 'Tyler R.', cls: false, drv: false, label: '3 sessions left' },
@@ -306,21 +453,41 @@ export default function DemoPage() {
                   { name: 'Brandon L.', cls: false, drv: false, label: 'Just started' },
                   { name: 'Marcus D.', cls: true, drv: false, label: '1 session left' },
                 ].map((s) => (
-                  <div key={s.name} className="flex items-center justify-between py-2.5 px-4 rounded-lg bg-white/[0.03]">
-                    <div className="flex items-center gap-3">
-                      <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-white/60 text-xs">
-                        {s.name[0]}
-                      </div>
-                      <span className="text-sm text-white/70">{s.name}</span>
+                  <div key={s.name} style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '10px 14px', borderRadius: '10px',
+                    background: 'rgba(255,255,255,0.02)',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{
+                        width: '24px', height: '24px', borderRadius: '50%',
+                        background: 'rgba(255,255,255,0.06)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '11px', color: 'rgba(255,255,255,0.5)',
+                      }}>{s.name[0]}</div>
+                      <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>{s.name}</span>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="flex gap-1.5">
-                        <div className={`w-5 h-5 rounded text-xs flex items-center justify-center ${s.cls ? 'bg-cyan-500 text-black' : 'bg-white/10 text-white/30'}`}>✓</div>
-                        <div className="text-xs text-white/30">cls</div>
-                        <div className={`w-5 h-5 rounded text-xs flex items-center justify-center ${s.drv ? 'bg-cyan-500 text-black' : 'bg-white/10 text-white/30'}`}>✓</div>
-                        <div className="text-xs text-white/30">drv</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        <div style={{
+                          width: '20px', height: '20px', borderRadius: '4px',
+                          background: s.cls ? '#4ADE80' : 'rgba(255,255,255,0.08)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '10px', color: s.cls ? '#000000' : 'rgba(255,255,255,0.3)',
+                        }}>✓</div>
+                        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>cls</span>
+                        <div style={{
+                          width: '20px', height: '20px', borderRadius: '4px',
+                          background: s.drv ? '#4ADE80' : 'rgba(255,255,255,0.08)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '10px', color: s.drv ? '#000000' : 'rgba(255,255,255,0.3)',
+                        }}>✓</div>
+                        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>drv</span>
                       </div>
-                      <span className={`text-xs ${s.label === 'Ready for road test' ? 'text-cyan-400' : 'text-white/40'}`}>{s.label}</span>
+                      <span style={{
+                        fontSize: '11px',
+                        color: s.label === 'Ready for road test' ? '#4ADE80' : 'rgba(255,255,255,0.4)',
+                      }}>{s.label}</span>
                     </div>
                   </div>
                 ))}
@@ -331,20 +498,27 @@ export default function DemoPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-28 px-6 text-center">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Want to see your school?</h2>
-          <p className="text-white/50 mb-8 text-base">
-            Set up takes 2 minutes. No credit card. No commitment.<br/>
+      <section style={{ padding: '112px 24px', textAlign: 'center' }}>
+        <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+          <h2 style={{
+            fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: '800',
+            fontFamily: 'Outfit, sans-serif', marginBottom: '16px',
+          }}>Want to see your school?</h2>
+          <p style={{ fontSize: '16px', color: '#9CA3AF', marginBottom: '32px', lineHeight: '1.6' }}>
+            Set up takes 2 minutes. No credit card. No commitment.<br />
             Your school, your data, live in under an hour.
           </p>
-          <a
-            href="/signup"
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-base transition-colors"
-          >
+          <Link href='/signup' style={{
+            display: 'inline-flex', alignItems: 'center', gap: '10px',
+            padding: '14px 28px', borderRadius: '12px',
+            background: '#FFFFFF', color: '#000000',
+            fontSize: '15px', fontWeight: '700', textDecoration: 'none',
+          }}>
             Start your free trial →
-          </a>
-          <div className="mt-5 text-xs text-white/30">Free for 14 days · Then $99/month · Cancel anytime</div>
+          </Link>
+          <div style={{ marginTop: '20px', fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>
+            Free for 14 days · Then $99/month · Cancel anytime
+          </div>
         </div>
       </section>
     </div>

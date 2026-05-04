@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Plus, Mail, Shield, Pencil, X, Check, User, ArrowRight } from 'lucide-react'
+import { Plus, Mail, Shield, Pencil, X, User } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 function InviteModal({ onClose, onInvite }: { onClose: () => void; onInvite: (name: string, email: string) => void }) {
@@ -17,35 +17,139 @@ function InviteModal({ onClose, onInvite }: { onClose: () => void; onInvite: (na
     setLoading(false)
   }
 
+  const inputStyle: React.CSSProperties = {
+    background: '#0D0D0D',
+    border: '1px solid #1A1A1A',
+    color: '#FFFFFF',
+    outline: 'none',
+    borderRadius: '12px',
+    width: '100%',
+    padding: '12px 16px',
+    fontSize: '14px',
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="glass-card w-full max-w-sm rounded-2xl p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Invite Instructor</h2>
-          <button onClick={onClose} className="p-1" style={{ color: 'var(--text-muted)' }}><X className="w-5 h-5" /></button>
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      zIndex: 50,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '16px',
+      background: 'rgba(0,0,0,0.7)',
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '420px',
+        background: '#0F1117',
+        border: '1px solid #1A1A1A',
+        borderRadius: '16px',
+        padding: '32px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+          <h2 style={{
+            fontFamily: 'Outfit, sans-serif',
+            fontSize: '18px',
+            fontWeight: '600',
+            color: '#FFFFFF',
+          }}>
+            Invite Instructor
+          </h2>
+          <button onClick={onClose} style={{
+            padding: '4px',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#6B7280',
+            borderRadius: '6px',
+            display: 'flex',
+            alignItems: 'center',
+          }}>
+            <X className="w-5 h-5" />
+          </button>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
-            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Name</label>
-            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Matt Reedy" required
-              className="w-full rounded-xl px-4 py-3 text-sm"
-              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)', outline: 'none' }}
-              onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-              onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+            <label style={{
+              display: 'block',
+              fontSize: '12px',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: '#9CA3AF',
+              marginBottom: '6px',
+            }}>
+              Name
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Matt Reedy"
+              required
+              style={inputStyle}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+            />
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="matt@school.com" required
-              className="w-full rounded-xl px-4 py-3 text-sm"
-              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)', outline: 'none' }}
-              onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-              onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+            <label style={{
+              display: 'block',
+              fontSize: '12px',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: '#9CA3AF',
+              marginBottom: '6px',
+            }}>
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="matt@school.com"
+              required
+              style={inputStyle}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+            />
           </div>
-          <div className="flex gap-3 pt-1">
-            <button type="button" onClick={onClose} className="btn-ghost flex-1 text-center py-3 text-sm font-medium">
+          <div style={{ display: 'flex', gap: '12px', paddingTop: '8px' }}>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                flex: 1,
+                padding: '12px',
+                background: 'transparent',
+                border: '1px solid #1A1A1A',
+                borderRadius: '12px',
+                color: '#FFFFFF',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+              }}
+            >
               Cancel
             </button>
-            <button type="submit" disabled={loading} className="btn-glow flex-1 text-center py-3 text-sm font-semibold disabled:opacity-50">
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                flex: 1,
+                padding: '12px',
+                background: '#4ADE80',
+                border: 'none',
+                borderRadius: '12px',
+                color: '#000000',
+                fontSize: '14px',
+                fontWeight: '700',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.5 : 1,
+              }}
+            >
               {loading ? 'Sending...' : 'Send Invite →'}
             </button>
           </div>
@@ -65,7 +169,6 @@ export default function InstructorsPage() {
       const supabase = createClient()
       let schoolId: string | null = null
 
-      // Try demo_user cookie first (DEMO_MODE)
       const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
       if (demoCookie) {
         try {
@@ -74,7 +177,6 @@ export default function InstructorsPage() {
         } catch {}
       }
 
-      // Fall back to Supabase auth
       if (!schoolId) {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) { window.location.href = '/login'; return }
@@ -85,7 +187,7 @@ export default function InstructorsPage() {
 
       const { data } = await supabase
         .from('instructors')
-        .select('id, name, email, phone, active')
+        .select('id, name, email, phone, active, status')
         .eq('school_id', schoolId)
       setInstructors((data as any[]) || [])
       setLoading(false)
@@ -93,15 +195,16 @@ export default function InstructorsPage() {
     load()
   }, [])
 
-
   async function handleInvite(name: string, email: string) {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user!.id).single()
+    if (!user) return
+    const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
+    if (!school) return
 
     const { data: instructor } = await supabase
       .from('instructors')
-      .insert({ school_id: school!.id, name, email, status: 'pending' })
+      .insert({ school_id: school.id, name, email, status: 'pending', active: false })
       .select()
       .single()
 
@@ -112,69 +215,185 @@ export default function InstructorsPage() {
   }
 
   return (
-    <div className="max-w-5xl">
-      <div className="flex items-center justify-between mb-6">
+    <div style={{ maxWidth: '1200px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
         <div>
-          <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Instructors</h1>
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{instructors.length} total</p>
+          <h1 style={{
+            fontFamily: 'Outfit, sans-serif',
+            fontSize: '28px',
+            fontWeight: '700',
+            color: '#FFFFFF',
+            marginBottom: '4px',
+          }}>
+            Instructors
+          </h1>
+          <p style={{ fontSize: '14px', color: '#6B7280' }}>
+            {instructors.length} total
+          </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="btn-glow inline-flex items-center gap-2 text-sm">
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '10px 20px',
+            background: '#4ADE80',
+            border: 'none',
+            borderRadius: '12px',
+            color: '#000000',
+            fontSize: '14px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            transition: 'transform 0.15s, box-shadow 0.15s',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+            ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px rgba(74,222,128,0.3)'
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
+            ;(e.currentTarget as HTMLElement).style.boxShadow = 'none'
+          }}
+        >
           <Plus className="w-4 h-4" />
           Invite Instructor
         </button>
       </div>
 
       {loading ? (
-        <div className="glass-card text-center py-16">
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading...</p>
+        <div style={{
+          background: '#0F1117',
+          border: '1px solid #1A1A1A',
+          borderRadius: '16px',
+          textAlign: 'center',
+          padding: '64px',
+          color: '#6B7280',
+        }}>
+          <p style={{ fontSize: '14px' }}>Loading...</p>
         </div>
       ) : !instructors.length ? (
-        <div className="glass-card text-center py-16">
-          <User className="w-10 h-10 mx-auto mb-3 opacity-30" style={{ color: 'var(--text-muted)' }} />
-          <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>No instructors yet</p>
-          <button onClick={() => setShowModal(true)} className="text-sm font-medium" style={{ color: 'var(--accent)' }}>
+        <div style={{
+          background: '#0F1117',
+          border: '1px solid #1A1A1A',
+          borderRadius: '16px',
+          textAlign: 'center',
+          padding: '64px',
+        }}>
+          <User className="w-10 h-10 mx-auto mb-3" style={{ color: '#6B7280', opacity: 0.3 }} />
+          <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '12px' }}>No instructors yet</p>
+          <button onClick={() => setShowModal(true)} style={{
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#4ADE80',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+          }}>
             Invite your first instructor →
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: '16px',
+        }}>
           {instructors.map(instructor => (
-            <div key={instructor.id} className="glass-card">
-              {/* Avatar */}
-              <div className="flex items-start justify-between mb-4">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold"
-                  style={{ background: 'var(--accent-dim)', color: 'var(--accent)' }}
-                >
+            <div
+              key={instructor.id}
+              style={{
+                background: '#0F1117',
+                border: '1px solid #1A1A1A',
+                borderRadius: '16px',
+                padding: '24px',
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#13161F')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = '#0F1117')}
+            >
+              {/* Avatar + status */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: 'rgba(74,222,128,0.15)',
+                  color: '#4ADE80',
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontFamily: 'Outfit, sans-serif',
+                }}>
                   {instructor.name?.[0]?.toUpperCase() || 'I'}
                 </div>
-                <span
-                  className="text-xs px-2 py-0.5 rounded-full font-medium capitalize"
-                  style={{
-                    background: instructor.status === 'active' ? 'rgba(74,222,128,0.15)' : 'rgba(249,115,22,0.15)',
-                    color: instructor.status === 'active' ? 'var(--success)' : 'var(--accent-secondary)',
-                  }}
-                >
-                  {instructor.status}
+                <span style={{
+                  fontSize: '11px',
+                  padding: '4px 10px',
+                  borderRadius: '999px',
+                  fontWeight: '600',
+                  background: instructor.active ? 'rgba(74,222,128,0.15)' : 'rgba(249,115,22,0.15)',
+                  color: instructor.active ? '#4ADE80' : '#F97316',
+                }}>
+                  {instructor.active ? 'Active' : instructor.status === 'pending' ? 'Pending' : 'Inactive'}
                 </span>
               </div>
-              <h3 className="text-base font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{instructor.name}</h3>
-              <div className="flex items-center gap-1.5 text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
+
+              {/* Name + email */}
+              <h3 style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#FFFFFF',
+                marginBottom: '8px',
+              }}>
+                {instructor.name}
+              </h3>
+              <div style={{
+                fontSize: '13px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                color: '#6B7280',
+                marginBottom: '16px',
+              }}>
                 <Mail className="w-3.5 h-3.5" />
                 {instructor.email}
               </div>
-              <div className="flex gap-2">
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 {instructor.status === 'pending' && (
-                  <div className="text-xs py-1 px-2 rounded-lg" style={{ background: 'var(--accent-dim)', color: 'var(--accent)' }}>
+                  <div style={{
+                    fontSize: '11px',
+                    padding: '4px 10px',
+                    borderRadius: '8px',
+                    background: 'rgba(74,222,128,0.15)',
+                    color: '#4ADE80',
+                    fontWeight: '500',
+                  }}>
                     Awaiting response
                   </div>
                 )}
                 <Link
                   href={`/school-admin/instructors/${instructor.id}/schedule`}
-                  className="text-xs py-1 px-2 rounded-lg flex items-center gap-1 transition-colors"
-                  style={{ background: 'var(--bg-elevated)', color: 'var(--text-secondary)' }}
+                  style={{
+                    fontSize: '11px',
+                    padding: '4px 10px',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    background: '#0A0A0B',
+                    color: '#9CA3AF',
+                    textDecoration: 'none',
+                    transition: 'background 0.15s',
+                    border: '1px solid #1A1A1A',
+                  }}
+                  onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#13161F')}
+                  onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = '#0A0A0B')}
                 >
                   <Shield className="w-3 h-3" />
                   Set schedule

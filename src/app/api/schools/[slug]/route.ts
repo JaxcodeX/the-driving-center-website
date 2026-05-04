@@ -8,9 +8,10 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params
-  const supabase = await createClient()
+  // Use admin client for public school page — bypasses RLS so booking info is visible
+  const admin = getSupabaseAdmin()
 
-  const { data: school, error } = await supabase
+  const { data: school, error } = await admin
     .from('schools')
     .select('id, name, phone, state, service_zips, plan_tier')
     .eq('slug', slug)
@@ -20,14 +21,14 @@ export async function GET(
     return new NextResponse('School not found', { status: 404 })
   }
 
-  const { data: sessionTypes } = await supabase
+  const { data: sessionTypes } = await admin
     .from('session_types')
     .select('id, name, description, duration_minutes, price_cents, deposit_cents, color, tca_hours_credit')
     .eq('school_id', school.id)
     .eq('active', true)
     .order('price_cents', { ascending: true })
 
-  const { data: profile } = await supabase
+  const { data: profile } = await admin
     .from('school_profiles')
     .select('tagline, about, address, city, zip, email, website, facebook, instagram')
     .eq('school_id', school.id)

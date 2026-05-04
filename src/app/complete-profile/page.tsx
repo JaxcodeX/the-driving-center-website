@@ -45,7 +45,7 @@ function CompleteProfileForm() {
   if (isSchoolOwner) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#080809' }}>
-        <div className="glass-card p-8 max-w-md w-full text-center">
+        <div style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '32px', maxWidth: '480px', margin: '0 auto', width: '100%' }}>
           <div className="text-4xl mb-4">🏫</div>
           <h1 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>School Admin Dashboard</h1>
           <p className="text-sm" style={{ color: '#94A3B8' }}>Redirecting you to your school admin panel...</p>
@@ -135,7 +135,7 @@ function CompleteProfileForm() {
           <h1 className="text-3xl font-bold mb-3" style={{ color: '#ffffff' }}>You&apos;re all set!</h1>
           <p className="text-base mb-8" style={{ color: '#94A3B8' }}>Profile complete. Book your first lesson at the dashboard.</p>
           <a href="/dashboard"
-            className="btn-glow inline-flex items-center gap-2 px-8 py-4 text-base">
+            style={{ background: '#4ADE80', color: '#000', padding: '16px 32px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '16px', textDecoration: 'none' }}>
             Go to Dashboard <ArrowRight className="w-5 h-5" />
           </a>
         </div>
@@ -156,7 +156,7 @@ function CompleteProfileForm() {
           <span className="text-white font-semibold text-sm">The Driving Center</span>
         </div>
 
-        <div className="glass-card" style={{ padding: '36px 32px' }}>
+        <div style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '36px 32px' }}>
           <div className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: '#64748B' }}>Step 1 of 1</div>
           <h1 className="text-2xl font-bold mb-1.5" style={{ color: '#ffffff' }}>Complete your profile</h1>
           <p className="text-sm mb-7" style={{ color: '#94A3B8' }}>
@@ -249,8 +249,7 @@ function CompleteProfileForm() {
             )}
 
             <button type="submit" disabled={loading}
-              className="btn-glow w-full justify-center mt-2 disabled:opacity-50"
-              style={{ padding: '16px 24px' }}>
+              style={{ background: '#4ADE80', color: '#000', padding: '16px 24px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: 'pointer', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', opacity: loading ? 0.5 : 1 }}>
               {loading ? 'Saving...' : 'Complete Profile'} <ArrowRight className="w-4 h-4" />
             </button>
           </form>

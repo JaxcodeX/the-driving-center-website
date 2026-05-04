@@ -38,7 +38,6 @@ function getStatusLabel(status: string): string {
   return 'Pending'
 }
 
-// Gradient for avatar based on name
 function avatarGradient(name: string): string {
   const gradients = [
     'linear-gradient(135deg, #38BDF8, #818CF8)',
@@ -61,7 +60,20 @@ function getInitials(name: string): string {
 
 function StatusBadge({ status }: { status: string }) {
   const cls = getStatusPillClass(status)
-  return <span className={`status-pill ${cls}`}>{getStatusLabel(status)}</span>
+  return (
+    <span style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      padding: '4px 12px',
+      borderRadius: '999px',
+      fontSize: '12px',
+      fontWeight: '600',
+      background: status === 'certified' ? 'rgba(96,165,250,0.15)' : status === 'in_progress' ? 'rgba(74,222,128,0.15)' : 'rgba(249,115,22,0.15)',
+      color: status === 'certified' ? '#60A5FA' : status === 'in_progress' ? '#4ADE80' : '#F97316',
+    }}>
+      {getStatusLabel(status)}
+    </span>
+  )
 }
 
 function AddStudentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: Partial<Student>) => void }) {
@@ -113,46 +125,114 @@ function AddStudentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: P
     setLoading(false)
   }
 
-  const inputStyle = {
-    background: 'var(--bg-elevated)',
-    border: '1px solid var(--border)',
-    color: 'var(--text-primary)',
-    outline: 'none' as const,
+  const inputStyle: React.CSSProperties = {
+    background: '#0D0D0D',
+    border: '1px solid #1A1A1A',
+    color: '#FFFFFF',
+    outline: 'none',
     borderRadius: '12px',
+    width: '100%',
+    padding: '12px 16px',
+    fontSize: '14px',
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="w-full max-w-md rounded-2xl p-8 glass-card">
-        <h2 className="text-lg font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Add Student</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      zIndex: 50,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '16px',
+      background: 'rgba(0,0,0,0.7)',
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '480px',
+        background: '#0F1117',
+        border: '1px solid #1A1A1A',
+        borderRadius: '16px',
+        padding: '32px',
+      }}>
+        <h2 style={{
+          fontFamily: 'Outfit, sans-serif',
+          fontSize: '18px',
+          fontWeight: '600',
+          color: '#FFFFFF',
+          marginBottom: '24px',
+        }}>
+          Add Student
+        </h2>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {[
             { key: 'legal_name', label: 'Full Legal Name', placeholder: 'Jordan Kim', type: 'text' },
-            { key: 'dob', label: 'Date of Birth (YYYY-MM-DD)', placeholder: '2010-03-15', type: 'date' },
+            { key: 'dob', label: 'Date of Birth', placeholder: '2010-03-15', type: 'date' },
             { key: 'parent_email', label: 'Parent Email', placeholder: 'parent@email.com', type: 'email' },
             { key: 'emergency_contact_name', label: 'Emergency Contact', placeholder: 'Full Name', type: 'text' },
             { key: 'emergency_contact_phone', label: 'Emergency Phone', placeholder: '(615) 555-0100', type: 'tel' },
           ].map(({ key, label, placeholder, type = 'text' }) => (
             <div key={key}>
-              <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>{label}</label>
+              <label style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: '#9CA3AF',
+                marginBottom: '6px',
+              }}>
+                {label}
+              </label>
               <input
                 type={type}
                 value={(form as any)[key]}
                 onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
                 placeholder={placeholder}
                 required
-                className="w-full px-4 py-3 text-sm"
                 style={inputStyle}
-                onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-                onBlur={e => (e.target.style.borderColor = 'var(--border)')}
+                onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+                onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
               />
             </div>
           ))}
-          <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="btn-ghost flex-1 text-center py-3 text-sm font-medium">
+          <div style={{ display: 'flex', gap: '12px', paddingTop: '8px' }}>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                flex: 1,
+                padding: '12px',
+                background: 'transparent',
+                border: '1px solid #1A1A1A',
+                borderRadius: '12px',
+                color: '#FFFFFF',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#13161F')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
+            >
               Cancel
             </button>
-            <button type="submit" disabled={loading} className="btn-glow flex-1 text-center py-3 text-sm font-semibold disabled:opacity-50">
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                flex: 1,
+                padding: '12px',
+                background: '#4ADE80',
+                border: 'none',
+                borderRadius: '12px',
+                color: '#000000',
+                fontSize: '14px',
+                fontWeight: '700',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.5 : 1,
+              }}
+            >
               {loading ? 'Adding...' : 'Add Student →'}
             </button>
           </div>
@@ -171,12 +251,9 @@ export default function StudentsPage() {
 
   useEffect(() => {
     async function load() {
-      // Check for demo mode via cookie
       const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
 
       if (demoCookie) {
-        // Demo mode: use server-side demo endpoint (bypasses RLS)
-        // The cookie is forwarded automatically; server reads it via cookies()
         try {
           const res = await fetch('/api/demo/students')
           if (res.ok) {
@@ -185,14 +262,12 @@ export default function StudentsPage() {
             setLoading(false)
             return
           }
-        } catch { /* fall through to error state */ }
+        } catch { /* fall through */ }
         setStudents([])
         setLoading(false)
         return
       }
 
-      // Normal mode: use Supabase auth
-      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { window.location.href = '/login'; return }
 
@@ -220,71 +295,144 @@ export default function StudentsPage() {
   )
 
   return (
-    <div className="max-w-5xl">
+    <div style={{ maxWidth: '1200px' }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
         <div>
-          <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Students</h1>
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{students.length} total</p>
+          <h1 style={{
+            fontFamily: 'Outfit, sans-serif',
+            fontSize: '28px',
+            fontWeight: '700',
+            color: '#FFFFFF',
+            marginBottom: '4px',
+          }}>
+            Students
+          </h1>
+          <p style={{ fontSize: '14px', color: '#6B7280' }}>
+            {students.length} total
+          </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="btn-glow inline-flex items-center gap-2 text-sm"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '10px 20px',
+            background: '#4ADE80',
+            border: 'none',
+            borderRadius: '12px',
+            color: '#000000',
+            fontSize: '14px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            transition: 'transform 0.15s, box-shadow 0.15s',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+            ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px rgba(74,222,128,0.3)'
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
+            ;(e.currentTarget as HTMLElement).style.boxShadow = 'none'
+          }}
         >
           <Plus className="w-4 h-4" />
           Add Student
         </button>
       </div>
 
-      {/* Search bar - pill input */}
-      <div className="relative mb-6">
+      {/* Search bar */}
+      <div style={{ position: 'relative', marginBottom: '24px' }}>
         <Search
           className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4"
-          style={{ color: 'var(--text-muted)' }}
+          style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#6B7280', pointerEvents: 'none' }}
         />
         <input
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search by name or email..."
-          className="input-pill w-full pl-11 pr-4 py-2.5 text-sm"
-          style={{ paddingLeft: '44px' }}
+          style={{
+            width: '100%',
+            padding: '12px 16px 12px 44px',
+            background: '#0D0D0D',
+            border: '1px solid #1A1A1A',
+            borderRadius: '12px',
+            color: '#FFFFFF',
+            fontSize: '14px',
+            outline: 'none',
+            transition: 'border-color 0.2s',
+          }}
+          onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+          onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
         />
       </div>
 
       {/* Table */}
       {loading ? (
-        <div className="glass-card text-center py-16">
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading students...</p>
+        <div style={{
+          background: '#0F1117',
+          border: '1px solid #1A1A1A',
+          borderRadius: '16px',
+          textAlign: 'center',
+          padding: '64px',
+          color: '#6B7280',
+        }}>
+          <p style={{ fontSize: '14px' }}>Loading students...</p>
         </div>
       ) : !filtered.length ? (
-        <div className="glass-card text-center py-16">
-          <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
+        <div style={{
+          background: '#0F1117',
+          border: '1px solid #1A1A1A',
+          borderRadius: '16px',
+          textAlign: 'center',
+          padding: '64px',
+        }}>
+          <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '12px' }}>
             {search ? 'No students match your search' : 'No students yet'}
           </p>
           {!search && (
-            <button onClick={() => setShowModal(true)} className="text-sm font-medium" style={{ color: 'var(--accent)' }}>
+            <button onClick={() => setShowModal(true)} style={{
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#4ADE80',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+            }}>
               Add your first student →
             </button>
           )}
         </div>
       ) : (
-        <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+        <div style={{
+          background: '#0F1117',
+          border: '1px solid #1A1A1A',
+          borderRadius: '16px',
+          overflow: 'hidden',
+        }}>
           {/* Table header */}
           <div
-            className="grid px-6 py-3 text-xs font-semibold uppercase tracking-wider"
             style={{
-              gridTemplateColumns: '2fr 1.5fr 1fr 1fr auto',
+              display: 'grid',
+              gridTemplateColumns: '2fr 1.5fr 1fr 1fr 60px',
               gap: '16px',
-              color: 'var(--text-muted)',
-              borderBottom: '1px solid var(--border)',
+              padding: '12px 24px',
+              borderBottom: '1px solid #1A1A1A',
             }}
           >
-            <div>Name</div>
-            <div>Contact</div>
-            <div>TCA Progress</div>
-            <div>Status</div>
-            <div className="text-right">Actions</div>
+            {['Name', 'Contact', 'TCA Progress', 'Status', ''].map((h, i) => (
+              <div key={i} style={{
+                fontSize: '11px',
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: '#9CA3AF',
+              }}>
+                {h}
+              </div>
+            ))}
           </div>
 
           {/* Rows */}
@@ -293,38 +441,66 @@ export default function StudentsPage() {
             const displayName = student.legal_name.startsWith('eyJ') ? 'Student Record' : student.legal_name
             const initials = getInitials(displayName)
             const gradient = avatarGradient(displayName)
-
-            // TCA progress: total hours vs 60 (6 class + 6 drive)
             const totalHours = student.classroom_hours + student.driving_hours
             const tcaPct = Math.min(100, Math.round((totalHours / 60) * 100))
 
             return (
               <div
                 key={student.id}
-                className="grid px-6 py-4 items-center text-sm transition-colors"
                 style={{
-                  gridTemplateColumns: '2fr 1.5fr 1fr 1fr auto',
+                  display: 'grid',
+                  gridTemplateColumns: '2fr 1.5fr 1fr 1fr 60px',
                   gap: '16px',
-                  borderBottom: `1px solid rgba(255,255,255,0.04)`,
+                  padding: '16px 24px',
+                  alignItems: 'center',
+                  borderBottom: '1px solid rgba(255,255,255,0.04)',
+                  transition: 'background 0.15s',
                 }}
                 onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.025)')}
                 onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
               >
                 {/* Name + avatar */}
-                <div className="flex items-center gap-3">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                    style={{ background: gradient }}
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      background: gradient,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '12px',
+                      fontWeight: '700',
+                      color: '#FFFFFF',
+                      flexShrink: 0,
+                    }}
                   >
                     {initials}
                   </div>
-                  <div className="min-w-0">
-                    <div className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>{displayName}</div>
-                    <div className="text-xs flex items-center gap-1 mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      color: '#FFFFFF',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}>
+                      {displayName}
+                    </div>
+                    <div style={{
+                      fontSize: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      marginTop: '2px',
+                      color: '#6B7280',
+                    }}>
                       <Shield
                         className="w-3 h-3"
                         style={{
-                          color: student.classroom_hours >= 6 && student.driving_hours >= 6 ? 'var(--success)' : 'var(--text-muted)',
+                          color: student.classroom_hours >= 6 && student.driving_hours >= 6 ? '#4ADE80' : '#6B7280',
                         }}
                       />
                       {student.classroom_hours}h class · {student.driving_hours}h drive
@@ -333,36 +509,57 @@ export default function StudentsPage() {
                 </div>
 
                 {/* Contact */}
-                <div className="space-y-1.5">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   {student.parent_email && (
-                    <div className="flex items-center gap-1.5 text-xs truncate" style={{ color: 'var(--text-secondary)' }}>
-                      <Mail className="w-3 h-3 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />
-                      {student.parent_email}
+                    <div style={{
+                      fontSize: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      color: '#9CA3AF',
+                    }}>
+                      <Mail className="w-3 h-3" style={{ color: '#6B7280', flexShrink: 0 }} />
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {student.parent_email}
+                      </span>
                     </div>
                   )}
                   {student.emergency_contact_phone && (
-                    <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
-                      <Phone className="w-3 h-3 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />
+                    <div style={{
+                      fontSize: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      color: '#9CA3AF',
+                    }}>
+                      <Phone className="w-3 h-3" style={{ color: '#6B7280', flexShrink: 0 }} />
                       {student.emergency_contact_phone}
                     </div>
                   )}
                 </div>
 
                 {/* TCA Progress Bar */}
-                <div className="flex items-center gap-2">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <div
-                    className="h-1.5 rounded-full overflow-hidden flex-1"
-                    style={{ background: 'rgba(255,255,255,0.08)', minWidth: '60px' }}
+                    style={{
+                      height: '6px',
+                      borderRadius: '999px',
+                      background: 'rgba(255,255,255,0.08)',
+                      flex: 1,
+                      minWidth: '60px',
+                      overflow: 'hidden',
+                    }}
                   >
                     <div
-                      className="h-full rounded-full"
                       style={{
                         width: `${tcaPct}%`,
+                        height: '100%',
+                        borderRadius: '999px',
                         background: 'linear-gradient(90deg, #38BDF8, #818CF8)',
                       }}
                     />
                   </div>
-                  <span className="text-xs flex-shrink-0" style={{ color: 'var(--text-muted)' }}>
+                  <span style={{ fontSize: '12px', color: '#6B7280', flexShrink: 0 }}>
                     {tcaPct}%
                   </span>
                 </div>
@@ -373,12 +570,18 @@ export default function StudentsPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-end">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                   <Link
                     href={`/school-admin/students/${student.id}`}
-                    className="p-2 rounded-lg transition-colors"
-                    style={{ color: 'var(--text-muted)' }}
-                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'var(--bg-elevated)')}
+                    style={{
+                      padding: '8px',
+                      borderRadius: '8px',
+                      transition: 'background 0.15s',
+                      color: '#9CA3AF',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#13161F')}
                     onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                   >
                     <Pencil className="w-4 h-4" />

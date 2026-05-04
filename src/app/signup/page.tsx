@@ -44,66 +44,77 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden" style={{ background: 'var(--bg-base)' }}>
-      {/* Decorative gradient circles */}
-      <div
-        className="bg-circle"
-        style={{
-          width: 600,
-          height: 600,
-          top: -200,
-          left: -150,
-          background: 'radial-gradient(circle, rgba(26,86,255,0.5) 0%, transparent 70%)',
-          opacity: 0.12,
-        }}
-      />
-      <div
-        className="bg-circle"
-        style={{
-          width: 500,
-          height: 500,
-          bottom: -150,
-          right: -100,
-          background: 'radial-gradient(circle, rgba(112,123,255,0.5) 0%, transparent 70%)',
-          opacity: 0.1,
-        }}
-      />
+    <div style={{
+      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: '#050505', position: 'relative', overflow: 'hidden',
+    }}>
+      {/* Background glows — swapped sides from login */}
+      <div style={{
+        position: 'absolute', top: '-20%', left: '-10%', width: '600px', height: '600px',
+        background: 'radial-gradient(circle, rgba(45,27,78,0.6) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute', bottom: '-20%', right: '-10%', width: '500px', height: '500px',
+        background: 'radial-gradient(circle, rgba(26,26,59,0.6) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
 
       {/* Logo */}
-      <Link href="/" className="flex items-center gap-3 mb-12 absolute top-8 left-1/2 -translate-x-1/2">
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold" style={{ background: 'linear-gradient(135deg, #7ED4FD, #707BFF)' }}>DC</div>
-        <span className="text-sm font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>The Driving Center</span>
+      <Link href='/' style={{
+        position: 'fixed', top: '32px', left: '50%', transform: 'translateX(-50%)',
+        display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none',
+      }}>
+        <div style={{
+          width: '32px', height: '32px', borderRadius: '10px',
+          background: '#4ADE80', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <svg width='16' height='16' viewBox='0 0 16 16' fill='none'>
+            <path d='M8 2L13 5.5H3L8 2Z' fill='white' />
+            <path d='M3 5.5V10.5L8 14V8.5H13V5.5H3Z' fill='white' fillOpacity='0.7' />
+          </svg>
+        </div>
+        <span style={{ fontSize: '15px', fontWeight: '700', color: '#FFFFFF', fontFamily: "'Outfit', sans-serif" }}>The Driving Center</span>
       </Link>
 
-      {/* Glassmorphism card — use glass-card class */}
-      <div className="glass-card relative w-full max-w-[480px] mx-auto px-8 py-10">
+      {/* Main card */}
+      <div style={{
+        width: '100%', maxWidth: '440px', margin: '0 24px',
+        background: '#0F1117', border: '1px solid #1A1A1A',
+        borderRadius: '20px', padding: '40px',
+        position: 'relative', zIndex: 1,
+      }}>
         {/* Step indicator */}
-        <div className="flex items-center justify-center mb-10">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '32px' }}>
           {STEPS.map((step, i) => (
-            <div key={step} className="flex items-center">
+            <div key={step} style={{ display: 'flex', alignItems: 'center' }}>
               {i > 0 && (
                 <div
-                  className="w-12 h-px mx-2"
                   style={{
-                    background: i <= 0 ? 'var(--border)' : 'var(--accent)',
+                    width: '40px', height: '1px', margin: '0 8px',
+                    background: i <= 0 ? '#1A1A1A' : '#4ADE80',
                   }}
                 />
               )}
-              <div className="flex flex-col items-center gap-1">
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
                 <div
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold"
                   style={{
-                    background: i === 0 ? 'var(--accent)' : 'var(--card-bg)',
-                    color: i === 0 ? 'var(--text-primary)' : 'var(--text-muted)',
-                    border: i === 0 ? 'none' : '1px solid var(--border)',
+                    width: '32px', height: '32px', borderRadius: '50%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '13px', fontWeight: '700',
+                    background: i === 0 ? '#4ADE80' : '#0D0D0D',
+                    color: i === 0 ? '#000000' : '#6B7280',
+                    border: i === 0 ? 'none' : '1px solid #1A1A1A',
+                    fontFamily: "'Inter', sans-serif",
                   }}
                 >
                   {i + 1}
                 </div>
-                <span
-                  className="text-[10px] font-medium"
-                  style={{ color: i === 0 ? 'var(--text-secondary)' : 'var(--text-muted)' }}
-                >
+                <span style={{
+                  fontSize: '10px', fontWeight: '600', textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: i === 0 ? '#9CA3AF' : '#6B7280',
+                }}>
                   {step}
                 </span>
               </div>
@@ -112,100 +123,164 @@ export default function SignupPage() {
         </div>
 
         {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Create your school account</h1>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Start your 14-day free trial. No credit card required.</p>
+        <div style={{ marginBottom: '32px', textAlign: 'center' }}>
+          <h1 style={{
+            fontSize: '28px', fontFamily: "'Outfit', sans-serif", fontWeight: '700',
+            color: '#FFFFFF', letterSpacing: '-0.02em', marginBottom: '8px',
+          }}>
+            Create your school account
+          </h1>
+          <p style={{ fontSize: '15px', color: '#9CA3AF', lineHeight: '1.5' }}>
+            Start your 14-day free trial. No credit card required.
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {/* Full name */}
-          <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2">
-              <User className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+          <div style={{ position: 'relative' }}>
+            <div style={{
+              position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)',
+              color: '#6B7280',
+            }}>
+              <User size={16} />
             </div>
             <input
-              type="text"
+              type='text'
               value={form.ownerName}
               onChange={e => set('ownerName', e.target.value)}
-              placeholder="Your full name"
+              placeholder='Your full name'
               required
-              className="w-full h-[50px] rounded-[999px] pl-11 pr-4 text-sm"
               style={{
-                background: 'var(--card-bg)',
-                border: '1px solid var(--card-border)',
-                color: 'var(--text-primary)',
-                outline: 'none',
+                width: '100%', height: '50px', borderRadius: '12px',
+                background: '#0D0D0D', border: '1px solid #1A1A1A',
+                color: '#FFFFFF', fontSize: '15px', fontFamily: "'Inter', sans-serif",
+                paddingLeft: '44px', paddingRight: '16px', outline: 'none',
+                transition: 'border-color 0.2s',
               }}
-              onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--accent)')}
-              onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--card-border)')}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+            />
+          </div>
+
+          {/* School name */}
+          <div style={{ position: 'relative' }}>
+            <div style={{
+              position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)',
+              color: '#6B7280', display: 'flex', alignItems: 'center',
+            }}>
+              <svg width='16' height='16' viewBox='0 0 16 16' fill='none'>
+                <path d='M8 2L13 5.5H3L8 2Z' fill='currentColor' />
+                <path d='M3 5.5V10.5L8 14V8.5H13V5.5H3Z' fill='currentColor' fillOpacity='0.7' />
+              </svg>
+            </div>
+            <input
+              type='text'
+              value={form.schoolName}
+              onChange={e => set('schoolName', e.target.value)}
+              placeholder='Driving school name'
+              required
+              style={{
+                width: '100%', height: '50px', borderRadius: '12px',
+                background: '#0D0D0D', border: '1px solid #1A1A1A',
+                color: '#FFFFFF', fontSize: '15px', fontFamily: "'Inter', sans-serif",
+                paddingLeft: '44px', paddingRight: '16px', outline: 'none',
+                transition: 'border-color 0.2s',
+              }}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
             />
           </div>
 
           {/* Email */}
-          <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2">
-              <Mail className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+          <div style={{ position: 'relative' }}>
+            <div style={{
+              position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)',
+              color: '#6B7280',
+            }}>
+              <Mail size={16} />
             </div>
             <input
-              type="email"
+              type='email'
               value={form.email}
               onChange={e => set('email', e.target.value)}
-              placeholder="you@yourdrivingschool.com"
+              placeholder='you@yourdrivingschool.com'
               required
-              className="w-full h-[50px] rounded-[999px] pl-11 pr-4 text-sm"
               style={{
-                background: 'var(--card-bg)',
-                border: '1px solid var(--card-border)',
-                color: 'var(--text-primary)',
-                outline: 'none',
+                width: '100%', height: '50px', borderRadius: '12px',
+                background: '#0D0D0D', border: '1px solid #1A1A1A',
+                color: '#FFFFFF', fontSize: '15px', fontFamily: "'Inter', sans-serif",
+                paddingLeft: '44px', paddingRight: '16px', outline: 'none',
+                transition: 'border-color 0.2s',
               }}
-              onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--accent)')}
-              onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--card-border)')}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
             />
           </div>
 
-          {/* Password */}
-          <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2">
-              <Lock className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+          {/* Password (optional) */}
+          <div style={{ position: 'relative' }}>
+            <div style={{
+              position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)',
+              color: '#6B7280',
+            }}>
+              <Lock size={16} />
             </div>
             <input
-              type="password"
-              placeholder="Create a password (optional)"
-              className="w-full h-[50px] rounded-[999px] pl-11 pr-4 text-sm"
+              type='password'
+              placeholder='Create a password (optional)'
               style={{
-                background: 'var(--card-bg)',
-                border: '1px solid var(--card-border)',
-                color: 'var(--text-primary)',
-                outline: 'none',
+                width: '100%', height: '50px', borderRadius: '12px',
+                background: '#0D0D0D', border: '1px solid #1A1A1A',
+                color: '#FFFFFF', fontSize: '15px', fontFamily: "'Inter', sans-serif",
+                paddingLeft: '44px', paddingRight: '16px', outline: 'none',
+                transition: 'border-color 0.2s',
               }}
-              onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--accent)')}
-              onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--card-border)')}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
             />
           </div>
 
           {error && (
-            <div className="flex items-start gap-2 text-sm" style={{ color: 'var(--accent-secondary)' }}>
-              <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-              {error}
+            <div style={{
+              display: 'flex', alignItems: 'flex-start', gap: '8px',
+              padding: '12px', borderRadius: '10px',
+              background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
+            }}>
+              <AlertCircle size={16} style={{ color: '#EF4444', marginTop: '1px', flexShrink: 0 }} />
+              <span style={{ fontSize: '13px', color: '#EF4444', lineHeight: '1.5' }}>{error}</span>
             </div>
           )}
 
           <button
-            type="submit"
+            type='submit'
             disabled={loading}
-            className="btn-glow w-full h-[50px] rounded-[999px] text-sm font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            style={{
+              width: '100%', height: '50px', borderRadius: '12px',
+              background: '#FFFFFF', color: '#000000',
+              fontSize: '14px', fontWeight: '700', fontFamily: "'Inter', sans-serif",
+              border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+              opacity: loading ? 0.6 : 1,
+              transition: 'opacity 0.2s, transform 0.2s',
+            }}
+            onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)' }}
           >
-            {loading ? 'Creating school...' : 'Create school account →'}
-            {!loading && <ArrowRight className="w-4 h-4" />}
+            {loading ? 'Creating school...' : 'Create school account'}
+            {!loading && <ArrowRight size={15} />}
           </button>
         </form>
       </div>
 
       {/* Sign in link */}
-      <p className="text-sm mt-6" style={{ color: 'var(--text-secondary)' }}>
+      <p style={{
+        position: 'fixed', bottom: '32px', left: '50%', transform: 'translateX(-50%)',
+        fontSize: '14px', color: '#6B7280',
+      }}>
         Already have an account?{' '}
-        <Link href="/login" className="font-semibold" style={{ color: 'var(--accent)' }}>Sign in</Link>
+        <Link href='/login' style={{ color: '#4ADE80', fontWeight: '600', textDecoration: 'none' }}>
+          Sign in
+        </Link>
       </p>
     </div>
   )

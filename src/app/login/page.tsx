@@ -2,24 +2,21 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { CheckCircle, Zap, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react'
+import { CheckCircle, Mail, ArrowRight } from 'lucide-react'
 
 export default function LoginPage() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
-
-  // Demo login state
+  const [isDemoMode, setIsDemoMode] = useState(false)
+  const [activeTab, setActiveTab] = useState<'magic' | 'demo'>('magic')
   const [demoEmail, setDemoEmail] = useState('')
   const [demoPin, setDemoPin] = useState('0000')
   const [showPin, setShowPin] = useState(false)
   const [demoLoading, setDemoLoading] = useState(false)
   const [demoError, setDemoError] = useState('')
-  const [isDemoMode, setIsDemoMode] = useState(false)
 
   useEffect(() => {
     fetch('/api/schools').then(r => r.json()).then(d => {
@@ -27,17 +24,15 @@ export default function LoginPage() {
     }).catch(() => {})
   }, [])
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleMagicLink(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError('')
-
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     })
-
     if (error) {
       setError(error.message)
     } else {
@@ -50,7 +45,6 @@ export default function LoginPage() {
     e.preventDefault()
     setDemoLoading(true)
     setDemoError('')
-
     try {
       const res = await fetch('/api/auth/demo-login', {
         method: 'POST',
@@ -58,13 +52,11 @@ export default function LoginPage() {
         body: JSON.stringify({ email: demoEmail, pin: demoPin }),
       })
       const data = await res.json()
-
       if (!res.ok) {
         setDemoError(data.error || 'Login failed')
         setDemoLoading(false)
         return
       }
-
       window.location.href = '/school-admin'
     } catch {
       setDemoError('Network error — try again')
@@ -73,178 +65,268 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden" style={{ background: 'var(--bg-base)' }}>
-      {/* Decorative gradient circles */}
-      <div
-        className="bg-circle"
-        style={{
-          width: 600,
-          height: 600,
-          top: -200,
-          right: -150,
-          background: 'radial-gradient(circle, rgba(26,86,255,0.5) 0%, transparent 70%)',
-          opacity: 0.12,
-        }}
-      />
-      <div
-        className="bg-circle"
-        style={{
-          width: 500,
-          height: 500,
-          bottom: -150,
-          left: -100,
-          background: 'radial-gradient(circle, rgba(112,123,255,0.5) 0%, transparent 70%)',
-          opacity: 0.1,
-        }}
-      />
+    <div style={{
+      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: '#050505', padding: '24px',
+    }}>
+      {/* Card */}
+      <div style={{
+        width: '100%', maxWidth: '420px',
+        background: '#0F1117', border: '1px solid #1A1A1A',
+        borderRadius: '20px', padding: '40px',
+      }}>
+        {/* Logo */}
+        <Link href='/' style={{
+          display: 'flex', alignItems: 'center', gap: '10px',
+          textDecoration: 'none', marginBottom: '36px',
+        }}>
+          <div style={{
+            width: '32px', height: '32px', borderRadius: '10px',
+            background: '#4ADE80', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <svg width='16' height='16' viewBox='0 0 16 16' fill='none'>
+              <path d='M8 2L13 5.5H3L8 2Z' fill='white' />
+              <path d='M3 5.5V10.5L8 14V8.5H13V5.5H3Z' fill='white' fillOpacity='0.7' />
+            </svg>
+          </div>
+          <span style={{ fontSize: '15px', fontWeight: '700', color: '#FFFFFF', fontFamily: 'Outfit, sans-serif' }}>
+            The Driving Center
+          </span>
+        </Link>
 
-      {/* Logo */}
-      <Link href="/" className="flex items-center gap-3 mb-12 absolute top-8 left-1/2 -translate-x-1/2">
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold" style={{ background: 'linear-gradient(135deg, #7ED4FD, #707BFF)' }}>DC</div>
-        <span className="text-sm font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>The Driving Center</span>
-      </Link>
-
-      {/* Glassmorphism card — use glass-card class */}
-      <div className="glass-card relative w-full max-w-[480px] mx-auto px-8 py-10">
         {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Sign in to your account</h1>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Enter your credentials to access your school dashboard</p>
+        <div style={{ marginBottom: '32px' }}>
+          <h1 style={{
+            fontSize: '24px', fontFamily: 'Outfit, sans-serif', fontWeight: '700',
+            color: '#FFFFFF', letterSpacing: '-0.02em', marginBottom: '6px',
+          }}>
+            Sign in
+          </h1>
+          <p style={{ fontSize: '14px', color: '#9CA3AF' }}>
+            to your school dashboard
+          </p>
         </div>
 
-        {/* Magic Link Form */}
-        {!sent ? (
-          <>
-            <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-              {/* Email */}
-              <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                  <Mail className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
-                </div>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="you@yourdrivingschool.com"
-                  required
-                  className="w-full h-[50px] rounded-[999px] pl-11 pr-4 text-sm"
-                  style={{
-                    background: 'var(--card-bg)',
-                    border: '1px solid var(--card-border)',
-                    color: 'var(--text-primary)',
-                    outline: 'none',
-                  }}
-                  onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--accent)')}
-                  onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--card-border)')}
-                />
-              </div>
-
-              {error && (
-                <p className="text-xs text-center" style={{ color: 'var(--accent-secondary)' }}>{error}</p>
-              )}
-
+        {/* Tabs */}
+        {isDemoMode && (
+          <div style={{
+            display: 'flex', gap: '0', marginBottom: '24px',
+            background: '#0D0D0D', borderRadius: '10px',
+            padding: '4px', border: '1px solid #1A1A1A',
+          }}>
+            {(['magic', 'demo'] as const).map(tab => (
               <button
-                type="submit"
-                disabled={loading}
-                className="btn-glow w-full h-[50px] rounded-[999px] text-sm font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                style={{
+                  flex: 1, padding: '8px 12px', borderRadius: '8px', border: 'none',
+                  fontSize: '13px', fontWeight: '600', cursor: 'pointer',
+                  background: activeTab === tab ? '#1A1A1A' : 'transparent',
+                  color: activeTab === tab ? '#FFFFFF' : '#6B7280',
+                  transition: 'all 0.2s',
+                }}
               >
-                {loading ? 'Sending...' : 'Send login link →'}
-                {!loading && <ArrowRight className="w-4 h-4" />}
+                {tab === 'magic' ? 'Magic Link' : 'Demo Login'}
               </button>
-            </form>
-
-            {/* Divider */}
-            <div className="flex items-center gap-3 mb-6">
-              <div className="flex-1 h-px" style={{ background: 'var(--card-border)' }} />
-              <span className="text-xs px-2" style={{ color: 'var(--text-muted)' }}>or continue with</span>
-              <div className="flex-1 h-px" style={{ background: 'var(--card-border)' }} />
-            </div>
-          </>
-        ) : (
-          <div className="mb-6 text-center">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(74,222,128,0.12)', border: '1px solid rgba(74,222,128,0.2)' }}>
-              <CheckCircle className="w-6 h-6" style={{ color: 'var(--success)' }} />
-            </div>
-            <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Check your inbox</h2>
-            <p className="text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>Magic link sent to <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{email}</span></p>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Click the link in the email to sign in.</p>
+            ))}
           </div>
         )}
 
-        {/* DEMO_MODE Quick Login — glass-card */}
-        {isDemoMode && (
-          <div className="glass-card rounded-[16px] p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Zap className="w-4 h-4" style={{ color: 'var(--accent-secondary)' }} />
-              <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--accent-secondary)' }}>Demo Mode</span>
-            </div>
-            <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>Use PIN <span className="font-mono" style={{ color: 'var(--text-primary)' }}>0000</span> after entering any email</p>
-
-            <form onSubmit={handleDemoLogin} className="space-y-3">
-              <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                  <Mail className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
-                </div>
+        {/* Magic Link */}
+        {(!isDemoMode || activeTab === 'magic') && !sent && (
+          <form onSubmit={handleMagicLink} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div>
+              <label style={{
+                display: 'block', fontSize: '13px', fontWeight: '500',
+                color: '#9CA3AF', marginBottom: '8px',
+              }}>
+                Email address
+              </label>
+              <div style={{ position: 'relative' }}>
+                <Mail size='15' style={{
+                  position: 'absolute', left: '14px', top: '50%',
+                  transform: 'translateY(-50%)', color: '#6B7280', pointerEvents: 'none',
+                }} />
                 <input
-                  type="email"
-                  value={demoEmail}
-                  onChange={e => setDemoEmail(e.target.value)}
-                  placeholder="school owner email"
+                  type='email'
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder='you@yourdrivingschool.com'
                   required
-                  className="w-full h-[50px] rounded-[999px] pl-11 pr-4 text-sm"
+                  autoComplete='email'
                   style={{
-                    background: 'var(--card-bg)',
-                    border: '1px solid var(--card-border)',
-                    color: 'var(--text-primary)',
-                    outline: 'none',
+                    width: '100%', height: '48px', borderRadius: '12px',
+                    background: '#0D0D0D', border: '1px solid #1A1A1A',
+                    color: '#FFFFFF', fontSize: '14px',
+                    paddingLeft: '42px', paddingRight: '16px', outline: 'none',
+                    transition: 'border-color 0.2s',
                   }}
-                  onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--accent)')}
-                  onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--card-border)')}
+                  onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+                  onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
                 />
               </div>
+            </div>
 
-              <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                  <Lock className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+            {error && (
+              <p style={{ fontSize: '13px', color: '#EF4444', textAlign: 'center' }}>{error}</p>
+            )}
+
+            <button
+              type='submit'
+              disabled={loading}
+              style={{
+                width: '100%', height: '48px', borderRadius: '12px',
+                background: '#FFFFFF', color: '#000000',
+                fontSize: '14px', fontWeight: '700',
+                border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                opacity: loading ? 0.6 : 1, transition: 'opacity 0.2s',
+              }}
+            >
+              {loading ? 'Sending link...' : 'Continue'}
+              {!loading && <ArrowRight size='15' />}
+            </button>
+          </form>
+        )}
+
+        {/* Success */}
+        {(!isDemoMode || activeTab === 'magic') && sent && (
+          <div style={{ textAlign: 'center', padding: '20px 0' }}>
+            <div style={{
+              width: '56px', height: '56px', borderRadius: '50%',
+              background: 'rgba(74,222,128,0.1)',
+              border: '1px solid rgba(74,222,128,0.2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 16px',
+            }}>
+              <CheckCircle size='28' style={{ color: '#4ADE80' }} />
+            </div>
+            <h2 style={{
+              fontSize: '18px', fontFamily: 'Outfit, sans-serif', fontWeight: '600',
+              color: '#FFFFFF', marginBottom: '8px',
+            }}>
+              Check your inbox
+            </h2>
+            <p style={{ fontSize: '13px', color: '#9CA3AF', lineHeight: '1.6' }}>
+              We sent a magic link to{' '}
+              <span style={{ color: '#FFFFFF', fontWeight: '600' }}>{email}</span>
+              <br />Click it to sign in.
+            </p>
+          </div>
+        )}
+
+        {/* Demo Login */}
+        {isDemoMode && activeTab === 'demo' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '8px',
+              padding: '8px 12px', borderRadius: '8px',
+              background: 'rgba(74,222,128,0.08)',
+              border: '1px solid rgba(74,222,128,0.15)',
+            }}>
+              <div style={{
+                width: '6px', height: '6px', borderRadius: '50%',
+                background: '#4ADE80',
+              }} />
+              <span style={{
+                fontSize: '11px', fontWeight: '600', textTransform: 'uppercase',
+                letterSpacing: '0.08em', color: '#4ADE80',
+              }}>
+                Demo Mode — PIN is 0000
+              </span>
+            </div>
+
+            <form onSubmit={handleDemoLogin} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div>
+                <label style={{
+                  display: 'block', fontSize: '13px', fontWeight: '500',
+                  color: '#9CA3AF', marginBottom: '8px',
+                }}>
+                  School owner email
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <Mail size='15' style={{
+                    position: 'absolute', left: '14px', top: '50%',
+                    transform: 'translateY(-50%)', color: '#6B7280', pointerEvents: 'none',
+                  }} />
+                  <input
+                    type='email'
+                    value={demoEmail}
+                    onChange={e => setDemoEmail(e.target.value)}
+                    placeholder='any@email.com'
+                    required
+                    style={{
+                      width: '100%', height: '48px', borderRadius: '12px',
+                      background: '#0D0D0D', border: '1px solid #1A1A1A',
+                      color: '#FFFFFF', fontSize: '14px',
+                      paddingLeft: '42px', paddingRight: '16px', outline: 'none',
+                      transition: 'border-color 0.2s',
+                    }}
+                    onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+                    onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+                  />
                 </div>
-                <input
-                  type={showPin ? 'text' : 'password'}
-                  value={demoPin}
-                  maxLength={4}
-                  onChange={e => setDemoPin(e.target.value)}
-                  placeholder="Demo PIN"
-                  required
-                  pattern="\d{4}"
-                  className="w-full h-[50px] rounded-[999px] pl-11 pr-12 text-sm text-center font-mono"
-                  style={{
-                    background: 'var(--card-bg)',
-                    border: '1px solid var(--card-border)',
-                    color: 'var(--text-primary)',
-                    outline: 'none',
-                  }}
-                  onFocus={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--accent)')}
-                  onBlur={e => ((e.target as HTMLInputElement).style.borderColor = 'var(--card-border)')}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPin(!showPin)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2"
-                  style={{ color: 'var(--text-muted)' }}
-                >
-                  {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block', fontSize: '13px', fontWeight: '500',
+                  color: '#9CA3AF', marginBottom: '8px',
+                }}>
+                  Demo PIN
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showPin ? 'text' : 'password'}
+                    value={demoPin}
+                    maxLength={4}
+                    onChange={e => setDemoPin(e.target.value)}
+                    placeholder='0000'
+                    required
+                    style={{
+                      width: '100%', height: '48px', borderRadius: '12px',
+                      background: '#0D0D0D', border: '1px solid #1A1A1A',
+                      color: '#FFFFFF', fontSize: '16px', fontWeight: '600',
+                      textAlign: 'center', letterSpacing: '0.3em',
+                      paddingLeft: '16px', paddingRight: '44px', outline: 'none',
+                      transition: 'border-color 0.2s',
+                    }}
+                    onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+                    onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+                  />
+                  <button
+                    type='button'
+                    onClick={() => setShowPin(!showPin)}
+                    style={{
+                      position: 'absolute', right: '14px', top: '50%',
+                      transform: 'translateY(-50%)', background: 'none',
+                      border: 'none', cursor: 'pointer', color: '#6B7280',
+                      fontSize: '11px', fontWeight: '600',
+                    }}
+                  >
+                    {showPin ? 'HIDE' : 'SHOW'}
+                  </button>
+                </div>
               </div>
 
               {demoError && (
-                <p className="text-xs" style={{ color: 'var(--accent-secondary)' }}>{demoError}</p>
+                <p style={{ fontSize: '13px', color: '#EF4444', textAlign: 'center' }}>{demoError}</p>
               )}
 
               <button
-                type="submit"
+                type='submit'
                 disabled={demoLoading}
-                className="btn-glow w-full h-[50px] rounded-[999px] text-sm font-semibold disabled:opacity-50"
+                style={{
+                  width: '100%', height: '48px', borderRadius: '12px',
+                  background: '#4ADE80', color: '#000000',
+                  fontSize: '14px', fontWeight: '700',
+                  border: 'none', cursor: demoLoading ? 'not-allowed' : 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  opacity: demoLoading ? 0.6 : 1, transition: 'opacity 0.2s',
+                }}
               >
-                {demoLoading ? 'Logging in...' : 'Demo Login →'}
+                {demoLoading ? 'Signing in...' : 'Demo Login'}
+                {!demoLoading && <ArrowRight size='15' />}
               </button>
             </form>
           </div>
@@ -252,9 +334,14 @@ export default function LoginPage() {
       </div>
 
       {/* Sign up link */}
-      <p className="text-sm mt-6" style={{ color: 'var(--text-secondary)' }}>
+      <p style={{
+        position: 'fixed', bottom: '28px', left: '50%', transform: 'translateX(-50%)',
+        fontSize: '13px', color: '#6B7280', whiteSpace: 'nowrap',
+      }}>
         Don&apos;t have an account?{' '}
-        <Link href="/signup" className="font-semibold" style={{ color: 'var(--accent)' }}>Sign up</Link>
+        <Link href='/signup' style={{ color: '#4ADE80', fontWeight: '600', textDecoration: 'none' }}>
+          Sign up
+        </Link>
       </p>
     </div>
   )

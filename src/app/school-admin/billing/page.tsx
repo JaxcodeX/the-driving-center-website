@@ -47,37 +47,74 @@ export default function BillingPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading...</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px' }}>
+        <p style={{ fontSize: '14px', color: '#6B7280' }}>Loading...</p>
       </div>
     )
   }
 
   const status = subscription?.subscription_status || 'trial'
 
+  const statusIcon = status === 'active'
+    ? <CheckCircle className="w-5 h-5" style={{ color: '#4ADE80' }} />
+    : status === 'past_due'
+    ? <AlertCircle className="w-5 h-5" style={{ color: '#F97316' }} />
+    : <CreditCard className="w-5 h-5" style={{ color: '#78E4FF' }} />
+
+  const statusBg = status === 'active'
+    ? 'rgba(74,222,128,0.15)'
+    : status === 'past_due'
+    ? 'rgba(249,115,22,0.15)'
+    : 'rgba(120,228,255,0.15)'
+
+  const statusColor = status === 'active'
+    ? '#4ADE80'
+    : status === 'past_due'
+    ? '#F97316'
+    : '#78E4FF'
+
   return (
-    <div className="max-w-3xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Billing</h1>
-        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Manage your subscription and payment settings.</p>
+    <div style={{ maxWidth: '720px' }}>
+      {/* Header */}
+      <div style={{ marginBottom: '32px' }}>
+        <h1 style={{
+          fontFamily: 'Outfit, sans-serif',
+          fontSize: '28px',
+          fontWeight: '700',
+          color: '#FFFFFF',
+          marginBottom: '4px',
+        }}>
+          Billing
+        </h1>
+        <p style={{ fontSize: '14px', color: '#6B7280' }}>
+          Manage your subscription and payment settings.
+        </p>
       </div>
 
       {/* Status banner */}
-      <div className="glass-card flex items-start gap-4 p-5 mb-6">
-        <div className="mt-0.5">
-          {status === 'active' ? (
-            <CheckCircle className="w-5 h-5" style={{ color: 'var(--success)' }} />
-          ) : status === 'past_due' ? (
-            <AlertCircle className="w-5 h-5" style={{ color: 'var(--accent-secondary)' }} />
-          ) : (
-            <CreditCard className="w-5 h-5" style={{ color: 'var(--accent)' }} />
-          )}
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '16px',
+        padding: '20px',
+        background: '#0F1117',
+        border: '1px solid #1A1A1A',
+        borderRadius: '16px',
+        marginBottom: '24px',
+      }}>
+        <div style={{ marginTop: '2px', flexShrink: 0 }}>
+          {statusIcon}
         </div>
         <div>
-          <div className="text-sm font-semibold mb-0.5" style={{ color: 'var(--text-primary)' }}>
+          <div style={{
+            fontSize: '14px',
+            fontWeight: '600',
+            color: statusColor,
+            marginBottom: '2px',
+          }}>
             {status === 'active' ? 'Subscription active' : status === 'past_due' ? 'Payment past due' : 'Free trial'}
           </div>
-          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+          <div style={{ fontSize: '12px', color: '#9CA3AF' }}>
             {status === 'active'
               ? 'Your subscription is active and billing is up to date.'
               : status === 'past_due'
@@ -88,17 +125,50 @@ export default function BillingPage() {
       </div>
 
       {/* Plan card */}
-      <div className="glass-card p-6 mb-6">
-        <div className="flex items-start justify-between mb-4">
+      <div style={{
+        background: '#0F1117',
+        border: '1px solid #1A1A1A',
+        borderRadius: '16px',
+        padding: '28px',
+        marginBottom: '24px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '20px' }}>
           <div>
-            <div className="text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>Current Plan</div>
-            <div className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>Starter</div>
-            <div className="text-sm" style={{ color: 'var(--text-muted)' }}>$99/month</div>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: '#9CA3AF', marginBottom: '4px' }}>
+              Current Plan
+            </div>
+            <div style={{
+              fontFamily: 'Outfit, sans-serif',
+              fontSize: '28px',
+              fontWeight: '800',
+              color: '#4ADE80',
+            }}>
+              Starter
+            </div>
+            <div style={{ fontSize: '14px', color: '#6B7280' }}>$99/month</div>
           </div>
-          <span className="status-pill status-active">{status}</span>
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '4px 12px',
+            borderRadius: '999px',
+            fontSize: '12px',
+            fontWeight: '600',
+            background: 'rgba(74,222,128,0.15)',
+            color: '#4ADE80',
+          }}>
+            {status}
+          </span>
         </div>
 
-        <div className="space-y-2 mb-6 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
+        <div style={{
+          paddingTop: '20px',
+          borderTop: '1px solid #1A1A1A',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          marginBottom: '24px',
+        }}>
           {[
             'Unlimited bookings',
             'SMS + email reminders',
@@ -107,8 +177,14 @@ export default function BillingPage() {
             'CSV student import',
             'Stripe payments',
           ].map(f => (
-            <div key={f} className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-              <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--success)' }} />
+            <div key={f} style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '13px',
+              color: '#9CA3AF',
+            }}>
+              <CheckCircle className="w-4 h-4" style={{ color: '#4ADE80', flexShrink: 0 }} />
               {f}
             </div>
           ))}
@@ -116,7 +192,20 @@ export default function BillingPage() {
 
         <button
           onClick={openBillingPortal}
-          className="btn-ghost w-full text-center py-3 text-sm font-semibold"
+          style={{
+            width: '100%',
+            padding: '12px',
+            background: 'transparent',
+            border: '1px solid #1A1A1A',
+            borderRadius: '12px',
+            color: '#FFFFFF',
+            fontSize: '13px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'background 0.15s',
+          }}
+          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#13161F')}
+          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
         >
           Manage subscription
         </button>
@@ -124,19 +213,45 @@ export default function BillingPage() {
 
       {/* Payment method */}
       {subscription?.stripe_customer_id && (
-        <div className="glass-card p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Payment method</div>
-            <CreditCard className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+        <div style={{
+          background: '#0F1117',
+          border: '1px solid #1A1A1A',
+          borderRadius: '16px',
+          padding: '24px',
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '16px',
+          }}>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: '#FFFFFF' }}>
+              Payment method
+            </div>
+            <CreditCard className="w-4 h-4" style={{ color: '#6B7280' }} />
           </div>
-          <div className="text-sm" style={{ color: 'var(--text-muted)' }}>
+          <div style={{ fontSize: '13px', color: '#9CA3AF' }}>
             Visa •••• 4242
-            <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>Expires 12/26</span>
+            <span style={{ marginLeft: '8px', color: '#6B7280' }}>Expires 12/26</span>
           </div>
           <button
             onClick={openBillingPortal}
-            className="mt-4 text-xs font-medium flex items-center gap-1"
-            style={{ color: 'var(--accent)' }}
+            style={{
+              marginTop: '16px',
+              fontSize: '12px',
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#4ADE80',
+              padding: 0,
+              transition: 'opacity 0.15s',
+            }}
+            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '0.7')}
+            onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
           >
             Update payment method <ExternalLink className="w-3 h-3" />
           </button>

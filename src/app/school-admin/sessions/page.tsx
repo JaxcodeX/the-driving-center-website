@@ -21,15 +21,15 @@ type Session = {
 type FilterTab = 'all' | 'scheduled' | 'completed' | 'canceled'
 
 function statusPillClass(status: string): string {
-  if (status === 'completed') return 'status-completed'
-  if (status === 'canceled') return 'status-pending'
-  return 'status-active'
+  if (status === 'completed') return 'completed'
+  if (status === 'canceled') return 'pending'
+  return 'active'
 }
 
 function borderColor(status: string): string {
-  if (status === 'completed') return 'var(--success)'
+  if (status === 'completed') return '#4ADE80'
   if (status === 'canceled') return '#F97316'
-  return 'var(--accent)'
+  return '#78E4FF'
 }
 
 function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: Session) => void }) {
@@ -46,27 +46,22 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
       const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
 
       if (demoCookie) {
-        // Demo mode: use server-side endpoint
         try {
           const res = await fetch('/api/demo/sessions')
           if (res.ok) {
             const data = await res.json()
             setInstructors(data.instructors || [])
             setSessionTypes(data.sessionTypes || [])
-            setLoading(false)
             return
           }
         } catch { /* fall through */ }
-        setLoading(false)
         return
       }
 
-      // Normal mode
-      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { window.location.href = '/login'; return }
       const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
-      if (!school) { setLoading(false); return }
+      if (!school) return
       const schoolId = school.id
 
       const [i, st] = await Promise.all([
@@ -75,7 +70,6 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
       ])
       setInstructors(i.data || [])
       setSessionTypes(st.data || [])
-      setLoading(false)
     }
     load()
   }, [])
@@ -118,85 +112,186 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
     setLoading(false)
   }
 
-  const inputStyle = {
-    background: 'var(--bg-elevated)',
-    border: '1px solid var(--border)',
-    color: 'var(--text-primary)',
-    outline: 'none' as const,
+  const inputStyle: React.CSSProperties = {
+    background: '#0D0D0D',
+    border: '1px solid #1A1A1A',
+    color: '#FFFFFF',
+    outline: 'none',
     borderRadius: '12px',
+    width: '100%',
+    padding: '12px 16px',
+    fontSize: '14px',
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="w-full max-w-md rounded-2xl p-8 glass-card">
-        <h2 className="text-lg font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Schedule Session</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      zIndex: 50,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '16px',
+      background: 'rgba(0,0,0,0.7)',
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '480px',
+        background: '#0F1117',
+        border: '1px solid #1A1A1A',
+        borderRadius: '16px',
+        padding: '32px',
+      }}>
+        <h2 style={{
+          fontFamily: 'Outfit, sans-serif',
+          fontSize: '18px',
+          fontWeight: '600',
+          color: '#FFFFFF',
+          marginBottom: '24px',
+        }}>
+          Schedule Session
+        </h2>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
-            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Date</label>
+            <label style={{
+              display: 'block',
+              fontSize: '12px',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: '#9CA3AF',
+              marginBottom: '6px',
+            }}>
+              Date
+            </label>
             <input
               type="date"
               value={form.start_date}
               onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))}
               required
-              className="w-full px-4 py-3 text-sm"
               style={inputStyle}
-              onFocus={e => (e.target.style.borderColor = `var(--accent)`)}
-              onBlur={e => (e.target.style.borderColor = 'var(--border)')}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
             />
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Instructor</label>
+            <label style={{
+              display: 'block',
+              fontSize: '12px',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: '#9CA3AF',
+              marginBottom: '6px',
+            }}>
+              Instructor
+            </label>
             <select
               value={form.instructor_id}
               onChange={e => setForm(f => ({ ...f, instructor_id: e.target.value }))}
-              className="w-full px-4 py-3 text-sm"
-              style={inputStyle}
+              style={{ ...inputStyle, cursor: 'pointer' }}
             >
               <option value="">Select instructor</option>
               {instructors.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Session Type</label>
+            <label style={{
+              display: 'block',
+              fontSize: '12px',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: '#9CA3AF',
+              marginBottom: '6px',
+            }}>
+              Session Type
+            </label>
             <select
               value={form.session_type_id}
               onChange={e => setForm(f => ({ ...f, session_type_id: e.target.value }))}
-              className="w-full px-4 py-3 text-sm"
-              style={inputStyle}
+              style={{ ...inputStyle, cursor: 'pointer' }}
             >
               <option value="">Select type</option>
               {sessionTypes.map(st => <option key={st.id} value={st.id}>{st.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Location</label>
+            <label style={{
+              display: 'block',
+              fontSize: '12px',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: '#9CA3AF',
+              marginBottom: '6px',
+            }}>
+              Location
+            </label>
             <input
               type="text"
               value={form.location}
               onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
               placeholder="e.g. 123 Main St"
-              className="w-full px-4 py-3 text-sm"
               style={inputStyle}
-              onFocus={e => (e.target.style.borderColor = `var(--accent)`)}
-              onBlur={e => (e.target.style.borderColor = 'var(--border)')}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
+              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
             />
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Max Seats</label>
+            <label style={{
+              display: 'block',
+              fontSize: '12px',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: '#9CA3AF',
+              marginBottom: '6px',
+            }}>
+              Max Seats
+            </label>
             <input
               type="number"
               value={form.max_seats}
               onChange={e => setForm(f => ({ ...f, max_seats: parseInt(e.target.value) || 10 }))}
               min="1" max="100"
-              className="w-full px-4 py-3 text-sm"
               style={inputStyle}
             />
           </div>
-          <div className="flex gap-3 pt-1">
-            <button type="button" onClick={onClose} className="btn-ghost flex-1 text-center py-3 text-sm font-medium">
+          <div style={{ display: 'flex', gap: '12px', paddingTop: '8px' }}>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                flex: 1,
+                padding: '12px',
+                background: 'transparent',
+                border: '1px solid #1A1A1A',
+                borderRadius: '12px',
+                color: '#FFFFFF',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+              }}
+            >
               Cancel
             </button>
-            <button type="submit" disabled={loading} className="btn-glow flex-1 text-center py-3 text-sm font-semibold disabled:opacity-50">
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                flex: 1,
+                padding: '12px',
+                background: '#4ADE80',
+                border: 'none',
+                borderRadius: '12px',
+                color: '#000000',
+                fontSize: '14px',
+                fontWeight: '700',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.5 : 1,
+              }}
+            >
               {loading ? 'Scheduling...' : 'Schedule Session →'}
             </button>
           </div>
@@ -218,7 +313,6 @@ export default function SessionsPage() {
       const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
 
       if (demoCookie) {
-        // Demo mode: use server-side endpoint (service role)
         try {
           const res = await fetch('/api/demo/sessions')
           if (res.ok) {
@@ -233,7 +327,6 @@ export default function SessionsPage() {
         return
       }
 
-      // Normal mode: use Supabase auth
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
       const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
@@ -271,16 +364,47 @@ export default function SessionsPage() {
     : sessions.filter(s => s.status === activeFilter)
 
   return (
-    <div className="max-w-5xl">
+    <div style={{ maxWidth: '1200px' }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
         <div>
-          <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Sessions</h1>
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{sessions.length} total</p>
+          <h1 style={{
+            fontFamily: 'Outfit, sans-serif',
+            fontSize: '28px',
+            fontWeight: '700',
+            color: '#FFFFFF',
+            marginBottom: '4px',
+          }}>
+            Sessions
+          </h1>
+          <p style={{ fontSize: '14px', color: '#6B7280' }}>
+            {sessions.length} total
+          </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="btn-glow inline-flex items-center gap-2 text-sm"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '10px 20px',
+            background: '#4ADE80',
+            border: 'none',
+            borderRadius: '12px',
+            color: '#000000',
+            fontSize: '14px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            transition: 'transform 0.15s, box-shadow 0.15s',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+            ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px rgba(74,222,128,0.3)'
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
+            ;(e.currentTarget as HTMLElement).style.boxShadow = 'none'
+          }}
         >
           <Plus className="w-4 h-4" />
           New Session
@@ -288,23 +412,33 @@ export default function SessionsPage() {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 mb-6">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
         {filterTabs.map(({ key, label }) => (
           <button
             key={key}
             onClick={() => setActiveFilter(key)}
-            className="text-sm font-semibold px-4 py-2 rounded-full transition-all"
             style={
               activeFilter === key
                 ? {
-                    background: 'var(--accent-dim)',
-                    color: 'var(--accent)',
-                    border: '1px solid var(--accent)',
+                    padding: '8px 16px',
+                    background: 'rgba(74,222,128,0.15)',
+                    color: '#4ADE80',
+                    border: '1px solid #4ADE80',
+                    borderRadius: '999px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
                   }
                 : {
-                    background: 'var(--card-bg)',
-                    color: 'var(--text-muted)',
-                    border: '1px solid var(--border)',
+                    padding: '8px 16px',
+                    background: '#0F1117',
+                    color: '#9CA3AF',
+                    border: '1px solid #1A1A1A',
+                    borderRadius: '999px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'background 0.15s, color 0.15s',
                   }
             }
           >
@@ -313,44 +447,75 @@ export default function SessionsPage() {
         ))}
       </div>
 
-      {/* Calendar / Session List */}
+      {/* Sessions Table */}
       {loading ? (
-        <div className="glass-card text-center py-16">
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading sessions...</p>
+        <div style={{
+          background: '#0F1117',
+          border: '1px solid #1A1A1A',
+          borderRadius: '16px',
+          textAlign: 'center',
+          padding: '64px',
+          color: '#6B7280',
+        }}>
+          <p style={{ fontSize: '14px' }}>Loading sessions...</p>
         </div>
       ) : !filteredSessions.length ? (
-        <div className="glass-card text-center py-16">
-          <Calendar className="w-10 h-10 mx-auto mb-3 opacity-30" style={{ color: 'var(--text-muted)' }} />
-          <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
+        <div style={{
+          background: '#0F1117',
+          border: '1px solid #1A1A1A',
+          borderRadius: '16px',
+          textAlign: 'center',
+          padding: '64px',
+        }}>
+          <Calendar className="w-10 h-10 mx-auto mb-3" style={{ color: '#6B7280', opacity: 0.3 }} />
+          <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '12px' }}>
             {activeFilter === 'all' ? 'No sessions yet' : `No ${activeFilter} sessions`}
           </p>
           {activeFilter === 'all' && (
-            <button onClick={() => setShowModal(true)} className="text-sm font-medium" style={{ color: 'var(--accent)' }}>
+            <button onClick={() => setShowModal(true)} style={{
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#4ADE80',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+            }}>
               Schedule your first session →
             </button>
           )}
         </div>
       ) : (
-        <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-          {/* Calendar header row */}
+        <div style={{
+          background: '#0F1117',
+          border: '1px solid #1A1A1A',
+          borderRadius: '16px',
+          overflow: 'hidden',
+        }}>
+          {/* Table header */}
           <div
-            className="grid px-6 py-3 text-xs font-semibold uppercase tracking-wider"
             style={{
+              display: 'grid',
               gridTemplateColumns: '80px 1fr 120px 100px 80px',
               gap: '16px',
-              color: 'var(--text-muted)',
-              borderBottom: '1px solid var(--border)',
+              padding: '12px 24px',
+              borderBottom: '1px solid #1A1A1A',
             }}
           >
-            <div>Date</div>
-            <div>Session</div>
-            <div>Details</div>
-            <div>Status</div>
-            <div className="text-right">Actions</div>
+            {['Date', 'Session', 'Details', 'Status', ''].map((h, i) => (
+              <div key={i} style={{
+                fontSize: '11px',
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: '#9CA3AF',
+              }}>
+                {h}
+              </div>
+            ))}
           </div>
 
           {/* Session rows */}
-          <div className="divide-y" style={{ borderTop: 'none' }}>
+          <div>
             {filteredSessions.map(session => {
               const date = new Date(session.start_date + 'T12:00:00')
               const pillClass = statusPillClass(session.status)
@@ -359,35 +524,49 @@ export default function SessionsPage() {
               return (
                 <div
                   key={session.id}
-                  className="grid px-6 py-4 items-center text-sm transition-colors"
                   style={{
+                    display: 'grid',
                     gridTemplateColumns: '80px 1fr 120px 100px 80px',
                     gap: '16px',
+                    padding: '16px 24px',
+                    alignItems: 'center',
                     borderLeft: `3px solid ${leftColor}`,
+                    transition: 'background 0.15s',
                   }}
-                  onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'var(--card-bg)')}
+                  onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#13161F')}
                   onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                 >
                   {/* Date */}
-                  <div className="text-center flex-shrink-0">
-                    <div className="text-xs font-semibold uppercase" style={{ color: leftColor }}>
+                  <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                    <div style={{
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      textTransform: 'uppercase',
+                      color: leftColor,
+                    }}>
                       {date.toLocaleDateString('en-US', { month: 'short' })}
                     </div>
-                    <div className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{date.getDate()}</div>
-                    <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    <div style={{
+                      fontFamily: 'Outfit, sans-serif',
+                      fontSize: '28px',
+                      fontWeight: '800',
+                      color: '#FFFFFF',
+                      lineHeight: 1.2,
+                    }}>
+                      {date.getDate()}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#6B7280' }}>
                       {date.toLocaleDateString('en-US', { weekday: 'short' })}
                     </div>
                   </div>
 
                   {/* Session info */}
                   <div>
-                    <div className="font-medium mb-0.5" style={{ color: 'var(--text-primary)' }}>
+                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', marginBottom: '2px' }}>
                       {session.session_type?.name || 'Session'}
                     </div>
-                    <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}>
-                      {session.instructor?.name && (
-                        <span>{session.instructor.name}</span>
-                      )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#6B7280' }}>
+                      {session.instructor?.name && <span>{session.instructor.name}</span>}
                       {session.location && (
                         <>
                           <span>·</span>
@@ -398,29 +577,49 @@ export default function SessionsPage() {
                   </div>
 
                   {/* Details */}
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
-                      <Clock className="w-3 h-3" style={{ color: 'var(--text-muted)' }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#9CA3AF' }}>
+                      <Clock className="w-3 h-3" style={{ color: '#6B7280' }} />
                       {session.session_type?.duration_minutes || 60} min
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
-                      <Users className="w-3 h-3" style={{ color: 'var(--text-muted)' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#9CA3AF' }}>
+                      <Users className="w-3 h-3" style={{ color: '#6B7280' }} />
                       {session.seats_booked}/{session.max_seats} seats
                     </div>
                   </div>
 
                   {/* Status pill */}
                   <div>
-                    <span className={`status-pill ${pillClass}`}>{session.status}</span>
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '4px 12px',
+                      borderRadius: '999px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      background: session.status === 'scheduled' ? 'rgba(74,222,128,0.15)' : session.status === 'completed' ? 'rgba(96,165,250,0.15)' : 'rgba(249,115,22,0.15)',
+                      color: session.status === 'scheduled' ? '#4ADE80' : session.status === 'completed' ? '#60A5FA' : '#F97316',
+                    }}>
+                      {session.status}
+                    </span>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center justify-end gap-2">
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
                     <button
                       onClick={() => handleStatusToggle(session.id, session.status)}
-                      className="p-2 rounded-lg transition-colors"
-                      style={{ color: 'var(--text-muted)' }}
-                      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'var(--bg-elevated)')}
+                      style={{
+                        padding: '8px',
+                        borderRadius: '8px',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#9CA3AF',
+                        display: 'flex',
+                        alignItems: 'center',
+                        transition: 'background 0.15s',
+                      }}
+                      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#13161F')}
                       onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                       title={session.status === 'scheduled' ? 'Cancel session' : 'Reactivate session'}
                     >

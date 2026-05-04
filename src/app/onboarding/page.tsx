@@ -74,7 +74,7 @@ const pillInput = {
 // ─── Page Card ───────────────────────────────────────────────────────────────
 function PageCard({ children }: { children: React.ReactNode }) {
   return (
-    <div className="glass-card" style={{ maxWidth: '480px', margin: '0 auto', width: '100%' }}>
+    <div style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '24px', maxWidth: '480px', margin: '0 auto', width: '100%' }}>
       {children}
     </div>
   )
@@ -181,7 +181,7 @@ function OnboardingContent() {
         <StepIndicator current={step} />
 
         {/* Card */}
-        <div className="glass-card" style={{ padding: '32px 28px' }}>
+        <div style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '32px 28px' }}>
 
           {/* Step 1 — School Info */}
           {step === 1 && (
@@ -203,8 +203,7 @@ function OnboardingContent() {
                     className="input-pill" style={{ ...pillInput, borderRadius: '12px' }} />
                 </div>
                 <button onClick={handleStep1} disabled={loading}
-                  className="btn-glow w-full justify-center mt-2"
-                  style={{ padding: '14px 24px' }}>
+                  style={{ background: '#4ADE80', color: '#000', padding: '14px 24px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: 'pointer', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
                   Continue <ArrowRight className="w-4 h-4" />
                 </button>
                 <button onClick={() => setStep(4)} className="w-full text-center text-xs" style={{ color: 'var(--text-muted)' }}>
@@ -237,8 +236,7 @@ function OnboardingContent() {
                     className="input-pill" style={pillInput} />
                 </div>
                 <button onClick={handleStep2} disabled={loading || !instructorName || !instructorEmail}
-                  className="btn-glow w-full justify-center mt-2 disabled:opacity-50"
-                  style={{ padding: '14px 24px' }}>
+                  style={{ background: '#4ADE80', color: '#000', padding: '14px 24px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: 'pointer', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', opacity: (loading || !instructorName || !instructorEmail) ? 0.5 : 1 }}>
                   Continue <ArrowRight className="w-4 h-4" />
                 </button>
                 <button onClick={() => setStep(4)} className="w-full text-center text-xs" style={{ color: 'var(--text-muted)' }}>
@@ -278,8 +276,7 @@ function OnboardingContent() {
                   </div>
                 </div>
                 <button onClick={handleStep3} disabled={loading || !sessionName}
-                  className="btn-glow w-full justify-center mt-2 disabled:opacity-50"
-                  style={{ padding: '14px 24px' }}>
+                  style={{ background: '#4ADE80', color: '#000', padding: '14px 24px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: 'pointer', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', opacity: (loading || !sessionName) ? 0.5 : 1 }}>
                   Finish setup <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -302,8 +299,7 @@ function OnboardingContent() {
                 Your school is ready. Head to your dashboard to start managing students and sessions.
               </p>
               <button onClick={handleDone}
-                className="btn-glow w-full justify-center"
-                style={{ padding: '14px 24px' }}>
+                style={{ background: '#4ADE80', color: '#000', padding: '14px 24px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: 'pointer', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
                 Go to dashboard <ArrowRight className="w-4 h-4" />
               </button>
             </div>
