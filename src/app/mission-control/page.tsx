@@ -68,7 +68,7 @@ export default function MissionControlPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen relative overflow-hidden" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+      <div className="min-h-screen relative overflow-hidden" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)' }}>
         <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
           <p style={{ color: '#94A3B8' }}>Loading mission control...</p>
         </div>
@@ -77,7 +77,7 @@ export default function MissionControlPage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+    <div className="min-h-screen relative overflow-hidden" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)' }}>
       <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
 
         {/* Header */}
@@ -197,7 +197,7 @@ function TaskCard({ task }: { task: McTask }) {
   const projectColors: Record<string, { bg: string; text: string }> = {
     saas: { bg: 'rgba(0,111,255,0.1)', text: '#006FFF' },
     fso: { bg: 'rgba(129,140,248,0.1)', text: '#818CF8' },
-    personal: { bg: 'rgba(255,140,66,0.1)', text: '#FF8C42' },
+    personal: { bg: 'rgba(74,222,128,0.1)', text: '#4ADE80' },
     admin: { bg: 'rgba(255,255,255,0.05)', text: '#94A3B8' },
   }
   const pColors = projectColors[task.project] ?? projectColors.admin

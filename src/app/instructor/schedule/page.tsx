@@ -119,7 +119,7 @@ export default function InstructorSchedulePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)' }}>
         <p className="text-sm" style={{ color: '#94A3B8' }}>Loading your schedule...</p>
       </div>
     )
@@ -127,19 +127,19 @@ export default function InstructorSchedulePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-6" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-6" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)' }}>
         <p className="text-sm text-center" style={{ color: '#F87171' }}>{error}</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+    <div className="min-h-screen relative overflow-hidden" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)' }}>
       <div className="max-w-lg mx-auto px-6 py-8 relative z-10">
 
         {/* Header */}
         <div className="mb-6">
-          <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: '#FF8C42', fontFamily: 'Outfit, sans-serif' }}>Instructor Schedule</div>
+          <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: '#4ADE80', fontFamily: 'Outfit, sans-serif' }}>Instructor Schedule</div>
           <h1 className="text-2xl font-bold" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>{instructorName}</h1>
           <p className="text-sm mt-0.5" style={{ color: '#94A3B8' }}>{schoolName}</p>
         </div>
@@ -160,7 +160,7 @@ export default function InstructorSchedulePage() {
                 className="glass-card"
                 style={{
                   padding: '16px',
-                  border: dayAvail.active ? '1px solid rgba(255,140,66,0.3)' : undefined,
+                  border: dayAvail.active ? '1px solid rgba(74,222,128,0.3)' : undefined,
                 }}
               >
                 {/* Day header */}
@@ -173,7 +173,7 @@ export default function InstructorSchedulePage() {
                         height: 24,
                         borderRadius: 12,
                         border: 'none',
-                        background: dayAvail.active ? '#FF8C42' : '#18181B',
+                        background: dayAvail.active ? '#4ADE80' : '#18181B',
                         cursor: 'pointer',
                         position: 'relative',
                         transition: 'background 0.2s',
@@ -195,7 +195,7 @@ export default function InstructorSchedulePage() {
                     <span className="text-sm font-medium" style={{ color: '#ffffff', fontFamily: 'Outfit, sans-serif' }}>{day.label}</span>
                   </div>
                   {dayAvail.active && (
-                    <span className="text-xs" style={{ color: '#FF8C42' }}>
+                    <span className="text-xs" style={{ color: '#4ADE80' }}>
                       {dayAvail.start_time} – {dayAvail.end_time}
                     </span>
                   )}
@@ -250,7 +250,7 @@ export default function InstructorSchedulePage() {
           disabled={saving}
           className="mt-5 w-full flex items-center justify-center gap-2 font-semibold py-3 rounded-2xl transition-opacity disabled:opacity-50"
           style={{
-            background: 'linear-gradient(135deg, #FF8C42, #FF6B2B)',
+            background: 'linear-gradient(135deg, #4ADE80, #22C55E)',
             color: '#ffffff',
             fontFamily: 'Outfit, sans-serif',
           }}

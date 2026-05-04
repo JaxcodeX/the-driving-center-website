@@ -36,13 +36,13 @@ export default function DemoPage() {
             padding: '6px 14px', borderRadius: '100px',
             border: '1px solid rgba(255,140,66,0.3)',
             background: 'rgba(255,140,66,0.08)',
-            fontSize: '11px', fontWeight: '600', color: '#FF8C42',
+            fontSize: '11px', fontWeight: '600', color: '#4ADE80',
             textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '24px',
             fontFamily: 'Inter, sans-serif',
           }}>
             <span style={{
               width: '6px', height: '6px', borderRadius: '50%',
-              background: '#FF8C42',
+              background: '#4ADE80',
             }} />
             Live Demo
           </div>
@@ -71,7 +71,7 @@ export default function DemoPage() {
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
             <span style={{
-              fontSize: '12px', fontWeight: '600', color: '#FF8C42',
+              fontSize: '12px', fontWeight: '600', color: '#4ADE80',
               textTransform: 'uppercase', letterSpacing: '0.08em',
             }}>01</span>
             <h2 style={{
@@ -99,7 +99,7 @@ export default function DemoPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{
                   width: '32px', height: '32px', borderRadius: '8px',
-                  background: '#FF8C42', display: 'flex',
+                  background: '#4ADE80', display: 'flex',
                   alignItems: 'center', justifyContent: 'center',
                   fontWeight: '700', fontSize: '12px', color: '#FFFFFF',
                 }}>DC</div>
@@ -156,7 +156,7 @@ export default function DemoPage() {
                 <span style={{ fontSize: '13px', fontWeight: '600', color: 'rgba(255,255,255,0.6)', fontFamily: 'Inter, sans-serif' }}>
                   Recent Student Activity
                 </span>
-                <span style={{ fontSize: '12px', color: '#FF8C42', cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>View all →</span>
+                <span style={{ fontSize: '12px', color: '#4ADE80', cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>View all →</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {[
@@ -175,7 +175,7 @@ export default function DemoPage() {
                         width: '28px', height: '28px', borderRadius: '50%',
                         background: 'rgba(255,140,66,0.15)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '11px', fontWeight: '600', color: '#FF8C42',
+                        fontSize: '11px', fontWeight: '600', color: '#4ADE80',
                       }}>{row.name[0]}</div>
                       <span style={{ fontSize: '13px', fontWeight: '500', fontFamily: 'Inter, sans-serif' }}>{row.name}</span>
                     </div>
@@ -198,7 +198,7 @@ export default function DemoPage() {
       }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-            <span style={{ fontSize: '12px', fontWeight: '600', color: '#FF8C42', textTransform: 'uppercase', letterSpacing: '0.08em' }}>02</span>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ADE80', textTransform: 'uppercase', letterSpacing: '0.08em' }}>02</span>
             <h2 style={{ fontSize: '24px', fontWeight: '700', fontFamily: 'Outfit, sans-serif', color: '#FFFFFF' }}>Student Booking Flow</h2>
           </div>
           <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.45)', maxWidth: '480px', marginLeft: '36px', marginBottom: '40px', fontFamily: 'Inter, sans-serif' }}>
@@ -243,12 +243,12 @@ export default function DemoPage() {
                 <div style={{
                   position: 'absolute', top: '-14px', left: '20px',
                   width: '24px', height: '24px', borderRadius: '50%',
-                  background: '#FF8C42',
+                  background: '#4ADE80',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: '11px', fontWeight: '700', color: '#FFFFFF',
                 }}>{step.num}</div>
                 <div style={{
-                  fontSize: '11px', fontWeight: '600', color: '#FF8C42',
+                  fontSize: '11px', fontWeight: '600', color: '#4ADE80',
                   marginTop: '4px', marginBottom: '12px', fontFamily: 'Inter, sans-serif',
                 }}>{step.title}</div>
 
@@ -294,7 +294,7 @@ export default function DemoPage() {
       }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-            <span style={{ fontSize: '12px', fontWeight: '600', color: '#FF8C42', textTransform: 'uppercase', letterSpacing: '0.08em' }}>03</span>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ADE80', textTransform: 'uppercase', letterSpacing: '0.08em' }}>03</span>
             <h2 style={{ fontSize: '24px', fontWeight: '700', fontFamily: 'Outfit, sans-serif', color: '#FFFFFF' }}>Automated SMS Reminders</h2>
           </div>
           <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.45)', maxWidth: '480px', marginLeft: '36px', marginBottom: '40px', fontFamily: 'Inter, sans-serif' }}>
@@ -322,7 +322,7 @@ export default function DemoPage() {
                     padding: '4px 12px', borderRadius: '100px',
                     background: 'rgba(255,140,66,0.1)',
                     border: '1px solid rgba(255,140,66,0.2)',
-                    fontSize: '11px', fontWeight: '600', color: '#FF8C42',
+                    fontSize: '11px', fontWeight: '600', color: '#4ADE80',
                   }}>{reminder.time}</div>
                   <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif' }}>{reminder.sub}</span>
                 </div>
@@ -343,7 +343,7 @@ export default function DemoPage() {
                         <span style={{ fontSize: '13px', fontWeight: '600', color: '#FFFFFF', fontFamily: 'Inter, sans-serif' }}>The Driving Center</span>
                         <div style={{ display: 'flex', gap: '4px' }}>
                           {[1, 2, 3].map(d => (
-                            <div key={d} style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#FF8C42' }} />
+                            <div key={d} style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ADE80' }} />
                           ))}
                         </div>
                       </div>
@@ -381,7 +381,7 @@ export default function DemoPage() {
       }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-            <span style={{ fontSize: '12px', fontWeight: '600', color: '#FF8C42', textTransform: 'uppercase', letterSpacing: '0.08em' }}>04</span>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ADE80', textTransform: 'uppercase', letterSpacing: '0.08em' }}>04</span>
             <h2 style={{ fontSize: '24px', fontWeight: '700', fontFamily: 'Outfit, sans-serif', color: '#FFFFFF' }}>TCA Compliance Tracking</h2>
           </div>
           <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.45)', maxWidth: '480px', marginLeft: '36px', marginBottom: '40px', fontFamily: 'Inter, sans-serif' }}>
@@ -399,7 +399,7 @@ export default function DemoPage() {
                   width: '48px', height: '48px', borderRadius: '50%',
                   background: 'rgba(255,140,66,0.15)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '16px', fontWeight: '700', color: '#FF8C42',
+                  fontSize: '16px', fontWeight: '700', color: '#4ADE80',
                 }}>JM</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '15px', fontWeight: '600', color: '#FFFFFF', fontFamily: 'Inter, sans-serif' }}>Jessica Martinez</div>
@@ -420,7 +420,7 @@ export default function DemoPage() {
                   <span style={{ color: '#FFFFFF', fontWeight: '600' }}>4 / 6 hrs</span>
                 </div>
                 <div style={{ height: '6px', borderRadius: '100px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: '66%', borderRadius: '100px', background: '#FF8C42' }} />
+                  <div style={{ height: '100%', width: '66%', borderRadius: '100px', background: '#4ADE80' }} />
                 </div>
               </div>
 
@@ -431,7 +431,7 @@ export default function DemoPage() {
                   <span style={{ color: '#FFFFFF', fontWeight: '600' }}>2 / 6 hrs</span>
                 </div>
                 <div style={{ height: '6px', borderRadius: '100px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: '33%', borderRadius: '100px', background: '#FF8C42' }} />
+                  <div style={{ height: '100%', width: '33%', borderRadius: '100px', background: '#4ADE80' }} />
                 </div>
               </div>
 
@@ -445,11 +445,11 @@ export default function DemoPage() {
                   background: 'rgba(255,255,255,0.08)', overflow: 'hidden',
                   display: 'flex',
                 }}>
-                  <div style={{ height: '100%', width: '50%', background: '#FF8C42' }} />
+                  <div style={{ height: '100%', width: '50%', background: '#4ADE80' }} />
                   <div style={{ height: '100%', width: '2px', background: 'rgba(251,191,36,0.5)', marginLeft: '-1px' }} />
                   <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)' }} />
                 </div>
-                <span style={{ fontSize: '12px', fontWeight: '600', color: '#FF8C42', fontFamily: 'Inter, sans-serif' }}>50% complete</span>
+                <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ADE80', fontFamily: 'Inter, sans-serif' }}>50% complete</span>
               </div>
             </div>
 
@@ -528,7 +528,7 @@ export default function DemoPage() {
           <Link href='/signup' style={{
             display: 'inline-flex', alignItems: 'center', gap: '10px',
             padding: '14px 28px', borderRadius: '12px',
-            background: '#FF8C42', color: '#FFFFFF',
+            background: '#4ADE80', color: '#FFFFFF',
             fontSize: '15px', fontWeight: '700', textDecoration: 'none',
             fontFamily: 'Inter, sans-serif',
           }}>

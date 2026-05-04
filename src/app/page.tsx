@@ -262,15 +262,15 @@ function Hero() {
             <Link href='/signup' style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
               padding: '14px 32px',
-              background: 'linear-gradient(135deg, #FF8C42, #FF6B2B)',
+              background: 'linear-gradient(135deg, #4ADE80, #22C55E)',
               color: '#FFFFFF', fontWeight: '700',
               fontSize: '15px', borderRadius: '12px', textDecoration: 'none',
-              boxShadow: '0 4px 24px rgba(255,140,66,0.4)',
+              boxShadow: '0 4px 24px rgba(74,222,128,0.4)',
               transition: 'transform 0.2s, box-shadow 0.2s',
               fontFamily: "'Inter', sans-serif",
             }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(255,140,66,0.5)' }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(255,140,66,0.4)' }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(74,222,128,0.5)' }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(74,222,128,0.4)' }}
             >
               Start free trial <ArrowRight size={16} />
             </Link>
@@ -400,8 +400,8 @@ function Features() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
-        {features.map((f) => (
-          <div key={f.title} className='feature-card'>
+        {features.map((f, i) => (
+          <div key={f.title} className='feature-card' data-animate style={{ animationDelay: `${i * 100}ms` }}>
             <div className='feature-icon'>
               {f.icon}
             </div>
@@ -448,13 +448,7 @@ function HowItWorks() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px', position: 'relative' }}>
         {steps.map((step, i) => (
-          <div key={step.num} style={{
-            background: '#0F1117', borderRadius: '16px', padding: '40px 32px',
-            border: '1px solid #1A1A1A',
-            display: 'flex', flexDirection: 'column', gap: '20px',
-            position: 'relative',
-            transition: 'transform 0.3s, border-color 0.3s',
-          }}
+          <div key={step.num} className='step-card' data-animate style={{ animationDelay: `${i * 150}ms`, background: '#0F1117', borderRadius: '16px', padding: '40px 32px', border: '1px solid #1A1A1A', display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative', transition: 'transform 0.3s, border-color 0.3s' }}
             onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = 'translateY(-4px)'; el.style.borderColor = '#2A2A3A' }}
             onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = 'translateY(0)'; el.style.borderColor = '#1A1A1A' }}
           >
@@ -726,12 +720,7 @@ function Testimonials() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px', maxWidth: '900px', margin: '0 auto' }}>
         {testimonials.map((t, i) => (
-          <div key={t.name} style={{
-            background: '#0F1117', borderRadius: '16px', padding: '32px',
-            border: '1px solid #1A1A1A',
-            display: 'flex', flexDirection: 'column', gap: '16px',
-            transition: 'transform 0.3s, border-color 0.3s',
-          }}
+          <div key={t.name} className='testimonial-card' data-animate style={{ animationDelay: `${i * 120}ms`, background: '#0F1117', borderRadius: '16px', padding: '32px', border: '1px solid #1A1A1A', display: 'flex', flexDirection: 'column', gap: '16px', transition: 'transform 0.3s, border-color 0.3s' }}
             onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = 'translateY(-4px)'; el.style.borderColor = '#2A2A3A' }}
             onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = 'translateY(0)'; el.style.borderColor = '#1A1A1A' }}
           >
@@ -809,24 +798,24 @@ function Pricing() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', alignItems: 'start' }}>
-        {plans.map(p => (
-          <div key={p.name} style={{
-            background: p.highlighted ? '#13161F' : '#0F1117',
-            borderRadius: '24px', padding: '32px',
-            border: p.highlighted ? '1px solid rgba(255,140,66,0.4)' : '1px solid #1A1A1A',
-            boxShadow: p.highlighted ? '0 0 60px rgba(255,140,66,0.08)' : 'none',
-            display: 'flex', flexDirection: 'column',
-            position: 'relative',
-            transition: 'transform 0.3s',
-          }}
-            onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px)'}
-            onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'}
+        {plans.map((p, i) => (
+          <div key={p.name} className='pricing-card' data-animate style={{ animationDelay: `${i * 100}ms`, background: p.highlighted ? '#13161F' : '#0F1117', borderRadius: '24px', padding: '32px', border: p.highlighted ? '1px solid rgba(74,222,128,0.3)' : '1px solid #1A1A1A', boxShadow: p.highlighted ? '0 0 60px rgba(74,222,128,0.1)' : 'none', display: 'flex', flexDirection: 'column', position: 'relative', transition: 'transform 0.3s, box-shadow 0.3s' }}
+            onMouseEnter={e => {
+              const el = e.currentTarget as HTMLDivElement
+              el.style.transform = 'translateY(-6px)'
+              el.style.boxShadow = p.highlighted ? '0 20px 60px rgba(74,222,128,0.15)' : '0 12px 40px rgba(0,0,0,0.4)'
+            }}
+            onMouseLeave={e => {
+              const el = e.currentTarget as HTMLDivElement
+              el.style.transform = 'translateY(0)'
+              el.style.boxShadow = p.highlighted ? '0 0 60px rgba(74,222,128,0.1)' : 'none'
+            }}
           >
             {p.highlighted && (
               <div style={{
                 position: 'absolute', top: '-1px', left: '20px', right: '20px',
                 height: '2px',
-                background: 'linear-gradient(90deg, transparent, #FF8C42, transparent)',
+                background: 'linear-gradient(90deg, transparent, #4ADE80, transparent)',
                 borderRadius: '0 0 2px 2px',
               }} />
             )}
@@ -835,9 +824,9 @@ function Pricing() {
               <span style={{
                 display: 'inline-block', fontSize: '11px', fontWeight: '700',
                 padding: '4px 12px', borderRadius: '999px',
-                background: 'linear-gradient(135deg, rgba(255,140,66,0.2), rgba(255,107,43,0.2))',
-                color: '#FF8C42', letterSpacing: '0.05em', marginBottom: '16px', alignSelf: 'flex-start',
-                border: '1px solid rgba(255,140,66,0.3)',
+                background: 'linear-gradient(135deg, rgba(74,222,128,0.2), rgba(34,197,94,0.2))',
+                color: '#4ADE80', letterSpacing: '0.05em', marginBottom: '16px', alignSelf: 'flex-start',
+                border: '1px solid rgba(74,222,128,0.3)',
               }}>
                 Most Popular
               </span>
@@ -1079,6 +1068,25 @@ export default function HomePage() {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'dark')
     document.body.style.background = '#050505'
+
+    // Scroll animation observer
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    )
+
+    // Observe all [data-animate] elements
+    const animatables = document.querySelectorAll('[data-animate]')
+    animatables.forEach((el) => observer.observe(el))
+
+    return () => observer.disconnect()
   }, [])
 
   return (
@@ -1088,6 +1096,34 @@ export default function HomePage() {
           from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes fadeInScale {
+          from { opacity: 0; transform: scale(0.95) translateY(20px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes slideInLeft {
+          from { opacity: 0; transform: translateX(-24px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Default: hidden until viewport intersection */
+        [data-animate] {
+          opacity: 0;
+        }
+        [data-animate].visible {
+          animation: fadeInUp 0.6s ease-out forwards;
+        }
+        [data-animate].visible.scale {
+          animation: fadeInScale 0.6s ease-out forwards;
+        }
+        [data-animate].visible.slide {
+          animation: slideInLeft 0.6s ease-out forwards;
+        }
+
+        /* Stagger siblings */
+        [data-animate] ~ [data-animate] {
+          /* handled via animation-delay inline */
+        }
+
         .hero-content { animation: fadeInUp 0.8s ease-out forwards; }
         .hero-cta { animation: fadeInUp 0.8s ease-out 0.2s forwards; opacity: 0; }
         .hero-image { animation: fadeInUp 0.8s ease-out 0.35s forwards; opacity: 0; }
@@ -1101,7 +1137,7 @@ export default function HomePage() {
         .feature-card:hover {
           transform: translateY(-4px);
           border-color: #2A2A3A;
-          box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+          box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(74,222,128,0.08);
         }
         .feature-icon {
           width: 48px; height: 48px; border-radius: 14px;
@@ -1109,6 +1145,50 @@ export default function HomePage() {
           border: 1px solid rgba(74,222,128,0.15);
           display: flex; align-items: center; justify-content: center;
           color: #4ADE80;
+        }
+
+        .step-card {
+          background: #0F1117; border-radius: 16px; padding: 40px 32px;
+          border: 1px solid #1A1A1A; display: flex; flex-direction: column; gap: 20px;
+          position: relative;
+          transition: transform 0.3s, border-color 0.3s;
+        }
+        .step-card:hover {
+          transform: translateY(-4px);
+          border-color: #2A2A3A;
+        }
+
+        .testimonial-card {
+          background: #0F1117; border-radius: 16px; padding: 32px;
+          border: 1px solid #1A1A1A; display: flex; flex-direction: column; gap: 16px;
+          transition: transform 0.3s, border-color 0.3s;
+        }
+        .testimonial-card:hover {
+          transform: translateY(-4px);
+          border-color: #2A2A3A;
+        }
+
+        .pricing-card {
+          background: #0F1117; border-radius: 24px; padding: 32px;
+          border: 1px solid #1A1A1A; display: flex; flex-direction: column;
+          position: relative;
+          transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .pricing-card:hover {
+          transform: translateY(-6px);
+        }
+
+        /* Warm bottom glow */
+        .warm-glow {
+          position: fixed;
+          bottom: 0; left: 0; right: 0; height: 300px;
+          background: radial-gradient(ellipse at 30% 100%, rgba(74,222,128,0.04) 0%, transparent 60%);
+          pointer-events: none; z-index: 0;
+        }
+
+        /* Green accent in hero */
+        .hero-glow {
+          background: radial-gradient(ellipse at center, rgba(74,222,128,0.12) 0%, transparent 65%) !important;
         }
 
         @media (max-width: 768px) {
@@ -1130,6 +1210,7 @@ export default function HomePage() {
       <FAQ />
       <CTASection />
       <Footer />
+      <div className="warm-glow" />
 
       <style>{`
         @media (max-width: 768px) {

@@ -250,7 +250,7 @@ const GLASS_BG = 'rgba(255,255,255,0.03)'
 const GLASS_BORDER = 'rgba(255,255,255,0.06)'
 const GLASS_BLUR = 'blur(24px)'
 const TEXT_SECONDARY = '#9CA3AF'
-const ACCENT_ORANGE = '#FF8C42'
+const ACCENT_ORANGE = '#4ADE80'
 const CARD_SHADOW = '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)'
 
 export default function StudentsPage() {
@@ -465,7 +465,7 @@ export default function StudentsPage() {
               <button onClick={() => setShowModal(true)} style={{
                 fontSize: '14px',
                 fontWeight: '500',
-                color: ACCENT_ORANGE,
+                color: '#4ADE80',
                 background: 'transparent',
                 border: 'none',
                 cursor: 'pointer',

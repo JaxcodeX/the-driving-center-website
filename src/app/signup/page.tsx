@@ -65,7 +65,7 @@ export default function SignupPage() {
       }}>
         <div style={{
           width: '32px', height: '32px', borderRadius: '10px',
-          background: '#FF8C42', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: '#4ADE80', display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           <svg width='16' height='16' viewBox='0 0 16 16' fill='none'>
             <path d='M8 2L13 5.5H3L8 2Z' fill='white' />
@@ -92,7 +92,7 @@ export default function SignupPage() {
                 <div
                   style={{
                     width: '40px', height: '1px', margin: '0 8px',
-                    background: i <= 0 ? 'rgba(255,255,255,0.06)' : '#FF8C42',
+                    background: i <= 0 ? 'rgba(255,255,255,0.06)' : '#4ADE80',
                   }}
                 />
               )}
@@ -102,7 +102,7 @@ export default function SignupPage() {
                     width: '32px', height: '32px', borderRadius: '50%',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '13px', fontWeight: '700',
-                    background: i === 0 ? '#FF8C42' : 'rgba(255,255,255,0.03)',
+                    background: i === 0 ? '#4ADE80' : 'rgba(255,255,255,0.03)',
                     color: i === 0 ? '#FFFFFF' : 'rgba(255,255,255,0.45)',
                     border: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.06)',
                     fontFamily: 'Inter, sans-serif',
@@ -157,7 +157,7 @@ export default function SignupPage() {
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none',
                 transition: 'border-color 0.2s',
               }}
-              onFocus={e => (e.target.style.borderColor = '#FF8C42')}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
               onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
             />
           </div>
@@ -186,7 +186,7 @@ export default function SignupPage() {
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none',
                 transition: 'border-color 0.2s',
               }}
-              onFocus={e => (e.target.style.borderColor = '#FF8C42')}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
               onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
             />
           </div>
@@ -212,7 +212,7 @@ export default function SignupPage() {
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none',
                 transition: 'border-color 0.2s',
               }}
-              onFocus={e => (e.target.style.borderColor = '#FF8C42')}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
               onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
             />
           </div>
@@ -235,7 +235,7 @@ export default function SignupPage() {
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none',
                 transition: 'border-color 0.2s',
               }}
-              onFocus={e => (e.target.style.borderColor = '#FF8C42')}
+              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
               onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
             />
           </div>
@@ -256,7 +256,7 @@ export default function SignupPage() {
             disabled={loading}
             style={{
               width: '100%', height: '50px', borderRadius: '12px',
-              background: '#FF8C42', color: '#FFFFFF',
+              background: '#4ADE80', color: '#FFFFFF',
               fontSize: '14px', fontWeight: '700', fontFamily: 'Inter, sans-serif',
               border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
@@ -278,7 +278,7 @@ export default function SignupPage() {
         fontSize: '14px', color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif',
       }}>
         Already have an account?{' '}
-        <Link href='/login' style={{ color: '#FF8C42', fontWeight: '600', textDecoration: 'none' }}>
+        <Link href='/login' style={{ color: '#4ADE80', fontWeight: '600', textDecoration: 'none' }}>
           Sign in
         </Link>
       </p>

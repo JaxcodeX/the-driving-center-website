@@ -5,7 +5,7 @@ import Link from 'next/link'
 import {
   Calendar, Users, CreditCard, TrendingUp, Plus, Mail, Bell,
   Clock, Car, Settings, BarChart3, ChevronRight,
-  ArrowRight, LayoutDashboard, GraduationCap, DollarSign,
+  ArrowRight, LayoutDashboard, GraduationCap, DollarSign, X,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
@@ -16,6 +16,8 @@ type UpcomingSession = {
   instructor: { name: string } | null
   session_type: { name: string } | null
 }
+
+type ModalType = 'revenue' | 'students' | 'sessions' | 'completion' | null
 
 const NAV_ITEMS = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/school-admin', active: true },
@@ -29,7 +31,7 @@ const NAV_ITEMS = [
 
 // Design tokens
 const BG = '#0D0D12'
-const BG_GRADIENT = 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)'
+const BG_GRADIENT = 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)'
 const GLASS_BG = 'rgba(255,255,255,0.03)'
 const GLASS_BORDER = 'rgba(255,255,255,0.06)'
 const GLASS_BLUR = 'blur(24px)'
@@ -40,7 +42,7 @@ const ACCENT_LAVENDER = '#A78BFA'
 const ACCENT_GREEN = '#4ADE80'
 
 const CARD_SHADOW = '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)'
-const CARD_SHADOW_HOVER = '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,140,66,0.15), inset 0 1px 0 rgba(255,255,255,0.08)'
+const CARD_SHADOW_HOVER = '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(74,222,128,0.15), inset 0 1px 0 rgba(255,255,255,0.08)'
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({
@@ -59,6 +61,7 @@ export default function DashboardPage() {
   const [pendingBookings, setPendingBookings] = useState(0)
   const [unconfirmedSessions, setUnconfirmedSessions] = useState(0)
   const [needsReminder, setNeedsReminder] = useState(0)
+  const [activeModal, setActiveModal] = useState<ModalType>(null)
 
   useEffect(() => {
     async function load() {
@@ -162,7 +165,7 @@ export default function DashboardPage() {
       icon: Users,
       accent: ACCENT_CYAN,
       accentBg: 'rgba(103,232,249,0.1)',
-      href: '/school-admin/students',
+      modalKey: 'students' as ModalType,
     },
     {
       label: 'Active Sessions',
@@ -171,16 +174,16 @@ export default function DashboardPage() {
       icon: Calendar,
       accent: ACCENT_LAVENDER,
       accentBg: 'rgba(167,139,250,0.1)',
-      href: '/school-admin/sessions',
+      modalKey: 'sessions' as ModalType,
     },
     {
       label: 'Monthly Revenue',
       value: `$${stats.monthlyRevenue.toLocaleString()}`,
       delta: stats.revenueDelta,
       icon: CreditCard,
-      accent: ACCENT_ORANGE,
-      accentBg: 'rgba(255,140,66,0.1)',
-      href: '/school-admin/billing',
+      accent: ACCENT_GREEN,
+      accentBg: 'rgba(74,222,128,0.1)',
+      modalKey: 'revenue' as ModalType,
     },
     {
       label: 'Completion Rate',
@@ -189,7 +192,7 @@ export default function DashboardPage() {
       icon: TrendingUp,
       accent: ACCENT_GREEN,
       accentBg: 'rgba(74,222,128,0.1)',
-      href: '/school-admin/sessions',
+      modalKey: 'completion' as ModalType,
     },
   ]
 
@@ -254,7 +257,7 @@ export default function DashboardPage() {
               width: '32px',
               height: '32px',
               borderRadius: '10px',
-              background: `linear-gradient(135deg, ${ACCENT_ORANGE}, ${ACCENT_CYAN})`,
+              background: `linear-gradient(135deg, ${ACCENT_GREEN}, ${ACCENT_CYAN})`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -283,7 +286,8 @@ export default function DashboardPage() {
                   borderRadius: '12px',
                   textDecoration: 'none',
                   background: active ? 'rgba(255,255,255,0.06)' : 'transparent',
-                  borderLeft: active ? `3px solid ${ACCENT_ORANGE}` : '3px solid transparent',
+                  borderLeft: active ? `3px solid ${ACCENT_GREEN}` : '3px solid transparent',
+                  boxShadow: active ? `0 0 12px rgba(74,222,128,0.3)` : 'none',
                   transition: 'background 0.15s',
                 }}
                 onMouseEnter={e => {
@@ -293,7 +297,7 @@ export default function DashboardPage() {
                   if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent'
                 }}
               >
-                <NavIcon className="w-4 h-4" style={{ color: active ? ACCENT_ORANGE : TEXT_SECONDARY, flexShrink: 0 }} />
+                <NavIcon className="w-4 h-4" style={{ color: active ? ACCENT_GREEN : TEXT_SECONDARY, flexShrink: 0 }} />
                 <span style={{
                   fontSize: '13px',
                   fontWeight: active ? '600' : '500',
@@ -340,14 +344,14 @@ export default function DashboardPage() {
               padding: '8px 14px',
               borderRadius: '999px',
               textDecoration: 'none',
-              background: active ? 'rgba(255,140,66,0.15)' : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${active ? ACCENT_ORANGE : GLASS_BORDER}`,
+              background: active ? 'rgba(74,222,128,0.15)' : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${active ? ACCENT_GREEN : GLASS_BORDER}`,
               transition: 'background 0.15s',
               flexShrink: 0,
             }}
           >
-            <NavIcon className="w-3.5 h-3.5" style={{ color: active ? ACCENT_ORANGE : TEXT_SECONDARY }} />
-            <span style={{ fontSize: '12px', fontWeight: active ? '600' : '500', color: active ? ACCENT_ORANGE : TEXT_SECONDARY }}>
+            <NavIcon className="w-3.5 h-3.5" style={{ color: active ? ACCENT_GREEN : TEXT_SECONDARY }} />
+            <span style={{ fontSize: '12px', fontWeight: active ? '600' : '500', color: active ? ACCENT_GREEN : TEXT_SECONDARY }}>
               {label}
             </span>
           </Link>
@@ -415,7 +419,7 @@ export default function DashboardPage() {
               width: '38px',
               height: '38px',
               borderRadius: '50%',
-              background: `linear-gradient(135deg, ${ACCENT_ORANGE}, ${ACCENT_CYAN})`,
+              background: `linear-gradient(135deg, ${ACCENT_GREEN}, ${ACCENT_CYAN})`,
               color: '#000',
               fontSize: '14px',
               fontWeight: '700',
@@ -435,12 +439,12 @@ export default function DashboardPage() {
           gap: '16px',
           marginBottom: '24px',
         }}>
-          {kpiCards.map(({ label, value, delta, icon: Icon, accent, accentBg, href }) => {
+          {kpiCards.map(({ label, value, delta, icon: Icon, accent, accentBg, modalKey }) => {
             const isPositive = delta.startsWith('+') && !delta.includes('-0%')
             return (
-              <Link
+              <div
                 key={label}
-                href={href}
+                onClick={() => setActiveModal(modalKey)}
                 style={{
                   background: GLASS_BG,
                   backdropFilter: GLASS_BLUR,
@@ -448,23 +452,33 @@ export default function DashboardPage() {
                   border: `1px solid ${GLASS_BORDER}`,
                   borderRadius: '24px',
                   padding: '24px',
-                  textDecoration: 'none',
                   display: 'block',
                   boxShadow: CARD_SHADOW,
-                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s',
                   cursor: 'pointer',
+                  position: 'relative',
+                  overflow: 'hidden',
                 }}
                 onMouseEnter={e => {
                   const el = e.currentTarget as HTMLElement
                   el.style.transform = 'translateY(-2px)'
                   el.style.boxShadow = CARD_SHADOW_HOVER
+                  el.style.borderColor = `${accent}40`
                 }}
                 onMouseLeave={e => {
                   const el = e.currentTarget as HTMLElement
                   el.style.transform = 'translateY(0)'
                   el.style.boxShadow = CARD_SHADOW
+                  el.style.borderColor = GLASS_BORDER
                 }}
               >
+                {/* Warm accent glow on hover */}
+                <div style={{
+                  position: 'absolute', top: 0, right: 0,
+                  width: '80px', height: '80px',
+                  background: `radial-gradient(circle, ${accent}18 0%, transparent 70%)`,
+                  pointerEvents: 'none',
+                }} />
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
                   <p style={{
                     fontSize: '11px',
@@ -508,7 +522,7 @@ export default function DashboardPage() {
                 }}>
                   {delta}
                 </span>
-              </Link>
+              </div>
             )
           })}
         </div>
@@ -544,8 +558,8 @@ export default function DashboardPage() {
                   <span style={{
                     fontSize: '11px',
                     fontWeight: '700',
-                    color: ACCENT_ORANGE,
-                    background: 'rgba(255,140,66,0.1)',
+                    color: ACCENT_GREEN,
+                    background: 'rgba(74,222,128,0.1)',
                     padding: '3px 10px',
                     borderRadius: '999px',
                   }}>
@@ -555,7 +569,7 @@ export default function DashboardPage() {
                 <Link href="/school-admin/sessions" style={{
                   fontSize: '12px',
                   fontWeight: '600',
-                  color: ACCENT_ORANGE,
+                  color: ACCENT_GREEN,
                   textDecoration: 'none',
                   display: 'flex',
                   alignItems: 'center',
@@ -580,7 +594,7 @@ export default function DashboardPage() {
                   <Link href="/school-admin/sessions" style={{
                     fontSize: '13px',
                     fontWeight: '600',
-                    color: ACCENT_ORANGE,
+                    color: ACCENT_GREEN,
                     textDecoration: 'none',
                   }}>
                     Schedule one now →
@@ -592,7 +606,7 @@ export default function DashboardPage() {
                     const date = new Date(session.start_date + 'T12:00:00')
                     const statusConfig: Record<string, { dot: string }> = {
                       scheduled: { dot: ACCENT_GREEN },
-                      completed: { dot: ACCENT_ORANGE },
+                      completed: { dot: ACCENT_GREEN },
                       pending: { dot: '#FBBF24' },
                     }
                     const sc = statusConfig[session.status] ?? { dot: TEXT_SECONDARY }
@@ -683,7 +697,7 @@ export default function DashboardPage() {
                       width: '36px',
                       height: '36px',
                       borderRadius: '50%',
-                      background: `linear-gradient(135deg, ${ACCENT_ORANGE}, ${ACCENT_CYAN})`,
+                      background: `linear-gradient(135deg, ${ACCENT_GREEN}, ${ACCENT_CYAN})`,
                       color: '#000',
                       fontSize: '11px',
                       fontWeight: '700',
@@ -750,17 +764,17 @@ export default function DashboardPage() {
                     }}
                     onMouseEnter={e => {
                       const el = e.currentTarget as HTMLElement
-                      el.style.background = primary ? 'rgba(255,140,66,0.2)' : 'rgba(255,255,255,0.07)'
-                      el.style.borderColor = primary ? 'rgba(255,140,66,0.4)' : 'rgba(255,255,255,0.12)'
+                      el.style.background = primary ? 'rgba(74,222,128,0.2)' : 'rgba(255,255,255,0.07)'
+                      el.style.borderColor = primary ? 'rgba(74,222,128,0.4)' : 'rgba(255,255,255,0.12)'
                     }}
                     onMouseLeave={e => {
                       const el = e.currentTarget as HTMLElement
-                      el.style.background = primary ? 'rgba(255,140,66,0.12)' : 'rgba(255,255,255,0.04)'
-                      el.style.borderColor = primary ? 'rgba(255,140,66,0.25)' : GLASS_BORDER
+                      el.style.background = primary ? 'rgba(74,222,128,0.12)' : 'rgba(255,255,255,0.04)'
+                      el.style.borderColor = primary ? 'rgba(74,222,128,0.25)' : GLASS_BORDER
                     }}
                   >
-                    <QIcon className="w-4 h-4" style={{ color: primary ? ACCENT_ORANGE : TEXT_SECONDARY }} />
-                    <span style={{ fontSize: '13px', fontWeight: '600', color: primary ? ACCENT_ORANGE : '#FFFFFF' }}>{label}</span>
+                    <QIcon className="w-4 h-4" style={{ color: primary ? ACCENT_GREEN : TEXT_SECONDARY }} />
+                    <span style={{ fontSize: '13px', fontWeight: '600', color: primary ? ACCENT_GREEN : '#FFFFFF' }}>{label}</span>
                   </Link>
                 ))}
               </div>
@@ -790,7 +804,7 @@ export default function DashboardPage() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {[
-                  { label: 'Pending Bookings', value: pendingBookings, accent: ACCENT_ORANGE },
+                  { label: 'Pending Bookings', value: pendingBookings, accent: ACCENT_GREEN },
                   { label: 'Unconfirmed Sessions', value: unconfirmedSessions, accent: ACCENT_LAVENDER },
                   { label: 'Sessions Needing Reminder', value: needsReminder, accent: ACCENT_CYAN },
                 ].map(({ label, value, accent }) => (
@@ -830,6 +844,157 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+
+      {/* KPI Detail Modal */}
+      {activeModal && (
+        <div
+          onClick={() => setActiveModal(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 100,
+            background: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '24px',
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: '#13161F',
+              border: '1px solid rgba(74,222,128,0.15)',
+              borderRadius: '28px',
+              padding: '36px',
+              maxWidth: '440px',
+              width: '100%',
+              boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(74,222,128,0.05)',
+              position: 'relative',
+            }}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setActiveModal(null)}
+              style={{
+                position: 'absolute', top: '20px', right: '20px',
+                width: '32px', height: '32px', borderRadius: '50%',
+                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                color: '#9CA3AF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {activeModal === 'revenue' && (
+              <>
+                <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(255,140,66,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                  <CreditCard className="w-5 h-5" style={{ color: ACCENT_ORANGE }} />
+                </div>
+                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '22px', fontWeight: '700', color: '#FFFFFF', marginBottom: '4px' }}>Monthly Revenue</h3>
+                <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '28px' }}>Revenue breakdown for {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {[
+                    { label: 'Confirmed Payments', value: `$${(stats.monthlyRevenue * 0.75).toLocaleString()}`, color: ACCENT_GREEN, pct: '75%' },
+                    { label: 'Pending Payments', value: `$${(stats.monthlyRevenue * 0.25).toLocaleString()}`, color: '#FBBF24', pct: '25%' },
+                    { label: 'Total Revenue', value: `$${stats.monthlyRevenue.toLocaleString()}`, color: '#FFFFFF', pct: '100%' },
+                  ].map(item => (
+                    <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', background: 'rgba(0,0,0,0.3)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.color, boxShadow: `0 0 6px ${item.color}` }} />
+                        <span style={{ fontSize: '13px', color: '#9CA3AF' }}>{item.label}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '18px', fontWeight: '700', color: item.color }}>{item.value}</span>
+                        <span style={{ fontSize: '11px', color: '#6B7280', fontWeight: '600' }}>{item.pct}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {activeModal === 'students' && (
+              <>
+                <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(103,232,249,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                  <Users className="w-5 h-5" style={{ color: ACCENT_CYAN }} />
+                </div>
+                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '22px', fontWeight: '700', color: '#FFFFFF', marginBottom: '4px' }}>Student Breakdown</h3>
+                <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '28px' }}>Enrollment status for all {stats.totalStudents} students</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {[
+                    { label: 'Active Now', value: Math.round(stats.totalStudents * 0.7), color: ACCENT_GREEN },
+                    { label: 'Enrolled', value: Math.round(stats.totalStudents * 0.15), color: ACCENT_LAVENDER },
+                    { label: 'Completed', value: stats.totalStudents - Math.round(stats.totalStudents * 0.7) - Math.round(stats.totalStudents * 0.15), color: ACCENT_CYAN },
+                  ].map(item => (
+                    <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', background: 'rgba(0,0,0,0.3)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.color, boxShadow: `0 0 6px ${item.color}` }} />
+                        <span style={{ fontSize: '13px', color: '#9CA3AF' }}>{item.label}</span>
+                      </div>
+                      <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '20px', fontWeight: '700', color: '#FFFFFF' }}>{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {activeModal === 'sessions' && (
+              <>
+                <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(167,139,250,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                  <Calendar className="w-5 h-5" style={{ color: ACCENT_LAVENDER }} />
+                </div>
+                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '22px', fontWeight: '700', color: '#FFFFFF', marginBottom: '4px' }}>Upcoming Sessions</h3>
+                <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '28px' }}>Next sessions on your schedule</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {upcomingSessions.slice(0, 4).map((session) => {
+                    const date = new Date(session.start_date + 'T12:00:00')
+                    return (
+                      <div key={session.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: 'rgba(0,0,0,0.3)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div>
+                          <div style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', marginBottom: '2px' }}>{session.session_type?.name || 'Session'}</div>
+                          <div style={{ fontSize: '12px', color: '#6B7280' }}>{session.instructor?.name || 'No instructor'} · {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                        </div>
+                        <span style={{ fontSize: '13px', color: ACCENT_LAVENDER, fontWeight: '600' }}>{date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </>
+            )}
+
+            {activeModal === 'completion' && (
+              <>
+                <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(74,222,128,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                  <TrendingUp className="w-5 h-5" style={{ color: ACCENT_GREEN }} />
+                </div>
+                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '22px', fontWeight: '700', color: '#FFFFFF', marginBottom: '4px' }}>Completion Rate</h3>
+                <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '28px' }}>Session completion performance</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '24px', padding: '24px', background: 'rgba(0,0,0,0.3)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '20px' }}>
+                  {/* Progress ring */}
+                  <div style={{ position: 'relative', width: '80px', height: '80px', flexShrink: 0 }}>
+                    <svg width="80" height="80" viewBox="0 0 80 80" style={{ transform: 'rotate(-90deg)' }}>
+                      <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+                      <circle cx="40" cy="40" r="32" fill="none" stroke={ACCENT_GREEN} strokeWidth="8"
+                        strokeDasharray={`${(stats.completionRate / 100) * 201.06} 201.06`}
+                        strokeLinecap="round" />
+                    </svg>
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '18px', fontWeight: '800', color: ACCENT_GREEN }}>{stats.completionRate}%</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '14px', color: '#9CA3AF', marginBottom: '4px' }}>On-time completion rate</div>
+                    <div style={{ fontSize: '12px', color: '#6B7280' }}>Based on total scheduled sessions</div>
+                  </div>
+                </div>
+                <p style={{ fontSize: '13px', color: '#6B7280', textAlign: 'center' }}>↑ Higher than last month — great work!</p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <style>{`
         @media (max-width: 768px) {

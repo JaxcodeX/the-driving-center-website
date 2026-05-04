@@ -14,7 +14,7 @@ import {
 const GLASS_BG = 'rgba(255,255,255,0.03)'
 const GLASS_BORDER = 'rgba(255,255,255,0.06)'
 const GLASS_SHADOW = '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)'
-const ACCENT = '#FF8C42'
+const ACCENT = '#4ADE80'
 const ACCENT_DIM = 'rgba(255,140,66,0.12)'
 const SUCCESS = '#4ADE80'
 

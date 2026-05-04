@@ -148,8 +148,8 @@ export default async function DashboardPage() {
             <div className="text-xs" style={{ color: '#94A3B8' }}>TCA Hours</div>
           </div>
           <div className="glass-card" style={{ padding: '16px', textAlign: 'center' }}>
-            <div className="text-2xl font-bold mb-0.5 flex items-center justify-center gap-1" style={{ color: '#FF8C42' }}>
-              <Star className="w-4 h-4" style={{ color: '#FF8C42' }} />4.8
+            <div className="text-2xl font-bold mb-0.5 flex items-center justify-center gap-1" style={{ color: '#4ADE80' }}>
+              <Star className="w-4 h-4" style={{ color: '#4ADE80' }} />4.8
             </div>
             <div className="text-xs" style={{ color: '#94A3B8' }}>Instructor Rating</div>
           </div>

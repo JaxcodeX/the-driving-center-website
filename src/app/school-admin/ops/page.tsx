@@ -10,7 +10,7 @@ const GLASS_BORDER = 'rgba(255,255,255,0.06)'
 const GLASS_BLUR = 'blur(24px)'
 const TEXT_SECONDARY = '#9CA3AF'
 const ACCENT_CYAN = '#67E8F9'
-const ACCENT_ORANGE = '#FF8C42'
+const ACCENT_ORANGE = '#4ADE80'
 const ACCENT_GREEN = '#4ADE80'
 const CARD_SHADOW = '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)'
 
@@ -292,7 +292,7 @@ export default function OpsPage() {
                 [
                   { label: 'Schools', count: dbData.counts.schools, color: ACCENT_CYAN },
                   { label: 'Students', count: dbData.counts.students, color: '#A78BFA' },
-                  { label: 'Sessions', count: dbData.counts.sessions, color: ACCENT_ORANGE },
+                  { label: 'Sessions', count: dbData.counts.sessions, color: ACCENT_GREEN },
                   { label: 'Bookings', count: dbData.counts.bookings, color: ACCENT_GREEN },
                   { label: 'Instructors', count: dbData.counts.instructors, color: '#FBBF24' },
                 ].map(c => (

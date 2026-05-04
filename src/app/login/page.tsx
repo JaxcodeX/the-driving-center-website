@@ -113,7 +113,7 @@ export default function LoginPage() {
           }}>
             <div style={{
               width: '36px', height: '36px', borderRadius: '10px',
-              background: '#FF8C42', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: '#4ADE80', display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               <svg width='18' height='18' viewBox='0 0 16 16' fill='none'>
                 <path d="M8 2L13 5.5H3L8 2Z" fill='white' />
@@ -189,7 +189,7 @@ export default function LoginPage() {
                   transform: emailFocused || email ? 'none' : 'translateY(-50%)',
                   fontSize: emailFocused || email ? '11px' : '14px',
                   fontWeight: emailFocused || email ? '600' : '400',
-                  color: emailFocused ? '#FF8C42' : '#9CA3AF',
+                  color: emailFocused ? '#4ADE80' : '#9CA3AF',
                   fontFamily: 'Inter, sans-serif',
                   pointerEvents: 'none',
                   transition: 'all 0.2s',
@@ -215,7 +215,7 @@ export default function LoginPage() {
                   style={{
                     width: '100%', height: '52px', borderRadius: '12px',
                     background: '#FFFFFF',
-                    border: `1px solid ${emailFocused ? '#FF8C42' : '#E5E7EB'}`,
+                    border: `1px solid ${emailFocused ? '#4ADE80' : '#E5E7EB'}`,
                     color: '#111827', fontSize: '14px', fontFamily: 'Inter, sans-serif',
                     paddingLeft: '42px', paddingRight: '16px', outline: 'none',
                     transition: 'border-color 0.2s',
@@ -233,13 +233,13 @@ export default function LoginPage() {
                 disabled={loading}
                 style={{
                   width: '100%', height: '52px', borderRadius: '12px',
-                  background: '#FF8C42', color: '#FFFFFF',
+                  background: '#4ADE80', color: '#FFFFFF',
                   fontSize: '14px', fontWeight: '700', fontFamily: 'Inter, sans-serif',
                   border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                   opacity: loading ? 0.6 : 1, transition: 'box-shadow 0.2s, opacity 0.2s',
                 }}
-                onMouseEnter={e => { if (!loading) (e.target as HTMLButtonElement).style.boxShadow = '0 4px 16px rgba(255,140,66,0.35)' } }
+                onMouseEnter={e => { if (!loading) (e.target as HTMLButtonElement).style.boxShadow = '0 4px 16px rgba(74,222,128,0.35)' } }
                 onMouseLeave={e => { (e.target as HTMLButtonElement).style.boxShadow = 'none' }}
               >
                 {loading ? 'Sending link...' : 'Continue'}
@@ -292,7 +292,7 @@ export default function LoginPage() {
                     transform: demoEmailFocused || demoEmail ? 'none' : 'translateY(-50%)',
                     fontSize: demoEmailFocused || demoEmail ? '11px' : '14px',
                     fontWeight: demoEmailFocused || demoEmail ? '600' : '400',
-                    color: demoEmailFocused ? '#FF8C42' : '#9CA3AF',
+                    color: demoEmailFocused ? '#4ADE80' : '#9CA3AF',
                     fontFamily: 'Inter, sans-serif',
                     pointerEvents: 'none',
                     transition: 'all 0.2s',
@@ -317,7 +317,7 @@ export default function LoginPage() {
                     style={{
                       width: '100%', height: '52px', borderRadius: '12px',
                       background: '#FFFFFF',
-                      border: `1px solid ${demoEmailFocused ? '#FF8C42' : '#E5E7EB'}`,
+                      border: `1px solid ${demoEmailFocused ? '#4ADE80' : '#E5E7EB'}`,
                       color: '#111827', fontSize: '14px', fontFamily: 'Inter, sans-serif',
                       paddingLeft: '42px', paddingRight: '16px', outline: 'none',
                       transition: 'border-color 0.2s',
@@ -382,13 +382,13 @@ export default function LoginPage() {
                   disabled={demoLoading}
                   style={{
                     width: '100%', height: '52px', borderRadius: '12px',
-                    background: '#FF8C42', color: '#FFFFFF',
+                    background: '#4ADE80', color: '#FFFFFF',
                     fontSize: '14px', fontWeight: '700', fontFamily: 'Inter, sans-serif',
                     border: 'none', cursor: demoLoading ? 'not-allowed' : 'pointer',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                     opacity: demoLoading ? 0.6 : 1, transition: 'box-shadow 0.2s, opacity 0.2s',
                   }}
-                  onMouseEnter={e => { if (!demoLoading) (e.target as HTMLButtonElement).style.boxShadow = '0 4px 16px rgba(255,140,66,0.35)' } }
+                  onMouseEnter={e => { if (!demoLoading) (e.target as HTMLButtonElement).style.boxShadow = '0 4px 16px rgba(74,222,128,0.35)' } }
                   onMouseLeave={e => { (e.target as HTMLButtonElement).style.boxShadow = 'none' }}
                 >
                   {demoLoading ? 'Signing in...' : 'Demo Login'}
@@ -410,7 +410,7 @@ export default function LoginPage() {
               fontSize: '13px', color: '#6B7280', fontFamily: 'Inter, sans-serif',
             }}>
               Don&apos;t have an account?{' '}
-              <Link href='/signup' style={{ color: '#FF8C42', fontWeight: '600', textDecoration: 'none' }}>
+              <Link href='/signup' style={{ color: '#4ADE80', fontWeight: '600', textDecoration: 'none' }}>
                 Sign up
               </Link>
             </p>
