@@ -88,6 +88,7 @@ export async function POST(request: Request) {
     booking_token: bookingToken,
     confirmation_token: bookingToken,  // FIX: was missing — confirmations looked up by confirmation_token
     payment_status: depositAmount > 0 ? 'pending' : 'paid',
+    deposit_amount_cents: depositAmount,
   }
   if (session_id) insertPayload.session_id = session_id
   if (sessionSchoolId) insertPayload.school_id = sessionSchoolId
