@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   Calendar, Users, CreditCard, TrendingUp, Plus, Mail, Bell,
-  Clock, CheckCircle2, Car, Settings, BarChart3, ChevronRight,
+  Clock, Car, Settings, BarChart3, ChevronRight,
   ArrowRight, LayoutDashboard, GraduationCap, DollarSign,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -27,11 +27,20 @@ const NAV_ITEMS = [
   { icon: Settings, label: 'Settings', href: '/school-admin/settings', active: false },
 ]
 
-const GLASS_BG = 'rgba(255,255,255,0.04)'
-const GLASS_BORDER = 'rgba(255,255,255,0.08)'
-const GLASS_BLUR = 'blur(20px)'
+// Design tokens
+const BG = '#0D0D12'
+const BG_GRADIENT = 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)'
+const GLASS_BG = 'rgba(255,255,255,0.03)'
+const GLASS_BORDER = 'rgba(255,255,255,0.06)'
+const GLASS_BLUR = 'blur(24px)'
 const TEXT_SECONDARY = '#9CA3AF'
-const BG = '#0A0A0F'
+const ACCENT_ORANGE = '#FF8C42'
+const ACCENT_CYAN = '#67E8F9'
+const ACCENT_LAVENDER = '#A78BFA'
+const ACCENT_GREEN = '#4ADE80'
+
+const CARD_SHADOW = '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)'
+const CARD_SHADOW_HOVER = '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,140,66,0.15), inset 0 1px 0 rgba(255,255,255,0.08)'
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({
@@ -47,6 +56,9 @@ export default function DashboardPage() {
   const [upcomingSessions, setUpcomingSessions] = useState<UpcomingSession[]>([])
   const [schoolId, setSchoolId] = useState('')
   const [loadingSessions, setLoadingSessions] = useState(true)
+  const [pendingBookings, setPendingBookings] = useState(0)
+  const [unconfirmedSessions, setUnconfirmedSessions] = useState(0)
+  const [needsReminder, setNeedsReminder] = useState(0)
 
   useEffect(() => {
     async function load() {
@@ -60,6 +72,9 @@ export default function DashboardPage() {
             setStats(data.stats)
             setSchoolId(data.schoolId || '')
             setUpcomingSessions(data.upcomingSessions || [])
+            setPendingBookings(data.pendingBookings || 0)
+            setUnconfirmedSessions(data.unconfirmedSessions || 0)
+            setNeedsReminder(data.needsReminder || 0)
             setLoadingSessions(false)
             return
           }
@@ -81,6 +96,9 @@ export default function DashboardPage() {
         { count: sessions },
         { data: revenueData },
         { data: sessionsData },
+        { count: pendingBookings },
+        { count: unconfirmedSessions },
+        { count: needsReminder },
       ] = await Promise.all([
         supabase.from('students_driver_ed').select('*', { count: 'exact', head: true }).eq('school_id', schoolId),
         supabase.from('sessions').select('*', { count: 'exact', head: true }).eq('school_id', schoolId).eq('status', 'scheduled'),
@@ -96,6 +114,11 @@ export default function DashboardPage() {
           .eq('school_id', schoolId)
           .order('start_date', { ascending: true })
           .limit(8),
+        supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('school_id', schoolId).eq('status', 'pending'),
+        supabase.from('sessions').select('*', { count: 'exact', head: true }).eq('school_id', schoolId).eq('status', 'pending'),
+        supabase.from('sessions').select('*', { count: 'exact', head: true })
+          .eq('school_id', schoolId).eq('status', 'scheduled')
+          .lt('start_date', new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()),
       ])
 
       const totalStudents = students || 0
@@ -123,6 +146,9 @@ export default function DashboardPage() {
         completionDelta: completionRate > 0 ? `+${completionRate - 72}%` : '+0%',
       })
       setUpcomingSessions((sessionsData as UpcomingSession[]) || [])
+      setPendingBookings(pendingBookings || 0)
+      setUnconfirmedSessions(unconfirmedSessions || 0)
+      setNeedsReminder(needsReminder || 0)
       setLoadingSessions(false)
     }
     load()
@@ -134,8 +160,8 @@ export default function DashboardPage() {
       value: stats.totalStudents,
       delta: stats.studentsDelta,
       icon: Users,
-      accent: '#4ADE80',
-      accentBg: 'rgba(74,222,128,0.12)',
+      accent: ACCENT_CYAN,
+      accentBg: 'rgba(103,232,249,0.1)',
       href: '/school-admin/students',
     },
     {
@@ -143,8 +169,8 @@ export default function DashboardPage() {
       value: stats.activeSessions,
       delta: stats.sessionsDelta,
       icon: Calendar,
-      accent: '#67E8F9',
-      accentBg: 'rgba(103,232,249,0.12)',
+      accent: ACCENT_LAVENDER,
+      accentBg: 'rgba(167,139,250,0.1)',
       href: '/school-admin/sessions',
     },
     {
@@ -152,8 +178,8 @@ export default function DashboardPage() {
       value: `$${stats.monthlyRevenue.toLocaleString()}`,
       delta: stats.revenueDelta,
       icon: CreditCard,
-      accent: '#FB923C',
-      accentBg: 'rgba(251,146,60,0.12)',
+      accent: ACCENT_ORANGE,
+      accentBg: 'rgba(255,140,66,0.1)',
       href: '/school-admin/billing',
     },
     {
@@ -161,16 +187,16 @@ export default function DashboardPage() {
       value: `${stats.completionRate}%`,
       delta: stats.completionDelta,
       icon: TrendingUp,
-      accent: '#A78BFA',
-      accentBg: 'rgba(167,139,250,0.12)',
+      accent: ACCENT_GREEN,
+      accentBg: 'rgba(74,222,128,0.1)',
       href: '/school-admin/sessions',
     },
   ]
 
   const quickActions = [
-    { icon: Plus, label: 'Schedule Session', href: '/school-admin/sessions', accent: '#4ADE80', bg: 'rgba(74,222,128,0.12)' },
-    { icon: Users, label: 'Add Student', href: '/school-admin/students', accent: '#67E8F9', bg: 'rgba(103,232,249,0.08)' },
-    { icon: Mail, label: 'Send Reminder', href: '/school-admin/sessions', accent: '#A78BFA', bg: 'rgba(167,139,250,0.08)' },
+    { icon: Plus, label: 'Schedule', href: '/school-admin/sessions', primary: true },
+    { icon: Users, label: 'Add Student', href: '/school-admin/students', primary: false },
+    { icon: Mail, label: 'Send Reminder', href: '/school-admin/sessions', primary: false },
   ]
 
   const recentActivity = [
@@ -183,14 +209,23 @@ export default function DashboardPage() {
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
   const greeting = new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 17 ? 'Good afternoon' : 'Good evening'
-  const completionPercent = stats.completionRate
-
-  const ringR = 26
-  const ringCircumference = 2 * Math.PI * ringR
-  const ringOffset = ringCircumference - (completionPercent / 100) * ringCircumference
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: BG, fontFamily: 'Inter, sans-serif' }}>
+    <div style={{
+      display: 'flex',
+      minHeight: '100vh',
+      background: BG,
+      fontFamily: 'Inter, sans-serif',
+      position: 'relative',
+    }}>
+      {/* Background gradient */}
+      <div style={{
+        position: 'fixed',
+        inset: 0,
+        background: BG_GRADIENT,
+        pointerEvents: 'none',
+        zIndex: 0,
+      }} />
 
       {/* Sidebar */}
       <aside style={{
@@ -202,7 +237,6 @@ export default function DashboardPage() {
         borderRight: `1px solid ${GLASS_BORDER}`,
         display: 'flex',
         flexDirection: 'column',
-        padding: '0',
         position: 'fixed',
         top: 0,
         left: 0,
@@ -220,7 +254,7 @@ export default function DashboardPage() {
               width: '32px',
               height: '32px',
               borderRadius: '10px',
-              background: 'linear-gradient(135deg, #4ADE80, #67E8F9)',
+              background: `linear-gradient(135deg, ${ACCENT_ORANGE}, ${ACCENT_CYAN})`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -248,18 +282,18 @@ export default function DashboardPage() {
                   padding: '10px 12px',
                   borderRadius: '12px',
                   textDecoration: 'none',
-                  background: active ? 'rgba(255,255,255,0.08)' : 'transparent',
-                  borderLeft: active ? '3px solid #4ADE80' : '3px solid transparent',
-                  transition: 'background 0.15s, border-color 0.15s',
+                  background: active ? 'rgba(255,255,255,0.06)' : 'transparent',
+                  borderLeft: active ? `3px solid ${ACCENT_ORANGE}` : '3px solid transparent',
+                  transition: 'background 0.15s',
                 }}
                 onMouseEnter={e => {
-                  if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'
+                  if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'
                 }}
                 onMouseLeave={e => {
                   if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent'
                 }}
               >
-                <NavIcon className="w-4 h-4" style={{ color: active ? '#4ADE80' : TEXT_SECONDARY, flexShrink: 0 }} />
+                <NavIcon className="w-4 h-4" style={{ color: active ? ACCENT_ORANGE : TEXT_SECONDARY, flexShrink: 0 }} />
                 <span style={{
                   fontSize: '13px',
                   fontWeight: active ? '600' : '500',
@@ -272,26 +306,12 @@ export default function DashboardPage() {
           </div>
         </nav>
 
-        {/* Demo badge */}
-        <div style={{ padding: '16px 20px', borderTop: `1px solid ${GLASS_BORDER}` }}>
-          <div style={{
-            padding: '8px 12px',
-            borderRadius: '10px',
-            background: 'rgba(251,146,60,0.12)',
-            border: '1px solid rgba(251,146,60,0.2)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}>
-            <div style={{
-              width: '6px',
-              height: '6px',
-              borderRadius: '50%',
-              background: '#FB923C',
-              flexShrink: 0,
-            }} />
-            <span style={{ fontSize: '11px', fontWeight: '600', color: '#FB923C' }}>Demo Mode</span>
-          </div>
+        {/* School name */}
+        <div style={{
+          padding: '16px 20px',
+          borderTop: `1px solid ${GLASS_BORDER}`,
+        }}>
+          <p style={{ fontSize: '10px', color: TEXT_SECONDARY, fontWeight: '500' }}>Your Driving School</p>
         </div>
       </aside>
 
@@ -301,6 +321,8 @@ export default function DashboardPage() {
         marginLeft: '220px',
         padding: '40px 48px',
         maxWidth: '1100px',
+        position: 'relative',
+        zIndex: 1,
       }}>
 
         {/* Top bar */}
@@ -313,10 +335,11 @@ export default function DashboardPage() {
           <div>
             <h1 style={{
               fontFamily: 'Outfit, sans-serif',
-              fontSize: '28px',
+              fontSize: '32px',
               fontWeight: '700',
               color: '#FFFFFF',
               marginBottom: '4px',
+              letterSpacing: '-0.01em',
             }}>
               {greeting}
             </h1>
@@ -353,7 +376,7 @@ export default function DashboardPage() {
               width: '38px',
               height: '38px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #4ADE80, #67E8F9)',
+              background: `linear-gradient(135deg, ${ACCENT_ORANGE}, ${ACCENT_CYAN})`,
               color: '#000',
               fontSize: '14px',
               fontWeight: '700',
@@ -370,8 +393,8 @@ export default function DashboardPage() {
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '20px',
-          marginBottom: '32px',
+          gap: '16px',
+          marginBottom: '24px',
         }}>
           {kpiCards.map(({ label, value, delta, icon: Icon, accent, accentBg, href }) => {
             const isPositive = delta.startsWith('+') && !delta.includes('-0%')
@@ -384,22 +407,23 @@ export default function DashboardPage() {
                   backdropFilter: GLASS_BLUR,
                   WebkitBackdropFilter: GLASS_BLUR,
                   border: `1px solid ${GLASS_BORDER}`,
-                  borderRadius: '20px',
+                  borderRadius: '24px',
                   padding: '24px',
                   textDecoration: 'none',
                   display: 'block',
+                  boxShadow: CARD_SHADOW,
                   transition: 'transform 0.2s, box-shadow 0.2s',
                   cursor: 'pointer',
                 }}
                 onMouseEnter={e => {
                   const el = e.currentTarget as HTMLElement
                   el.style.transform = 'translateY(-2px)'
-                  el.style.boxShadow = `0 0 24px ${accent}20`
+                  el.style.boxShadow = CARD_SHADOW_HOVER
                 }}
                 onMouseLeave={e => {
                   const el = e.currentTarget as HTMLElement
                   el.style.transform = 'translateY(0)'
-                  el.style.boxShadow = 'none'
+                  el.style.boxShadow = CARD_SHADOW
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
@@ -415,7 +439,7 @@ export default function DashboardPage() {
                   <div style={{
                     width: '36px',
                     height: '36px',
-                    borderRadius: '12px',
+                    borderRadius: '16px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -426,7 +450,7 @@ export default function DashboardPage() {
                 </div>
                 <div style={{
                   fontFamily: 'Outfit, sans-serif',
-                  fontSize: '36px',
+                  fontSize: '40px',
                   fontWeight: '800',
                   letterSpacing: '-0.02em',
                   lineHeight: 1,
@@ -438,7 +462,7 @@ export default function DashboardPage() {
                 <span style={{
                   fontSize: '12px',
                   fontWeight: '600',
-                  color: isPositive ? '#4ADE80' : TEXT_SECONDARY,
+                  color: isPositive ? ACCENT_GREEN : TEXT_SECONDARY,
                   background: isPositive ? 'rgba(74,222,128,0.1)' : 'rgba(156,163,175,0.08)',
                   padding: '3px 10px',
                   borderRadius: '999px',
@@ -462,26 +486,27 @@ export default function DashboardPage() {
               backdropFilter: GLASS_BLUR,
               WebkitBackdropFilter: GLASS_BLUR,
               border: `1px solid ${GLASS_BORDER}`,
-              borderRadius: '20px',
+              borderRadius: '24px',
               padding: '28px',
+              boxShadow: CARD_SHADOW,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <h2 style={{
                     fontFamily: 'Outfit, sans-serif',
-                    fontSize: '13px',
+                    fontSize: '11px',
                     fontWeight: '600',
-                    color: '#FFFFFF',
+                    color: TEXT_SECONDARY,
                     textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
+                    letterSpacing: '0.1em',
                   }}>
                     Upcoming Sessions
                   </h2>
                   <span style={{
                     fontSize: '11px',
                     fontWeight: '700',
-                    color: '#4ADE80',
-                    background: 'rgba(74,222,128,0.12)',
+                    color: ACCENT_ORANGE,
+                    background: 'rgba(255,140,66,0.1)',
                     padding: '3px 10px',
                     borderRadius: '999px',
                   }}>
@@ -491,7 +516,7 @@ export default function DashboardPage() {
                 <Link href="/school-admin/sessions" style={{
                   fontSize: '12px',
                   fontWeight: '600',
-                  color: '#4ADE80',
+                  color: ACCENT_ORANGE,
                   textDecoration: 'none',
                   display: 'flex',
                   alignItems: 'center',
@@ -516,38 +541,38 @@ export default function DashboardPage() {
                   <Link href="/school-admin/sessions" style={{
                     fontSize: '13px',
                     fontWeight: '600',
-                    color: '#4ADE80',
+                    color: ACCENT_ORANGE,
                     textDecoration: 'none',
                   }}>
                     Schedule one now →
                   </Link>
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {upcomingSessions.slice(0, 5).map(session => {
                     const date = new Date(session.start_date + 'T12:00:00')
-                    const statusConfig: Record<string, { bg: string; color: string; dot: string }> = {
-                      scheduled: { bg: 'rgba(74,222,128,0.1)', color: '#4ADE80', dot: '#4ADE80' },
-                      completed: { bg: 'rgba(251,146,60,0.1)', color: '#FB923C', dot: '#FB923C' },
-                      pending: { bg: 'rgba(251,191,36,0.1)', color: '#FBBF24', dot: '#FBBF24' },
+                    const statusConfig: Record<string, { dot: string }> = {
+                      scheduled: { dot: ACCENT_GREEN },
+                      completed: { dot: ACCENT_ORANGE },
+                      pending: { dot: '#FBBF24' },
                     }
-                    const sc = statusConfig[session.status] ?? { bg: 'rgba(156,163,175,0.1)', color: TEXT_SECONDARY, dot: TEXT_SECONDARY }
+                    const sc = statusConfig[session.status] ?? { dot: TEXT_SECONDARY }
                     return (
                       <div key={session.id} style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '14px',
-                        padding: '14px 16px',
+                        padding: '12px 14px',
                         background: 'rgba(0,0,0,0.2)',
                         border: `1px solid ${GLASS_BORDER}`,
-                        borderRadius: '14px',
+                        borderRadius: '16px',
                         transition: 'background 0.15s, border-color 0.15s',
                         cursor: 'pointer',
                       }}
                       onMouseEnter={e => {
                         const el = e.currentTarget as HTMLElement
-                        el.style.background = 'rgba(255,255,255,0.04)'
-                        el.style.borderColor = 'rgba(255,255,255,0.12)'
+                        el.style.background = 'rgba(255,255,255,0.03)'
+                        el.style.borderColor = 'rgba(255,255,255,0.1)'
                       }}
                       onMouseLeave={e => {
                         const el = e.currentTarget as HTMLElement
@@ -555,22 +580,18 @@ export default function DashboardPage() {
                         el.style.borderColor = GLASS_BORDER
                       }}>
                         <div style={{
-                          width: '42px',
-                          height: '42px',
-                          borderRadius: '12px',
-                          background: `${sc.dot}15`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          background: sc.dot,
                           flexShrink: 0,
-                        }}>
-                          <Calendar className="w-4 h-4" style={{ color: sc.dot }} />
-                        </div>
+                          boxShadow: `0 0 6px ${sc.dot}`,
+                        }} />
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', marginBottom: '2px' }}>
+                          <div style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', marginBottom: '1px' }}>
                             {session.session_type?.name || 'Session'}
                           </div>
-                          <div style={{ fontSize: '12px', color: TEXT_SECONDARY }}>
+                          <div style={{ fontSize: '13px', color: TEXT_SECONDARY, fontWeight: '400' }}>
                             {session.instructor?.name || 'No instructor'}
                           </div>
                         </div>
@@ -582,20 +603,6 @@ export default function DashboardPage() {
                             {date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                           </div>
                         </div>
-                        <span style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          padding: '5px 12px',
-                          borderRadius: '999px',
-                          fontSize: '11px',
-                          fontWeight: '600',
-                          background: sc.bg,
-                          color: sc.color,
-                          textTransform: 'capitalize',
-                          flexShrink: 0,
-                        }}>
-                          {session.status}
-                        </span>
                       </div>
                     )
                   })}
@@ -609,16 +616,17 @@ export default function DashboardPage() {
               backdropFilter: GLASS_BLUR,
               WebkitBackdropFilter: GLASS_BLUR,
               border: `1px solid ${GLASS_BORDER}`,
-              borderRadius: '20px',
+              borderRadius: '24px',
               padding: '28px',
+              boxShadow: CARD_SHADOW,
             }}>
               <h2 style={{
                 fontFamily: 'Outfit, sans-serif',
-                fontSize: '13px',
+                fontSize: '11px',
                 fontWeight: '600',
-                color: '#FFFFFF',
+                color: TEXT_SECONDARY,
                 textTransform: 'uppercase',
-                letterSpacing: '0.08em',
+                letterSpacing: '0.1em',
                 marginBottom: '20px',
               }}>
                 Recent Activity
@@ -636,7 +644,7 @@ export default function DashboardPage() {
                       width: '36px',
                       height: '36px',
                       borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #4ADE80, #67E8F9)',
+                      background: `linear-gradient(135deg, ${ACCENT_ORANGE}, ${ACCENT_CYAN})`,
                       color: '#000',
                       fontSize: '11px',
                       fontWeight: '700',
@@ -668,153 +676,115 @@ export default function DashboardPage() {
               backdropFilter: GLASS_BLUR,
               WebkitBackdropFilter: GLASS_BLUR,
               border: `1px solid ${GLASS_BORDER}`,
-              borderRadius: '20px',
-              padding: '28px',
+              borderRadius: '24px',
+              padding: '24px',
+              boxShadow: CARD_SHADOW,
             }}>
               <h2 style={{
                 fontFamily: 'Outfit, sans-serif',
-                fontSize: '13px',
+                fontSize: '11px',
                 fontWeight: '600',
-                color: '#FFFFFF',
+                color: TEXT_SECONDARY,
                 textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                marginBottom: '20px',
+                letterSpacing: '0.1em',
+                marginBottom: '16px',
               }}>
                 Quick Actions
               </h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {quickActions.map(({ icon: QIcon, label, href, accent, bg }) => (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {quickActions.map(({ icon: QIcon, label, href, primary }) => (
                   <Link
                     key={label}
                     href={href}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '12px',
-                      padding: '14px 18px',
-                      background: bg,
-                      border: `1px solid ${GLASS_BORDER}`,
-                      borderRadius: '14px',
+                      gap: '6px',
+                      padding: '10px 14px',
+                      height: '36px',
+                      background: primary ? 'rgba(255,140,66,0.12)' : 'rgba(255,255,255,0.04)',
+                      border: `1px solid ${primary ? 'rgba(255,140,66,0.25)' : GLASS_BORDER}`,
+                      borderRadius: '16px',
                       textDecoration: 'none',
-                      transition: 'background 0.15s, border-color 0.15s, transform 0.1s',
+                      transition: 'background 0.15s, border-color 0.15s',
                       cursor: 'pointer',
                     }}
                     onMouseEnter={e => {
                       const el = e.currentTarget as HTMLElement
-                      el.style.background = `${accent}20`
-                      el.style.borderColor = `${accent}40`
-                      el.style.transform = 'scale(0.99)'
+                      el.style.background = primary ? 'rgba(255,140,66,0.2)' : 'rgba(255,255,255,0.07)'
+                      el.style.borderColor = primary ? 'rgba(255,140,66,0.4)' : 'rgba(255,255,255,0.12)'
                     }}
                     onMouseLeave={e => {
                       const el = e.currentTarget as HTMLElement
-                      el.style.background = bg
-                      el.style.borderColor = GLASS_BORDER
-                      el.style.transform = 'scale(1)'
+                      el.style.background = primary ? 'rgba(255,140,66,0.12)' : 'rgba(255,255,255,0.04)'
+                      el.style.borderColor = primary ? 'rgba(255,140,66,0.25)' : GLASS_BORDER
                     }}
                   >
-                    <QIcon className="w-4 h-4" style={{ color: accent }} />
-                    <span style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF' }}>{label}</span>
-                    <ChevronRight className="w-4 h-4" style={{ color: TEXT_SECONDARY, marginLeft: 'auto' }} />
+                    <QIcon className="w-4 h-4" style={{ color: primary ? ACCENT_ORANGE : TEXT_SECONDARY }} />
+                    <span style={{ fontSize: '13px', fontWeight: '600', color: primary ? ACCENT_ORANGE : '#FFFFFF' }}>{label}</span>
                   </Link>
                 ))}
               </div>
             </div>
 
-            {/* Completion Rate */}
+            {/* Pending Actions */}
             <div style={{
               background: GLASS_BG,
               backdropFilter: GLASS_BLUR,
               WebkitBackdropFilter: GLASS_BLUR,
               border: `1px solid ${GLASS_BORDER}`,
-              borderRadius: '20px',
+              borderRadius: '24px',
               padding: '28px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
+              boxShadow: CARD_SHADOW,
             }}>
               <h2 style={{
                 fontFamily: 'Outfit, sans-serif',
-                fontSize: '13px',
+                fontSize: '11px',
                 fontWeight: '600',
-                color: '#FFFFFF',
+                color: TEXT_SECONDARY,
                 textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                marginBottom: '28px',
-                alignSelf: 'flex-start',
+                letterSpacing: '0.1em',
+                marginBottom: '20px',
               }}>
-                Completion Rate
+                Pending Actions
               </h2>
 
-              <div style={{ position: 'relative', marginBottom: '20px' }}>
-                <svg width="90" height="90" style={{ transform: 'rotate(-90deg)' }}>
-                  <circle
-                    cx="45"
-                    cy="45"
-                    r={ringR}
-                    fill="none"
-                    stroke="rgba(255,255,255,0.06)"
-                    strokeWidth="6"
-                  />
-                  <circle
-                    cx="45"
-                    cy="45"
-                    r={ringR}
-                    fill="none"
-                    stroke="#4ADE80"
-                    strokeWidth="6"
-                    strokeDasharray={ringCircumference}
-                    strokeDashoffset={ringOffset}
-                    strokeLinecap="round"
-                    style={{ filter: 'drop-shadow(0 0 6px rgba(74,222,128,0.4))' }}
-                  />
-                </svg>
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                  <span style={{
-                    fontFamily: 'Outfit, sans-serif',
-                    fontSize: '20px',
-                    fontWeight: '800',
-                    color: '#FFFFFF',
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {[
+                  { label: 'Pending Bookings', value: pendingBookings, accent: ACCENT_ORANGE },
+                  { label: 'Unconfirmed Sessions', value: unconfirmedSessions, accent: ACCENT_LAVENDER },
+                  { label: 'Sessions Needing Reminder', value: needsReminder, accent: ACCENT_CYAN },
+                ].map(({ label, value, accent }) => (
+                  <div key={label} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '14px 16px',
+                    background: 'rgba(0,0,0,0.2)',
+                    borderRadius: '16px',
+                    border: `1px solid ${GLASS_BORDER}`,
                   }}>
-                    {completionPercent}%
-                  </span>
-                </div>
-              </div>
-
-              <p style={{ fontSize: '13px', color: TEXT_SECONDARY, textAlign: 'center' }}>
-                {stats.completionRate > 0 ? 'Above national average' : 'Complete sessions to track'}
-              </p>
-
-              <div style={{
-                marginTop: '20px',
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px',
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '12px', color: TEXT_SECONDARY }}>This month</span>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#FFFFFF' }}>{stats.completionRate}%</span>
-                </div>
-                <div style={{
-                  height: '4px',
-                  background: 'rgba(255,255,255,0.06)',
-                  borderRadius: '999px',
-                  overflow: 'hidden',
-                }}>
-                  <div style={{
-                    height: '100%',
-                    width: `${completionPercent}%`,
-                    background: 'linear-gradient(90deg, #4ADE80, #67E8F9)',
-                    borderRadius: '999px',
-                    transition: 'width 0.6s ease',
-                  }} />
-                </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: accent,
+                        boxShadow: `0 0 6px ${accent}`,
+                      }} />
+                      <span style={{ fontSize: '13px', fontWeight: '500', color: '#FFFFFF' }}>{label}</span>
+                    </div>
+                    <span style={{
+                      fontFamily: 'Outfit, sans-serif',
+                      fontSize: '20px',
+                      fontWeight: '800',
+                      color: '#FFFFFF',
+                      letterSpacing: '-0.01em',
+                    }}>
+                      {value}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
