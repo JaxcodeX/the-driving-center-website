@@ -229,7 +229,7 @@ function Hero() {
         <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
 
           {/* Eyebrow badge */}
-          <div style={{
+          <div className='hero-content' style={{
             display: 'inline-flex', alignItems: 'center', gap: '8px',
             padding: '6px 16px', borderRadius: '100px',
             background: '#0F1117', border: '1px solid #1A1A1A',
@@ -241,7 +241,7 @@ function Hero() {
           </div>
 
           {/* Headline */}
-          <h1 style={{
+          <h1 className='hero-content' style={{
             fontSize: 'clamp(52px, 7vw, 80px)', fontFamily: "'Outfit', sans-serif", fontWeight: '800',
             lineHeight: '1.05', letterSpacing: '-0.03em',
             color: '#FFFFFF', margin: '0 0 24px',
@@ -250,7 +250,7 @@ function Hero() {
           </h1>
 
           {/* Subheadline */}
-          <p style={{
+          <p className='hero-content' style={{
             fontSize: '18px', color: '#9CA3AF', lineHeight: '1.7',
             margin: '0 0 40px', maxWidth: '540px', marginLeft: 'auto', marginRight: 'auto',
           }}>
@@ -258,16 +258,19 @@ function Hero() {
           </p>
 
           {/* CTAs */}
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div className='hero-cta' style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap', alignItems: 'center' }}>
             <Link href='/signup' style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
-              padding: '14px 32px', background: '#FFFFFF', color: '#000000', fontWeight: '700',
+              padding: '14px 32px',
+              background: 'linear-gradient(135deg, #FF8C42, #FF6B2B)',
+              color: '#FFFFFF', fontWeight: '700',
               fontSize: '15px', borderRadius: '12px', textDecoration: 'none',
-              transition: 'transform 0.2s',
+              boxShadow: '0 4px 24px rgba(255,140,66,0.4)',
+              transition: 'transform 0.2s, box-shadow 0.2s',
               fontFamily: "'Inter', sans-serif",
             }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)' }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)' }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(255,140,66,0.5)' }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(255,140,66,0.4)' }}
             >
               Start free trial <ArrowRight size={16} />
             </Link>
@@ -398,33 +401,12 @@ function Features() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
         {features.map((f) => (
-          <div key={f.title} style={{
-            background: '#0F1117', borderRadius: '16px', padding: '32px',
-            border: '1px solid #1A1A1A',
-            display: 'flex', flexDirection: 'column', gap: '12px',
-            transition: 'transform 0.3s, border-color 0.3s',
-            cursor: 'default',
-          }}
-            onMouseEnter={e => {
-              const el = e.currentTarget as HTMLDivElement
-              el.style.transform = 'translateY(-4px)'
-              el.style.borderColor = '#2A2A3A'
-            }}
-            onMouseLeave={e => {
-              const el = e.currentTarget as HTMLDivElement
-              el.style.transform = 'translateY(0)'
-              el.style.borderColor = '#1A1A1A'
-            }}
-          >
-            <div style={{
-              width: '40px', height: '40px', borderRadius: '12px',
-              background: '#1A1A3B', display: 'flex',
-              alignItems: 'center', justifyContent: 'center', color: f.color,
-            }}>
+          <div key={f.title} className='feature-card'>
+            <div className='feature-icon'>
               {f.icon}
             </div>
             <h3 style={{ fontSize: '18px', fontFamily: "'Outfit', sans-serif", fontWeight: '600', color: '#FFFFFF', letterSpacing: '-0.01em', margin: 0 }}>{f.title}</h3>
-            <p style={{ fontSize: '15px', color: '#9CA3AF', lineHeight: '1.7', margin: 0 }}>{f.desc}</p>
+            <p style={{ fontSize: '14px', color: '#9CA3AF', lineHeight: '1.7', margin: 0 }}>{f.desc}</p>
           </div>
         ))}
       </div>
@@ -464,7 +446,7 @@ function HowItWorks() {
         <SectionSub mb='0' ta='center'>Every feature built around the problems that actually cost you time and money.</SectionSub>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', position: 'relative' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px', position: 'relative' }}>
         {steps.map((step, i) => (
           <div key={step.num} style={{
             background: '#0F1117', borderRadius: '16px', padding: '40px 32px',
@@ -704,6 +686,13 @@ function StatsBar() {
 
 const testimonials = [
   {
+    quote: "This is exactly what I needed for my driving school. Setup was painless and my students love it. It's been a complete game changer for managing bookings.",
+    name: 'Matt Reedy',
+    role: 'Owner, The Driving Center',
+    initials: 'MR',
+    color: '#4ADE80',
+  },
+  {
     quote: "We cut our admin work in half. Parents love being able to book and pay online. It's been a complete game changer for our school.",
     name: 'Renee Holloway',
     role: 'Owner, Smokey Mountain Drivers',
@@ -718,31 +707,10 @@ const testimonials = [
     color: '#4ADE80',
   },
   {
-    quote: "Finally, a platform that understands how driving schools actually work. Setup took 10 minutes. My instructors were live the same day.",
-    name: 'Tina Kowalski',
-    role: 'Manager, River City Driving',
-    initials: 'TK',
-    color: '#4ADE80',
-  },
-  {
     quote: "Student tracking and TCA compliance used to be a nightmare. Now it's just... seamless. Worth every penny.",
     name: 'David Park',
     role: 'Founder, Summit Traffic School',
     initials: 'DP',
-    color: '#4ADE80',
-  },
-  {
-    quote: "We scaled from 1 location to 3 without adding any additional office staff. The platform just handles it all.",
-    name: 'Alicia Ramsey',
-    role: 'Operations, Delta Advanced Drivers',
-    initials: 'AR',
-    color: '#4ADE80',
-  },
-  {
-    quote: "The dashboard gives me everything I need to make decisions fast. No more spreadsheets, no more guesswork.",
-    name: 'Chris Ballard',
-    role: 'Owner, Ballard Driving Academy',
-    initials: 'CB',
     color: '#4ADE80',
   },
 ]
@@ -756,7 +724,7 @@ function Testimonials() {
         <SectionSub mb='0' ta='center'>Don&apos;t take our word for it. Here&apos;s what school owners have to say.</SectionSub>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px', maxWidth: '900px', margin: '0 auto' }}>
         {testimonials.map((t, i) => (
           <div key={t.name} style={{
             background: '#0F1117', borderRadius: '16px', padding: '32px',
@@ -844,9 +812,9 @@ function Pricing() {
         {plans.map(p => (
           <div key={p.name} style={{
             background: p.highlighted ? '#13161F' : '#0F1117',
-            borderRadius: '16px', padding: '40px 32px',
-            border: p.highlighted ? '1px solid rgba(74,222,128,0.3)' : '1px solid #1A1A1A',
-            boxShadow: p.highlighted ? '0 0 60px rgba(74,222,128,0.08)' : 'none',
+            borderRadius: '24px', padding: '32px',
+            border: p.highlighted ? '1px solid rgba(255,140,66,0.4)' : '1px solid #1A1A1A',
+            boxShadow: p.highlighted ? '0 0 60px rgba(255,140,66,0.08)' : 'none',
             display: 'flex', flexDirection: 'column',
             position: 'relative',
             transition: 'transform 0.3s',
@@ -858,7 +826,7 @@ function Pricing() {
               <div style={{
                 position: 'absolute', top: '-1px', left: '20px', right: '20px',
                 height: '2px',
-                background: 'linear-gradient(90deg, transparent, #4ADE80, transparent)',
+                background: 'linear-gradient(90deg, transparent, #FF8C42, transparent)',
                 borderRadius: '0 0 2px 2px',
               }} />
             )}
@@ -867,9 +835,9 @@ function Pricing() {
               <span style={{
                 display: 'inline-block', fontSize: '11px', fontWeight: '700',
                 padding: '4px 12px', borderRadius: '999px',
-                background: 'linear-gradient(135deg, #2D1B4E, #1A1A3B)',
-                color: '#FFFFFF', letterSpacing: '0.05em', marginBottom: '16px', alignSelf: 'flex-start',
-                border: '1px solid rgba(74,222,128,0.3)',
+                background: 'linear-gradient(135deg, rgba(255,140,66,0.2), rgba(255,107,43,0.2))',
+                color: '#FF8C42', letterSpacing: '0.05em', marginBottom: '16px', alignSelf: 'flex-start',
+                border: '1px solid rgba(255,140,66,0.3)',
               }}>
                 Most Popular
               </span>
@@ -1033,46 +1001,72 @@ function CTASection() {
 
 function Footer() {
   return (
-    <footer style={{ borderTop: '1px solid #1A1A1A', background: '#050505', padding: '48px 0' }}>
+    <footer style={{ borderTop: '1px solid #1A1A1A', background: '#050505', padding: '64px 0 32px' }}>
       <Container>
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          flexWrap: 'wrap', gap: '20px',
-        }}>
-          {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '28px', height: '28px', borderRadius: '8px',
-              background: '#4ADE80', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <svg width='14' height='14' viewBox='0 0 16 16' fill='none'>
-                <path d='M8 2L13 5.5H3L8 2Z' fill='white' />
-                <path d='M3 5.5V10.5L8 14V8.5H13V5.5H3Z' fill='white' fillOpacity='0.7' />
-              </svg>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '40px', marginBottom: '48px' }}>
+          {/* Brand */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+              <div style={{
+                width: '28px', height: '28px', borderRadius: '8px',
+                background: '#4ADE80', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <svg width='14' height='14' viewBox='0 0 16 16' fill='none'>
+                  <path d='M8 2L13 5.5H3L8 2Z' fill='white' />
+                  <path d='M3 5.5V10.5L8 14V8.5H13V5.5H3Z' fill='white' fillOpacity='0.7' />
+                </svg>
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', fontFamily: "'Outfit', sans-serif" }}>The Driving Center</span>
             </div>
-            <span style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', fontFamily: "'Outfit', sans-serif" }}>The Driving Center</span>
+            <p style={{ fontSize: '13px', color: '#6B7280', lineHeight: '1.6', maxWidth: '260px' }}>
+              Modern software for driving schools. Book more students, automate reminders, and grow your business.
+            </p>
           </div>
 
-          {/* Links */}
-          <div style={{ display: 'flex', gap: '24px' }}>
-            {[
-              { label: 'Privacy', href: '/legal/privacy' },
-              { label: 'Terms', href: '/legal/terms' },
-              { label: 'Login', href: '/login' },
-            ].map(link => (
-              <a key={link.label} href={link.href} style={{
-                fontSize: '13px', color: '#6B7280', textDecoration: 'none',
-                transition: 'color 0.15s',
-              }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#FFFFFF')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#6B7280')}
-              >
-                {link.label}
-              </a>
-            ))}
+          {/* Product links */}
+          <div>
+            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#71717A', marginBottom: '16px' }}>Product</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {[
+                { label: 'Features', href: '#features' },
+                { label: 'Pricing', href: '#pricing' },
+                { label: 'FAQ', href: '#faq' },
+                { label: 'Blog', href: '/blog' },
+              ].map(link => (
+                <a key={link.label} href={link.href} style={{ fontSize: '13px', color: '#6B7280', textDecoration: 'none', transition: 'color 0.15s' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#FFFFFF')}
+                  onMouseLeave={e => (e.currentTarget.style.color = '#6B7280')}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
           </div>
 
+          {/* Company links */}
+          <div>
+            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#71717A', marginBottom: '16px' }}>Company</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {[
+                { label: 'About', href: '/about' },
+                { label: 'Contact', href: '/contact' },
+                { label: 'Privacy Policy', href: '/legal/privacy' },
+                { label: 'Terms of Service', href: '/legal/terms' },
+              ].map(link => (
+                <a key={link.label} href={link.href} style={{ fontSize: '13px', color: '#6B7280', textDecoration: 'none', transition: 'color 0.15s' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#FFFFFF')}
+                  onMouseLeave={e => (e.currentTarget.style.color = '#6B7280')}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ borderTop: '1px solid #1A1A1A', paddingTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <span style={{ fontSize: '13px', color: '#6B7280' }}>© 2026 The Driving Center. All rights reserved.</span>
+          <span style={{ fontSize: '13px', color: '#52525B' }}>Built with ▲ by Everest</span>
         </div>
       </Container>
     </footer>
@@ -1089,12 +1083,49 @@ export default function HomePage() {
 
   return (
     <main style={{ background: '#050505', color: '#FFFFFF', fontFamily: "'Inter', sans-serif", overflowX: 'hidden' }}>
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .hero-content { animation: fadeInUp 0.8s ease-out forwards; }
+        .hero-cta { animation: fadeInUp 0.8s ease-out 0.2s forwards; opacity: 0; }
+        .hero-image { animation: fadeInUp 0.8s ease-out 0.35s forwards; opacity: 0; }
+
+        .feature-card {
+          background: #0F1117; border-radius: 16px; padding: 32px;
+          border: 1px solid #1A1A1A; display: flex; flex-direction: column; gap: 12px;
+          transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+          cursor: default;
+        }
+        .feature-card:hover {
+          transform: translateY(-4px);
+          border-color: #2A2A3A;
+          box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+        .feature-icon {
+          width: 48px; height: 48px; border-radius: 14px;
+          background: rgba(74,222,128,0.1);
+          border: 1px solid rgba(74,222,128,0.15);
+          display: flex; align-items: center; justify-content: center;
+          color: #4ADE80;
+        }
+
+        @media (max-width: 768px) {
+          .desktop-nav { display: none !important; }
+          .mobile-menu-btn { display: block !important; }
+        }
+        @media (min-width: 769px) {
+          .mobile-menu-btn { display: none !important; }
+        }
+      `}</style>
       <Navbar />
       <Hero />
       <LogoStrip />
       <Features />
       <HowItWorks />
       <DashboardMockup />
+      <StatsBar />
       <Pricing />
       <FAQ />
       <CTASection />
