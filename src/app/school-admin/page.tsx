@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
-  Calendar, Users, Clock, TrendingUp, ArrowRight, Plus,
-  CreditCard, Mail, Bell, CheckCircle2,
+  Calendar, Users, CreditCard, TrendingUp, Plus, Mail, Bell,
+  Clock, CheckCircle2, Car, Settings, BarChart3, ChevronRight,
+  ArrowRight, LayoutDashboard, GraduationCap, DollarSign,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
@@ -15,6 +16,22 @@ type UpcomingSession = {
   instructor: { name: string } | null
   session_type: { name: string } | null
 }
+
+const NAV_ITEMS = [
+  { icon: LayoutDashboard, label: 'Dashboard', href: '/school-admin', active: true },
+  { icon: GraduationCap, label: 'Students', href: '/school-admin/students', active: false },
+  { icon: Calendar, label: 'Sessions', href: '/school-admin/sessions', active: false },
+  { icon: Car, label: 'Instructors', href: '/school-admin/instructors', active: false },
+  { icon: Clock, label: 'Calendar', href: '/school-admin/calendar', active: false },
+  { icon: DollarSign, label: 'Billing', href: '/school-admin/billing', active: false },
+  { icon: Settings, label: 'Settings', href: '/school-admin/settings', active: false },
+]
+
+const GLASS_BG = 'rgba(255,255,255,0.04)'
+const GLASS_BORDER = 'rgba(255,255,255,0.08)'
+const GLASS_BLUR = 'blur(20px)'
+const TEXT_SECONDARY = '#9CA3AF'
+const BG = '#0A0A0F'
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({
@@ -118,7 +135,7 @@ export default function DashboardPage() {
       delta: stats.studentsDelta,
       icon: Users,
       accent: '#4ADE80',
-      accentBg: 'rgba(74,222,128,0.1)',
+      accentBg: 'rgba(74,222,128,0.12)',
       href: '/school-admin/students',
     },
     {
@@ -126,8 +143,8 @@ export default function DashboardPage() {
       value: stats.activeSessions,
       delta: stats.sessionsDelta,
       icon: Calendar,
-      accent: '#78E4FF',
-      accentBg: 'rgba(120,228,255,0.1)',
+      accent: '#67E8F9',
+      accentBg: 'rgba(103,232,249,0.12)',
       href: '/school-admin/sessions',
     },
     {
@@ -135,8 +152,8 @@ export default function DashboardPage() {
       value: `$${stats.monthlyRevenue.toLocaleString()}`,
       delta: stats.revenueDelta,
       icon: CreditCard,
-      accent: '#FBBF24',
-      accentBg: 'rgba(251,191,36,0.1)',
+      accent: '#FB923C',
+      accentBg: 'rgba(251,146,60,0.12)',
       href: '/school-admin/billing',
     },
     {
@@ -144,23 +161,16 @@ export default function DashboardPage() {
       value: `${stats.completionRate}%`,
       delta: stats.completionDelta,
       icon: TrendingUp,
-      accent: '#A855F7',
-      accentBg: 'rgba(168,85,247,0.1)',
+      accent: '#A78BFA',
+      accentBg: 'rgba(167,139,250,0.12)',
       href: '/school-admin/sessions',
     },
   ]
 
   const quickActions = [
-    { icon: Plus, label: 'Schedule Session', href: '/school-admin/sessions', accent: '#4ADE80' },
-    { icon: Users, label: 'Add Student', href: '/school-admin/students', accent: '#78E4FF' },
-    { icon: Mail, label: 'Send Reminder', href: '/school-admin/sessions', accent: '#818CF8' },
-  ]
-
-  const popularServices = [
-    { name: 'Behind the Wheel Training', count: 142, price: '$75/session' },
-    { name: 'Traffic Court Awareness', count: 38, price: '$45/session' },
-    { name: 'Parent Taught Course', count: 24, price: '$299/course' },
-    { name: 'BTW Package (5 Sessions)', count: 18, price: '$350/pkg' },
+    { icon: Plus, label: 'Schedule Session', href: '/school-admin/sessions', accent: '#4ADE80', bg: 'rgba(74,222,128,0.12)' },
+    { icon: Users, label: 'Add Student', href: '/school-admin/students', accent: '#67E8F9', bg: 'rgba(103,232,249,0.08)' },
+    { icon: Mail, label: 'Send Reminder', href: '/school-admin/sessions', accent: '#A78BFA', bg: 'rgba(167,139,250,0.08)' },
   ]
 
   const recentActivity = [
@@ -172,565 +182,645 @@ export default function DashboardPage() {
   ]
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+  const greeting = new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 17 ? 'Good afternoon' : 'Good evening'
   const completionPercent = stats.completionRate
 
-  // SVG ring params
   const ringR = 26
   const ringCircumference = 2 * Math.PI * ringR
   const ringOffset = ringCircumference - (completionPercent / 100) * ringCircumference
 
   return (
-    <div style={{ maxWidth: '1200px' }}>
-      {/* Header Row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
-        <div>
-          <h1 style={{
-            fontFamily: 'Outfit, sans-serif',
-            fontSize: '24px',
-            fontWeight: '700',
-            color: '#FFFFFF',
-            marginBottom: '4px',
-          }}>
-            Dashboard
-          </h1>
-          <p style={{ fontSize: '13px', color: '#6B7280' }}>{today}</p>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '10px',
-            background: '#0F1117',
-            border: '1px solid #1A1A1A',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            color: '#9CA3AF',
-            transition: 'background 0.15s',
-          }}
-          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#13161F')}
-          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = '#0F1117')}
-          >
-            <Bell className="w-4 h-4" />
-          </button>
-          <div style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #4ADE80, #22D3EE)',
-            color: '#000',
-            fontSize: '13px',
-            fontWeight: '700',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-            S
+    <div style={{ display: 'flex', minHeight: '100vh', background: BG, fontFamily: 'Inter, sans-serif' }}>
+
+      {/* Sidebar */}
+      <aside style={{
+        width: '220px',
+        flexShrink: 0,
+        background: GLASS_BG,
+        backdropFilter: GLASS_BLUR,
+        WebkitBackdropFilter: GLASS_BLUR,
+        borderRight: `1px solid ${GLASS_BORDER}`,
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '0',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        height: '100vh',
+        overflowY: 'auto',
+        zIndex: 10,
+      }}>
+        {/* Logo */}
+        <div style={{
+          padding: '28px 20px 20px',
+          borderBottom: `1px solid ${GLASS_BORDER}`,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #4ADE80, #67E8F9)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <Car className="w-4 h-4" style={{ color: '#000' }} />
+            </div>
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: '#FFFFFF', lineHeight: 1.2 }}>Driving Center</div>
+              <div style={{ fontSize: '10px', color: TEXT_SECONDARY, fontWeight: '500' }}>School Admin</div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* KPI Stats Row */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: '24px',
-        marginBottom: '24px',
-      }}>
-        {kpiCards.map(({ label, value, delta, icon: Icon, accent, accentBg }) => {
-          const isPositive = delta.startsWith('+') && !delta.includes('-0%')
-          return (
-            <div
-              key={label}
-              style={{
-                background: '#0F1117',
-                border: '1px solid #1A1A1A',
-                borderRadius: '16px',
-                padding: '24px',
-                position: 'relative',
-                overflow: 'hidden',
-                cursor: 'pointer',
-                transition: 'background 0.2s',
-              }}
-              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#13161F')}
-              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = '#0F1117')}
-            >
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <p style={{
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  color: '#6B7280',
-                }}>
-                  {label}
-                </p>
-                <div style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '10px',
+        {/* Nav */}
+        <nav style={{ padding: '16px 12px', flex: 1 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {NAV_ITEMS.map(({ icon: NavIcon, label, href, active }) => (
+              <Link
+                key={label}
+                href={href}
+                style={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  background: accentBg,
-                }}>
-                  <Icon className="w-4 h-4" style={{ color: accent }} />
-                </div>
-              </div>
-              <div style={{
-                fontFamily: 'Outfit, sans-serif',
-                fontSize: '32px',
-                fontWeight: '800',
-                letterSpacing: '-0.02em',
-                lineHeight: 1,
-                color: '#FFFFFF',
-                marginBottom: '8px',
-              }}>
-                {value}
-              </div>
-              <span style={{
-                fontSize: '12px',
-                fontWeight: '600',
-                color: isPositive ? '#4ADE80' : '#9CA3AF',
-                background: isPositive ? 'rgba(74,222,128,0.1)' : 'rgba(156,163,175,0.1)',
-                padding: '2px 8px',
-                borderRadius: '999px',
-              }}>
-                {delta}
-              </span>
-            </div>
-          )
-        })}
-      </div>
-
-      {/* Main Grid: 2 columns */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
-
-        {/* Left Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-
-          {/* Upcoming Sessions */}
-          <div style={{
-            background: '#0F1117',
-            border: '1px solid #1A1A1A',
-            borderRadius: '16px',
-            padding: '24px',
-          }}>
-            {/* Section header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h2 style={{
-                  fontFamily: 'Outfit, sans-serif',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#FFFFFF',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                }}>
-                  Upcoming Sessions
-                </h2>
+                  gap: '10px',
+                  padding: '10px 12px',
+                  borderRadius: '12px',
+                  textDecoration: 'none',
+                  background: active ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  borderLeft: active ? '3px solid #4ADE80' : '3px solid transparent',
+                  transition: 'background 0.15s, border-color 0.15s',
+                }}
+                onMouseEnter={e => {
+                  if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'
+                }}
+                onMouseLeave={e => {
+                  if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent'
+                }}
+              >
+                <NavIcon className="w-4 h-4" style={{ color: active ? '#4ADE80' : TEXT_SECONDARY, flexShrink: 0 }} />
                 <span style={{
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  color: '#4ADE80',
-                  background: 'rgba(74,222,128,0.12)',
-                  padding: '2px 8px',
+                  fontSize: '13px',
+                  fontWeight: active ? '600' : '500',
+                  color: active ? '#FFFFFF' : TEXT_SECONDARY,
+                }}>
+                  {label}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </nav>
+
+        {/* Demo badge */}
+        <div style={{ padding: '16px 20px', borderTop: `1px solid ${GLASS_BORDER}` }}>
+          <div style={{
+            padding: '8px 12px',
+            borderRadius: '10px',
+            background: 'rgba(251,146,60,0.12)',
+            border: '1px solid rgba(251,146,60,0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}>
+            <div style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              background: '#FB923C',
+              flexShrink: 0,
+            }} />
+            <span style={{ fontSize: '11px', fontWeight: '600', color: '#FB923C' }}>Demo Mode</span>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main style={{
+        flex: 1,
+        marginLeft: '220px',
+        padding: '40px 48px',
+        maxWidth: '1100px',
+      }}>
+
+        {/* Top bar */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '40px',
+        }}>
+          <div>
+            <h1 style={{
+              fontFamily: 'Outfit, sans-serif',
+              fontSize: '28px',
+              fontWeight: '700',
+              color: '#FFFFFF',
+              marginBottom: '4px',
+            }}>
+              {greeting}
+            </h1>
+            <p style={{ fontSize: '14px', color: TEXT_SECONDARY }}>{today}</p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '12px',
+              background: GLASS_BG,
+              backdropFilter: GLASS_BLUR,
+              WebkitBackdropFilter: GLASS_BLUR,
+              border: `1px solid ${GLASS_BORDER}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: TEXT_SECONDARY,
+              transition: 'background 0.15s, border-color 0.15s',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)'
+              ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.15)'
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.background = GLASS_BG
+              ;(e.currentTarget as HTMLElement).style.borderColor = GLASS_BORDER
+            }}
+            >
+              <Bell className="w-4 h-4" />
+            </button>
+            <div style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #4ADE80, #67E8F9)',
+              color: '#000',
+              fontSize: '14px',
+              fontWeight: '700',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              S
+            </div>
+          </div>
+        </div>
+
+        {/* KPI Row */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '20px',
+          marginBottom: '32px',
+        }}>
+          {kpiCards.map(({ label, value, delta, icon: Icon, accent, accentBg, href }) => {
+            const isPositive = delta.startsWith('+') && !delta.includes('-0%')
+            return (
+              <Link
+                key={label}
+                href={href}
+                style={{
+                  background: GLASS_BG,
+                  backdropFilter: GLASS_BLUR,
+                  WebkitBackdropFilter: GLASS_BLUR,
+                  border: `1px solid ${GLASS_BORDER}`,
+                  borderRadius: '20px',
+                  padding: '24px',
+                  textDecoration: 'none',
+                  display: 'block',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={e => {
+                  const el = e.currentTarget as HTMLElement
+                  el.style.transform = 'translateY(-2px)'
+                  el.style.boxShadow = `0 0 24px ${accent}20`
+                }}
+                onMouseLeave={e => {
+                  const el = e.currentTarget as HTMLElement
+                  el.style.transform = 'translateY(0)'
+                  el.style.boxShadow = 'none'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
+                  <p style={{
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    color: TEXT_SECONDARY,
+                  }}>
+                    {label}
+                  </p>
+                  <div style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: accentBg,
+                  }}>
+                    <Icon className="w-4 h-4" style={{ color: accent }} />
+                  </div>
+                </div>
+                <div style={{
+                  fontFamily: 'Outfit, sans-serif',
+                  fontSize: '36px',
+                  fontWeight: '800',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1,
+                  color: '#FFFFFF',
+                  marginBottom: '10px',
+                }}>
+                  {value}
+                </div>
+                <span style={{
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  color: isPositive ? '#4ADE80' : TEXT_SECONDARY,
+                  background: isPositive ? 'rgba(74,222,128,0.1)' : 'rgba(156,163,175,0.08)',
+                  padding: '3px 10px',
                   borderRadius: '999px',
                 }}>
-                  {upcomingSessions.length}
+                  {delta}
                 </span>
-              </div>
-              <Link href="/school-admin/sessions" style={{
-                fontSize: '12px',
-                fontWeight: '500',
-                color: '#4ADE80',
-                textDecoration: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-              }}>
-                View all <ArrowRight className="w-3 h-3" />
               </Link>
-            </div>
+            )
+          })}
+        </div>
 
-            {loadingSessions ? (
-              <div style={{ textAlign: 'center', padding: '32px', color: '#6B7280' }}>
-                <p style={{ fontSize: '14px' }}>Loading sessions...</p>
-              </div>
-            ) : upcomingSessions.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '32px' }}>
-                <Clock className="w-8 h-8 mx-auto mb-2" style={{ color: '#6B7280', opacity: 0.4 }} />
-                <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '8px' }}>No upcoming sessions</p>
+        {/* Main 2-column grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '24px' }}>
+
+          {/* Left column */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+            {/* Upcoming Sessions */}
+            <div style={{
+              background: GLASS_BG,
+              backdropFilter: GLASS_BLUR,
+              WebkitBackdropFilter: GLASS_BLUR,
+              border: `1px solid ${GLASS_BORDER}`,
+              borderRadius: '20px',
+              padding: '28px',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <h2 style={{
+                    fontFamily: 'Outfit, sans-serif',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    color: '#FFFFFF',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                  }}>
+                    Upcoming Sessions
+                  </h2>
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: '700',
+                    color: '#4ADE80',
+                    background: 'rgba(74,222,128,0.12)',
+                    padding: '3px 10px',
+                    borderRadius: '999px',
+                  }}>
+                    {upcomingSessions.length}
+                  </span>
+                </div>
                 <Link href="/school-admin/sessions" style={{
                   fontSize: '12px',
-                  fontWeight: '500',
+                  fontWeight: '600',
                   color: '#4ADE80',
                   textDecoration: 'none',
-                }}>
-                  Schedule one now →
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  transition: 'gap 0.15s',
+                }}
+                onMouseEnter={e => ((e.currentTarget as HTMLElement).style.gap = '8px')}
+                onMouseLeave={e => ((e.currentTarget as HTMLElement).style.gap = '4px')}
+                >
+                  View all <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {upcomingSessions.slice(0, 5).map(session => {
-                  const date = new Date(session.start_date + 'T12:00:00')
-                  const statusColor = session.status === 'scheduled' ? '#4ADE80' : session.status === 'completed' ? '#FBBF24' : '#9CA3AF'
-                  const dotColor = session.status === 'scheduled' ? '#4ADE80' : session.status === 'completed' ? '#FBBF24' : '#F97316'
-                  return (
-                    <div key={session.id} style={{
+
+              {loadingSessions ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: TEXT_SECONDARY }}>
+                  <p style={{ fontSize: '14px' }}>Loading sessions...</p>
+                </div>
+              ) : upcomingSessions.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px' }}>
+                  <Clock className="w-8 h-8 mx-auto mb-3" style={{ color: TEXT_SECONDARY, opacity: 0.4 }} />
+                  <p style={{ fontSize: '14px', color: TEXT_SECONDARY, marginBottom: '8px' }}>No upcoming sessions</p>
+                  <Link href="/school-admin/sessions" style={{
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    color: '#4ADE80',
+                    textDecoration: 'none',
+                  }}>
+                    Schedule one now →
+                  </Link>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {upcomingSessions.slice(0, 5).map(session => {
+                    const date = new Date(session.start_date + 'T12:00:00')
+                    const statusConfig: Record<string, { bg: string; color: string; dot: string }> = {
+                      scheduled: { bg: 'rgba(74,222,128,0.1)', color: '#4ADE80', dot: '#4ADE80' },
+                      completed: { bg: 'rgba(251,146,60,0.1)', color: '#FB923C', dot: '#FB923C' },
+                      pending: { bg: 'rgba(251,191,36,0.1)', color: '#FBBF24', dot: '#FBBF24' },
+                    }
+                    const sc = statusConfig[session.status] ?? { bg: 'rgba(156,163,175,0.1)', color: TEXT_SECONDARY, dot: TEXT_SECONDARY }
+                    return (
+                      <div key={session.id} style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '14px',
+                        padding: '14px 16px',
+                        background: 'rgba(0,0,0,0.2)',
+                        border: `1px solid ${GLASS_BORDER}`,
+                        borderRadius: '14px',
+                        transition: 'background 0.15s, border-color 0.15s',
+                        cursor: 'pointer',
+                      }}
+                      onMouseEnter={e => {
+                        const el = e.currentTarget as HTMLElement
+                        el.style.background = 'rgba(255,255,255,0.04)'
+                        el.style.borderColor = 'rgba(255,255,255,0.12)'
+                      }}
+                      onMouseLeave={e => {
+                        const el = e.currentTarget as HTMLElement
+                        el.style.background = 'rgba(0,0,0,0.2)'
+                        el.style.borderColor = GLASS_BORDER
+                      }}>
+                        <div style={{
+                          width: '42px',
+                          height: '42px',
+                          borderRadius: '12px',
+                          background: `${sc.dot}15`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}>
+                          <Calendar className="w-4 h-4" style={{ color: sc.dot }} />
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', marginBottom: '2px' }}>
+                            {session.session_type?.name || 'Session'}
+                          </div>
+                          <div style={{ fontSize: '12px', color: TEXT_SECONDARY }}>
+                            {session.instructor?.name || 'No instructor'}
+                          </div>
+                        </div>
+                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                          <div style={{ fontSize: '13px', color: '#FFFFFF', fontWeight: '500' }}>
+                            {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </div>
+                          <div style={{ fontSize: '12px', color: TEXT_SECONDARY }}>
+                            {date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                          </div>
+                        </div>
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          padding: '5px 12px',
+                          borderRadius: '999px',
+                          fontSize: '11px',
+                          fontWeight: '600',
+                          background: sc.bg,
+                          color: sc.color,
+                          textTransform: 'capitalize',
+                          flexShrink: 0,
+                        }}>
+                          {session.status}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Recent Activity */}
+            <div style={{
+              background: GLASS_BG,
+              backdropFilter: GLASS_BLUR,
+              WebkitBackdropFilter: GLASS_BLUR,
+              border: `1px solid ${GLASS_BORDER}`,
+              borderRadius: '20px',
+              padding: '28px',
+            }}>
+              <h2 style={{
+                fontFamily: 'Outfit, sans-serif',
+                fontSize: '13px',
+                fontWeight: '600',
+                color: '#FFFFFF',
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                marginBottom: '20px',
+              }}>
+                Recent Activity
+              </h2>
+              <div>
+                {recentActivity.map((item, idx) => (
+                  <div key={idx} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '14px',
+                    padding: '14px 0',
+                    borderBottom: idx < recentActivity.length - 1 ? `1px solid ${GLASS_BORDER}` : 'none',
+                  }}>
+                    <div style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #4ADE80, #67E8F9)',
+                      color: '#000',
+                      fontSize: '11px',
+                      fontWeight: '700',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '16px',
-                      padding: '14px 16px',
-                      background: '#050505',
-                      border: '1px solid #1A1A1A',
-                      borderRadius: '12px',
-                      transition: 'background 0.15s, border-color 0.15s',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>
+                      {item.initials}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <span style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF' }}>{item.name}</span>
+                      <span style={{ fontSize: '14px', color: TEXT_SECONDARY }}> {item.action} </span>
+                      <span style={{ fontSize: '14px', fontWeight: '500', color: TEXT_SECONDARY }}>{item.item}</span>
+                    </div>
+                    <span style={{ fontSize: '12px', color: TEXT_SECONDARY, flexShrink: 0 }}>{item.time}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right column */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+            {/* Quick Actions */}
+            <div style={{
+              background: GLASS_BG,
+              backdropFilter: GLASS_BLUR,
+              WebkitBackdropFilter: GLASS_BLUR,
+              border: `1px solid ${GLASS_BORDER}`,
+              borderRadius: '20px',
+              padding: '28px',
+            }}>
+              <h2 style={{
+                fontFamily: 'Outfit, sans-serif',
+                fontSize: '13px',
+                fontWeight: '600',
+                color: '#FFFFFF',
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                marginBottom: '20px',
+              }}>
+                Quick Actions
+              </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {quickActions.map(({ icon: QIcon, label, href, accent, bg }) => (
+                  <Link
+                    key={label}
+                    href={href}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '14px 18px',
+                      background: bg,
+                      border: `1px solid ${GLASS_BORDER}`,
+                      borderRadius: '14px',
+                      textDecoration: 'none',
+                      transition: 'background 0.15s, border-color 0.15s, transform 0.1s',
                       cursor: 'pointer',
                     }}
                     onMouseEnter={e => {
                       const el = e.currentTarget as HTMLElement
-                      el.style.background = '#13161F'
-                      el.style.borderColor = '#2A2A3A'
+                      el.style.background = `${accent}20`
+                      el.style.borderColor = `${accent}40`
+                      el.style.transform = 'scale(0.99)'
                     }}
                     onMouseLeave={e => {
                       const el = e.currentTarget as HTMLElement
-                      el.style.background = '#050505'
-                      el.style.borderColor = '#1A1A1A'
-                    }}>
-                      {/* Session type dot + icon circle */}
-                      <div style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '10px',
-                        background: `${dotColor}15`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}>
-                        <Calendar className="w-4 h-4" style={{ color: dotColor }} />
-                      </div>
-                      {/* Session info */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', marginBottom: '2px' }}>
-                          {session.session_type?.name || 'Session'}
-                        </div>
-                        <div style={{ fontSize: '12px', color: '#6B7280' }}>
-                          {session.instructor?.name || 'No instructor'}
-                        </div>
-                      </div>
-                      {/* Date/time */}
-                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <div style={{ fontSize: '13px', color: '#9CA3AF' }}>
-                          {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        </div>
-                        <div style={{ fontSize: '12px', color: '#6B7280' }}>
-                          {date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
-                        </div>
-                      </div>
-                      {/* Status pill */}
-                      <span style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        padding: '4px 10px',
-                        borderRadius: '999px',
-                        fontSize: '11px',
-                        fontWeight: '600',
-                        background: session.status === 'scheduled' ? 'rgba(74,222,128,0.15)' : 'rgba(156,163,175,0.1)',
-                        color: session.status === 'scheduled' ? '#4ADE80' : '#9CA3AF',
-                        textTransform: 'capitalize',
-                        flexShrink: 0,
-                      }}>
-                        {session.status}
-                      </span>
-                    </div>
-                  )
-                })}
+                      el.style.background = bg
+                      el.style.borderColor = GLASS_BORDER
+                      el.style.transform = 'scale(1)'
+                    }}
+                  >
+                    <QIcon className="w-4 h-4" style={{ color: accent }} />
+                    <span style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF' }}>{label}</span>
+                    <ChevronRight className="w-4 h-4" style={{ color: TEXT_SECONDARY, marginLeft: 'auto' }} />
+                  </Link>
+                ))}
               </div>
-            )}
-          </div>
-
-          {/* Recent Activity */}
-          <div style={{
-            background: '#0F1117',
-            border: '1px solid #1A1A1A',
-            borderRadius: '16px',
-            padding: '24px',
-          }}>
-            <h2 style={{
-              fontFamily: 'Outfit, sans-serif',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#FFFFFF',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginBottom: '20px',
-            }}>
-              Recent Activity
-            </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-              {recentActivity.map((item, idx) => (
-                <div key={idx} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '14px',
-                  padding: '12px 0',
-                  borderBottom: idx < recentActivity.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                }}>
-                  {/* Avatar circle */}
-                  <div style={{
-                    width: '34px',
-                    height: '34px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #4ADE80, #22D3EE)',
-                    color: '#000',
-                    fontSize: '11px',
-                    fontWeight: '700',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}>
-                    {item.initials}
-                  </div>
-                  {/* Action text */}
-                  <div style={{ flex: 1 }}>
-                    <span style={{ fontSize: '14px', fontWeight: '500', color: '#FFFFFF' }}>{item.name}</span>
-                    <span style={{ fontSize: '14px', color: '#6B7280' }}> {item.action} </span>
-                    <span style={{ fontSize: '14px', fontWeight: '500', color: '#9CA3AF' }}>{item.item}</span>
-                  </div>
-                  {/* Time */}
-                  <span style={{ fontSize: '12px', color: '#6B7280', flexShrink: 0 }}>{item.time}</span>
-                </div>
-              ))}
             </div>
-          </div>
 
-        </div>
-
-        {/* Right Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-
-          {/* Popular Services */}
-          <div style={{
-            background: '#0F1117',
-            border: '1px solid #1A1A1A',
-            borderRadius: '16px',
-            padding: '24px',
-          }}>
-            <h2 style={{
-              fontFamily: 'Outfit, sans-serif',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#FFFFFF',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginBottom: '20px',
+            {/* Completion Rate */}
+            <div style={{
+              background: GLASS_BG,
+              backdropFilter: GLASS_BLUR,
+              WebkitBackdropFilter: GLASS_BLUR,
+              border: `1px solid ${GLASS_BORDER}`,
+              borderRadius: '20px',
+              padding: '28px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
             }}>
-              Popular Services
-            </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {popularServices.map((svc, idx) => (
-                <div key={idx} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '12px 14px',
-                  background: '#050505',
-                  border: '1px solid #1A1A1A',
-                  borderRadius: '10px',
-                  transition: 'border-color 0.15s',
-                }}
-                onMouseEnter={e => ((e.currentTarget as HTMLElement).style.borderColor = '#2A2A3A')}
-                onMouseLeave={e => ((e.currentTarget as HTMLElement).style.borderColor = '#1A1A1A')}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      background: idx === 0 ? '#4ADE80' : idx === 1 ? '#78E4FF' : idx === 2 ? '#FBBF24' : '#A855F7',
-                      flexShrink: 0,
-                    }} />
-                    <span style={{ fontSize: '13px', fontWeight: '500', color: '#FFFFFF' }}>{svc.name}</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span style={{ fontSize: '11px', color: '#6B7280' }}>{svc.count} sessions</span>
-                    <span style={{ fontSize: '12px', fontWeight: '600', color: '#9CA3AF' }}>{svc.price}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div style={{
-            background: '#0F1117',
-            border: '1px solid #1A1A1A',
-            borderRadius: '16px',
-            padding: '24px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-          }}>
-            <h2 style={{
-              fontFamily: 'Outfit, sans-serif',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#FFFFFF',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginBottom: '4px',
-            }}>
-              Quick Actions
-            </h2>
-            <Link
-              href="/school-admin/sessions"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                padding: '12px 20px',
-                background: '#4ADE80',
-                borderRadius: '12px',
-                fontSize: '14px',
-                fontWeight: '700',
-                color: '#000000',
-                textDecoration: 'none',
-                transition: 'opacity 0.15s',
-              }}
-              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '0.85')}
-              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
-            >
-              <Plus className="w-4 h-4" />
-              Schedule Session
-            </Link>
-            <Link
-              href="/school-admin/students"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                padding: '12px 20px',
-                background: 'transparent',
-                border: '1px solid #1A1A1A',
-                borderRadius: '12px',
-                fontSize: '14px',
+              <h2 style={{
+                fontFamily: 'Outfit, sans-serif',
+                fontSize: '13px',
                 fontWeight: '600',
                 color: '#FFFFFF',
-                textDecoration: 'none',
-                transition: 'background 0.15s, border-color 0.15s',
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.background = '#13161F'
-                ;(e.currentTarget as HTMLElement).style.borderColor = '#2A2A3A'
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.background = 'transparent'
-                ;(e.currentTarget as HTMLElement).style.borderColor = '#1A1A1A'
-              }}
-            >
-              <Users className="w-4 h-4" />
-              Add Student
-            </Link>
-            <Link
-              href="/school-admin/sessions"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                padding: '12px 20px',
-                background: 'transparent',
-                border: '1px solid transparent',
-                borderRadius: '12px',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#9CA3AF',
-                textDecoration: 'none',
-                transition: 'background 0.15s',
-              }}
-              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#13161F')}
-              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
-            >
-              <Mail className="w-4 h-4" />
-              Send Reminder
-            </Link>
-          </div>
-
-          {/* Completion Rate */}
-          <div style={{
-            background: '#0F1117',
-            border: '1px solid #1A1A1A',
-            borderRadius: '16px',
-            padding: '24px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}>
-            <h2 style={{
-              fontFamily: 'Outfit, sans-serif',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#FFFFFF',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginBottom: '20px',
-              alignSelf: 'flex-start',
-            }}>
-              Completion Rate
-            </h2>
-            {/* SVG ring */}
-            <div style={{ position: 'relative', marginBottom: '16px' }}>
-              <svg width="80" height="80" style={{ transform: 'rotate(-90deg)' }}>
-                <circle
-                  cx="40"
-                  cy="40"
-                  r={ringR}
-                  fill="none"
-                  stroke="#1A1A1A"
-                  strokeWidth="6"
-                />
-                <circle
-                  cx="40"
-                  cy="40"
-                  r={ringR}
-                  fill="none"
-                  stroke="#4ADE80"
-                  strokeWidth="6"
-                  strokeDasharray={ringCircumference}
-                  strokeDashoffset={ringOffset}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                marginBottom: '28px',
+                alignSelf: 'flex-start',
               }}>
-                <span style={{
-                  fontFamily: 'Outfit, sans-serif',
-                  fontSize: '18px',
-                  fontWeight: '800',
-                  color: '#FFFFFF',
+                Completion Rate
+              </h2>
+
+              <div style={{ position: 'relative', marginBottom: '20px' }}>
+                <svg width="90" height="90" style={{ transform: 'rotate(-90deg)' }}>
+                  <circle
+                    cx="45"
+                    cy="45"
+                    r={ringR}
+                    fill="none"
+                    stroke="rgba(255,255,255,0.06)"
+                    strokeWidth="6"
+                  />
+                  <circle
+                    cx="45"
+                    cy="45"
+                    r={ringR}
+                    fill="none"
+                    stroke="#4ADE80"
+                    strokeWidth="6"
+                    strokeDasharray={ringCircumference}
+                    strokeDashoffset={ringOffset}
+                    strokeLinecap="round"
+                    style={{ filter: 'drop-shadow(0 0 6px rgba(74,222,128,0.4))' }}
+                  />
+                </svg>
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}>
-                  {completionPercent}%
-                </span>
+                  <span style={{
+                    fontFamily: 'Outfit, sans-serif',
+                    fontSize: '20px',
+                    fontWeight: '800',
+                    color: '#FFFFFF',
+                  }}>
+                    {completionPercent}%
+                  </span>
+                </div>
+              </div>
+
+              <p style={{ fontSize: '13px', color: TEXT_SECONDARY, textAlign: 'center' }}>
+                {stats.completionRate > 0 ? 'Above national average' : 'Complete sessions to track'}
+              </p>
+
+              <div style={{
+                marginTop: '20px',
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '12px', color: TEXT_SECONDARY }}>This month</span>
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#FFFFFF' }}>{stats.completionRate}%</span>
+                </div>
+                <div style={{
+                  height: '4px',
+                  background: 'rgba(255,255,255,0.06)',
+                  borderRadius: '999px',
+                  overflow: 'hidden',
+                }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${completionPercent}%`,
+                    background: 'linear-gradient(90deg, #4ADE80, #67E8F9)',
+                    borderRadius: '999px',
+                    transition: 'width 0.6s ease',
+                  }} />
+                </div>
               </div>
             </div>
-            <p style={{ fontSize: '12px', color: '#6B7280', textAlign: 'center' }}>
-              {stats.completionRate > 0 ? 'Above national average' : 'Complete sessions to track'}
-            </p>
-          </div>
 
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
