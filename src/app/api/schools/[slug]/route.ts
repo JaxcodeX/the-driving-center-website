@@ -15,7 +15,8 @@ export async function GET(
     .from('schools')
     .select('id, name, phone, state, service_zips, plan_tier')
     .eq('slug', slug)
-    .single()
+    .single() as { data: { id: string; name: string; phone: string; state: string; service_zips: string[]; plan_tier: string } | null; error: any }
+
 
   if (error || !school) {
     return new NextResponse('School not found', { status: 404 })
@@ -24,15 +25,15 @@ export async function GET(
   const { data: sessionTypes } = await admin
     .from('session_types')
     .select('id, name, description, duration_minutes, price_cents, deposit_cents, color, tca_hours_credit')
-    .eq('school_id', school.id)
+    .eq('school_id', school!.id)
     .eq('active', true)
-    .order('price_cents', { ascending: true })
+    .order('price_cents', { ascending: true }) as { data: any[] | null; error: any }
 
   const { data: profile } = await admin
     .from('school_profiles')
     .select('tagline, about, address, city, zip, email, website, facebook, instagram')
-    .eq('school_id', school.id)
-    .single()
+    .eq('school_id', school!.id)
+    .single() as { data: any; error: any }
 
   return NextResponse.json({
     school: {

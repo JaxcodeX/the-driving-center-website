@@ -237,7 +237,7 @@ function Hero() {
             letterSpacing: '0.06em', marginBottom: '32px',
           }}>
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 8px #4ADE80' }} />
-            SCHEDULING SOFTWARE FOR DRIVING SCHOOLS
+            DRIVING SCHOOL MANAGEMENT SOFTWARE
           </div>
 
           {/* Headline */}
@@ -246,15 +246,15 @@ function Hero() {
             lineHeight: '1.05', letterSpacing: '-0.03em',
             color: '#FFFFFF', margin: '0 0 24px',
           }}>
-            The simplest way<br />to run your school
+            Stop losing hours<br />to scheduling chaos
           </h1>
 
           {/* Subheadline */}
           <p style={{
             fontSize: '18px', color: '#9CA3AF', lineHeight: '1.7',
-            margin: '0 0 40px', maxWidth: '560px', marginLeft: 'auto', marginRight: 'auto',
+            margin: '0 0 40px', maxWidth: '540px', marginLeft: 'auto', marginRight: 'auto',
           }}>
-            Everything you need to manage bookings, track students, and grow your school — all from one dashboard.
+            Your students book and pay online. You get automated reminders and a dashboard that actually tells you what's happening. No-shows drop. Revenue goes up. You stop playing phone tag.
           </p>
 
           {/* CTAs */}
@@ -287,7 +287,7 @@ function Hero() {
           </div>
 
           <p style={{ fontSize: '13px', color: '#6B7280', marginTop: '24px' }}>
-            Trusted by 50+ driving schools across Tennessee
+            Built for driving school owners. Not another generic scheduling tool.
           </p>
         </div>
       </Container>
@@ -437,21 +437,21 @@ function Features() {
 const steps = [
   {
     num: '01',
-    icon: <Users size={22} />,
-    title: 'Create your school',
-    desc: 'Sign up in 2 minutes. Add your instructors, set your session types and pricing.',
+    icon: <CreditCard size={22} />,
+    title: 'Students pay before the lesson',
+    desc: 'Deposit collection happens automatically at booking. You stop chasing payments and students stop ghosting.',
   },
   {
     num: '02',
-    icon: <CalendarCheck size={22} />,
-    title: 'Students book online',
-    desc: 'Share your booking link. Students pick a time, pay, and get instant confirmation.',
+    icon: <BellRing size={22} />,
+    title: 'AI handles the reminders',
+    desc: '48-hour and 4-hour reminders go out automatically. No-shows drop. Your phone stops ringing the morning of.',
   },
   {
     num: '03',
     icon: <BarChart3 size={22} />,
-    title: 'Run from your dashboard',
-    desc: 'Manage bookings, track student progress, and handle payments — all in one place.',
+    title: 'Your whole school in one dashboard',
+    desc: 'Student progress, session schedules, payments, instructor availability — everything in one place. No more spreadsheets.',
   },
 ]
 
@@ -460,8 +460,8 @@ function HowItWorks() {
     <Section pt={140} pb={140} style={{ background: '#0A0A0F' }}>
       <div style={{ textAlign: 'center', marginBottom: '80px' }}>
         <Eyebrow>How It Works</Eyebrow>
-        <SectionHeadline mb='8px'>Up and running in minutes</SectionHeadline>
-        <SectionSub mb='0' ta='center'>No training required. No complicated setup.</SectionSub>
+        <SectionHeadline mb='8px'>The automation that pays for itself</SectionHeadline>
+        <SectionSub mb='0' ta='center'>Every feature built around the problems that actually cost you time and money.</SectionSub>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', position: 'relative' }}>
@@ -1095,8 +1095,6 @@ export default function HomePage() {
       <Features />
       <HowItWorks />
       <DashboardMockup />
-      <StatsBar />
-      <Testimonials />
       <Pricing />
       <FAQ />
       <CTASection />
