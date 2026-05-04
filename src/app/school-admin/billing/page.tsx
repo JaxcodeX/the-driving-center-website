@@ -10,6 +10,8 @@ const GLASS_BG = 'rgba(255,255,255,0.03)'
 const GLASS_BORDER = 'rgba(255,255,255,0.06)'
 const GLASS_BLUR = 'blur(24px)'
 const TEXT_SECONDARY = '#9CA3AF'
+const ACCENT_ORANGE = '#FF8C42'
+const ACCENT_CYAN = '#67E8F9'
 const ACCENT_GREEN = '#4ADE80'
 const CARD_SHADOW = '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)'
 
@@ -70,23 +72,23 @@ export default function BillingPage() {
 
   const status = subscription?.subscription_status || 'trial'
 
-  const statusIcon = status === 'active'
-    ? <CheckCircle className="w-5 h-5" style={{ color: ACCENT_GREEN }} />
-    : status === 'past_due'
-    ? <AlertCircle className="w-5 h-5" style={{ color: '#F97316' }} />
-    : <CreditCard className="w-5 h-5" style={{ color: '#78E4FF' }} />
-
   const statusBg = status === 'active'
     ? 'rgba(74,222,128,0.15)'
     : status === 'past_due'
     ? 'rgba(249,115,22,0.15)'
-    : 'rgba(120,228,255,0.15)'
+    : 'rgba(103,232,249,0.15)'
 
   const statusColor = status === 'active'
     ? ACCENT_GREEN
     : status === 'past_due'
     ? '#F97316'
-    : '#78E4FF'
+    : ACCENT_CYAN
+
+  const statusIcon = status === 'active'
+    ? <CheckCircle className="w-5 h-5" style={{ color: ACCENT_GREEN }} />
+    : status === 'past_due'
+    ? <AlertCircle className="w-5 h-5" style={{ color: '#F97316' }} />
+    : <CreditCard className="w-5 h-5" style={{ color: ACCENT_CYAN }} />
 
   return (
     <div style={{
@@ -190,8 +192,8 @@ export default function BillingPage() {
               borderRadius: '999px',
               fontSize: '12px',
               fontWeight: '600',
-              background: 'rgba(74,222,128,0.15)',
-              color: ACCENT_GREEN,
+              background: statusBg,
+              color: statusColor,
             }}>
               {status}
             </span>
@@ -270,8 +272,8 @@ export default function BillingPage() {
               <CreditCard className="w-4 h-4" style={{ color: TEXT_SECONDARY }} />
             </div>
             <div style={{ fontSize: '13px', color: TEXT_SECONDARY }}>
-              Visa •••• 4242
-              <span style={{ marginLeft: '8px', color: TEXT_SECONDARY }}>Expires 12/26</span>
+              Visa ending 4242
+              <span style={{ marginLeft: '8px' }}>Expires 12/26</span>
             </div>
             <button
               onClick={openBillingPortal}

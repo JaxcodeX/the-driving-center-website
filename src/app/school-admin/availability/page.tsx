@@ -21,6 +21,7 @@ const GLASS_BORDER = 'rgba(255,255,255,0.06)'
 const GLASS_BLUR = 'blur(24px)'
 const TEXT_SECONDARY = '#9CA3AF'
 const ACCENT_CYAN = '#67E8F9'
+const ACCENT_ORANGE = '#FF8C42'
 const ACCENT_GREEN = '#4ADE80'
 const CARD_SHADOW = '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)'
 
@@ -314,7 +315,7 @@ function AvailabilityContent() {
               style={{
                 width: '100%',
                 padding: '14px',
-                background: `linear-gradient(135deg, ${ACCENT_CYAN}, #818CF8)`,
+                background: ACCENT_ORANGE,
                 border: 'none',
                 borderRadius: '12px',
                 color: '#000',
