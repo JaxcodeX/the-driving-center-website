@@ -33,21 +33,56 @@ export async function GET(
     return NextResponse.json({ error: 'Token required' }, { status: 400 })
   }
 
-  const supabase = await createClient()
-  const { data: booking, error } = await lookupByToken(supabase, token) as { data: BookingFull; error: any }
+  const supabaseAdmin = getSupabaseAdmin() as any
+
+  // Full query for GET: include all session relations for confirmation page
+  const { data: booking, error } = await supabaseAdmin
+    .from('bookings')
+    .select(`
+      *,
+      session:session_id(
+        id, school_id, start_date, location, seats_booked,
+        instructor:instructors(id, name),
+        session_type:session_type_id(id, name, color, duration_minutes, price_cents),
+        school:schools(id, name)
+      )
+    `)
+    .eq('booking_token', token)
+    .single()
+    .then(({ data, error }: any) => {
+      if (data) return { data, error: null }
+      return supabaseAdmin
+        .from('bookings')
+        .select(`
+          *,
+          session:session_id(
+            id, school_id, start_date, location, seats_booked,
+            instructor:instructors(id, name),
+            session_type:session_type_id(id, name, color, duration_minutes, price_cents),
+            school:schools(id, name)
+          )
+        `)
+        .eq('confirmation_token', token)
+        .single()
+        .then((r: any) => ({ data: r.data, error: r.error }))
+    }) as { data: any; error: any }
 
   if (error || !booking) {
     return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
   }
 
-  // Strip token fields from response — never expose raw tokens
+  // Strip token fields from response
   const safeBooking = {
     id: booking.id,
     student_name: booking.student_name,
     student_email: booking.student_email,
+    student_phone: booking.student_phone,
     status: booking.status,
+    payment_status: booking.payment_status,
     deposit_amount_cents: booking.deposit_amount_cents,
     created_at: booking.created_at,
+    session_date: booking.session_date,
+    session_time: booking.session_time,
     session: booking.session,
   }
   return NextResponse.json(safeBooking)
@@ -65,11 +100,21 @@ export async function POST(
     return NextResponse.json({ error: 'Token and action required' }, { status: 400 })
   }
 
-  const supabase = await createClient()
   const supabaseAdmin = getSupabaseAdmin() as any
-
-  // Get booking with session info — no string concatenation, no SQL injection risk
-  const { data: booking, error: fetchError } = await lookupByToken(supabase, token) as { data: BookingWithSession; error: any }
+  const { data: booking, error: fetchError } = await supabaseAdmin
+    .from('bookings')
+    .select('*, session:session_id(id, school_id, start_date, seats_booked)')
+    .eq('booking_token', token)
+    .single()
+    .then(({ data, error }: any) => {
+      if (data) return { data, error: null }
+      return supabaseAdmin
+        .from('bookings')
+        .select('*, session:session_id(id, school_id, start_date, seats_booked)')
+        .eq('confirmation_token', token)
+        .single()
+        .then((r: any) => ({ data: r.data, error: r.error }))
+    }) as { data: BookingWithSession; error: any }
 
   if (fetchError || !booking) {
     return NextResponse.json({ error: 'Booking not found' }, { status: 404 })

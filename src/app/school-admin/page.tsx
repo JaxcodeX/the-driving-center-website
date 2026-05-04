@@ -228,7 +228,7 @@ export default function DashboardPage() {
       }} />
 
       {/* Sidebar */}
-      <aside style={{
+      <aside className="admin-sidebar" style={{
         width: '220px',
         flexShrink: 0,
         background: GLASS_BG,
@@ -315,8 +315,47 @@ export default function DashboardPage() {
         </div>
       </aside>
 
+      {/* Mobile nav pills */}
+      <nav className="admin-nav-pills" style={{
+        display: 'none',
+        padding: '12px 16px',
+        gap: '8px',
+        overflowX: 'auto',
+        borderBottom: `1px solid ${GLASS_BORDER}`,
+        background: GLASS_BG,
+        backdropFilter: GLASS_BLUR,
+        WebkitBackdropFilter: GLASS_BLUR,
+        position: 'sticky',
+        top: 0,
+        zIndex: 20,
+      }}>
+        {NAV_ITEMS.map(({ icon: NavIcon, label, href, active }) => (
+          <Link
+            key={label}
+            href={href}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 14px',
+              borderRadius: '999px',
+              textDecoration: 'none',
+              background: active ? 'rgba(255,140,66,0.15)' : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${active ? ACCENT_ORANGE : GLASS_BORDER}`,
+              transition: 'background 0.15s',
+              flexShrink: 0,
+            }}
+          >
+            <NavIcon className="w-3.5 h-3.5" style={{ color: active ? ACCENT_ORANGE : TEXT_SECONDARY }} />
+            <span style={{ fontSize: '12px', fontWeight: active ? '600' : '500', color: active ? ACCENT_ORANGE : TEXT_SECONDARY }}>
+              {label}
+            </span>
+          </Link>
+        ))}
+      </nav>
+
       {/* Main Content */}
-      <main style={{
+      <main className="admin-main" style={{
         flex: 1,
         marginLeft: '220px',
         padding: '40px 48px',
@@ -390,7 +429,7 @@ export default function DashboardPage() {
         </div>
 
         {/* KPI Row */}
-        <div style={{
+        <div className="admin-kpi-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
           gap: '16px',
@@ -475,7 +514,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Main 2-column grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '24px' }}>
+        <div className="admin-2col" style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '24px' }}>
 
           {/* Left column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -791,6 +830,32 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .admin-sidebar {
+            display: none !important;
+          }
+          .admin-main {
+            margin-left: 0 !important;
+            padding: 24px 16px !important;
+          }
+          .admin-nav-pills {
+            display: flex !important;
+          }
+          .admin-kpi-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .admin-2col {
+            grid-template-columns: 1fr !important;
+          }
+        }
+        @media (min-width: 769px) {
+          .admin-nav-pills {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }

@@ -479,17 +479,32 @@ export default function SessionsPage() {
 
         {/* Sessions Table */}
         {loading ? (
-          <div style={{
-            background: GLASS_BG,
-            backdropFilter: GLASS_BLUR,
-            WebkitBackdropFilter: GLASS_BLUR,
-            border: `1px solid ${GLASS_BORDER}`,
-            borderRadius: '16px',
-            textAlign: 'center',
-            padding: '64px',
-            boxShadow: CARD_SHADOW,
-          }}>
-            <p style={{ fontSize: '14px', color: TEXT_SECONDARY }}>Loading sessions...</p>
+          <div style={{ background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, borderRadius: '16px', overflow: 'hidden', boxShadow: CARD_SHADOW }}>
+            {/* Table header */}
+            <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 80px', gap: '16px', padding: '12px 24px', borderBottom: `1px solid ${GLASS_BORDER}` }}>
+              {['Date', 'Session', 'Details', 'Status', ''].map((h, i) => (
+                <div key={i} style={{ height: '12px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} />
+              ))}
+            </div>
+            {[...Array(4)].map((_, i) => (
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 80px', gap: '16px', padding: '16px 24px', alignItems: 'center', borderBottom: `1px solid ${GLASS_BORDER}` }}>
+                <div>
+                  <div style={{ height: '11px', width: '30px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)', marginBottom: '4px' }} />
+                  <div style={{ height: '28px', width: '30px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', marginBottom: '4px' }} />
+                  <div style={{ height: '11px', width: '30px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)' }} />
+                </div>
+                <div>
+                  <div style={{ height: '14px', width: '70%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', marginBottom: '6px' }} />
+                  <div style={{ height: '12px', width: '50%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={{ height: '12px', width: '80%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} />
+                  <div style={{ height: '12px', width: '60%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} />
+                </div>
+                <div><div style={{ height: '24px', width: '80px', borderRadius: '999px', background: 'rgba(255,255,255,0.05)' }} /></div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}><div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }} /></div>
+              </div>
+            ))}
           </div>
         ) : !filteredSessions.length ? (
           <div style={{

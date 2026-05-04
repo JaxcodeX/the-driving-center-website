@@ -45,7 +45,7 @@ export async function GET(request: Request) {
   // NO cancelled column, NO start_time column
   let sessionQuery: any = admin
     .from('sessions')
-    .select('*, instructor:instructors(id, name), session_type:session_types(name, deposit_cents)')
+    .select('*, instructor:instructors(id, name), session_type:session_types(name, price_cents, deposit_cents)')
     .eq('school_id', schoolId)
     .eq('session_type_id', sessionTypeId)
     .eq('status', 'scheduled')
@@ -81,19 +81,25 @@ export async function GET(request: Request) {
     }, {})
   }
 
-  const slots = (sessions ?? []).map((session: any) => ({
-    id: session.id,
-    start_date: session.start_date,
-    end_date: session.end_date,
-    start_time: session.start_time ?? '09:00',
-    location: session.location,
-    instructor: session.instructor,
-    max_seats: session.max_seats,
-    seats_booked: bookingsBySession[session.id] ?? 0,
-    available: (session.max_seats ?? 0) - (bookingsBySession[session.id] ?? 0) > 0,
-    deposit_cents: session.session_type?.deposit_cents ?? 0,
-    price_cents: session.session_type?.price_cents ?? 0,
-  }))
+  const slots = (sessions ?? []).map((session: any) => {
+    const instructorData = session.instructor
+    return {
+      id: session.id,
+      session_date: session.start_date,
+      end_date: session.end_date,
+      start_time: session.start_time ?? '09:00',
+      end_time: session.end_time ?? null,
+      location: session.location,
+      instructor_id: instructorData?.id ?? null,
+      instructor_name: instructorData?.name ?? 'Instructor',
+      max_seats: session.max_seats,
+      seats_booked: bookingsBySession[session.id] ?? 0,
+      seats_available: Math.max(0, (session.max_seats ?? 0) - (bookingsBySession[session.id] ?? 0)),
+      available: (session.max_seats ?? 0) - (bookingsBySession[session.id] ?? 0) > 0,
+      deposit_cents: session.session_type?.deposit_cents ?? 0,
+      price_cents: session.session_type?.price_cents ?? 0,
+    }
+  })
 
   return NextResponse.json({
     session_type: {

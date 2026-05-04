@@ -84,7 +84,7 @@ export default function LoginPage() {
       padding: '24px',
     }}>
       {/* Card */}
-      <div style={{
+      <div className="login-card" style={{
         width: '100%', maxWidth: '420px',
         background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)',
         border: '1 solid rgba(255,255,255,0.06)',
@@ -445,8 +445,18 @@ export default function LoginPage() {
             opacity: 0;
           }
         }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
         .login-btn:not(:disabled):hover {
           box-shadow: 0 4px 16px rgba(255,140,66,0.35);
+        }
+        @media (max-width: 480px) {
+          .login-card {
+            padding: 24px 16px !important;
+            border-radius: 20px !important;
+          }
         }
       `}</style>
     </div>

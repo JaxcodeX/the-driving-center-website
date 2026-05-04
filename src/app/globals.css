@@ -2,8 +2,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
 
 /* ── Theme System ───────────────────────────────────────────────── */
+/* Dark mode tokens come AFTER light mode so dark mode takes precedence */
 :root,
 [data-theme="dark"] {
+  /* ── Dark Mode Tokens ── */
   --bg-base: #050505;
   --bg-surface: #0F1117;
   --bg-elevated: #13161F;
@@ -20,7 +22,6 @@
   --card-hover: #13161F;
   --card-border: #1A1A1A;
   --card-shadow: 0 20px 40px rgba(0,0,0,0.4);
-  --section-alt: #0A0A0F;
   --nav-bg: rgba(5,5,5,0.85);
   --nav-shadow: none;
   --glass-bg: rgba(255,255,255,0.03);
@@ -38,6 +39,7 @@
 }
 
 [data-theme="light"] {
+  /* ── Light Mode Tokens ── */
   --bg-base: #F5F4F0;
   --bg-surface: #FFFFFF;
   --bg-elevated: #FFFFFF;
@@ -54,7 +56,6 @@
   --card-hover: #FAFAFA;
   --card-border: rgba(0,0,0,0.06);
   --card-shadow: 0 4px 24px rgba(0,0,0,0.06);
-  --section-alt: #EEEEEA;
   --nav-bg: rgba(245,244,240,0.95);
   --nav-shadow: 0 1px 0 rgba(0,0,0,0.06);
   --glass-bg: rgba(255,255,255,0.95);

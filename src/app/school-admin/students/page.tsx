@@ -412,11 +412,40 @@ export default function StudentsPage() {
             WebkitBackdropFilter: GLASS_BLUR,
             border: `1px solid ${GLASS_BORDER}`,
             borderRadius: '16px',
-            textAlign: 'center',
-            padding: '64px',
+            padding: '0',
             boxShadow: CARD_SHADOW,
           }}>
-            <p style={{ fontSize: '14px', color: TEXT_SECONDARY }}>Loading students...</p>
+            {/* Skeleton header */}
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 60px', gap: '16px', padding: '12px 24px', borderBottom: `1px solid ${GLASS_BORDER}` }}>
+              {['Name', 'Contact', 'TCA Progress', 'Status', ''].map((_, i) => (
+                <div key={i} style={{ height: '12px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+              ))}
+            </div>
+            {/* Skeleton rows */}
+            {[...Array(4)].map((_, i) => (
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 60px', gap: '16px', padding: '16px 24px', borderBottom: `1px solid ${GLASS_BORDER}` }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ height: '14px', width: '60%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', marginBottom: '6px', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                    <div style={{ height: '12px', width: '40%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', paddingTop: '8px' }}>
+                  <div style={{ height: '12px', width: '80%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                  <div style={{ height: '12px', width: '60%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                </div>
+                <div style={{ paddingTop: '8px' }}>
+                  <div style={{ height: '6px', width: '100%', borderRadius: '999px', background: 'rgba(255,255,255,0.05)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                </div>
+                <div style={{ paddingTop: '8px' }}>
+                  <div style={{ height: '24px', width: '80px', borderRadius: '999px', background: 'rgba(255,255,255,0.05)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                </div>
+                <div style={{ paddingTop: '8px', display: 'flex', justifyContent: 'flex-end' }}>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                </div>
+              </div>
+            ))}
           </div>
         ) : !filtered.length ? (
           <div style={{

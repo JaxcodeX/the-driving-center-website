@@ -293,17 +293,21 @@ export default function InstructorsPage() {
         </div>
 
         {loading ? (
-          <div style={{
-            background: GLASS_BG,
-            backdropFilter: GLASS_BLUR,
-            WebkitBackdropFilter: GLASS_BLUR,
-            border: `1px solid ${GLASS_BORDER}`,
-            borderRadius: '16px',
-            textAlign: 'center',
-            padding: '64px',
-            boxShadow: CARD_SHADOW,
-          }}>
-            <p style={{ fontSize: '14px', color: TEXT_SECONDARY }}>Loading...</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+            {[...Array(3)].map((_, i) => (
+              <div key={i} style={{ background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, borderRadius: '16px', padding: '24px', boxShadow: CARD_SHADOW }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)' }} />
+                  <div style={{ height: '24px', width: '60px', borderRadius: '999px', background: 'rgba(255,255,255,0.05)' }} />
+                </div>
+                <div style={{ height: '16px', width: '60%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', marginBottom: '8px' }} />
+                <div style={{ height: '13px', width: '80%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', marginBottom: '16px' }} />
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <div style={{ height: '28px', width: '90px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }} />
+                  <div style={{ height: '28px', width: '80px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }} />
+                </div>
+              </div>
+            ))}
           </div>
         ) : !instructors.length ? (
           <div style={{

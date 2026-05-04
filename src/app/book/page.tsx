@@ -57,7 +57,8 @@ type SessionType = {
   price_cents: number; deposit_cents: number; color: string; tca_hours_credit: number | null
 }
 type Slot = {
-  session_date: string; start_time: string; end_time: string
+  id?: string;
+  session_date: string; start_time: string; end_time: string | null
   instructor_id: string; instructor_name: string; seats_available: number
 }
 
@@ -357,9 +358,9 @@ function StudentDetails({ selectedType, selectedSlot, studentName, setStudentNam
         )}
 
         <button type="submit" disabled={submitting}
-          style={{ background: SUCCESS, color: '#000', padding: '16px 28px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: 'pointer', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', fontSize: '16px', marginTop: '8px', fontFamily: 'Outfit, sans-serif' }}
+          style={{ background: submitting ? 'rgba(74,222,128,0.5)' : SUCCESS, color: '#000', padding: '16px 28px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', fontSize: '16px', marginTop: '8px', fontFamily: 'Outfit, sans-serif' }}
           className="disabled:opacity-50">
-          {submitting ? 'Processing...' : selectedType.deposit_cents > 0 ? `Pay ${fp(selectedType.deposit_cents)} Deposit` : 'Confirm Booking'}
+          {submitting ? '⏳ Processing...' : selectedType.deposit_cents > 0 ? `Pay ${fp(selectedType.deposit_cents)} Deposit` : 'Confirm Booking'}
         </button>
 
         <p className="text-center text-xs px-2" style={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'Inter, sans-serif' }}>
@@ -563,7 +564,24 @@ function BookContent() {
       s.start_date === selectedSlot!.session_date &&
       s.instructor_id === selectedSlot!.instructor_id
     )
-    if (!matched) { setFormError('This slot is no longer available. Please go back and select another time.'); setSubmitting(false); return }
+    if (!matched) {
+      // Fallback: use the session_id from the selected slot directly (skip lookup)
+      const slotSessionId = selectedSlot!.id
+      const bookRes = await fetch('/api/bookings', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: slotSessionId, session_date: selectedSlot!.session_date, session_time: selectedSlot!.start_time, student_name: studentName, student_email: studentEmail, student_phone: studentPhone || undefined, permit_number: permitNumber || undefined }),
+      })
+      const bookData = await bookRes.json()
+      if (!bookRes.ok) { setFormError(bookData.error ?? 'Booking failed'); setSubmitting(false); return }
+      setBookingId(bookData.booking_id)
+      if (bookData.status === 'pending_payment' && selectedType!.deposit_cents > 0) {
+        const cr = await fetch(`/api/bookings/${bookData.booking_id}/checkout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ booking_id: bookData.booking_id }) })
+        const cd = await cr.json()
+        if (cd.url) { setCheckoutUrl(cd.url); setStep(3) } else setStep(3)
+      } else setStep(3)
+      setSubmitting(false)
+      return
+    }
     const bookRes = await fetch('/api/bookings', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ session_id: matched.id, student_name: studentName, student_email: studentEmail, student_phone: studentPhone || undefined, permit_number: permitNumber || undefined }),

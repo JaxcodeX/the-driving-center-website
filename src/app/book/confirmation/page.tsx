@@ -3,6 +3,7 @@
 import { Suspense, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { Clock, Mail, Users } from 'lucide-react'
 
 const GLASS_BG = 'rgba(255,255,255,0.03)'
 const GLASS_BORDER = 'rgba(255,255,255,0.06)'
@@ -185,6 +186,36 @@ function ConfirmationContent() {
           Reply C to confirm or R to reschedule.
         </p>
 
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(74,222,128,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Mail size='14' style={{ color: '#4ADE80' }} />
+            </div>
+            <div>
+              <div style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', fontFamily: 'Inter, sans-serif' }}>Check your email</div>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontFamily: 'Inter, sans-serif' }}>Confirmation sent to {student_email}</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(74,222,128,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Clock size='14' style={{ color: '#4ADE80' }} />
+            </div>
+            <div>
+              <div style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', fontFamily: 'Inter, sans-serif' }}>SMS reminder 48h before</div>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontFamily: 'Inter, sans-serif' }}>Reply C to confirm or R to reschedule</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(74,222,128,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Users size='14' style={{ color: '#4ADE80' }} />
+            </div>
+            <div>
+              <div style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', fontFamily: 'Inter, sans-serif' }}>Your instructor will contact you</div>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontFamily: 'Inter, sans-serif' }}>with {instructor?.name || 'details about your lesson'}</div>
+            </div>
+          </div>
+        </div>
+
         <div className="space-y-3">
           <button
             onClick={handleAddToCalendar}
@@ -193,10 +224,10 @@ function ConfirmationContent() {
             📅 Add to Calendar
           </button>
           <Link
-            href="/"
+            href="/school-admin"
             style={{ background: `linear-gradient(135deg, ${ACCENT}, #FF6B1E)`, color: '#000', fontWeight: '600', padding: '14px 28px', borderRadius: '100px', textDecoration: 'none', display: 'block', textAlign: 'center', fontFamily: 'Outfit, sans-serif', fontSize: '15px' }}
           >
-            Back to Home →
+            Back to Dashboard →
           </Link>
         </div>
       </div>
