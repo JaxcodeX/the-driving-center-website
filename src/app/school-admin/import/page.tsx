@@ -3,6 +3,17 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
+const BG = '#0D0D12'
+const BG_GRADIENT = 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)'
+const GLASS_BG = 'rgba(255,255,255,0.03)'
+const GLASS_BORDER = 'rgba(255,255,255,0.06)'
+const GLASS_BLUR = 'blur(24px)'
+const TEXT_SECONDARY = '#9CA3AF'
+const ACCENT_CYAN = '#67E8F9'
+const ACCENT_ORANGE = '#FF8C42'
+const ACCENT_GREEN = '#4ADE80'
+const CARD_SHADOW = '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)'
+
 export default function ImportStudentsPage() {
   const [csvText, setCsvText] = useState('')
   const [result, setResult] = useState<any>(null)
@@ -10,7 +21,6 @@ export default function ImportStudentsPage() {
   const [error, setError] = useState('')
   const [schoolId, setSchoolId] = useState<string | null>(null)
 
-  // Get school_id from session on mount
   useEffect(() => {
     fetch('/api/auth/session')
       .then(r => r.json())
@@ -51,45 +61,132 @@ export default function ImportStudentsPage() {
   const rowCount = csvText.trim() ? csvText.trim().split('\n').length - 1 : 0
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50">
-      <div className="border-b border-white/10 px-6 py-4">
-        <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center text-sm font-bold">DC</div>
-            <span className="font-semibold">Import Students</span>
-          </div>
-          <Link href="/school-admin/students" className="text-sm text-gray-400 hover:text-white">← Back</Link>
-        </div>
-      </div>
+    <div style={{
+      minHeight: '100vh',
+      background: BG,
+      fontFamily: 'Inter, sans-serif',
+      position: 'relative',
+    }}>
+      <div style={{
+        position: 'fixed',
+        inset: 0,
+        background: BG_GRADIENT,
+        pointerEvents: 'none',
+        zIndex: 0,
+      }} />
 
-      <div className="max-w-3xl mx-auto p-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-2">Import from CSV</h1>
-          <p className="text-gray-400 text-sm">
+      <div style={{ maxWidth: '720px', margin: '0 auto', padding: '40px 48px', position: 'relative', zIndex: 1 }}>
+
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '24px',
+          paddingBottom: '24px',
+          borderBottom: `1px solid ${GLASS_BORDER}`,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '10px',
+              background: `linear-gradient(135deg, ${ACCENT_CYAN}, #818CF8)`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '13px',
+              fontWeight: '700',
+              color: '#000',
+            }}>
+              DC
+            </div>
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: '600', color: '#FFFFFF' }}>Import Students</div>
+              <div style={{ fontSize: '11px', color: TEXT_SECONDARY }}>School Admin</div>
+            </div>
+          </div>
+          <Link href="/school-admin/students" style={{
+            fontSize: '13px',
+            color: TEXT_SECONDARY,
+            textDecoration: 'none',
+            transition: 'color 0.15s',
+          }}
+          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#FFFFFF')}
+          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = TEXT_SECONDARY)}
+          >
+            ← Back
+          </Link>
+        </div>
+
+        <div style={{ marginBottom: '24px' }}>
+          <h1 style={{
+            fontFamily: 'Outfit, sans-serif',
+            fontSize: '24px',
+            fontWeight: '700',
+            color: '#FFFFFF',
+            marginBottom: '8px',
+          }}>
+            Import from CSV
+          </h1>
+          <p style={{ fontSize: '14px', color: TEXT_SECONDARY }}>
             Upload your existing student list from Excel or Google Sheets.
             All student data is encrypted before storage.
           </p>
         </div>
 
         {/* Instructions */}
-        <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-4 mb-6">
-          <div className="text-sm font-medium text-cyan-400 mb-2">Accepted CSV columns:</div>
-          <div className="grid grid-cols-2 gap-1 text-xs text-gray-400 font-mono">
-            <div><span className="text-white">legal_name</span> (required)</div>
-            <div><span className="text-white">dob</span> (required — YYYY-MM-DD)</div>
-            <div><span className="text-white">permit_number</span></div>
-            <div><span className="text-white">parent_email</span></div>
-            <div><span className="text-white">emergency_contact_phone</span></div>
-            <div><span className="text-white">driving_hours</span></div>
+        <div style={{
+          padding: '16px 20px',
+          background: GLASS_BG,
+          backdropFilter: GLASS_BLUR,
+          WebkitBackdropFilter: GLASS_BLUR,
+          border: `1px solid rgba(103,232,249,0.2)`,
+          borderRadius: '16px',
+          marginBottom: '24px',
+          boxShadow: CARD_SHADOW,
+        }}>
+          <div style={{
+            fontSize: '13px',
+            fontWeight: '600',
+            color: ACCENT_CYAN,
+            marginBottom: '8px',
+          }}>
+            Accepted CSV columns:
           </div>
-          <div className="text-xs text-gray-500 mt-2">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px 24px', marginBottom: '8px' }}>
+            {[
+              ['legal_name', '(required)'],
+              ['dob', '(required — YYYY-MM-DD)'],
+              ['permit_number', ''],
+              ['parent_email', ''],
+              ['emergency_contact_phone', ''],
+              ['driving_hours', ''],
+            ].map(([col, note]) => (
+              <div key={col} style={{ fontSize: '12px', fontFamily: 'monospace' }}>
+                <span style={{ color: '#FFFFFF' }}>{col}</span>
+                <span style={{ color: TEXT_SECONDARY }}> {note}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ fontSize: '12px', color: TEXT_SECONDARY }}>
             Export from Excel/Google Sheets as CSV. Headers must be in the first row.
           </div>
         </div>
 
-        <form onSubmit={handleImport} className="space-y-4">
+        <form onSubmit={handleImport} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Paste CSV content</label>
+            <label style={{
+              display: 'block',
+              fontSize: '12px',
+              fontWeight: '600',
+              color: TEXT_SECONDARY,
+              marginBottom: '8px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}>
+              Paste CSV content
+            </label>
             <textarea
               value={csvText}
               onChange={e => setCsvText(e.target.value)}
@@ -97,35 +194,70 @@ export default function ImportStudentsPage() {
 Jane Smith,2010-03-15,LM-123456,jane@parent.com,8
 John Doe,2009-11-22,LM-789012,john@parent.com,12"
               rows={12}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm font-mono placeholder-gray-600 focus:outline-none focus:border-cyan-500 resize-y"
+              style={{
+                width: '100%',
+                background: GLASS_BG,
+                backdropFilter: GLASS_BLUR,
+                WebkitBackdropFilter: GLASS_BLUR,
+                border: `1px solid ${GLASS_BORDER}`,
+                borderRadius: '16px',
+                padding: '16px',
+                color: '#FFFFFF',
+                fontSize: '14px',
+                fontFamily: 'monospace',
+                outline: 'none',
+                resize: 'vertical',
+                boxShadow: CARD_SHADOW,
+                transition: 'border-color 0.2s',
+              }}
+              onFocus={e => (e.target.style.borderColor = 'rgba(103,232,249,0.4)')}
+              onBlur={e => (e.target.style.borderColor = GLASS_BORDER)}
             />
           </div>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 text-red-400 text-sm">
+            <div style={{
+              padding: '12px 16px',
+              borderRadius: '12px',
+              background: 'rgba(239,68,68,0.1)',
+              border: `1px solid rgba(239,68,68,0.2)`,
+              color: '#EF4444',
+              fontSize: '14px',
+              fontWeight: '500',
+            }}>
               {error}
             </div>
           )}
 
           {result && (
-            <div className={`rounded-xl p-4 border ${
-              result.failed === 0
-                ? 'bg-green-500/10 border-green-500/20'
-                : 'bg-yellow-500/10 border-yellow-500/20'
-            }`}>
-              <div className="text-sm font-medium mb-1">
+            <div style={{
+              padding: '16px',
+              borderRadius: '16px',
+              background: result.failed === 0 ? 'rgba(74,222,128,0.1)' : 'rgba(250,204,21,0.1)',
+              border: `1px solid ${result.failed === 0 ? 'rgba(74,222,128,0.2)' : 'rgba(250,204,21,0.2)'}`,
+              boxShadow: CARD_SHADOW,
+            }}>
+              <div style={{ fontSize: '14px', fontWeight: '600', color: result.failed === 0 ? ACCENT_GREEN : '#FACC15', marginBottom: '4px' }}>
                 {result.failed === 0
                   ? `✅ All ${result.imported} students imported`
                   : `Imported ${result.imported} of ${result.total} rows`}
                 {result.failed > 0 && ` — ${result.failed} failed`}
               </div>
               {result.errors && result.errors.length > 0 && (
-                <div className="text-xs text-gray-400 font-mono mt-2 space-y-1">
+                <div style={{
+                  fontSize: '12px',
+                  color: TEXT_SECONDARY,
+                  fontFamily: 'monospace',
+                  marginTop: '8px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                }}>
                   {result.errors.slice(0, 5).map((err: string, i: number) => (
                     <div key={i}>{err}</div>
                   ))}
                   {result.errors.length > 5 && (
-                    <div className="text-gray-600">...and {result.errors.length - 5} more errors</div>
+                    <div style={{ color: TEXT_SECONDARY }}>...and {result.errors.length - 5} more errors</div>
                   )}
                 </div>
               )}
@@ -135,7 +267,31 @@ John Doe,2009-11-22,LM-789012,john@parent.com,12"
           <button
             type="submit"
             disabled={loading || !csvText.trim()}
-            className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+            style={{
+              width: '100%',
+              padding: '14px',
+              background: loading ? 'rgba(74,222,128,0.5)' : ACCENT_GREEN,
+              border: 'none',
+              borderRadius: '12px',
+              color: '#000000',
+              fontSize: '14px',
+              fontWeight: '700',
+              cursor: (loading || !csvText.trim()) ? 'not-allowed' : 'pointer',
+              transition: 'transform 0.15s, box-shadow 0.15s',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onMouseEnter={e => {
+              if (!loading && csvText.trim()) {
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+                ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px rgba(74,222,128,0.3)'
+              }
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
+              ;(e.currentTarget as HTMLElement).style.boxShadow = 'none'
+            }}
           >
             {loading ? 'Importing...' : `Import ${rowCount} Student${rowCount !== 1 ? 's' : ''}`}
           </button>

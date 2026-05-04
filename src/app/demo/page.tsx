@@ -1,10 +1,24 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect } from 'react'
 
 export default function DemoPage() {
+  useEffect(() => {
+    const link = document.createElement('link')
+    link.href = 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap'
+    link.rel = 'stylesheet'
+    document.head.appendChild(link)
+    return () => { document.head.removeChild(link) }
+  }, [])
+
   return (
-    <div style={{ minHeight: '100vh', background: '#050505', color: '#FFFFFF' }}>
+    <div style={{
+      minHeight: '100vh',
+      background: '#0D0D12',
+      backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)',
+      color: '#FFFFFF',
+    }}>
 
       {/* Hero */}
       <section style={{
@@ -13,21 +27,22 @@ export default function DemoPage() {
       }}>
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'radial-gradient(ellipse at center, rgba(74,222,128,0.06) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse at center, rgba(255,140,66,0.06) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
         <div style={{ position: 'relative', maxWidth: '768px', margin: '0 auto' }}>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: '8px',
             padding: '6px 14px', borderRadius: '100px',
-            border: '1px solid rgba(74,222,128,0.3)',
-            background: 'rgba(74,222,128,0.08)',
-            fontSize: '11px', fontWeight: '600', color: '#4ADE80',
+            border: '1px solid rgba(255,140,66,0.3)',
+            background: 'rgba(255,140,66,0.08)',
+            fontSize: '11px', fontWeight: '600', color: '#FF8C42',
             textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '24px',
+            fontFamily: 'Inter, sans-serif',
           }}>
             <span style={{
               width: '6px', height: '6px', borderRadius: '50%',
-              background: '#4ADE80',
+              background: '#FF8C42',
             }} />
             Live Demo
           </div>
@@ -39,8 +54,8 @@ export default function DemoPage() {
             See The Driving Center<br />in Action
           </h1>
           <p style={{
-            fontSize: '18px', color: '#9CA3AF', maxWidth: '560px',
-            margin: '0 auto', lineHeight: '1.6',
+            fontSize: '18px', color: 'rgba(255,255,255,0.45)', maxWidth: '560px',
+            margin: '0 auto', lineHeight: '1.6', fontFamily: 'Inter, sans-serif',
           }}>
             Here&apos;s what your school dashboard looks like after 2 minutes of setup.
             No credit card required.
@@ -56,7 +71,7 @@ export default function DemoPage() {
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
             <span style={{
-              fontSize: '12px', fontWeight: '600', color: '#4ADE80',
+              fontSize: '12px', fontWeight: '600', color: '#FF8C42',
               textTransform: 'uppercase', letterSpacing: '0.08em',
             }}>01</span>
             <h2 style={{
@@ -65,15 +80,15 @@ export default function DemoPage() {
             }}>School Admin Dashboard</h2>
           </div>
           <p style={{
-            fontSize: '15px', color: '#9CA3AF', maxWidth: '480px',
-            marginLeft: '36px', marginBottom: '40px',
+            fontSize: '15px', color: 'rgba(255,255,255,0.45)', maxWidth: '480px',
+            marginLeft: '36px', marginBottom: '40px', fontFamily: 'Inter, sans-serif',
           }}>
             A clean, focused view of your entire operation — students, schedules, and revenue at a glance.
           </p>
 
           <div style={{
-            borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)',
-            background: 'rgba(255,255,255,0.03)', overflow: 'hidden',
+            borderRadius: '16px', border: '1px solid rgba(255,255,255,0.06)',
+            background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)', overflow: 'hidden',
           }}>
             {/* Header */}
             <div style={{
@@ -84,9 +99,9 @@ export default function DemoPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{
                   width: '32px', height: '32px', borderRadius: '8px',
-                  background: '#4ADE80', display: 'flex',
+                  background: '#FF8C42', display: 'flex',
                   alignItems: 'center', justifyContent: 'center',
-                  fontWeight: '700', fontSize: '12px', color: '#000000',
+                  fontWeight: '700', fontSize: '12px', color: '#FFFFFF',
                 }}>DC</div>
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: '600', color: '#FFFFFF' }}>Metro Driving School</div>
@@ -125,9 +140,9 @@ export default function DemoPage() {
                   padding: '24px 20px', textAlign: 'center',
                   borderRight: '1px solid rgba(255,255,255,0.05)',
                 }}>
-                  <div style={{ fontSize: '28px', fontWeight: '700', color: '#FFFFFF', marginBottom: '4px' }}>{stat.value}</div>
-                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>{stat.label}</div>
-                  <div style={{ fontSize: '11px', color: stat.accent }}>{stat.change}</div>
+                  <div style={{ fontSize: '28px', fontWeight: '700', color: '#FFFFFF', marginBottom: '4px', fontFamily: 'Outfit, sans-serif' }}>{stat.value}</div>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px', fontFamily: 'Inter, sans-serif' }}>{stat.label}</div>
+                  <div style={{ fontSize: '11px', color: stat.accent, fontFamily: 'Inter, sans-serif' }}>{stat.change}</div>
                 </div>
               ))}
             </div>
@@ -138,10 +153,10 @@ export default function DemoPage() {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 marginBottom: '16px',
               }}>
-                <span style={{ fontSize: '13px', fontWeight: '600', color: 'rgba(255,255,255,0.6)' }}>
+                <span style={{ fontSize: '13px', fontWeight: '600', color: 'rgba(255,255,255,0.6)', fontFamily: 'Inter, sans-serif' }}>
                   Recent Student Activity
                 </span>
-                <span style={{ fontSize: '12px', color: '#4ADE80', cursor: 'pointer' }}>View all →</span>
+                <span style={{ fontSize: '12px', color: '#FF8C42', cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>View all →</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {[
@@ -158,15 +173,15 @@ export default function DemoPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{
                         width: '28px', height: '28px', borderRadius: '50%',
-                        background: 'rgba(74,222,128,0.15)',
+                        background: 'rgba(255,140,66,0.15)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '11px', fontWeight: '600', color: '#4ADE80',
+                        fontSize: '11px', fontWeight: '600', color: '#FF8C42',
                       }}>{row.name[0]}</div>
-                      <span style={{ fontSize: '13px', fontWeight: '500' }}>{row.name}</span>
+                      <span style={{ fontSize: '13px', fontWeight: '500', fontFamily: 'Inter, sans-serif' }}>{row.name}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-                      <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>{row.hrs}</span>
-                      <span style={{ fontSize: '12px', fontWeight: '600', color: row.color }}>{row.status}</span>
+                      <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif' }}>{row.hrs}</span>
+                      <span style={{ fontSize: '12px', fontWeight: '600', color: row.color, fontFamily: 'Inter, sans-serif' }}>{row.status}</span>
                     </div>
                   </div>
                 ))}
@@ -183,10 +198,10 @@ export default function DemoPage() {
       }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-            <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ADE80', textTransform: 'uppercase', letterSpacing: '0.08em' }}>02</span>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: '#FF8C42', textTransform: 'uppercase', letterSpacing: '0.08em' }}>02</span>
             <h2 style={{ fontSize: '24px', fontWeight: '700', fontFamily: 'Outfit, sans-serif', color: '#FFFFFF' }}>Student Booking Flow</h2>
           </div>
-          <p style={{ fontSize: '15px', color: '#9CA3AF', maxWidth: '480px', marginLeft: '36px', marginBottom: '40px' }}>
+          <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.45)', maxWidth: '480px', marginLeft: '36px', marginBottom: '40px', fontFamily: 'Inter, sans-serif' }}>
             Students pick a time slot in under 60 seconds. No phone calls. No back-and-forth.
           </p>
 
@@ -222,35 +237,35 @@ export default function DemoPage() {
             ].map((step) => (
               <div key={step.num} style={{
                 position: 'relative', borderRadius: '16px',
-                border: '1px solid rgba(255,255,255,0.08)',
-                background: 'rgba(255,255,255,0.03)', padding: '20px',
+                border: '1px solid rgba(255,255,255,0.06)',
+                background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)', padding: '20px',
               }}>
                 <div style={{
                   position: 'absolute', top: '-14px', left: '20px',
                   width: '24px', height: '24px', borderRadius: '50%',
-                  background: '#4ADE80',
+                  background: '#FF8C42',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '11px', fontWeight: '700', color: '#000000',
+                  fontSize: '11px', fontWeight: '700', color: '#FFFFFF',
                 }}>{step.num}</div>
                 <div style={{
-                  fontSize: '11px', fontWeight: '600', color: '#4ADE80',
-                  marginTop: '4px', marginBottom: '12px',
+                  fontSize: '11px', fontWeight: '600', color: '#FF8C42',
+                  marginTop: '4px', marginBottom: '12px', fontFamily: 'Inter, sans-serif',
                 }}>{step.title}</div>
 
                 {step.sms ? (
                   <div style={{
-                    background: '#13161F', borderRadius: '10px',
+                    background: 'rgba(255,255,255,0.03)', borderRadius: '10px',
                     padding: '14px', fontFamily: 'monospace',
                     fontSize: '12px', color: 'rgba(255,255,255,0.6)',
                     lineHeight: '1.7', marginBottom: '12px',
-                    borderLeft: '2px solid rgba(74,222,128,0.3)',
+                    borderLeft: '2px solid rgba(255,140,66,0.3)',
                     paddingLeft: '16px',
                   }}>
                     {step.sms}
                   </div>
                 ) : (
                   <div style={{
-                    background: '#13161F', borderRadius: '10px',
+                    background: 'rgba(255,255,255,0.03)', borderRadius: '10px',
                     padding: '14px', marginBottom: '12px',
                   }}>
                     {step.content.map((row, i) => (
@@ -258,14 +273,14 @@ export default function DemoPage() {
                         display: 'flex', justifyContent: 'space-between',
                         fontSize: '12px', marginBottom: '6px',
                       }}>
-                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>{row.left}</span>
-                    <span style={{ color: row.color, fontWeight: '700' }}>{row.right}</span>
+                        <span style={{ color: 'rgba(255,255,255,0.5)', fontFamily: 'Inter, sans-serif' }}>{row.left}</span>
+                    <span style={{ color: row.color, fontWeight: '700', fontFamily: 'Inter, sans-serif' }}>{row.right}</span>
                       </div>
                     ))}
                   </div>
                 )}
 
-                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>{step.footer}</div>
+                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif' }}>{step.footer}</div>
               </div>
             ))}
           </div>
@@ -279,10 +294,10 @@ export default function DemoPage() {
       }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-            <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ADE80', textTransform: 'uppercase', letterSpacing: '0.08em' }}>03</span>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: '#FF8C42', textTransform: 'uppercase', letterSpacing: '0.08em' }}>03</span>
             <h2 style={{ fontSize: '24px', fontWeight: '700', fontFamily: 'Outfit, sans-serif', color: '#FFFFFF' }}>Automated SMS Reminders</h2>
           </div>
-          <p style={{ fontSize: '15px', color: '#9CA3AF', maxWidth: '480px', marginLeft: '36px', marginBottom: '40px' }}>
+          <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.45)', maxWidth: '480px', marginLeft: '36px', marginBottom: '40px', fontFamily: 'Inter, sans-serif' }}>
             Two reminders fire automatically — 48 hours and 4 hours before every session. No-shows drop to near zero.
           </p>
 
@@ -305,29 +320,30 @@ export default function DemoPage() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                   <div style={{
                     padding: '4px 12px', borderRadius: '100px',
-                    background: 'rgba(74,222,128,0.1)',
-                    border: '1px solid rgba(74,222,128,0.2)',
-                    fontSize: '11px', fontWeight: '600', color: '#4ADE80',
+                    background: 'rgba(255,140,66,0.1)',
+                    border: '1px solid rgba(255,140,66,0.2)',
+                    fontSize: '11px', fontWeight: '600', color: '#FF8C42',
                   }}>{reminder.time}</div>
-                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>{reminder.sub}</span>
+                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif' }}>{reminder.sub}</span>
                 </div>
                 <div style={{
-                  background: '#0F1117', borderRadius: '16px', padding: '20px',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)',
+                  borderRadius: '16px', padding: '20px',
+                  border: '1px solid rgba(255,255,255,0.06)',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
                     <div style={{
                       width: '40px', height: '40px', borderRadius: '50%',
-                      background: 'rgba(74,222,128,0.1)',
+                      background: 'rgba(255,140,66,0.1)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       flexShrink: 0, fontSize: '16px',
                     }}>💬</div>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                        <span style={{ fontSize: '13px', fontWeight: '600', color: '#FFFFFF' }}>The Driving Center</span>
+                        <span style={{ fontSize: '13px', fontWeight: '600', color: '#FFFFFF', fontFamily: 'Inter, sans-serif' }}>The Driving Center</span>
                         <div style={{ display: 'flex', gap: '4px' }}>
                           {[1, 2, 3].map(d => (
-                            <div key={d} style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ADE80' }} />
+                            <div key={d} style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#FF8C42' }} />
                           ))}
                         </div>
                       </div>
@@ -335,7 +351,7 @@ export default function DemoPage() {
                         fontSize: '13px', color: 'rgba(255,255,255,0.65)',
                         lineHeight: '1.6', fontFamily: 'monospace',
                       }}>{reminder.msg}</div>
-                      <div style={{ marginTop: '12px', fontSize: '11px', color: 'rgba(255,255,255,0.25)' }}>{reminder.delivered}</div>
+                      <div style={{ marginTop: '12px', fontSize: '11px', color: 'rgba(255,255,255,0.25)', fontFamily: 'Inter, sans-serif' }}>{reminder.delivered}</div>
                     </div>
                   </div>
                 </div>
@@ -345,13 +361,13 @@ export default function DemoPage() {
 
           <div style={{
             marginTop: '32px', padding: '16px 20px', borderRadius: '12px',
-            background: 'rgba(74,222,128,0.08)',
-            border: '1px solid rgba(74,222,128,0.15)',
+            background: 'rgba(255,140,66,0.08)',
+            border: '1px solid rgba(255,140,66,0.15)',
             display: 'flex', alignItems: 'center', gap: '12px',
             maxWidth: '480px',
           }}>
             <span style={{ fontSize: '16px' }}>✓</span>
-            <span style={{ fontSize: '13px', color: 'rgba(74,222,128,0.8)' }}>
+            <span style={{ fontSize: '13px', color: 'rgba(255,140,66,0.8)', fontFamily: 'Inter, sans-serif' }}>
               SMS costs are included in your plan — no per-message billing
             </span>
           </div>
@@ -365,29 +381,29 @@ export default function DemoPage() {
       }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-            <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ADE80', textTransform: 'uppercase', letterSpacing: '0.08em' }}>04</span>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: '#FF8C42', textTransform: 'uppercase', letterSpacing: '0.08em' }}>04</span>
             <h2 style={{ fontSize: '24px', fontWeight: '700', fontFamily: 'Outfit, sans-serif', color: '#FFFFFF' }}>TCA Compliance Tracking</h2>
           </div>
-          <p style={{ fontSize: '15px', color: '#9CA3AF', maxWidth: '480px', marginLeft: '36px', marginBottom: '40px' }}>
+          <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.45)', maxWidth: '480px', marginLeft: '36px', marginBottom: '40px', fontFamily: 'Inter, sans-serif' }}>
             State-required hour tracking handled automatically. Students see their progress. You stay compliant.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px' }}>
             {/* Student Card */}
             <div style={{
-              borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)',
-              background: 'rgba(255,255,255,0.03)', padding: '24px',
+              borderRadius: '16px', border: '1px solid rgba(255,255,255,0.06)',
+              background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)', padding: '24px',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
                 <div style={{
                   width: '48px', height: '48px', borderRadius: '50%',
-                  background: 'rgba(74,222,128,0.15)',
+                  background: 'rgba(255,140,66,0.15)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '16px', fontWeight: '700', color: '#4ADE80',
+                  fontSize: '16px', fontWeight: '700', color: '#FF8C42',
                 }}>JM</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '15px', fontWeight: '600', color: '#FFFFFF' }}>Jessica Martinez</div>
-                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>Permit #D-4892011 · Started Mar 3</div>
+                  <div style={{ fontSize: '15px', fontWeight: '600', color: '#FFFFFF', fontFamily: 'Inter, sans-serif' }}>Jessica Martinez</div>
+                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif' }}>Permit #D-4892011 · Started Mar 3</div>
                 </div>
                 <div style={{
                   padding: '4px 12px', borderRadius: '100px',
@@ -399,23 +415,23 @@ export default function DemoPage() {
 
               {/* Classroom Hours */}
               <div style={{ marginBottom: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px', fontFamily: 'Inter, sans-serif' }}>
                   <span>Classroom Hours</span>
                   <span style={{ color: '#FFFFFF', fontWeight: '600' }}>4 / 6 hrs</span>
                 </div>
                 <div style={{ height: '6px', borderRadius: '100px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: '66%', borderRadius: '100px', background: '#4ADE80' }} />
+                  <div style={{ height: '100%', width: '66%', borderRadius: '100px', background: '#FF8C42' }} />
                 </div>
               </div>
 
               {/* Driving Hours */}
               <div style={{ marginBottom: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px', fontFamily: 'Inter, sans-serif' }}>
                   <span>Behind-the-Wheel Hours</span>
                   <span style={{ color: '#FFFFFF', fontWeight: '600' }}>2 / 6 hrs</span>
                 </div>
                 <div style={{ height: '6px', borderRadius: '100px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: '33%', borderRadius: '100px', background: '#4ADE80' }} />
+                  <div style={{ height: '100%', width: '33%', borderRadius: '100px', background: '#FF8C42' }} />
                 </div>
               </div>
 
@@ -429,20 +445,20 @@ export default function DemoPage() {
                   background: 'rgba(255,255,255,0.08)', overflow: 'hidden',
                   display: 'flex',
                 }}>
-                  <div style={{ height: '100%', width: '50%', background: '#4ADE80' }} />
+                  <div style={{ height: '100%', width: '50%', background: '#FF8C42' }} />
                   <div style={{ height: '100%', width: '2px', background: 'rgba(251,191,36,0.5)', marginLeft: '-1px' }} />
                   <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)' }} />
                 </div>
-                <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ADE80' }}>50% complete</span>
+                <span style={{ fontSize: '12px', fontWeight: '600', color: '#FF8C42', fontFamily: 'Inter, sans-serif' }}>50% complete</span>
               </div>
             </div>
 
             {/* Admin View */}
             <div style={{
-              borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)',
-              background: 'rgba(255,255,255,0.03)', padding: '24px',
+              borderRadius: '16px', border: '1px solid rgba(255,255,255,0.06)',
+              background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)', padding: '24px',
             }}>
-              <div style={{ fontSize: '13px', fontWeight: '600', color: 'rgba(255,255,255,0.6)', marginBottom: '16px' }}>
+              <div style={{ fontSize: '13px', fontWeight: '600', color: 'rgba(255,255,255,0.6)', marginBottom: '16px', fontFamily: 'Inter, sans-serif' }}>
                 TCA Completion Summary · Last 30 days
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -465,7 +481,7 @@ export default function DemoPage() {
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: '11px', color: 'rgba(255,255,255,0.5)',
                       }}>{s.name[0]}</div>
-                      <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>{s.name}</span>
+                      <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', fontFamily: 'Inter, sans-serif' }}>{s.name}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                       <div style={{ display: 'flex', gap: '4px' }}>
@@ -475,18 +491,19 @@ export default function DemoPage() {
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           fontSize: '10px', color: s.cls ? '#000000' : 'rgba(255,255,255,0.3)',
                         }}>✓</div>
-                        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>cls</span>
+                        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', fontFamily: 'Inter, sans-serif' }}>cls</span>
                         <div style={{
                           width: '20px', height: '20px', borderRadius: '4px',
                           background: s.drv ? '#4ADE80' : 'rgba(255,255,255,0.08)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           fontSize: '10px', color: s.drv ? '#000000' : 'rgba(255,255,255,0.3)',
                         }}>✓</div>
-                        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>drv</span>
+                        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', fontFamily: 'Inter, sans-serif' }}>drv</span>
                       </div>
                       <span style={{
                         fontSize: '11px',
                         color: s.label === 'Ready for road test' ? '#4ADE80' : 'rgba(255,255,255,0.4)',
+                        fontFamily: 'Inter, sans-serif',
                       }}>{s.label}</span>
                     </div>
                   </div>
@@ -504,19 +521,20 @@ export default function DemoPage() {
             fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: '800',
             fontFamily: 'Outfit, sans-serif', marginBottom: '16px',
           }}>Want to see your school?</h2>
-          <p style={{ fontSize: '16px', color: '#9CA3AF', marginBottom: '32px', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.45)', marginBottom: '32px', lineHeight: '1.6', fontFamily: 'Inter, sans-serif' }}>
             Set up takes 2 minutes. No credit card. No commitment.<br />
             Your school, your data, live in under an hour.
           </p>
           <Link href='/signup' style={{
             display: 'inline-flex', alignItems: 'center', gap: '10px',
             padding: '14px 28px', borderRadius: '12px',
-            background: '#FFFFFF', color: '#000000',
+            background: '#FF8C42', color: '#FFFFFF',
             fontSize: '15px', fontWeight: '700', textDecoration: 'none',
+            fontFamily: 'Inter, sans-serif',
           }}>
             Start your free trial →
           </Link>
-          <div style={{ marginTop: '20px', fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>
+          <div style={{ marginTop: '20px', fontSize: '12px', color: 'rgba(255,255,255,0.3)', fontFamily: 'Inter, sans-serif' }}>
             Free for 14 days · Then $99/month · Cancel anytime
           </div>
         </div>

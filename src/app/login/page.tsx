@@ -19,6 +19,14 @@ export default function LoginPage() {
   const [demoError, setDemoError] = useState('')
 
   useEffect(() => {
+    const link = document.createElement('link')
+    link.href = 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap'
+    link.rel = 'stylesheet'
+    document.head.appendChild(link)
+    return () => { document.head.removeChild(link) }
+  }, [])
+
+  useEffect(() => {
     fetch('/api/schools').then(r => r.json()).then(d => {
       if (d.DEMO_MODE) setIsDemoMode(true)
     }).catch(() => {})
@@ -67,13 +75,17 @@ export default function LoginPage() {
   return (
     <div style={{
       minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: '#050505', padding: '24px',
+      background: '#0D0D12',
+      backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)',
+      padding: '24px',
     }}>
       {/* Card */}
       <div style={{
         width: '100%', maxWidth: '420px',
-        background: '#0F1117', border: '1px solid #1A1A1A',
-        borderRadius: '20px', padding: '40px',
+        background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)',
+        border: '1px solid rgba(255,255,255,0.06)',
+        borderRadius: '24px', padding: '40px',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)',
       }}>
         {/* Logo */}
         <Link href='/' style={{
@@ -82,7 +94,7 @@ export default function LoginPage() {
         }}>
           <div style={{
             width: '32px', height: '32px', borderRadius: '10px',
-            background: '#4ADE80', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: '#FF8C42', display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             <svg width='16' height='16' viewBox='0 0 16 16' fill='none'>
               <path d='M8 2L13 5.5H3L8 2Z' fill='white' />
@@ -102,7 +114,7 @@ export default function LoginPage() {
           }}>
             Sign in
           </h1>
-          <p style={{ fontSize: '14px', color: '#9CA3AF' }}>
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.45)', fontFamily: 'Inter, sans-serif' }}>
             to your school dashboard
           </p>
         </div>
@@ -111,8 +123,8 @@ export default function LoginPage() {
         {isDemoMode && (
           <div style={{
             display: 'flex', gap: '0', marginBottom: '24px',
-            background: '#0D0D0D', borderRadius: '10px',
-            padding: '4px', border: '1px solid #1A1A1A',
+            background: 'rgba(255,255,255,0.03)', borderRadius: '10px',
+            padding: '4px', border: '1px solid rgba(255,255,255,0.06)',
           }}>
             {(['magic', 'demo'] as const).map(tab => (
               <button
@@ -120,9 +132,9 @@ export default function LoginPage() {
                 onClick={() => setActiveTab(tab)}
                 style={{
                   flex: 1, padding: '8px 12px', borderRadius: '8px', border: 'none',
-                  fontSize: '13px', fontWeight: '600', cursor: 'pointer',
-                  background: activeTab === tab ? '#1A1A1A' : 'transparent',
-                  color: activeTab === tab ? '#FFFFFF' : '#6B7280',
+                  fontSize: '13px', fontWeight: '600', fontFamily: 'Inter, sans-serif', cursor: 'pointer',
+                  background: activeTab === tab ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  color: activeTab === tab ? '#FFFFFF' : 'rgba(255,255,255,0.45)',
                   transition: 'all 0.2s',
                 }}
               >
@@ -138,14 +150,14 @@ export default function LoginPage() {
             <div>
               <label style={{
                 display: 'block', fontSize: '13px', fontWeight: '500',
-                color: '#9CA3AF', marginBottom: '8px',
+                color: 'rgba(255,255,255,0.45)', marginBottom: '8px', fontFamily: 'Inter, sans-serif',
               }}>
                 Email address
               </label>
               <div style={{ position: 'relative' }}>
                 <Mail size='15' style={{
                   position: 'absolute', left: '14px', top: '50%',
-                  transform: 'translateY(-50%)', color: '#6B7280', pointerEvents: 'none',
+                  transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.35)', pointerEvents: 'none',
                 }} />
                 <input
                   type='email'
@@ -156,19 +168,19 @@ export default function LoginPage() {
                   autoComplete='email'
                   style={{
                     width: '100%', height: '48px', borderRadius: '12px',
-                    background: '#0D0D0D', border: '1px solid #1A1A1A',
-                    color: '#FFFFFF', fontSize: '14px',
+                    background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                    color: '#FFFFFF', fontSize: '14px', fontFamily: 'Inter, sans-serif',
                     paddingLeft: '42px', paddingRight: '16px', outline: 'none',
                     transition: 'border-color 0.2s',
                   }}
-                  onFocus={e => (e.target.style.borderColor = '#4ADE80')}
-                  onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+                  onFocus={e => (e.target.style.borderColor = '#FF8C42')}
+                  onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
                 />
               </div>
             </div>
 
             {error && (
-              <p style={{ fontSize: '13px', color: '#EF4444', textAlign: 'center' }}>{error}</p>
+              <p style={{ fontSize: '13px', color: '#EF4444', textAlign: 'center', fontFamily: 'Inter, sans-serif' }}>{error}</p>
             )}
 
             <button
@@ -176,8 +188,8 @@ export default function LoginPage() {
               disabled={loading}
               style={{
                 width: '100%', height: '48px', borderRadius: '12px',
-                background: '#FFFFFF', color: '#000000',
-                fontSize: '14px', fontWeight: '700',
+                background: '#FF8C42', color: '#FFFFFF',
+                fontSize: '14px', fontWeight: '700', fontFamily: 'Inter, sans-serif',
                 border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                 opacity: loading ? 0.6 : 1, transition: 'opacity 0.2s',
@@ -207,7 +219,7 @@ export default function LoginPage() {
             }}>
               Check your inbox
             </h2>
-            <p style={{ fontSize: '13px', color: '#9CA3AF', lineHeight: '1.6' }}>
+            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', lineHeight: '1.6', fontFamily: 'Inter, sans-serif' }}>
               We sent a magic link to{' '}
               <span style={{ color: '#FFFFFF', fontWeight: '600' }}>{email}</span>
               <br />Click it to sign in.
@@ -230,7 +242,7 @@ export default function LoginPage() {
               }} />
               <span style={{
                 fontSize: '11px', fontWeight: '600', textTransform: 'uppercase',
-                letterSpacing: '0.08em', color: '#4ADE80',
+                letterSpacing: '0.08em', color: '#4ADE80', fontFamily: 'Inter, sans-serif',
               }}>
                 Demo Mode — PIN is 0000
               </span>
@@ -240,14 +252,14 @@ export default function LoginPage() {
               <div>
                 <label style={{
                   display: 'block', fontSize: '13px', fontWeight: '500',
-                  color: '#9CA3AF', marginBottom: '8px',
+                  color: 'rgba(255,255,255,0.45)', marginBottom: '8px', fontFamily: 'Inter, sans-serif',
                 }}>
                   School owner email
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Mail size='15' style={{
                     position: 'absolute', left: '14px', top: '50%',
-                    transform: 'translateY(-50%)', color: '#6B7280', pointerEvents: 'none',
+                    transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.35)', pointerEvents: 'none',
                   }} />
                   <input
                     type='email'
@@ -257,13 +269,13 @@ export default function LoginPage() {
                     required
                     style={{
                       width: '100%', height: '48px', borderRadius: '12px',
-                      background: '#0D0D0D', border: '1px solid #1A1A1A',
-                      color: '#FFFFFF', fontSize: '14px',
+                      background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                      color: '#FFFFFF', fontSize: '14px', fontFamily: 'Inter, sans-serif',
                       paddingLeft: '42px', paddingRight: '16px', outline: 'none',
                       transition: 'border-color 0.2s',
                     }}
-                    onFocus={e => (e.target.style.borderColor = '#4ADE80')}
-                    onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+                    onFocus={e => (e.target.style.borderColor = '#FF8C42')}
+                    onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
                   />
                 </div>
               </div>
@@ -271,7 +283,7 @@ export default function LoginPage() {
               <div>
                 <label style={{
                   display: 'block', fontSize: '13px', fontWeight: '500',
-                  color: '#9CA3AF', marginBottom: '8px',
+                  color: 'rgba(255,255,255,0.45)', marginBottom: '8px', fontFamily: 'Inter, sans-serif',
                 }}>
                   Demo PIN
                 </label>
@@ -285,14 +297,14 @@ export default function LoginPage() {
                     required
                     style={{
                       width: '100%', height: '48px', borderRadius: '12px',
-                      background: '#0D0D0D', border: '1px solid #1A1A1A',
-                      color: '#FFFFFF', fontSize: '16px', fontWeight: '600',
+                      background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                      color: '#FFFFFF', fontSize: '16px', fontWeight: '600', fontFamily: 'Inter, sans-serif',
                       textAlign: 'center', letterSpacing: '0.3em',
                       paddingLeft: '16px', paddingRight: '44px', outline: 'none',
                       transition: 'border-color 0.2s',
                     }}
-                    onFocus={e => (e.target.style.borderColor = '#4ADE80')}
-                    onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+                    onFocus={e => (e.target.style.borderColor = '#FF8C42')}
+                    onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
                   />
                   <button
                     type='button'
@@ -300,7 +312,7 @@ export default function LoginPage() {
                     style={{
                       position: 'absolute', right: '14px', top: '50%',
                       transform: 'translateY(-50%)', background: 'none',
-                      border: 'none', cursor: 'pointer', color: '#6B7280',
+                      border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.35)',
                       fontSize: '11px', fontWeight: '600',
                     }}
                   >
@@ -310,7 +322,7 @@ export default function LoginPage() {
               </div>
 
               {demoError && (
-                <p style={{ fontSize: '13px', color: '#EF4444', textAlign: 'center' }}>{demoError}</p>
+                <p style={{ fontSize: '13px', color: '#EF4444', textAlign: 'center', fontFamily: 'Inter, sans-serif' }}>{demoError}</p>
               )}
 
               <button
@@ -318,8 +330,8 @@ export default function LoginPage() {
                 disabled={demoLoading}
                 style={{
                   width: '100%', height: '48px', borderRadius: '12px',
-                  background: '#4ADE80', color: '#000000',
-                  fontSize: '14px', fontWeight: '700',
+                  background: '#FF8C42', color: '#FFFFFF',
+                  fontSize: '14px', fontWeight: '700', fontFamily: 'Inter, sans-serif',
                   border: 'none', cursor: demoLoading ? 'not-allowed' : 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                   opacity: demoLoading ? 0.6 : 1, transition: 'opacity 0.2s',
@@ -336,10 +348,11 @@ export default function LoginPage() {
       {/* Sign up link */}
       <p style={{
         position: 'fixed', bottom: '28px', left: '50%', transform: 'translateX(-50%)',
-        fontSize: '13px', color: '#6B7280', whiteSpace: 'nowrap',
+        fontSize: '13px', color: 'rgba(255,255,255,0.4)', whiteSpace: 'nowrap',
+        fontFamily: 'Inter, sans-serif',
       }}>
         Don&apos;t have an account?{' '}
-        <Link href='/signup' style={{ color: '#4ADE80', fontWeight: '600', textDecoration: 'none' }}>
+        <Link href='/signup' style={{ color: '#FF8C42', fontWeight: '600', textDecoration: 'none' }}>
           Sign up
         </Link>
       </p>

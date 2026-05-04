@@ -29,8 +29,8 @@ export default async function DashboardPage() {
   const tcaProgress = 68 // percent
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-base, #080809)' }}>
-      <div className="max-w-2xl mx-auto px-6 py-8">
+    <div className="min-h-screen relative overflow-hidden" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+      <div className="max-w-2xl mx-auto px-6 py-8 relative z-10">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -44,7 +44,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* TCA Progress Card */}
-        <div style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '24px' }}>
+        <div className="glass-card" style={{ padding: '24px' }}>
           <div className="flex items-center justify-between mb-4">
             <div>
               <div className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: '#64748B' }}>Driver Education Progress</div>
@@ -78,7 +78,7 @@ export default async function DashboardPage() {
           {upcomingSessions && upcomingSessions.length > 0 ? (
             <div className="space-y-3">
               {upcomingSessions.map((session: any) => (
-                <div key={session.id} style={{ background: '#0F1117', border: '1px solid #1A1B1A', borderRadius: '16px', padding: '16px 20px' }}>
+                <div key={session.id} className="glass-card" style={{ padding: '16px 20px' }}>
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(126,212,253,0.1)' }}>
                       <BookOpen className="w-5 h-5" style={{ color: '#7ED4FD' }} />
@@ -102,7 +102,7 @@ export default async function DashboardPage() {
               ))}
             </div>
           ) : (
-            <div style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '32px', textAlign: 'center' }}>
+            <div className="glass-card" style={{ padding: '32px', textAlign: 'center' }}>
               <Calendar className="w-8 h-8 mx-auto mb-3" style={{ color: '#64748B' }} />
               <p className="text-sm font-medium mb-3" style={{ color: '#ffffff' }}>No upcoming lessons</p>
               <Link href="/book" style={{ background: '#1A56FF', color: '#fff', padding: '10px 20px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none', fontSize: '14px' }}>
@@ -116,7 +116,7 @@ export default async function DashboardPage() {
         <div className="mb-5">
           <h2 className="text-base font-semibold mb-3" style={{ color: '#ffffff' }}>Quick Actions</h2>
           <div className="grid grid-cols-2 gap-3">
-            <a href="/book" style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textDecoration: 'none' }} className="group">
+            <a href="/book" className="glass-card group" style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textDecoration: 'none' }}>
               <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors" style={{ background: 'rgba(26,86,255,0.15)' }}>
                 <Calendar className="w-5 h-5" style={{ color: '#60A5FA' }} />
               </div>
@@ -125,7 +125,7 @@ export default async function DashboardPage() {
                 <div className="text-xs" style={{ color: '#64748B' }}>Schedule a session</div>
               </div>
             </a>
-            <a href="/complete-profile" style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textDecoration: 'none' }} className="group">
+            <a href="/complete-profile" className="glass-card group" style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textDecoration: 'none' }}>
               <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors" style={{ background: 'rgba(74,222,128,0.12)' }}>
                 <CheckCircle className="w-5 h-5" style={{ color: '#4ADE80' }} />
               </div>
@@ -139,19 +139,19 @@ export default async function DashboardPage() {
 
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-3">
-          <div style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
+          <div className="glass-card" style={{ padding: '16px', textAlign: 'center' }}>
             <div className="text-2xl font-bold mb-0.5" style={{ color: '#ffffff' }}>6</div>
-            <div className="text-xs" style={{ color: '#64748B' }}>Sessions Done</div>
+            <div className="text-xs" style={{ color: '#94A3B8' }}>Sessions Done</div>
           </div>
-          <div style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
+          <div className="glass-card" style={{ padding: '16px', textAlign: 'center' }}>
             <div className="text-2xl font-bold mb-0.5" style={{ color: '#ffffff' }}>14h</div>
-            <div className="text-xs" style={{ color: '#64748B' }}>TCA Hours</div>
+            <div className="text-xs" style={{ color: '#94A3B8' }}>TCA Hours</div>
           </div>
-          <div style={{ background: '#0F1117', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
-            <div className="text-2xl font-bold mb-0.5 flex items-center justify-center gap-1" style={{ color: '#F97316' }}>
-              <Star className="w-4 h-4" style={{ color: '#F97316' }} />4.8
+          <div className="glass-card" style={{ padding: '16px', textAlign: 'center' }}>
+            <div className="text-2xl font-bold mb-0.5 flex items-center justify-center gap-1" style={{ color: '#FF8C42' }}>
+              <Star className="w-4 h-4" style={{ color: '#FF8C42' }} />4.8
             </div>
-            <div className="text-xs" style={{ color: '#64748B' }}>Instructor Rating</div>
+            <div className="text-xs" style={{ color: '#94A3B8' }}>Instructor Rating</div>
           </div>
         </div>
 

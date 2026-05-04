@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
-// mc_tasks and mc_calendar_events are Everest's personal task/calendar tables
-// — not part of the Driving Center SaaS schema.
 type McTask = {
   id: string
   title: string
@@ -70,34 +68,35 @@ export default function MissionControlPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#050505] text-white p-6">
-        <div className="max-w-7xl mx-auto">
-          <p className="text-[#5C6370]">Loading mission control...</p>
+      <div className="min-h-screen relative overflow-hidden" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+        <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+          <p style={{ color: '#94A3B8' }}>Loading mission control...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen relative overflow-hidden" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Mission Control</h1>
-          <p className="text-[#5C6370] mt-1">Everest & Cayden — {tasks.length} active tasks</p>
+          <h1 className="text-3xl font-bold tracking-tight" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Mission Control</h1>
+          <p className="mt-1" style={{ color: '#94A3B8' }}>Everest & Cayden — {tasks.length} active tasks</p>
         </div>
 
         {/* Tasks Board */}
         <div className="grid grid-cols-2 gap-6 mb-8">
           {/* My Tasks */}
-          <div className="bg-[#0D0D0D] border border-[#1A1A1A] rounded-2xl p-5">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <div className="glass-card" style={{ padding: '20px' }}>
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>
               <span className="w-2 h-2 rounded-full bg-[#10B981]" />
               Assigned to Me
             </h2>
             <div className="space-y-3">
               {myTasks.length === 0 ? (
-                <p className="text-[#5C6370] text-sm">No tasks assigned to you</p>
+                <p className="text-sm" style={{ color: '#94A3B8' }}>No tasks assigned to you</p>
               ) : (
                 myTasks.map(task => (
                   <TaskCard key={task.id} task={task} />
@@ -107,14 +106,14 @@ export default function MissionControlPage() {
           </div>
 
           {/* Everest/Subagent Tasks */}
-          <div className="bg-[#0D0D0D] border border-[#1A1A1A] rounded-2xl p-5">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <div className="glass-card" style={{ padding: '20px' }}>
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>
               <span className="w-2 h-2 rounded-full bg-[#006FFF]" />
               Everest / Subagents
             </h2>
             <div className="space-y-3">
               {everestTasks.length === 0 ? (
-                <p className="text-[#5C6370] text-sm">No active tasks</p>
+                <p className="text-sm" style={{ color: '#94A3B8' }}>No active tasks</p>
               ) : (
                 everestTasks.map(task => (
                   <TaskCard key={task.id} task={task} />
@@ -125,25 +124,25 @@ export default function MissionControlPage() {
         </div>
 
         {/* Calendar Events */}
-        <div className="bg-[#0D0D0D] border border-[#1A1A1A] rounded-2xl p-5 mb-8">
-          <h2 className="text-lg font-semibold mb-4">Calendar</h2>
+        <div className="glass-card mb-8" style={{ padding: '20px' }}>
+          <h2 className="text-lg font-semibold mb-4" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Calendar</h2>
           <div className="space-y-2">
             {events.length === 0 ? (
-              <p className="text-[#5C6370] text-sm">No events</p>
+              <p className="text-sm" style={{ color: '#94A3B8' }}>No events</p>
             ) : (
               events.map(event => (
-                <div key={event.id} className="flex items-center justify-between py-2 border-b border-[#1A1A1A] last:border-0">
+                <div key={event.id} className="flex items-center justify-between py-2 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
                   <div className="flex items-center gap-3">
                     <span className={`w-2 h-2 rounded-full ${
                       event.event_type === 'work_window' ? 'bg-[#10B981]' :
                       event.event_type === 'cron' ? 'bg-[#006FFF]' : 'bg-[#818CF8]'
                     }`} />
-                    <span className="text-sm">{event.title}</span>
-                    <span className="text-xs text-[#5C6370] px-2 py-0.5 bg-[#18181b] rounded-full">
+                    <span className="text-sm" style={{ color: '#94A3B8' }}>{event.title}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: '#18181B', color: '#94A3B8' }}>
                       {event.event_type}
                     </span>
                   </div>
-                  <div className="text-sm text-[#5C6370]">
+                  <div className="text-sm" style={{ color: '#94A3B8' }}>
                     {event.recurring ? '🔄 ' : ''}{event.start_time}
                   </div>
                 </div>
@@ -153,32 +152,32 @@ export default function MissionControlPage() {
         </div>
 
         {/* Agent Status */}
-        <div className="bg-[#0D0D0D] border border-[#1A1A1A] rounded-2xl p-5">
-          <h2 className="text-lg font-semibold mb-4">Agent Status</h2>
+        <div className="glass-card" style={{ padding: '20px' }}>
+          <h2 className="text-lg font-semibold mb-4" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Agent Status</h2>
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-[#18181b] rounded-xl p-4">
+            <div className="glass-card" style={{ padding: '16px' }}>
               <div className="flex items-center gap-2 mb-2">
                 <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-                <span className="font-medium">Everest (Main)</span>
+                <span className="font-medium" style={{ color: '#ffffff' }}>Everest (Main)</span>
               </div>
-              <p className="text-xs text-[#5C6370]">Active now</p>
-              <p className="text-xs text-[#5C6370] mt-1">Model: MiniMax-M2.7</p>
+              <p className="text-xs" style={{ color: '#94A3B8' }}>Active now</p>
+              <p className="text-xs mt-1" style={{ color: '#94A3B8' }}>Model: MiniMax-M2.7</p>
             </div>
-            <div className="bg-[#18181b] rounded-xl p-4">
+            <div className="glass-card" style={{ padding: '16px' }}>
               <div className="flex items-center gap-2 mb-2">
                 <span className="w-2 h-2 rounded-full bg-[#006FFF]" />
-                <span className="font-medium">Codex</span>
+                <span className="font-medium" style={{ color: '#ffffff' }}>Codex</span>
               </div>
-              <p className="text-xs text-[#5C6370]">On standby</p>
-              <p className="text-xs text-[#5C6370] mt-1">DeepSeek backend</p>
+              <p className="text-xs" style={{ color: '#94A3B8' }}>On standby</p>
+              <p className="text-xs mt-1" style={{ color: '#94A3B8' }}>DeepSeek backend</p>
             </div>
-            <div className="bg-[#18181b] rounded-xl p-4">
+            <div className="glass-card" style={{ padding: '16px' }}>
               <div className="flex items-center gap-2 mb-2">
                 <span className="w-2 h-2 rounded-full bg-[#818CF8]" />
-                <span className="font-medium">Subagents</span>
+                <span className="font-medium" style={{ color: '#ffffff' }}>Subagents</span>
               </div>
-              <p className="text-xs text-[#5C6370]">Spawned on demand</p>
-              <p className="text-xs text-[#5C6370] mt-1">MiniMax + DeepSeek</p>
+              <p className="text-xs" style={{ color: '#94A3B8' }}>Spawned on demand</p>
+              <p className="text-xs mt-1" style={{ color: '#94A3B8' }}>MiniMax + DeepSeek</p>
             </div>
           </div>
         </div>
@@ -188,34 +187,39 @@ export default function MissionControlPage() {
 }
 
 function TaskCard({ task }: { task: McTask }) {
-  const statusColors: Record<string, string> = {
-    todo: 'bg-[#18181b] text-[#5C6370]',
-    in_progress: 'bg-[#006FFF]/10 text-[#006FFF]',
-    done: 'bg-[#10B981]/10 text-[#10B981]',
+  const statusColors: Record<string, { bg: string; text: string }> = {
+    todo: { bg: 'rgba(255,255,255,0.05)', text: '#94A3B8' },
+    in_progress: { bg: 'rgba(0,111,255,0.1)', text: '#006FFF' },
+    done: { bg: 'rgba(16,185,129,0.1)', text: '#4ADE80' },
   }
+  const colors = statusColors[task.status] ?? statusColors.todo
+
+  const projectColors: Record<string, { bg: string; text: string }> = {
+    saas: { bg: 'rgba(0,111,255,0.1)', text: '#006FFF' },
+    fso: { bg: 'rgba(129,140,248,0.1)', text: '#818CF8' },
+    personal: { bg: 'rgba(255,140,66,0.1)', text: '#FF8C42' },
+    admin: { bg: 'rgba(255,255,255,0.05)', text: '#94A3B8' },
+  }
+  const pColors = projectColors[task.project] ?? projectColors.admin
 
   return (
-    <div className="bg-[#18181b] rounded-xl p-4 hover:border-[#27272a] border border-[#1A1A1A] transition-colors">
+    <div className="glass-card" style={{ padding: '16px' }}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium">{task.title}</p>
+          <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{task.title}</p>
           {task.last_activity && (
-            <p className="text-xs text-[#5C6370] mt-1 line-clamp-1">{task.last_activity}</p>
+            <p className="text-xs mt-1 line-clamp-1" style={{ color: '#94A3B8' }}>{task.last_activity}</p>
           )}
         </div>
-        <span className={`text-xs px-2 py-1 rounded-full ${statusColors[task.status] ?? ''}`}>
+        <span className="text-xs px-2 py-1 rounded-full" style={{ background: colors.bg, color: colors.text }}>
           {task.status.replace('_', ' ')}
         </span>
       </div>
       <div className="flex items-center gap-2 mt-2">
-        <span className={`text-xs px-2 py-0.5 rounded-full ${
-          task.project === 'saas' ? 'bg-[#006FFF]/10 text-[#006FFF]' :
-          task.project === 'fso' ? 'bg-[#818CF8]/10 text-[#818CF8]' :
-          'bg-[#18181b] text-[#5C6370] border border-[#27272a]'
-        }`}>
+        <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: pColors.bg, color: pColors.text }}>
           {task.project}
         </span>
-        <span className="text-xs text-[#5C6370]">
+        <span className="text-xs" style={{ color: '#94A3B8' }}>
           {new Date(task.updated_at).toLocaleDateString()}
         </span>
       </div>

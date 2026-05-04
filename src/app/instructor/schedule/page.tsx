@@ -14,11 +14,6 @@ const DAYS = [
   { value: 7, label: 'Sunday' },
 ]
 
-function formatTime(time: string): string {
-  if (!time) return '09:00'
-  return time
-}
-
 export default function InstructorSchedulePage() {
   const [instructorId, setInstructorId] = useState<string>('')
   const [schoolId, setSchoolId] = useState<string>('')
@@ -61,13 +56,11 @@ export default function InstructorSchedulePage() {
       setInstructorName(instructorData?.name ?? 'Instructor')
       setSchoolName(schoolData?.name ?? 'Your school')
 
-      // Initialize availability map with defaults (all disabled)
       const initState: Record<number, { active: boolean; start_time: string; end_time: string }> = {}
       DAYS.forEach(d => {
         initState[d.value] = { active: false, start_time: '09:00', end_time: '17:00' }
       })
 
-      // Override with existing availability
       ;(availabilityData ?? []).forEach((row: any) => {
         if (initState[row.day_of_week]) {
           initState[row.day_of_week] = {
@@ -126,34 +119,33 @@ export default function InstructorSchedulePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-gray-400 text-sm">Loading your schedule...</div>
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+        <p className="text-sm" style={{ color: '#94A3B8' }}>Loading your schedule...</p>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
-        <div className="text-red-400 text-sm text-center">{error}</div>
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-6" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+        <p className="text-sm text-center" style={{ color: '#F87171' }}>{error}</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      {/* Header */}
-      <div className="bg-slate-900 border-b border-white/10 px-6 py-5">
-        <div className="max-w-lg mx-auto">
-          <div className="text-xs text-cyan-400 font-medium uppercase tracking-wider mb-1">Instructor Schedule</div>
-          <h1 className="text-xl font-bold">{instructorName}</h1>
-          <p className="text-sm text-gray-400">{schoolName}</p>
-        </div>
-      </div>
+    <div className="min-h-screen relative overflow-hidden" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+      <div className="max-w-lg mx-auto px-6 py-8 relative z-10">
 
-      <div className="max-w-lg mx-auto px-6 py-6">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: '#FF8C42', fontFamily: 'Outfit, sans-serif' }}>Instructor Schedule</div>
+          <h1 className="text-2xl font-bold" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>{instructorName}</h1>
+          <p className="text-sm mt-0.5" style={{ color: '#94A3B8' }}>{schoolName}</p>
+        </div>
+
         {/* Instructions */}
-        <div className="text-sm text-gray-400 mb-5">
+        <div className="text-sm mb-5" style={{ color: '#94A3B8' }}>
           Toggle the days you&apos;re available and set your hours for each day.
           Your schedule is visible to students booking lessons.
         </div>
@@ -165,33 +157,45 @@ export default function InstructorSchedulePage() {
             return (
               <div
                 key={day.value}
-                className={`rounded-xl border transition-all ${
-                  dayAvail.active
-                    ? 'bg-slate-800 border-cyan-500/30'
-                    : 'bg-slate-900 border-white/8'
-                }`}
+                className="glass-card"
+                style={{
+                  padding: '16px',
+                  border: dayAvail.active ? '1px solid rgba(255,140,66,0.3)' : undefined,
+                }}
               >
                 {/* Day header */}
-                <div className="flex items-center justify-between px-4 py-3">
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => toggleDay(day.value)}
-                      className={`w-10 h-6 rounded-full transition-all relative ${
-                        dayAvail.active ? 'bg-cyan-500' : 'bg-slate-700'
-                      }`}
-                      style={{ width: 40, height: 24 }}
+                      style={{
+                        width: 40,
+                        height: 24,
+                        borderRadius: 12,
+                        border: 'none',
+                        background: dayAvail.active ? '#FF8C42' : '#18181B',
+                        cursor: 'pointer',
+                        position: 'relative',
+                        transition: 'background 0.2s',
+                      }}
                     >
                       <div
-                        className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                          dayAvail.active ? 'translate-x-[22px]' : 'translate-x-1'
-                        }`}
-                        style={{ width: 16, height: 16 }}
+                        style={{
+                          position: 'absolute',
+                          top: 4,
+                          left: dayAvail.active ? 22 : 4,
+                          width: 16,
+                          height: 16,
+                          borderRadius: '50%',
+                          background: '#ffffff',
+                          transition: 'left 0.2s',
+                        }}
                       />
                     </button>
-                    <span className="text-sm font-medium text-white">{day.label}</span>
+                    <span className="text-sm font-medium" style={{ color: '#ffffff', fontFamily: 'Outfit, sans-serif' }}>{day.label}</span>
                   </div>
                   {dayAvail.active && (
-                    <span className="text-xs text-cyan-400">
+                    <span className="text-xs" style={{ color: '#FF8C42' }}>
                       {dayAvail.start_time} – {dayAvail.end_time}
                     </span>
                   )}
@@ -199,9 +203,9 @@ export default function InstructorSchedulePage() {
 
                 {/* Time pickers — only when active */}
                 {dayAvail.active && (
-                  <div className="flex gap-3 px-4 pb-4">
+                  <div className="flex gap-3">
                     <div className="flex-1">
-                      <label className="text-xs text-gray-500 mb-1 block">Start</label>
+                      <label className="text-xs mb-1 block" style={{ color: '#94A3B8' }}>Start</label>
                       <input
                         type="time"
                         value={dayAvail.start_time}
@@ -209,11 +213,12 @@ export default function InstructorSchedulePage() {
                           ...prev,
                           [day.value]: { ...prev[day.value], start_time: e.target.value },
                         }))}
-                        className="w-full bg-slate-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                        className="w-full glass-card border-0 text-sm text-white focus:outline-none"
+                        style={{ padding: '8px 12px', borderRadius: 12 }}
                       />
                     </div>
                     <div className="flex-1">
-                      <label className="text-xs text-gray-500 mb-1 block">End</label>
+                      <label className="text-xs mb-1 block" style={{ color: '#94A3B8' }}>End</label>
                       <input
                         type="time"
                         value={dayAvail.end_time}
@@ -221,7 +226,8 @@ export default function InstructorSchedulePage() {
                           ...prev,
                           [day.value]: { ...prev[day.value], end_time: e.target.value },
                         }))}
-                        className="w-full bg-slate-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                        className="w-full glass-card border-0 text-sm text-white focus:outline-none"
+                        style={{ padding: '8px 12px', borderRadius: 12 }}
                       />
                     </div>
                   </div>
@@ -231,27 +237,35 @@ export default function InstructorSchedulePage() {
           })}
         </div>
 
-        {/* Save button */}
+        {/* Error */}
         {error && (
-          <div className="mt-4 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 text-sm text-red-400">
-            {error}
+          <div className="mt-4 glass-card border-[#F87171]/30" style={{ padding: '12px 16px' }}>
+            <p className="text-sm" style={{ color: '#F87171' }}>{error}</p>
           </div>
         )}
 
+        {/* Save button */}
         <button
           onClick={handleSave}
           disabled={saving}
-          className="mt-5 w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+          className="mt-5 w-full flex items-center justify-center gap-2 font-semibold py-3 rounded-2xl transition-opacity disabled:opacity-50"
+          style={{
+            background: 'linear-gradient(135deg, #FF8C42, #FF6B2B)',
+            color: '#ffffff',
+            fontFamily: 'Outfit, sans-serif',
+          }}
         >
           {saving ? (
-            'Saving...'
+            <span style={{ color: '#ffffff' }}>Saving...</span>
           ) : saved ? (
             <>
-              <CheckCircle className="w-4 h-4" /> Saved!
+              <CheckCircle className="w-4 h-4" style={{ color: '#ffffff' }} />
+              <span style={{ color: '#ffffff' }}>Saved!</span>
             </>
           ) : (
             <>
-              <Save className="w-4 h-4" /> Save Schedule
+              <Save className="w-4 h-4" style={{ color: '#ffffff' }} />
+              <span style={{ color: '#ffffff' }}>Save Schedule</span>
             </>
           )}
         </button>

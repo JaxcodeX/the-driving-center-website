@@ -1,5 +1,5 @@
 /* ── Google Fonts ─────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
 
 /* ── Theme System ───────────────────────────────────────────────── */
 :root,
@@ -23,9 +23,10 @@
   --section-alt: #0A0A0F;
   --nav-bg: rgba(5,5,5,0.85);
   --nav-shadow: none;
-  --glass-bg: rgba(15,17,23,0.8);
-  --glass-border: rgba(26,26,26,0.8);
-  --glass-shadow: 0 0 0 transparent;
+  --glass-bg: rgba(255,255,255,0.03);
+  --glass-border: rgba(255,255,255,0.06);
+  --glass-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+  --glass-blur: blur(24px);
   --accent-dim: rgba(74,222,128,0.15);
   --heading-shadow: none;
   --stat-change: #4ADE80;
@@ -219,10 +220,10 @@ h1, h2, h3, h4, h5, h6 {
 /* ── Glass Card ───────────────────────────────────────────────── */
 .glass-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: var(--glass-blur, blur(24px));
+  -webkit-backdrop-filter: var(--glass-blur, blur(24px));
   border: 1px solid var(--glass-border);
-  border-radius: 16px;
+  border-radius: 24px;
   padding: 32px;
   box-shadow: var(--glass-shadow);
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s, border-color 0.3s;

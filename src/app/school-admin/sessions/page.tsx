@@ -113,8 +113,8 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
   }
 
   const inputStyle: React.CSSProperties = {
-    background: '#0D0D0D',
-    border: '1px solid #1A1A1A',
+    background: 'rgba(0,0,0,0.4)',
+    border: '1px solid rgba(255,255,255,0.08)',
     color: '#FFFFFF',
     outline: 'none',
     borderRadius: '12px',
@@ -133,14 +133,17 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
       justifyContent: 'center',
       padding: '16px',
       background: 'rgba(0,0,0,0.7)',
+      backdropFilter: 'blur(8px)',
     }}>
       <div style={{
         width: '100%',
         maxWidth: '480px',
-        background: '#0F1117',
-        border: '1px solid #1A1A1A',
+        background: 'rgba(15,17,23,0.95)',
+        backdropFilter: 'blur(24px)',
+        border: '1px solid rgba(255,255,255,0.06)',
         borderRadius: '16px',
         padding: '32px',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
       }}>
         <h2 style={{
           fontFamily: 'Outfit, sans-serif',
@@ -171,7 +174,7 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
               required
               style={inputStyle}
               onFocus={e => (e.target.style.borderColor = '#4ADE80')}
-              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
             />
           </div>
           <div>
@@ -235,7 +238,7 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
               placeholder="e.g. 123 Main St"
               style={inputStyle}
               onFocus={e => (e.target.style.borderColor = '#4ADE80')}
-              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
             />
           </div>
           <div>
@@ -266,7 +269,7 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
                 flex: 1,
                 padding: '12px',
                 background: 'transparent',
-                border: '1px solid #1A1A1A',
+                border: '1px solid rgba(255,255,255,0.08)',
                 borderRadius: '12px',
                 color: '#FFFFFF',
                 fontSize: '14px',
@@ -300,6 +303,15 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
     </div>
   )
 }
+
+const BG = '#0D0D12'
+const BG_GRADIENT = 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)'
+const GLASS_BG = 'rgba(255,255,255,0.03)'
+const GLASS_BORDER = 'rgba(255,255,255,0.06)'
+const GLASS_BLUR = 'blur(24px)'
+const TEXT_SECONDARY = '#9CA3AF'
+const ACCENT_GREEN = '#4ADE80'
+const CARD_SHADOW = '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)'
 
 export default function SessionsPage() {
   const [sessions, setSessions] = useState<Session[]>([])
@@ -364,277 +376,304 @@ export default function SessionsPage() {
     : sessions.filter(s => s.status === activeFilter)
 
   return (
-    <div style={{ maxWidth: '1200px' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-        <div>
-          <h1 style={{
-            fontFamily: 'Outfit, sans-serif',
-            fontSize: '28px',
-            fontWeight: '700',
-            color: '#FFFFFF',
-            marginBottom: '4px',
-          }}>
-            Sessions
-          </h1>
-          <p style={{ fontSize: '14px', color: '#6B7280' }}>
-            {sessions.length} total
-          </p>
-        </div>
-        <button
-          onClick={() => setShowModal(true)}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 20px',
-            background: '#4ADE80',
-            border: 'none',
-            borderRadius: '12px',
-            color: '#000000',
-            fontSize: '14px',
-            fontWeight: '700',
-            cursor: 'pointer',
-            transition: 'transform 0.15s, box-shadow 0.15s',
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
-            ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px rgba(74,222,128,0.3)'
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
-            ;(e.currentTarget as HTMLElement).style.boxShadow = 'none'
-          }}
-        >
-          <Plus className="w-4 h-4" />
-          New Session
-        </button>
-      </div>
+    <div style={{
+      minHeight: '100vh',
+      background: BG,
+      fontFamily: 'Inter, sans-serif',
+      position: 'relative',
+    }}>
+      {/* Background gradient */}
+      <div style={{
+        position: 'fixed',
+        inset: 0,
+        background: BG_GRADIENT,
+        pointerEvents: 'none',
+        zIndex: 0,
+      }} />
 
-      {/* Filter Tabs */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-        {filterTabs.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setActiveFilter(key)}
-            style={
-              activeFilter === key
-                ? {
-                    padding: '8px 16px',
-                    background: 'rgba(74,222,128,0.15)',
-                    color: '#4ADE80',
-                    border: '1px solid #4ADE80',
-                    borderRadius: '999px',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                  }
-                : {
-                    padding: '8px 16px',
-                    background: '#0F1117',
-                    color: '#9CA3AF',
-                    border: '1px solid #1A1A1A',
-                    borderRadius: '999px',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'background 0.15s, color 0.15s',
-                  }
-            }
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 48px', position: 'relative', zIndex: 1 }}>
 
-      {/* Sessions Table */}
-      {loading ? (
-        <div style={{
-          background: '#0F1117',
-          border: '1px solid #1A1A1A',
-          borderRadius: '16px',
-          textAlign: 'center',
-          padding: '64px',
-          color: '#6B7280',
-        }}>
-          <p style={{ fontSize: '14px' }}>Loading sessions...</p>
-        </div>
-      ) : !filteredSessions.length ? (
-        <div style={{
-          background: '#0F1117',
-          border: '1px solid #1A1A1A',
-          borderRadius: '16px',
-          textAlign: 'center',
-          padding: '64px',
-        }}>
-          <Calendar className="w-10 h-10 mx-auto mb-3" style={{ color: '#6B7280', opacity: 0.3 }} />
-          <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '12px' }}>
-            {activeFilter === 'all' ? 'No sessions yet' : `No ${activeFilter} sessions`}
-          </p>
-          {activeFilter === 'all' && (
-            <button onClick={() => setShowModal(true)} style={{
-              fontSize: '14px',
-              fontWeight: '500',
-              color: '#4ADE80',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+          <div>
+            <h1 style={{
+              fontFamily: 'Outfit, sans-serif',
+              fontSize: '28px',
+              fontWeight: '700',
+              color: '#FFFFFF',
+              marginBottom: '4px',
             }}>
-              Schedule your first session →
-            </button>
-          )}
-        </div>
-      ) : (
-        <div style={{
-          background: '#0F1117',
-          border: '1px solid #1A1A1A',
-          borderRadius: '16px',
-          overflow: 'hidden',
-        }}>
-          {/* Table header */}
-          <div
+              Sessions
+            </h1>
+            <p style={{ fontSize: '14px', color: TEXT_SECONDARY }}>
+              {sessions.length} total
+            </p>
+          </div>
+          <button
+            onClick={() => setShowModal(true)}
             style={{
-              display: 'grid',
-              gridTemplateColumns: '80px 1fr 120px 100px 80px',
-              gap: '16px',
-              padding: '12px 24px',
-              borderBottom: '1px solid #1A1A1A',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 20px',
+              background: '#4ADE80',
+              border: 'none',
+              borderRadius: '12px',
+              color: '#000000',
+              fontSize: '14px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              transition: 'transform 0.15s, box-shadow 0.15s',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+              ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px rgba(74,222,128,0.3)'
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
+              ;(e.currentTarget as HTMLElement).style.boxShadow = 'none'
             }}
           >
-            {['Date', 'Session', 'Details', 'Status', ''].map((h, i) => (
-              <div key={i} style={{
-                fontSize: '11px',
-                fontWeight: '600',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                color: '#9CA3AF',
-              }}>
-                {h}
-              </div>
-            ))}
-          </div>
-
-          {/* Session rows */}
-          <div>
-            {filteredSessions.map(session => {
-              const date = new Date(session.start_date + 'T12:00:00')
-              const pillClass = statusPillClass(session.status)
-              const leftColor = borderColor(session.status)
-
-              return (
-                <div
-                  key={session.id}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '80px 1fr 120px 100px 80px',
-                    gap: '16px',
-                    padding: '16px 24px',
-                    alignItems: 'center',
-                    borderLeft: `3px solid ${leftColor}`,
-                    transition: 'background 0.15s',
-                  }}
-                  onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#13161F')}
-                  onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
-                >
-                  {/* Date */}
-                  <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                    <div style={{
-                      fontSize: '11px',
-                      fontWeight: '600',
-                      textTransform: 'uppercase',
-                      color: leftColor,
-                    }}>
-                      {date.toLocaleDateString('en-US', { month: 'short' })}
-                    </div>
-                    <div style={{
-                      fontFamily: 'Outfit, sans-serif',
-                      fontSize: '28px',
-                      fontWeight: '800',
-                      color: '#FFFFFF',
-                      lineHeight: 1.2,
-                    }}>
-                      {date.getDate()}
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#6B7280' }}>
-                      {date.toLocaleDateString('en-US', { weekday: 'short' })}
-                    </div>
-                  </div>
-
-                  {/* Session info */}
-                  <div>
-                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', marginBottom: '2px' }}>
-                      {session.session_type?.name || 'Session'}
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#6B7280' }}>
-                      {session.instructor?.name && <span>{session.instructor.name}</span>}
-                      {session.location && (
-                        <>
-                          <span>·</span>
-                          <span>{session.location}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Details */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#9CA3AF' }}>
-                      <Clock className="w-3 h-3" style={{ color: '#6B7280' }} />
-                      {session.session_type?.duration_minutes || 60} min
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#9CA3AF' }}>
-                      <Users className="w-3 h-3" style={{ color: '#6B7280' }} />
-                      {session.seats_booked}/{session.max_seats} seats
-                    </div>
-                  </div>
-
-                  {/* Status pill */}
-                  <div>
-                    <span style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      padding: '4px 12px',
-                      borderRadius: '999px',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      background: session.status === 'scheduled' ? 'rgba(74,222,128,0.15)' : session.status === 'completed' ? 'rgba(96,165,250,0.15)' : 'rgba(249,115,22,0.15)',
-                      color: session.status === 'scheduled' ? '#4ADE80' : session.status === 'completed' ? '#60A5FA' : '#F97316',
-                    }}>
-                      {session.status}
-                    </span>
-                  </div>
-
-                  {/* Actions */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
-                    <button
-                      onClick={() => handleStatusToggle(session.id, session.status)}
-                      style={{
-                        padding: '8px',
-                        borderRadius: '8px',
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        color: '#9CA3AF',
-                        display: 'flex',
-                        alignItems: 'center',
-                        transition: 'background 0.15s',
-                      }}
-                      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#13161F')}
-                      onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
-                      title={session.status === 'scheduled' ? 'Cancel session' : 'Reactivate session'}
-                    >
-                      {session.status === 'scheduled'
-                        ? <Pause className="w-4 h-4" />
-                        : <Play className="w-4 h-4" />
-                      }
-                    </button>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+            <Plus className="w-4 h-4" />
+            New Session
+          </button>
         </div>
-      )}
+
+        {/* Filter Tabs */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+          {filterTabs.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setActiveFilter(key)}
+              style={
+                activeFilter === key
+                  ? {
+                      padding: '8px 16px',
+                      background: 'rgba(74,222,128,0.15)',
+                      color: '#4ADE80',
+                      border: '1px solid #4ADE80',
+                      borderRadius: '999px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                    }
+                  : {
+                      padding: '8px 16px',
+                      background: GLASS_BG,
+                      backdropFilter: GLASS_BLUR,
+                      WebkitBackdropFilter: GLASS_BLUR,
+                      color: TEXT_SECONDARY,
+                      border: `1px solid ${GLASS_BORDER}`,
+                      borderRadius: '999px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'background 0.15s, color 0.15s',
+                    }
+              }
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Sessions Table */}
+        {loading ? (
+          <div style={{
+            background: GLASS_BG,
+            backdropFilter: GLASS_BLUR,
+            WebkitBackdropFilter: GLASS_BLUR,
+            border: `1px solid ${GLASS_BORDER}`,
+            borderRadius: '16px',
+            textAlign: 'center',
+            padding: '64px',
+            boxShadow: CARD_SHADOW,
+          }}>
+            <p style={{ fontSize: '14px', color: TEXT_SECONDARY }}>Loading sessions...</p>
+          </div>
+        ) : !filteredSessions.length ? (
+          <div style={{
+            background: GLASS_BG,
+            backdropFilter: GLASS_BLUR,
+            WebkitBackdropFilter: GLASS_BLUR,
+            border: `1px solid ${GLASS_BORDER}`,
+            borderRadius: '16px',
+            textAlign: 'center',
+            padding: '64px',
+            boxShadow: CARD_SHADOW,
+          }}>
+            <Calendar className="w-10 h-10 mx-auto mb-3" style={{ color: TEXT_SECONDARY, opacity: 0.4 }} />
+            <p style={{ fontSize: '14px', color: TEXT_SECONDARY, marginBottom: '12px' }}>
+              {activeFilter === 'all' ? 'No sessions yet' : `No ${activeFilter} sessions`}
+            </p>
+            {activeFilter === 'all' && (
+              <button onClick={() => setShowModal(true)} style={{
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#4ADE80',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+              }}>
+                Schedule your first session →
+              </button>
+            )}
+          </div>
+        ) : (
+          <div style={{
+            background: GLASS_BG,
+            backdropFilter: GLASS_BLUR,
+            WebkitBackdropFilter: GLASS_BLUR,
+            border: `1px solid ${GLASS_BORDER}`,
+            borderRadius: '16px',
+            overflow: 'hidden',
+            boxShadow: CARD_SHADOW,
+          }}>
+            {/* Table header */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '80px 1fr 120px 100px 80px',
+                gap: '16px',
+                padding: '12px 24px',
+                borderBottom: `1px solid ${GLASS_BORDER}`,
+              }}
+            >
+              {['Date', 'Session', 'Details', 'Status', ''].map((h, i) => (
+                <div key={i} style={{
+                  fontSize: '11px',
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  color: TEXT_SECONDARY,
+                }}>
+                  {h}
+                </div>
+              ))}
+            </div>
+
+            {/* Session rows */}
+            <div>
+              {filteredSessions.map(session => {
+                const date = new Date(session.start_date + 'T12:00:00')
+                const pillClass = statusPillClass(session.status)
+                const leftColor = borderColor(session.status)
+
+                return (
+                  <div
+                    key={session.id}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '80px 1fr 120px 100px 80px',
+                      gap: '16px',
+                      padding: '16px 24px',
+                      alignItems: 'center',
+                      borderLeft: `3px solid ${leftColor}`,
+                      transition: 'background 0.15s',
+                    }}
+                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.025)')}
+                    onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
+                  >
+                    {/* Date */}
+                    <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                      <div style={{
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        textTransform: 'uppercase',
+                        color: leftColor,
+                      }}>
+                        {date.toLocaleDateString('en-US', { month: 'short' })}
+                      </div>
+                      <div style={{
+                        fontFamily: 'Outfit, sans-serif',
+                        fontSize: '28px',
+                        fontWeight: '800',
+                        color: '#FFFFFF',
+                        lineHeight: 1.2,
+                      }}>
+                        {date.getDate()}
+                      </div>
+                      <div style={{ fontSize: '11px', color: TEXT_SECONDARY }}>
+                        {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                      </div>
+                    </div>
+
+                    {/* Session info */}
+                    <div>
+                      <div style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', marginBottom: '2px' }}>
+                        {session.session_type?.name || 'Session'}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: TEXT_SECONDARY }}>
+                        {session.instructor?.name && <span>{session.instructor.name}</span>}
+                        {session.location && (
+                          <>
+                            <span>·</span>
+                            <span>{session.location}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Details */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: TEXT_SECONDARY }}>
+                        <Clock className="w-3 h-3" style={{ color: TEXT_SECONDARY }} />
+                        {session.session_type?.duration_minutes || 60} min
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: TEXT_SECONDARY }}>
+                        <Users className="w-3 h-3" style={{ color: TEXT_SECONDARY }} />
+                        {session.seats_booked}/{session.max_seats} seats
+                      </div>
+                    </div>
+
+                    {/* Status pill */}
+                    <div>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        padding: '4px 12px',
+                        borderRadius: '999px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        background: session.status === 'scheduled' ? 'rgba(74,222,128,0.15)' : session.status === 'completed' ? 'rgba(96,165,250,0.15)' : 'rgba(249,115,22,0.15)',
+                        color: session.status === 'scheduled' ? '#4ADE80' : session.status === 'completed' ? '#60A5FA' : '#F97316',
+                      }}>
+                        {session.status}
+                      </span>
+                    </div>
+
+                    {/* Actions */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
+                      <button
+                        onClick={() => handleStatusToggle(session.id, session.status)}
+                        style={{
+                          padding: '8px',
+                          borderRadius: '8px',
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: TEXT_SECONDARY,
+                          display: 'flex',
+                          alignItems: 'center',
+                          transition: 'background 0.15s',
+                        }}
+                        onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)')}
+                        onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
+                        title={session.status === 'scheduled' ? 'Cancel session' : 'Reactivate session'}
+                      >
+                        {session.status === 'scheduled'
+                          ? <Pause className="w-4 h-4" />
+                          : <Play className="w-4 h-4" />
+                        }
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+      </div>
 
       {showModal && (
         <AddSessionModal onClose={() => setShowModal(false)} onAdd={s => setSessions(prev => [s, ...prev])} />

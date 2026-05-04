@@ -70,8 +70,8 @@ function SchoolContent() {
 
   if (!slug) {
     return (
-      <div className="min-h-screen flex items-center justify-center relative" style={{ background: '#080809' }}>
-        <div className="bg-circle w-96 h-96 -top-20 -left-20" style={{ background: 'radial-gradient(circle, rgba(0,102,255,0.25) 0%, transparent 70%)' }} />
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+        <div className="bg-circle w-96 h-96 -top-20 -left-20" style={{ background: 'radial-gradient(circle, rgba(255,140,66,0.1) 0%, transparent 70%)' }} />
         <div className="bg-circle w-64 h-64 bottom-20 -right-10" style={{ background: 'radial-gradient(circle, rgba(112,123,255,0.2) 0%, transparent 70%)' }} />
         <div className="text-center relative z-10">
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(126,212,253,0.12)', border: '1px solid rgba(126,212,253,0.3)' }}>
@@ -86,10 +86,10 @@ function SchoolContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#080809' }}>
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
         <div className="text-center">
-          <div className="w-12 h-12 rounded-full border-2 border-t-transparent animate-spin mx-auto mb-4" style={{ borderColor: 'rgba(126,212,253,0.3)', borderTopColor: 'transparent' }} />
-          <p style={{ color: '#64748B' }}>Loading school...</p>
+          <div className="w-12 h-12 rounded-full border-2 border-t-transparent animate-spin mx-auto mb-4" style={{ borderColor: 'rgba(255,140,66,0.3)', borderTopColor: 'transparent' }} />
+          <p style={{ color: '#94A3B8' }}>Loading school...</p>
         </div>
       </div>
     )
@@ -97,11 +97,11 @@ function SchoolContent() {
 
   if (error || !school) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#080809' }}>
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
         <div className="text-center">
           <div className="text-4xl mb-4">🔍</div>
-          <h1 className="text-2xl font-bold text-white mb-2">School not found</h1>
-          <p className="text-gray-400">This school doesn&apos;t exist or their page is not set up yet.</p>
+          <h1 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>School not found</h1>
+          <p style={{ color: '#94A3B8' }}>This school doesn&apos;t exist or their page is not set up yet.</p>
         </div>
       </div>
     )
@@ -119,16 +119,16 @@ function SchoolContent() {
   ]
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ background: '#080809', color: '#ffffff' }}>
+    <div className="min-h-screen relative overflow-hidden" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)', color: '#ffffff' }}>
       {/* Background decorative circles */}
-      <div className="bg-circle w-[600px] h-[600px] -top-48 -left-48" style={{ background: 'radial-gradient(circle, rgba(0,102,255,0.18) 0%, transparent 70%)' }} />
-      <div className="bg-circle w-[400px] h-[400px] top-80 -right-32" style={{ background: 'radial-gradient(circle, rgba(112,123,255,0.12) 0%, transparent 70%)' }} />
+      <div className="bg-circle w-[600px] h-[600px] -top-48 -left-48" style={{ background: 'radial-gradient(circle, rgba(255,140,66,0.08) 0%, transparent 70%)' }} />
+      <div className="bg-circle w-[400px] h-[400px] top-80 -right-32" style={{ background: 'radial-gradient(circle, rgba(255,140,66,0.05) 0%, transparent 70%)' }} />
 
       {/* Hero Header */}
       <div className="relative z-10 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
         <div className="max-w-3xl mx-auto px-6 py-10 text-center">
           {/* Logo */}
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: 'linear-gradient(135deg, #7ED4FD, #707BFF)' }}>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: 'linear-gradient(135deg, #FF8C42, #FF6B2B)' }}>
             <span className="text-white font-bold text-xl">DC</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold mb-3" style={{ color: '#ffffff' }}>{school.school.name}</h1>
@@ -142,7 +142,7 @@ function SchoolContent() {
               </span>
             )}
             {school.school.phone && (
-              <a href={`tel:${school.school.phone}`} className="flex items-center gap-1.5 transition-colors hover:text-white" style={{ color: '#7ED4FD' }}>
+              <a href={`tel:${school.school.phone}`} className="flex items-center gap-1.5 transition-colors hover:text-white" style={{ color: '#FF8C42' }}>
                 <Phone className="w-3.5 h-3.5" />{school.school.phone}
               </a>
             )}
@@ -163,7 +163,7 @@ function SchoolContent() {
         {school.profile?.about && (
           <section>
             <h2 className="text-lg font-semibold mb-3 flex items-center gap-2" style={{ color: '#ffffff' }}>
-              <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #7ED4FD, #707BFF)' }} />
+              <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #FF8C42, #FF6B2B)' }} />
               About Us
             </h2>
             <div className="glass-card">
@@ -176,14 +176,14 @@ function SchoolContent() {
         {school.session_types && school.session_types.length > 0 && (
           <section>
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#ffffff' }}>
-              <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #7ED4FD, #707BFF)' }} />
+              <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #FF8C42, #FF6B2B)' }} />
               Lessons & Services
             </h2>
             <div className="space-y-3">
               {school.session_types.map((type: any) => (
                 <div key={type.id} className="glass-card">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ background: 'rgba(126,212,253,0.1)', color: '#7ED4FD' }}>
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ background: 'rgba(255,140,66,0.1)', color: '#FF8C42' }}>
                       {iconForName(type.name)}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -191,7 +191,7 @@ function SchoolContent() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-semibold text-base" style={{ color: '#ffffff' }}>{type.name}</span>
                           {type.tca_hours_credit && (
-                            <span className="text-xs px-2.5 py-0.5 rounded-full" style={{ background: 'rgba(126,212,253,0.12)', color: '#7ED4FD', border: '1px solid rgba(126,212,253,0.2)' }}>
+                            <span className="text-xs px-2.5 py-0.5 rounded-full" style={{ background: 'rgba(255,140,66,0.12)', color: '#FF8C42', border: '1px solid rgba(255,140,66,0.2)' }}>
                               {type.tca_hours_credit}h TCA credit
                             </span>
                           )}
@@ -208,7 +208,7 @@ function SchoolContent() {
                         </span>
                         <Link href={`/book?school=${slug}&type=${type.id}`}
                           className="btn-pill text-sm font-semibold px-5 py-2.5"
-                          style={{ background: '#0066FF', color: '#fff' }}>
+                          style={{ background: '#FF8C42', color: '#fff' }}>
                           Book Now →
                         </Link>
                       </div>
@@ -223,14 +223,14 @@ function SchoolContent() {
         {/* Instructors */}
         <section>
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#ffffff' }}>
-            <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #7ED4FD, #707BFF)' }} />
+            <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #FF8C42, #FF6B2B)' }} />
             Our Instructors
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {instructors.map((inst: any) => (
               <div key={inst.name} className="glass-card flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
-                  style={{ background: 'linear-gradient(135deg, #7ED4FD, #707BFF)', color: '#ffffff' }}>
+                  style={{ background: 'linear-gradient(135deg, #FF8C42, #FF6B2B)', color: '#ffffff' }}>
                   {inst.initials}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -249,7 +249,7 @@ function SchoolContent() {
         {reviews.length > 0 && (
           <section>
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#ffffff' }}>
-              <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #7ED4FD, #707BFF)' }} />
+              <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #FF8C42, #FF6B2B)' }} />
               What Students Say
             </h2>
             <div className="space-y-3">
@@ -257,7 +257,7 @@ function SchoolContent() {
                 <div key={i} className="glass-card" style={{ padding: '20px' }}>
                   <div className="flex items-start gap-3">
                     <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-                      style={{ background: 'rgba(126,212,253,0.12)', color: '#7ED4FD', border: '1px solid rgba(126,212,253,0.2)' }}>
+                      style={{ background: 'rgba(255,140,66,0.12)', color: '#FF8C42', border: '1px solid rgba(255,140,66,0.2)' }}>
                       {review.name.split(' ')[0][0]}{review.name.split(' ')[1]?.[0] ?? ''}
                     </div>
                     <div className="flex-1">
@@ -281,26 +281,26 @@ function SchoolContent() {
         {/* Contact */}
         <section>
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#ffffff' }}>
-            <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #7ED4FD, #707BFF)' }} />
+            <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #FF8C42, #FF6B2B)' }} />
             Contact Us
           </h2>
           <div className="glass-card">
             <div className="space-y-3.5">
               {school.profile?.address && (
                 <div className="flex items-center gap-3 text-sm" style={{ color: '#94A3B8' }}>
-                  <MapPin className="w-4 h-4 shrink-0" style={{ color: '#7ED4FD' }} />
+                  <MapPin className="w-4 h-4 shrink-0" style={{ color: '#FF8C42' }} />
                   <span>{school.profile.address}, {school.profile.city} {school.profile.zip}</span>
                 </div>
               )}
               {school.school.phone && (
                 <div className="flex items-center gap-3 text-sm" style={{ color: '#94A3B8' }}>
-                  <Phone className="w-4 h-4 shrink-0" style={{ color: '#7ED4FD' }} />
+                  <Phone className="w-4 h-4 shrink-0" style={{ color: '#FF8C42' }} />
                   <a href={`tel:${school.school.phone}`} className="hover:text-white transition-colors" style={{ color: '#7ED4FD' }}>{school.school.phone}</a>
                 </div>
               )}
               {school.profile?.email && (
                 <div className="flex items-center gap-3 text-sm" style={{ color: '#94A3B8' }}>
-                  <Mail className="w-4 h-4 shrink-0" style={{ color: '#7ED4FD' }} />
+                  <Mail className="w-4 h-4 shrink-0" style={{ color: '#FF8C42' }} />
                   <a href={`mailto:${school.profile.email}`} className="hover:text-white transition-colors" style={{ color: '#7ED4FD' }}>{school.profile.email}</a>
                 </div>
               )}

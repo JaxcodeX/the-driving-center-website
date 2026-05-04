@@ -4,6 +4,33 @@ import { Suspense, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
+const GLASS_BG = 'rgba(255,255,255,0.03)'
+const GLASS_BORDER = 'rgba(255,255,255,0.06)'
+const GLASS_SHADOW = '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)'
+const ACCENT = '#FF8C42'
+const ACCENT_DIM = 'rgba(255,140,66,0.12)'
+const SUCCESS = '#4ADE80'
+
+function injectFonts() {
+  if (typeof document === 'undefined') return
+  const id = 'everest-fonts'
+  if (document.getElementById(id)) return
+  const link = document.createElement('link')
+  link.id = id
+  link.rel = 'stylesheet'
+  link.href = 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap'
+  document.head.appendChild(link)
+}
+
+const glassCard = {
+  background: GLASS_BG,
+  backdropFilter: 'blur(24px)',
+  WebkitBackdropFilter: 'blur(24px)',
+  border: `1px solid ${GLASS_BORDER}`,
+  borderRadius: '24px',
+  boxShadow: GLASS_SHADOW,
+}
+
 function formatDate(dateStr: string) {
   return new Date(`${dateStr}T12:00:00`).toLocaleDateString('en-US', {
     weekday: 'long', month: 'long', day: 'numeric',
@@ -23,6 +50,8 @@ function ConfirmationContent() {
   const [booking, setBooking] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+
+  useEffect(() => { injectFonts() }, [])
 
   useEffect(() => {
     if (!token) {
@@ -69,22 +98,24 @@ function ConfirmationContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <div className="text-gray-400">Loading booking...</div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+        <div style={glassCard} className="px-8 py-4 rounded-full">
+          <span style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>Loading booking...</span>
+        </div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-6">
-        <div className="max-w-md w-full text-center">
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+        <div style={{ ...glassCard, padding: '40px 32px', maxWidth: '440px', width: '100%', textAlign: 'center' }}>
           <div className="text-5xl mb-4">⏳</div>
-          <h1 className="text-2xl font-bold text-white mb-3">Pending Payment</h1>
-          <p className="text-gray-400 mb-6">{error}</p>
+          <h1 className="text-2xl font-bold mb-3" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Pending Payment</h1>
+          <p className="mb-6" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>{error}</p>
           <Link
             href="/"
-            className="inline-block bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold px-8 py-3 rounded-xl hover:opacity-90 transition-opacity"
+            style={{ background: `linear-gradient(135deg, ${ACCENT}, #FF6B1E)`, color: '#000', fontWeight: '600', padding: '14px 28px', borderRadius: '100px', textDecoration: 'none', display: 'inline-block', fontFamily: 'Outfit, sans-serif' }}
           >
             Back to Home
           </Link>
@@ -98,54 +129,58 @@ function ConfirmationContent() {
   const start_time = session_time
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-6">
-      <div className="max-w-md w-full text-center">
+    <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+      {/* decorative circles */}
+      <div className="bg-circle w-[500px] h-[500px] -top-40 -left-40" style={{ background: `radial-gradient(circle, ${ACCENT_DIM} 0%, transparent 70%)` }} />
+      <div className="bg-circle w-[400px] h-[400px] bottom-20 -right-32" style={{ background: 'radial-gradient(circle, rgba(112,123,255,0.1) 0%, transparent 70%)' }} />
+
+      <div style={{ ...glassCard, padding: '40px 32px', maxWidth: '480px', width: '100%', textAlign: 'center', position: 'relative', zIndex: 1 }}>
         <div className="text-6xl mb-6">✅</div>
-        <h1 className="text-3xl font-bold text-white mb-2">Lesson Booked!</h1>
-        <p className="text-gray-400 mb-6">
+        <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Lesson Booked!</h1>
+        <p className="mb-6" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>
           Hi {student_name.split(' ')[0]} — you're all set for your lesson.
         </p>
 
         {/* Booking details card */}
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 text-left space-y-3">
+        <div style={{ ...glassCard, padding: '24px', marginBottom: '24px', textAlign: 'left' }}>
           <div className="flex items-center gap-3 mb-2">
             <div
               className="w-3 h-3 rounded-full shrink-0"
-              style={{ backgroundColor: session_type?.color ?? '#06b6d4' }}
+              style={{ backgroundColor: session_type?.color ?? ACCENT }}
             />
-            <span className="font-bold text-white text-lg">{session_type?.name ?? 'Driving Lesson'}</span>
+            <span className="font-bold text-lg" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>{session_type?.name ?? 'Driving Lesson'}</span>
           </div>
-          <div className="flex items-center gap-3 text-gray-300 text-sm">
+          <div className="flex items-center gap-3 text-sm mb-2" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.6)' }}>
             <span>📅</span>
             <span>{formatDate(start_date)}</span>
           </div>
-          <div className="flex items-center gap-3 text-gray-300 text-sm">
+          <div className="flex items-center gap-3 text-sm mb-2" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.6)' }}>
             <span>🕐</span>
             <span>{formatTime(start_time)}</span>
           </div>
           {location && (
-            <div className="flex items-center gap-3 text-gray-300 text-sm">
+            <div className="flex items-center gap-3 text-sm mb-2" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.6)' }}>
               <span>📍</span>
               <span>{location}</span>
             </div>
           )}
           {instructor?.name && (
-            <div className="flex items-center gap-3 text-gray-300 text-sm">
+            <div className="flex items-center gap-3 text-sm mb-2" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.6)' }}>
               <span>👤</span>
               <span>with {instructor.name}</span>
             </div>
           )}
-          <div className="flex items-center gap-3 text-gray-300 text-sm">
+          <div className="flex items-center gap-3 text-sm mb-2" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.6)' }}>
             <span>🏫</span>
             <span>{school?.name}</span>
           </div>
-          <div className="flex items-center gap-3 text-gray-300 text-sm">
+          <div className="flex items-center gap-3 text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.6)' }}>
             <span>✉️</span>
             <span>{student_email}</span>
           </div>
         </div>
 
-        <p className="text-gray-500 text-sm mb-8">
+        <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.35)', fontFamily: 'Inter, sans-serif' }}>
           You'll get an SMS reminder 72 hours before your lesson.
           Reply C to confirm or R to reschedule.
         </p>
@@ -153,13 +188,13 @@ function ConfirmationContent() {
         <div className="space-y-3">
           <button
             onClick={handleAddToCalendar}
-            className="w-full bg-white/10 border border-white/10 text-white font-semibold py-3 rounded-lg hover:bg-white/15 transition-colors"
+            style={{ ...glassCard, width: '100%', padding: '14px', color: '#ffffff', fontFamily: 'Inter, sans-serif', fontWeight: '500', cursor: 'pointer', fontSize: '14px' }}
           >
             📅 Add to Calendar
           </button>
           <Link
             href="/"
-            className="block w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold py-3 rounded-lg hover:opacity-90 transition-opacity text-center"
+            style={{ background: `linear-gradient(135deg, ${ACCENT}, #FF6B1E)`, color: '#000', fontWeight: '600', padding: '14px 28px', borderRadius: '100px', textDecoration: 'none', display: 'block', textAlign: 'center', fontFamily: 'Outfit, sans-serif', fontSize: '15px' }}
           >
             Back to Home →
           </Link>
@@ -171,7 +206,7 @@ function ConfirmationContent() {
 
 export default function ConfirmationPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#0a0a0f]" />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ background: '#0D0D12' }} />}>
       <ConfirmationContent />
     </Suspense>
   )

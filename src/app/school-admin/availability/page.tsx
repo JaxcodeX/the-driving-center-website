@@ -14,9 +14,19 @@ const DEFAULT_WINDOWS: Record<number, { start: string; end: string }> = {
   5: { start: '08:00', end: '17:00' },
 }
 
+const BG = '#0D0D12'
+const BG_GRADIENT = 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)'
+const GLASS_BG = 'rgba(255,255,255,0.03)'
+const GLASS_BORDER = 'rgba(255,255,255,0.06)'
+const GLASS_BLUR = 'blur(24px)'
+const TEXT_SECONDARY = '#9CA3AF'
+const ACCENT_CYAN = '#67E8F9'
+const ACCENT_GREEN = '#4ADE80'
+const CARD_SHADOW = '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)'
+
 export default function InstructorAvailabilityPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-950" />}>
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: BG }} />}>
       <AvailabilityContent />
     </Suspense>
   )
@@ -41,7 +51,6 @@ function AvailabilityContent() {
       const availRes = await fetch(`/api/instructor-availability?instructor_id=${data[0]?.id}`)
       const availData = await availRes.json()
 
-      // Index by day_of_week
       const byDay: Record<number, any> = {}
       for (const w of availData) {
         byDay[w.day_of_week] = { start: w.start_time.slice(0, 5), end: w.end_time.slice(0, 5), enabled: true }
@@ -79,24 +88,80 @@ function AvailabilityContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50">
-      <div className="border-b border-white/10 px-6 py-4">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center text-sm font-bold">DC</div>
-            <span className="font-semibold">Instructor Availability</span>
-          </div>
-          <Link href="/school-admin" className="text-sm text-gray-400 hover:text-white">← Back</Link>
-        </div>
-      </div>
+    <div style={{
+      minHeight: '100vh',
+      background: BG,
+      fontFamily: 'Inter, sans-serif',
+      position: 'relative',
+    }}>
+      <div style={{
+        position: 'fixed',
+        inset: 0,
+        background: BG_GRADIENT,
+        pointerEvents: 'none',
+        zIndex: 0,
+      }} />
 
-      <div className="max-w-2xl mx-auto p-6">
-        <h1 className="text-xl font-bold mb-6">Set Weekly Hours</h1>
+      <div style={{ maxWidth: '720px', margin: '0 auto', padding: '40px 48px', position: 'relative', zIndex: 1 }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '10px',
+              background: `linear-gradient(135deg, ${ACCENT_CYAN}, #818CF8)`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '13px',
+              fontWeight: '700',
+              color: '#000',
+            }}>
+              DC
+            </div>
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: '600', color: '#FFFFFF' }}>Instructor Availability</div>
+              <div style={{ fontSize: '11px', color: TEXT_SECONDARY }}>School Admin</div>
+            </div>
+          </div>
+          <Link href="/school-admin" style={{
+            fontSize: '13px',
+            color: TEXT_SECONDARY,
+            textDecoration: 'none',
+            transition: 'color 0.15s',
+          }}
+          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#FFFFFF')}
+          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = TEXT_SECONDARY)}
+          >
+            ← Back
+          </Link>
+        </div>
+
+        <h1 style={{
+          fontFamily: 'Outfit, sans-serif',
+          fontSize: '24px',
+          fontWeight: '700',
+          color: '#FFFFFF',
+          marginBottom: '24px',
+        }}>
+          Set Weekly Hours
+        </h1>
 
         {instructors.length > 1 && (
-          <div className="mb-6">
-            <label className="block text-sm text-gray-400 mb-2">Instructor</label>
-            <div className="flex gap-2 flex-wrap">
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '12px',
+              fontWeight: '600',
+              color: TEXT_SECONDARY,
+              marginBottom: '8px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}>
+              Instructor
+            </label>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {instructors.map(inst => (
                 <button
                   key={inst.id}
@@ -104,11 +169,27 @@ function AvailabilityContent() {
                     setSelectedInstructor(inst)
                     setWindows({})
                   }}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    selectedInstructor?.id === inst.id
-                      ? 'bg-cyan-500 text-white'
-                      : 'bg-white/5 border border-white/10 hover:bg-white/10 text-gray-300'
-                  }`}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '12px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'background 0.15s, color 0.15s',
+                    ...(selectedInstructor?.id === inst.id
+                      ? {
+                          background: 'rgba(103,232,249,0.15)',
+                          color: ACCENT_CYAN,
+                          border: `1px solid ${ACCENT_CYAN}`,
+                        }
+                      : {
+                          background: GLASS_BG,
+                          backdropFilter: GLASS_BLUR,
+                          WebkitBackdropFilter: GLASS_BLUR,
+                          color: TEXT_SECONDARY,
+                          border: `1px solid ${GLASS_BORDER}`,
+                        }),
+                  }}
                 >
                   {inst.name}
                 </button>
@@ -117,11 +198,22 @@ function AvailabilityContent() {
           </div>
         )}
 
-        <form onSubmit={handleSave} className="space-y-3">
+        <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {[1, 2, 3, 4, 5].map(day => (
-            <div key={day} className="bg-white/5 border border-white/10 rounded-xl p-4">
-              <div className="flex items-center justify-between mb-3">
-                <label className="flex items-center gap-3 cursor-pointer">
+            <div
+              key={day}
+              style={{
+                background: GLASS_BG,
+                backdropFilter: GLASS_BLUR,
+                WebkitBackdropFilter: GLASS_BLUR,
+                border: `1px solid ${GLASS_BORDER}`,
+                borderRadius: '16px',
+                padding: '16px',
+                boxShadow: CARD_SHADOW,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
                   <input
                     type="checkbox"
                     checked={windows[day]?.enabled ?? false}
@@ -135,16 +227,21 @@ function AvailabilityContent() {
                         },
                       }))
                     }}
-                    className="w-4 h-4 rounded accent-cyan-500"
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '4px',
+                      accentColor: ACCENT_CYAN,
+                    }}
                   />
-                  <span className="font-medium text-white">{DAYS[day]}</span>
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF' }}>{DAYS[day]}</span>
                 </label>
               </div>
 
               {(windows[day]?.enabled ?? false) && (
-                <div className="flex items-center gap-3 ml-7">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">From</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: '28px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '11px', color: TEXT_SECONDARY }}>From</span>
                     <input
                       type="time"
                       value={windows[day]?.start ?? '08:00'}
@@ -154,11 +251,21 @@ function AvailabilityContent() {
                           [day]: { ...prev[day], start: e.target.value, enabled: true },
                         }))
                       }}
-                      className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-cyan-500"
+                      style={{
+                        background: 'rgba(0,0,0,0.4)',
+                        border: `1px solid rgba(255,255,255,0.08)`,
+                        borderRadius: '8px',
+                        padding: '8px 12px',
+                        color: '#FFFFFF',
+                        fontSize: '14px',
+                        outline: 'none',
+                      }}
+                      onFocus={e => (e.target.style.borderColor = ACCENT_CYAN)}
+                      onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
                     />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">to</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '11px', color: TEXT_SECONDARY }}>to</span>
                     <input
                       type="time"
                       value={windows[day]?.end ?? '17:00'}
@@ -168,7 +275,17 @@ function AvailabilityContent() {
                           [day]: { ...prev[day], end: e.target.value, enabled: true },
                         }))
                       }}
-                      className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-cyan-500"
+                      style={{
+                        background: 'rgba(0,0,0,0.4)',
+                        border: `1px solid rgba(255,255,255,0.08)`,
+                        borderRadius: '8px',
+                        padding: '8px 12px',
+                        color: '#FFFFFF',
+                        fontSize: '14px',
+                        outline: 'none',
+                      }}
+                      onFocus={e => (e.target.style.borderColor = ACCENT_CYAN)}
+                      onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
                     />
                   </div>
                 </div>
@@ -176,14 +293,47 @@ function AvailabilityContent() {
             </div>
           ))}
 
-          <div className="pt-2">
+          <div style={{ paddingTop: '8px' }}>
             {saved && (
-              <div className="text-center text-green-400 text-sm mb-3">✓ Availability saved</div>
+              <div style={{
+                textAlign: 'center',
+                fontSize: '13px',
+                fontWeight: '600',
+                color: ACCENT_GREEN,
+                background: 'rgba(74,222,128,0.1)',
+                padding: '10px',
+                borderRadius: '8px',
+                marginBottom: '12px',
+              }}>
+                ✓ Availability saved
+              </div>
             )}
             <button
               type="submit"
               disabled={saving}
-              className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold py-3 rounded-xl hover:opacity-90 disabled:opacity-50"
+              style={{
+                width: '100%',
+                padding: '14px',
+                background: `linear-gradient(135deg, ${ACCENT_CYAN}, #818CF8)`,
+                border: 'none',
+                borderRadius: '12px',
+                color: '#000',
+                fontSize: '14px',
+                fontWeight: '700',
+                cursor: saving ? 'not-allowed' : 'pointer',
+                opacity: saving ? 0.5 : 1,
+                transition: 'transform 0.15s, box-shadow 0.15s',
+              }}
+              onMouseEnter={e => {
+                if (!saving) {
+                  (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+                  ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px rgba(103,232,249,0.3)'
+                }
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
+                ;(e.currentTarget as HTMLElement).style.boxShadow = 'none'
+              }}
             >
               {saving ? 'Saving...' : 'Save Availability'}
             </button>

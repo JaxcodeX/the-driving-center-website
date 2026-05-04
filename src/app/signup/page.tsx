@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, AlertCircle, User, Mail, Lock } from 'lucide-react'
@@ -12,6 +12,14 @@ export default function SignupPage() {
   const [form, setForm] = useState({ schoolName: '', ownerName: '', email: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    const link = document.createElement('link')
+    link.href = 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap'
+    link.rel = 'stylesheet'
+    document.head.appendChild(link)
+    return () => { document.head.removeChild(link) }
+  }, [])
 
   function set(key: string, val: string) {
     setForm(f => ({ ...f, [key]: val }))
@@ -46,20 +54,10 @@ export default function SignupPage() {
   return (
     <div style={{
       minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: '#050505', position: 'relative', overflow: 'hidden',
+      background: '#0D0D12',
+      backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)',
+      position: 'relative', overflow: 'hidden',
     }}>
-      {/* Background glows — swapped sides from login */}
-      <div style={{
-        position: 'absolute', top: '-20%', left: '-10%', width: '600px', height: '600px',
-        background: 'radial-gradient(circle, rgba(45,27,78,0.6) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute', bottom: '-20%', right: '-10%', width: '500px', height: '500px',
-        background: 'radial-gradient(circle, rgba(26,26,59,0.6) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-
       {/* Logo */}
       <Link href='/' style={{
         position: 'fixed', top: '32px', left: '50%', transform: 'translateX(-50%)',
@@ -67,21 +65,23 @@ export default function SignupPage() {
       }}>
         <div style={{
           width: '32px', height: '32px', borderRadius: '10px',
-          background: '#4ADE80', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: '#FF8C42', display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           <svg width='16' height='16' viewBox='0 0 16 16' fill='none'>
             <path d='M8 2L13 5.5H3L8 2Z' fill='white' />
             <path d='M3 5.5V10.5L8 14V8.5H13V5.5H3Z' fill='white' fillOpacity='0.7' />
           </svg>
         </div>
-        <span style={{ fontSize: '15px', fontWeight: '700', color: '#FFFFFF', fontFamily: "'Outfit', sans-serif" }}>The Driving Center</span>
+        <span style={{ fontSize: '15px', fontWeight: '700', color: '#FFFFFF', fontFamily: 'Outfit, sans-serif' }}>The Driving Center</span>
       </Link>
 
       {/* Main card */}
       <div style={{
         width: '100%', maxWidth: '440px', margin: '0 24px',
-        background: '#0F1117', border: '1px solid #1A1A1A',
-        borderRadius: '20px', padding: '40px',
+        background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)',
+        border: '1px solid rgba(255,255,255,0.06)',
+        borderRadius: '24px', padding: '40px',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)',
         position: 'relative', zIndex: 1,
       }}>
         {/* Step indicator */}
@@ -92,7 +92,7 @@ export default function SignupPage() {
                 <div
                   style={{
                     width: '40px', height: '1px', margin: '0 8px',
-                    background: i <= 0 ? '#1A1A1A' : '#4ADE80',
+                    background: i <= 0 ? 'rgba(255,255,255,0.06)' : '#FF8C42',
                   }}
                 />
               )}
@@ -102,10 +102,10 @@ export default function SignupPage() {
                     width: '32px', height: '32px', borderRadius: '50%',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '13px', fontWeight: '700',
-                    background: i === 0 ? '#4ADE80' : '#0D0D0D',
-                    color: i === 0 ? '#000000' : '#6B7280',
-                    border: i === 0 ? 'none' : '1px solid #1A1A1A',
-                    fontFamily: "'Inter', sans-serif",
+                    background: i === 0 ? '#FF8C42' : 'rgba(255,255,255,0.03)',
+                    color: i === 0 ? '#FFFFFF' : 'rgba(255,255,255,0.45)',
+                    border: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.06)',
+                    fontFamily: 'Inter, sans-serif',
                   }}
                 >
                   {i + 1}
@@ -113,7 +113,7 @@ export default function SignupPage() {
                 <span style={{
                   fontSize: '10px', fontWeight: '600', textTransform: 'uppercase',
                   letterSpacing: '0.08em',
-                  color: i === 0 ? '#9CA3AF' : '#6B7280',
+                  color: i === 0 ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.3)',
                 }}>
                   {step}
                 </span>
@@ -125,12 +125,12 @@ export default function SignupPage() {
         {/* Header */}
         <div style={{ marginBottom: '32px', textAlign: 'center' }}>
           <h1 style={{
-            fontSize: '28px', fontFamily: "'Outfit', sans-serif", fontWeight: '700',
+            fontSize: '28px', fontFamily: 'Outfit, sans-serif', fontWeight: '700',
             color: '#FFFFFF', letterSpacing: '-0.02em', marginBottom: '8px',
           }}>
             Create your school account
           </h1>
-          <p style={{ fontSize: '15px', color: '#9CA3AF', lineHeight: '1.5' }}>
+          <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.45)', lineHeight: '1.5', fontFamily: 'Inter, sans-serif' }}>
             Start your 14-day free trial. No credit card required.
           </p>
         </div>
@@ -140,7 +140,7 @@ export default function SignupPage() {
           <div style={{ position: 'relative' }}>
             <div style={{
               position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)',
-              color: '#6B7280',
+              color: 'rgba(255,255,255,0.35)',
             }}>
               <User size={16} />
             </div>
@@ -152,13 +152,13 @@ export default function SignupPage() {
               required
               style={{
                 width: '100%', height: '50px', borderRadius: '12px',
-                background: '#0D0D0D', border: '1px solid #1A1A1A',
-                color: '#FFFFFF', fontSize: '15px', fontFamily: "'Inter', sans-serif",
+                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                color: '#FFFFFF', fontSize: '15px', fontFamily: 'Inter, sans-serif',
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none',
                 transition: 'border-color 0.2s',
               }}
-              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
-              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+              onFocus={e => (e.target.style.borderColor = '#FF8C42')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
             />
           </div>
 
@@ -166,7 +166,7 @@ export default function SignupPage() {
           <div style={{ position: 'relative' }}>
             <div style={{
               position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)',
-              color: '#6B7280', display: 'flex', alignItems: 'center',
+              color: 'rgba(255,255,255,0.35)', display: 'flex', alignItems: 'center',
             }}>
               <svg width='16' height='16' viewBox='0 0 16 16' fill='none'>
                 <path d='M8 2L13 5.5H3L8 2Z' fill='currentColor' />
@@ -181,13 +181,13 @@ export default function SignupPage() {
               required
               style={{
                 width: '100%', height: '50px', borderRadius: '12px',
-                background: '#0D0D0D', border: '1px solid #1A1A1A',
-                color: '#FFFFFF', fontSize: '15px', fontFamily: "'Inter', sans-serif",
+                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                color: '#FFFFFF', fontSize: '15px', fontFamily: 'Inter, sans-serif',
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none',
                 transition: 'border-color 0.2s',
               }}
-              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
-              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+              onFocus={e => (e.target.style.borderColor = '#FF8C42')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
             />
           </div>
 
@@ -195,7 +195,7 @@ export default function SignupPage() {
           <div style={{ position: 'relative' }}>
             <div style={{
               position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)',
-              color: '#6B7280',
+              color: 'rgba(255,255,255,0.35)',
             }}>
               <Mail size={16} />
             </div>
@@ -207,13 +207,13 @@ export default function SignupPage() {
               required
               style={{
                 width: '100%', height: '50px', borderRadius: '12px',
-                background: '#0D0D0D', border: '1px solid #1A1A1A',
-                color: '#FFFFFF', fontSize: '15px', fontFamily: "'Inter', sans-serif",
+                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                color: '#FFFFFF', fontSize: '15px', fontFamily: 'Inter, sans-serif',
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none',
                 transition: 'border-color 0.2s',
               }}
-              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
-              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+              onFocus={e => (e.target.style.borderColor = '#FF8C42')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
             />
           </div>
 
@@ -221,7 +221,7 @@ export default function SignupPage() {
           <div style={{ position: 'relative' }}>
             <div style={{
               position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)',
-              color: '#6B7280',
+              color: 'rgba(255,255,255,0.35)',
             }}>
               <Lock size={16} />
             </div>
@@ -230,13 +230,13 @@ export default function SignupPage() {
               placeholder='Create a password (optional)'
               style={{
                 width: '100%', height: '50px', borderRadius: '12px',
-                background: '#0D0D0D', border: '1px solid #1A1A1A',
-                color: '#FFFFFF', fontSize: '15px', fontFamily: "'Inter', sans-serif",
+                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                color: '#FFFFFF', fontSize: '15px', fontFamily: 'Inter, sans-serif',
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none',
                 transition: 'border-color 0.2s',
               }}
-              onFocus={e => (e.target.style.borderColor = '#4ADE80')}
-              onBlur={e => (e.target.style.borderColor = '#1A1A1A')}
+              onFocus={e => (e.target.style.borderColor = '#FF8C42')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
             />
           </div>
 
@@ -247,7 +247,7 @@ export default function SignupPage() {
               background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
             }}>
               <AlertCircle size={16} style={{ color: '#EF4444', marginTop: '1px', flexShrink: 0 }} />
-              <span style={{ fontSize: '13px', color: '#EF4444', lineHeight: '1.5' }}>{error}</span>
+              <span style={{ fontSize: '13px', color: '#EF4444', lineHeight: '1.5', fontFamily: 'Inter, sans-serif' }}>{error}</span>
             </div>
           )}
 
@@ -256,8 +256,8 @@ export default function SignupPage() {
             disabled={loading}
             style={{
               width: '100%', height: '50px', borderRadius: '12px',
-              background: '#FFFFFF', color: '#000000',
-              fontSize: '14px', fontWeight: '700', fontFamily: "'Inter', sans-serif",
+              background: '#FF8C42', color: '#FFFFFF',
+              fontSize: '14px', fontWeight: '700', fontFamily: 'Inter, sans-serif',
               border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
               opacity: loading ? 0.6 : 1,
@@ -275,10 +275,10 @@ export default function SignupPage() {
       {/* Sign in link */}
       <p style={{
         position: 'fixed', bottom: '32px', left: '50%', transform: 'translateX(-50%)',
-        fontSize: '14px', color: '#6B7280',
+        fontSize: '14px', color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif',
       }}>
         Already have an account?{' '}
-        <Link href='/login' style={{ color: '#4ADE80', fontWeight: '600', textDecoration: 'none' }}>
+        <Link href='/login' style={{ color: '#FF8C42', fontWeight: '600', textDecoration: 'none' }}>
           Sign in
         </Link>
       </p>
