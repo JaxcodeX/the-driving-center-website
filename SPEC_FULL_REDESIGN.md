@@ -1,214 +1,162 @@
-# SPEC — Full Site Redesign (Design Reference System)
+# SPEC — Landing Page Redesign
+# DesignJoy Reference Implementation
 
-## Overview
+## Reference Screens Analyzed
+- `design1.png` — SaaS split-screen login/signup (EASY-O dashboard)
+- `design2.png` — SaaS split-screen login/signup (EASY-O dashboard)
+- `design3.png` — Dark landing page (Calendr.com, dark mode)
+- `design4.png` — Dark calendar dashboard (beatgig)
+- `design5.png` — DesignJoy landing page (light, mesh gradients)
+- `design6.png` — DesignJoy hero section (warm off-white)
+- `design7.png` — DesignJoy membership benefits (mesh gradient cards)
+- `design8.png` — DesignJoy testimonials (editorial serif typography)
+- `design9.png` — DesignJoy booking page (dark with candy color accents)
 
-Apply the best elements from the 5 reference screenshots across ALL pages of The Driving Center SaaS. Not a full rebuild — a systematic design upgrade that brings the site in line with premium SaaS standards.
-
-**Design foundation:** Dark default (keeping our current dark mode) + light toggle. Keep our existing dark/light theme system — the redesign applies better aesthetics within it.
-
----
-
-## Design System — Borrowed Elements
-
-### Color Palette (dark mode)
-- Background base: `#080809` (current)
-- Surface/card: `#0F172A` (current) + glassmorphism (`rgba(255,255,255,0.04)`)
-- Accent primary: `#1A56FF` (current blue — keep)
-- Accent secondary (from FinPoint): `#F97316` (vibrant orange — for positive metrics, active states)
-- Success: `#4ADE80` (keep)
-- Text primary: `#FFFFFF`, secondary: `#94A3B8`, muted: `#64748B`
-- Border: `rgba(255,255,255,0.07)`
-
-### Light mode
-- Background: `#F5F4F0` (bone/off-white — from 24Solar's warm neutral)
-- Cards: `#FFFFFF`
-- Text dark: `#0A0A0A`
-
-### Typography (from Origin screenshot)
-- Headlines: bold geometric sans (Inter 800-weight), large sizes, tight letter-spacing
-- Subheadlines: Inter 400-500
-- Accent word in headline: `gradient-text` with blue-to-purple shimmer (keep existing)
-- Body: Inter 400, generous line-height (1.65)
-
-### Card System (from Dashboard + Zentra)
-- Rounded corners: `16px` (was `12px`)
-- Soft shadows: `0 8px 32px rgba(0,0,0,0.3)` (dark) / `0 8px 32px rgba(0,0,0,0.08)` (light)
-- Glassmorphism: `backdrop-filter: blur(12px)` + `background: rgba(255,255,255,0.04)` + `border: 1px solid rgba(255,255,255,0.08)`
-- Card hover: subtle `translateY(-2px)` lift + shadow deepen
-
-### Buttons (from Origin + 24Solar)
-- Primary: pill-shaped (`border-radius: 999px`), solid accent fill, white text, small arrow icon `→`
-- Secondary/ghost: pill-shaped, transparent with border, accent text
-- All buttons: `padding: 12px 24px`, `font-size: 14px`, `font-weight: 600`
-- Hover: slight glow effect (`box-shadow: 0 0 20px var(--accent-glow)`)
-
-### Dashboard-Specific (from Dashboard + FinPoint)
-- Sidebar: narrow (240px), dark `#0F172A`, icon + text nav items, active pill highlight
-- KPI cards: white/dark cards with large bold number, label below, colored delta indicator (green up, red down)
-- Data tables: clean rows, subtle hover highlight, rounded container
-- Status pills: `border-radius: 999px`, small, colored backgrounds
-
-### Section Layouts (from 24Solar)
-- Bento grid: features section uses varied-size grid cards
-- Trust bar: city names in a clean horizontal strip (keep existing)
-- Booking section: always dark, decorative circles (keep existing)
+## Design Direction: "Warm Premium Dark-Light Hybrid"
+Take DesignJoy's premium warmth + generous whitespace, adapt for a driving school SaaS.
+Not a dark-only site. Not flat corporate blue. Warm, confident, premium.
 
 ---
 
-## Page-by-Page Spec
+## Global Design Tokens
 
-### 1. Landing Page (`src/app/page.tsx`)
-
-#### Hero Section
-- Keep existing structure (eyebrow → badge → h1 → subhead → CTAs)
-- **Upgrade:** Add atmospheric gradient backdrop (dark vignette) behind the hero
-- Add small trust icons below CTAs (laurel/star icons like Origin)
-- Dashboard mockup below — glassmorphism card with rounded corners + subtle shadow
-
-#### Features Section
-- **Upgrade to bento grid** (from 24Solar): 3-column asymmetric grid
-  - Large feature card (spans 2 cols) with icon + title + description
-  - Smaller metric cards (student count, schools, sessions)
-  - Use glassmorphism cards with colored icon backgrounds (mesh gradient backgrounds)
-
-#### How It Works
-- Keep existing 3-step structure
-- Upgrade cards: glassmorphism, numbered steps with accent circle, clean icons
-
-#### Testimonials
-- Upgrade: cards with avatar (initials), name, school, quote
-- Glassmorphism cards, rounded corners, subtle border
-
-#### Pricing Section
-- Upgrade: larger cards, "Popular" badge on middle tier, all pill buttons
-- Dark card for recommended tier, light cards for others
-
-#### FAQ
-- Clean accordion, glassmorphism panel styling
-
-### 2. Signup Page (`src/app/signup/page.tsx`)
-- Clean centered card on dark background
-- Glassmorphism card container (`backdrop-filter: blur`)
-- Step indicator at top (1 → 2 → 3)
-- Form fields: pill-shaped inputs, dark surface
-- Primary CTA: full-width pill button
-- Subtle decorative gradient circles in background
-
-### 3. Login Page (`src/app/login/page.tsx`)
-- Same card layout as signup
-- Demo login box: subtle, distinct — glassmorphism inner panel
-- Magic link email input + "Send login link" button
-
-### 4. School Admin Dashboard (`src/app/school-admin/page.tsx`)
-
-#### KPI Row (from FinPoint/Dashboard)
-- 4 cards: Total Students, Active Sessions, Monthly Revenue, Completion Rate
-- Each card: large bold number, label, colored delta (e.g., "+12%")
-- Glassmorphism card style
-
-#### Quick Actions Strip
-- 4 icon buttons: Add Student, Schedule Session, Send Reminder, View Calendar
-- Pill-shaped, glassmorphism
-
-#### Recent Activity Table
-- Clean table: student name, session type, date, status pill, actions
-- Row hover: subtle highlight
-- Glassmorphism table container
-
-#### Upcoming Sessions Strip (from FinPoint watchlist)
-- Horizontal scrollable strip of session cards
-- Each card: time, student name, instructor, status pill
-
-### 5. Students Page (`src/app/school-admin/students/page.tsx`)
-- Search + filter bar at top
-- Table with avatar initials, name, email, progress bar, TCA status, actions
-- Glassmorphism table container
-- "Add Student" button in header
-
-### 6. Sessions Page (`src/app/school-admin/sessions/page.tsx`)
-- Calendar grid view (keep existing)
-- Session cards: glassmorphism, color-coded by status
-- Filter tabs: Upcoming / Completed / Cancelled
-
-### 7. Booking Page (`src/app/book/page.tsx`)
-- Clean, focused layout
-- 2-column: form left, confirmation card right
-- Progress indicator
-- Glassmorphism form card
-
-### 8. Global Styles (`src/app/globals.css`)
-
-#### New classes to add:
+### Colors — Warm Mode (default for landing)
 ```css
-/* Bento grid */
-.bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.bento-large { grid-column: span 2; }
-
-/* Glassmorphism card */
-.glass-card {
-  background: rgba(255,255,255,0.04);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  padding: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.glass-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
-}
-
-/* KPI card */
-.kpi-card { }
-.kpi-value { font-size: 36px; font-weight: 800; letter-spacing: -0.02em; }
-.kpi-delta { font-size: 13px; font-weight: 600; }
-.kpi-delta.positive { color: var(--success); }
-.kpi-delta.negative { color: #F87171; }
-
-/* Status pill */
-.status-pill {
-  display: inline-flex; align-items: center;
-  padding: 4px 12px; border-radius: 999px;
-  font-size: 12px; font-weight: 600;
-}
-.status-active { background: rgba(74,222,128,0.15); color: #4ADE80; }
-.status-pending { background: rgba(249,115,22,0.15); color: #F97316; }
-.status-completed { background: rgba(26,86,255,0.15); color: #60A5FA; }
-
-/* Nav pill (sidebar active state) */
-.nav-pill {
-  background: rgba(26,86,255,0.15);
-  color: #60A5FA;
-  border-radius: 999px;
-  padding: 8px 16px;
-  font-weight: 600;
-}
-
-/* Decorative background circles */
-.bg-circle {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.15;
-}
+--bg-base: #F5F4F0;           /* Warm off-white (DesignJoy "paper" background) */
+--bg-surface: #FFFFFF;         /* Pure white for cards */
+--bg-dark: #0B0B0E;            /* Near-black for dark sections */
+--text-primary: #0A0A0A;       /* Deep charcoal (not pure black) */
+--text-secondary: #6B6B6B;      /* Muted gray */
+--text-muted: #9B9B9B;         /* Light gray */
+--border: rgba(0,0,0,0.08);     /* Very subtle borders */
+--accent: #1A56FF;              /* Keep blue accent */
+--accent-secondary: #F97316;   /* Vibrant orange */
+--success: #16A34A;
 ```
 
+### Dark Sections (for contrast blocks)
+```css
+--dark-bg: #0B0B0E;
+--dark-surface: #131316;
+--dark-border: rgba(255,255,255,0.07);
+--dark-text: #FFFFFF;
+--dark-text-secondary: #8A8F98;
+```
+
+### Typography
+- **Display:** Inter 800 weight, massive size (clamp 56px–96px), tight letter-spacing (-0.03em)
+- **Headlines:** Inter 700, large, tight letter-spacing
+- **Emphasis words:** Inter italic or serif italic for accent words in headlines (like DesignJoy)
+- **Body:** Inter 400, generous line-height (1.7), comfortable size (16-17px)
+- **Labels:** Inter 500-600, small, uppercase, wide letter-spacing (0.08em)
+
+### Spacing System
+- Section padding: 100px–140px vertical (massive whitespace)
+- Container max-width: 1100px (centered)
+- Card gap: 24px
+- Generous margins between elements within sections
+
+### Border Radius
+- Cards: 20px (DesignJoy "squircle" feel)
+- Buttons: 999px (pill)
+- Inputs: 999px (pill)
+- Feature cards: 20px
+
+### Shadows
+- Cards: `0 8px 40px rgba(0,0,0,0.08)` (light), `0 8px 40px rgba(0,0,0,0.3)` (dark bg)
+- Soft, large radius, low opacity — not harsh
+
 ---
+
+## Section-by-Section Implementation
+
+### 1. Navbar (transparent, sticky)
+- Logo left: "The Driving Center" text mark or small icon + wordmark
+- Nav center (desktop): Features, Pricing, FAQ (text links, no background)
+- Right: "Login" (text link) + "Start free trial" (pill button, dark fill)
+- On scroll: add subtle backdrop blur or border-bottom
+- Height: 64px
+
+### 2. Hero Section (light/warm bg)
+- **Layout**: Asymmetric — headline left, feature card right (like DesignJoy hero)
+- **Eyebrow**: Small pill badge "Scheduling Software for Driving Schools"
+- **Headline**: Two-line massive headline (80px+) using gradient-text for key word
+  - "The simplest way to run your driving school"
+- **Subheadline**: 1-2 lines, text-secondary color, 18px
+- **CTA row**: Primary "Start free trial" (dark pill) + Secondary "See demo" (outlined pill)
+- **Trust line**: Small gray text below CTAs — "Trusted by 50+ driving schools"
+- **Right side**: Feature highlight card (bento-style) with mesh gradient background showing dashboard preview or abstract graphic
+- **Spacing**: Massive — top 120px padding, bottom 80px
+
+### 3. Features Section (bento grid, light bg)
+- **Layout**: Bento asymmetric grid — 2 large cards + 3 small metric cards
+- **Background**: Warm off-white (--bg-base)
+- **Section label**: Small eyebrow text "EVERYTHING YOUR SCHOOL NEEDS"
+- **Feature cards**: 
+  - Glassmorphism with warm tint + subtle shadow
+  - Icon at top (Lucide icon, 24px)
+  - Bold title + description
+  - Feature 1 (large): Online Booking
+  - Feature 2 (large): Automated Reminders
+  - Features 3-6 (small): Student Tracking, Stripe Billing, Instructor Management, Multi-tenant Security
+- **Small metric cards**: Show "50+ schools", "10,000+ sessions booked" with large bold numbers
+
+### 4. How It Works (dark bg section)
+- **Background**: Dark (#0B0B0E) for contrast
+- **Layout**: Centered, 3 steps horizontal
+- **Step cards**: Dark glassmorphism card per step
+  - Large step number (muted, huge 80px)
+  - Step title
+  - Step description
+- **Visual style**: Clean, minimal, high contrast white text on dark
+- **Spacing**: 100px+ vertical padding
+
+### 5. Testimonials / Social Proof (light bg, editorial)
+- **Background**: Warm off-white
+- **Layout**: Large quote centered, editorial serif italic typography
+- **Quote**: Huge serif italic quote text
+- **Attribution**: Name + school below in small caps
+- **Style**: Magazine editorial layout, not card-based grid
+
+### 6. Pricing (light bg)
+- **Background**: Warm off-white
+- **Layout**: 3-column grid, center tier highlighted
+- **Cards**: White cards with soft shadow, large rounded corners (20px)
+- **Middle card**: Dark fill, white text, "Most Popular" pill badge
+- **Cards should look like DesignJoy pricing**: large numbers, clear feature lists, pill CTAs
+
+### 7. CTA Section (dark bg)
+- **Background**: Dark (#0B0B0E)
+- **Layout**: Centered, single headline + subheadline + CTAs
+- **Text**: Large, white, centered
+- **CTAs**: Primary pill (white fill, dark text) + Secondary pill (outlined white)
+
+### 8. Footer
+- **Background**: Dark border top on warm off-white
+- **Layout**: Simple centered footer with logo + links
+
+---
+
+## Animation & Micro-interactions
+- Cards: subtle translateY(-4px) + shadow deepen on hover
+- Buttons: scale(0.98) on press, slight glow on hover
+- Scroll: fade-up animation on sections entering viewport (IntersectionObserver)
+- FAQ accordion: smooth height transition
 
 ## Implementation Order
+1. Design tokens in globals.css (warm palette + dark palette)
+2. Navbar component
+3. Hero section (with bento card right side)
+4. Features bento grid
+5. How It Works (dark section)
+6. Testimonials (editorial)
+7. Pricing cards
+8. CTA section (dark)
+9. Footer
 
-1. **globals.css** — add all new design system classes
-2. **Landing page** — hero upgrade, bento features, testimonial cards, pricing cards
-3. **Auth pages** — signup + login redesign with glassmorphism cards
-4. **School admin dashboard** — KPI cards, quick actions, activity table
-5. **Students page** — table styling with glassmorphism
-6. **Sessions page** — calendar and card styling
-7. **Booking page** — form and confirmation card
-
----
-
-## Build & Commit Rules
-- Run `npm run build` after each agent task — must pass
-- If build fails, agent self-corrects before reporting
-- Commit each page as: `feat: redesign [pagename] [prov: everest] [prov: deepseek-claude]`
-- Do NOT modify API routes, lib files, or database schemas — UI only
+## Build Rules
+- `npm run build` must pass after each section
+- Use existing design system classes where possible (`glass-card`, `btn-glow`, etc.)
+- Do NOT modify API routes or database schemas
+- Font: Inter is already loaded via next/font in layout.tsx — use it
+- For serif: import Playfair Display from Google Fonts for editorial quotes
