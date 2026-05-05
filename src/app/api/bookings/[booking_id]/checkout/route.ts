@@ -117,7 +117,9 @@ export async function POST(request: Request) {
     )
   } catch (stripeError: any) {
     // Stripe not configured — this is fine for demo mode
-    if (stripeError.message?.includes('STRIPE_SECRET_KEY') || stripeError.message?.includes('No API key provided')) {
+    const errMsg = stripeError?.message ?? ''
+    const isStripeKeyError = errMsg.includes('STRIPE_SECRET_KEY') || errMsg.includes('No API key') || errMsg.includes('api_key')
+    if (isStripeKeyError) {
       // Demo mode: confirm the booking directly without payment
       await supabaseAdmin
         .from('bookings')
@@ -126,7 +128,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ demo: true, confirmed: true })
     }
     // Real error — rethrow
-    throw stripeError
+    console.error('Checkout error:', stripeError)
+    return NextResponse.json({ error: 'Payment processing failed. Please try again.' }, { status: 500 })
   }
 
   return NextResponse.json({ url: stripeUrl })
