@@ -594,10 +594,6 @@ function BookContent() {
       if (!bookRes.ok) { setFormError(bookData.error ?? 'Booking failed'); setSubmitting(false); return }
       setBookingId(bookData.booking_id)
       setStep(3)
-      // Always call checkout endpoint — if Stripe is configured it returns a URL; if not, it returns { confirmed: true }
-      const cr = await fetch(`/api/bookings/${bookData.booking_id}/checkout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ booking_id: bookData.booking_id }) })
-      const cd = await cr.json()
-      if (cd.url) { setCheckoutUrl(cd.url) } else if (cd.confirmed) { /* confirmed, no checkout needed */ }
       setSubmitting(false)
       return
     }
@@ -609,10 +605,6 @@ function BookContent() {
     if (!bookRes.ok) { setFormError(bookData.error ?? 'Booking failed'); setSubmitting(false); return }
     setBookingId(bookData.booking_id)
     setStep(3)
-    // Always call checkout endpoint — if Stripe is configured it returns a URL; if not, it returns { confirmed: true }
-    const cr = await fetch(`/api/bookings/${bookData.booking_id}/checkout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ booking_id: bookData.booking_id }) })
-    const cd = await cr.json()
-    if (cd.url) { setCheckoutUrl(cd.url) } else if (cd.confirmed) { /* confirmed, no checkout needed */ }
     setSubmitting(false)
   }
 
