@@ -1,26 +1,17 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
 import type { CheckoutBookingData } from '@/lib/supabase/types'
-
-function getStripe(): Stripe {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    // This will be caught by the outer try/catch — don't throw here
-    return new Stripe('sk_placeholder_for_demo_mode')
-  }
-  return new Stripe(process.env.STRIPE_SECRET_KEY)
-}
 
 export async function POST(request: Request) {
   const body = await request.json()
   const { booking_id } = body
 
   if (!booking_id) {
-    return new NextResponse('booking_id required', { status: 400 })
+    return NextResponse.json({ error: 'booking_id required' }, { status: 400 })
   }
 
-  const supabase = await createClient()
   const supabaseAdmin = getSupabaseAdmin() as any
 
   // Get booking + session info (admin to bypass RLS on bookings table)
