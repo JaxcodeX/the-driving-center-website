@@ -62,6 +62,7 @@ export default function DashboardPage() {
   const [unconfirmedSessions, setUnconfirmedSessions] = useState(0)
   const [needsReminder, setNeedsReminder] = useState(0)
   const [activeModal, setActiveModal] = useState<ModalType>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -138,15 +139,52 @@ export default function DashboardPage() {
       const totalSess = (sessions || 0) + (completedSessions || 0)
       const completionRate = totalSess > 0 ? Math.round(((completedSessions || 0) / totalSess) * 100) : 0
 
+      // ── Real delta calculations ───────────────────────────────────────
+      const now = new Date()
+      const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+      const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString()
+      const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0).toISOString() // last day of prev month
+
+      const [
+        { count: lastMonthStudents },
+        { count: lastMonthActiveSessions },
+        { data: lastMonthRevenueRows },
+      ] = await Promise.all([
+        supabase.from('students_driver_ed').select('*', { count: 'exact', head: true }).eq('school_id', schoolId).gte('enrollment_date', lastMonthStart).lt('enrollment_date', thisMonthStart),
+        supabase.from('sessions').select('*', { count: 'exact', head: true }).eq('school_id', schoolId).eq('status', 'scheduled').gte('start_date', lastMonthStart).lt('start_date', thisMonthStart),
+        supabase.from('bookings').select('deposit_amount_cents').eq('school_id', schoolId).eq('status', 'confirmed').gte('created_at', lastMonthStart).lt('created_at', thisMonthStart),
+      ])
+
+      const lastMonthRevenue = (lastMonthRevenueRows as { deposit_amount_cents: number | null }[] || [])
+        .reduce((sum, b) => sum + (b.deposit_amount_cents ?? 0), 0) / 100
+
+      const studentsDeltaRaw = lastMonthStudents && lastMonthStudents > 0
+        ? Math.round(((totalStudents - (lastMonthStudents as number)) / (lastMonthStudents as number)) * 100)
+        : totalStudents > 0 ? 100 : 0
+      const studentsDelta = (studentsDeltaRaw >= 0 ? '+' : '') + studentsDeltaRaw + '%'
+
+      const sessionsDeltaRaw = lastMonthActiveSessions && (lastMonthActiveSessions as number) > 0
+        ? Math.round(((activeSessions - (lastMonthActiveSessions as number)) / (lastMonthActiveSessions as number)) * 100)
+        : activeSessions > 0 ? 100 : 0
+      const sessionsDelta = (sessionsDeltaRaw >= 0 ? '+' : '') + sessionsDeltaRaw + '%'
+
+      const revenueDeltaRaw = lastMonthRevenue > 0
+        ? Math.round(((monthlyRevenue - lastMonthRevenue) / lastMonthRevenue) * 100)
+        : monthlyRevenue > 0 ? 100 : 0
+      const revenueDelta = (revenueDeltaRaw >= 0 ? '+' : '') + revenueDeltaRaw + '%'
+
+      const completionTarget = 70
+      const completionDelta = (completionRate >= completionTarget ? '+' : '') + (completionRate - completionTarget) + '%'
+
       setStats({
         totalStudents,
         activeSessions,
         monthlyRevenue,
         completionRate,
-        studentsDelta: totalStudents > 0 ? '+12%' : '+0%',
-        sessionsDelta: activeSessions > 0 ? '+8%' : '+0%',
-        revenueDelta: monthlyRevenue > 0 ? '+15%' : '+0%',
-        completionDelta: completionRate > 0 ? `+${completionRate - 72}%` : '+0%',
+        studentsDelta,
+        sessionsDelta,
+        revenueDelta,
+        completionDelta,
       })
       setUpcomingSessions((sessionsData as UpcomingSession[]) || [])
       setPendingBookings(pendingBookings || 0)

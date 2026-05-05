@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Plus, Calendar, Clock, Users, Pencil, Play, Pause, LayoutDashboard, GraduationCap, Car, Settings, DollarSign } from 'lucide-react'
+import { Plus, Calendar, Clock, Users, Pencil, Play, Pause, LayoutDashboard, GraduationCap, Car, Settings, DollarSign, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 type Session = {
@@ -48,54 +48,60 @@ function borderColor(status: string): string {
   return '#78E4FF'
 }
 
-function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: Session) => void }) {
-  const [form, setForm] = useState({ start_date: '', instructor_id: '', session_type_id: '', location: '', max_seats: 10 })
-  const [instructors, setInstructors] = useState<any[]>([])
-  const [sessionTypes, setSessionTypes] = useState<any[]>([])
+function NewSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: Session) => void }) {
+  const [form, setForm] = useState({
+    session_type_id: '26c26850-91bb-4f8b-ae44-0a763ae9b2d6', // Driver Education default
+    instructor_id: '9458ccf4-8dad-4b42-8d11-75e88da256de', // Matt Reedy default
+    start_date: '',
+    start_time: '',
+    max_seats: 2,
+    price_cents: 7500,
+    location: '',
+  })
   const [loading, setLoading] = useState(false)
-  const supabase = createClient()
+  const [error, setError] = useState('')
 
-  useEffect(() => {
-    async function load() {
-      const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
-      if (demoCookie) {
-        try { const res = await fetch('/api/demo/sessions'); if (res.ok) { const data = await res.json(); setInstructors(data.instructors || []); setSessionTypes(data.sessionTypes || []); return } } catch {}
-        return
-      }
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { window.location.href = '/login'; return }
-      const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
-      if (!school) return
-      const schoolId = school.id
-      const [i, st] = await Promise.all([
-        supabase.from('instructors').select('id, name').eq('school_id', schoolId).eq('active', true),
-        supabase.from('session_types').select('id, name, duration_minutes').eq('school_id', schoolId).eq('active', true),
-      ])
-      setInstructors(i.data || []); setSessionTypes(st.data || [])
-    }
-    load()
-  }, [])
+  const sessionTypeOptions = [
+    { id: '26c26850-91bb-4f8b-ae44-0a763ae9b2d6', name: 'Driver Education' },
+    { id: '35fb94e5-83d7-43d4-a7be-b729baa5c143', name: 'Private Lesson' },
+  ]
+  const instructorOptions = [
+    { id: '9458ccf4-8dad-4b42-8d11-75e88da256de', name: 'Matt Reedy' },
+  ]
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    let schoolId: string | null = null
-    const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
-    if (demoCookie) { try { schoolId = JSON.parse(atob(decodeURIComponent(demoCookie.split('=')[1]))).schoolId } catch {} }
-    if (!schoolId) {
-      const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user!.id).single()
-      if (!school) { setLoading(false); return }
-      schoolId = school.id
+    setError('')
+    try {
+      const res = await fetch('/api/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          start_date: form.start_date,
+          end_date: form.start_date,
+          session_time: form.start_time,
+          instructor_id: form.instructor_id,
+          session_type_id: form.session_type_id,
+          location: form.location,
+          max_seats: form.max_seats,
+          price_cents: form.price_cents,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setError(data.error || 'Failed to create session'); setLoading(false); return }
+      onAdd({
+        ...data,
+        instructor: instructorOptions.find(i => i.id === form.instructor_id) || null,
+        session_type: sessionTypeOptions.find(st => st.id === form.session_type_id) || null,
+        status: 'scheduled',
+        seats_booked: 0,
+      })
+      onClose()
+    } catch (err) {
+      setError('Something went wrong')
+      setLoading(false)
     }
-    const { data, error } = await supabase.from('sessions').insert({
-      school_id: schoolId, start_date: form.start_date, end_date: form.start_date,
-      instructor_id: form.instructor_id || null, session_type_id: form.session_type_id || null,
-      location: form.location || '', max_seats: Math.max(1, parseInt(String(form.max_seats)) || 10),
-      seats_booked: 0, status: 'scheduled',
-    }).select().single()
-    if (!error && data) { onAdd(data as Session); onClose() }
-    setLoading(false)
   }
 
   const inputStyle: React.CSSProperties = {
@@ -104,40 +110,119 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}>
-      <div style={{ width: '100%', maxWidth: '480px', background: 'rgba(15,17,23,0.95)', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '32px', boxShadow: '0 4px 24px rgba(0,0,0,0.4)' }}>
-        <h2 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '18px', fontWeight: '600', color: '#FFFFFF', marginBottom: '24px' }}>Schedule Session</h2>
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 50,
+        background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px',
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: '100%', maxWidth: '480px',
+          background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(24px)',
+          border: '1px solid rgba(255,255,255,0.1)', borderRadius: '24px',
+          padding: '32px', position: 'relative',
+        }}
+      >
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute', top: '16px', right: '16px',
+            width: '32px', height: '32px', borderRadius: '50%',
+            background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+            color: '#9CA3AF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          <X className="w-4 h-4" />
+        </button>
+
+        <h2 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '18px', fontWeight: '600', color: '#FFFFFF', marginBottom: '24px' }}>New Session</h2>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {[
-            { label: 'Date', key: 'start_date', type: 'date', placeholder: '' },
-            { label: 'Location', key: 'location', type: 'text', placeholder: 'e.g. 123 Main St' },
-          ].map(({ key, label, type, placeholder }) => (
-            <div key={key}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>{label}</label>
-              <input type={type} value={(form as any)[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} placeholder={placeholder} required={key === 'start_date'} style={inputStyle} onFocus={e => (e.target.style.borderColor = '#4ADE80')} onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')} />
-            </div>
-          ))}
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Instructor</label>
-            <select value={form.instructor_id} onChange={e => setForm(f => ({ ...f, instructor_id: e.target.value }))} style={{ ...inputStyle, cursor: 'pointer' }}>
-              <option value="">Select instructor</option>
-              {instructors.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
-            </select>
-          </div>
           <div>
             <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Session Type</label>
-            <select value={form.session_type_id} onChange={e => setForm(f => ({ ...f, session_type_id: e.target.value }))} style={{ ...inputStyle, cursor: 'pointer' }}>
-              <option value="">Select type</option>
-              {sessionTypes.map(st => <option key={st.id} value={st.id}>{st.name}</option>)}
+            <select
+              value={form.session_type_id}
+              onChange={e => setForm(f => ({ ...f, session_type_id: e.target.value }))}
+              style={{ ...inputStyle, cursor: 'pointer' }}
+            >
+              {sessionTypeOptions.map(st => <option key={st.id} value={st.id}>{st.name}</option>)}
             </select>
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Max Seats</label>
-            <input type="number" value={form.max_seats} onChange={e => setForm(f => ({ ...f, max_seats: parseInt(e.target.value) || 10 }))} min="1" max="100" style={inputStyle} />
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Instructor</label>
+            <select
+              value={form.instructor_id}
+              onChange={e => setForm(f => ({ ...f, instructor_id: e.target.value }))}
+              style={{ ...inputStyle, cursor: 'pointer' }}
+            >
+              {instructorOptions.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
+            </select>
           </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Date</label>
+              <input
+                type="date"
+                value={form.start_date}
+                onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))}
+                required
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Start Time</label>
+              <input
+                type="time"
+                value={form.start_time}
+                onChange={e => setForm(f => ({ ...f, start_time: e.target.value }))}
+                required
+                style={inputStyle}
+              />
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Max Seats</label>
+              <input
+                type="number"
+                value={form.max_seats}
+                onChange={e => setForm(f => ({ ...f, max_seats: Math.max(1, parseInt(e.target.value) || 1) }))}
+                min="1"
+                max="10"
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Price ($)</label>
+              <input
+                type="number"
+                value={form.price_cents / 100}
+                onChange={e => setForm(f => ({ ...f, price_cents: Math.round((parseFloat(e.target.value) || 0) * 100) }))}
+                min="0"
+                step="0.01"
+                style={inputStyle}
+              />
+            </div>
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Location</label>
+            <input
+              type="text"
+              value={form.location}
+              onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
+              placeholder="e.g. 123 Main St"
+              style={inputStyle}
+            />
+          </div>
+          {error && <p style={{ fontSize: '13px', color: '#F97316', margin: 0 }}>{error}</p>}
           <div style={{ display: 'flex', gap: '12px', paddingTop: '8px' }}>
             <button type="button" onClick={onClose} style={{ flex: 1, padding: '12px', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#FFFFFF', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
-            <button type="submit" disabled={loading} style={{ flex: 1, padding: '12px', background: '#4ADE80', border: 'none', borderRadius: '12px', color: '#000000', fontSize: '14px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.5 : 1 }}>{loading ? 'Scheduling...' : 'Schedule Session →'}</button>
+            <button type="submit" disabled={loading} style={{ flex: 1, padding: '12px', background: '#4ADE80', border: 'none', borderRadius: '12px', color: '#000000', fontSize: '14px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.5 : 1 }}>
+              {loading ? 'Creating...' : 'Create Session'}
+            </button>
           </div>
         </form>
       </div>
@@ -148,7 +233,7 @@ function AddSessionModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: S
 export default function SessionsPage() {
   const [sessions, setSessions] = useState<Session[]>([])
   const [loading, setLoading] = useState(true)
-  const [showModal, setShowModal] = useState(false)
+  const [showNewSession, setShowNewSession] = useState(false)
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all')
   const supabase = createClient()
 
@@ -234,7 +319,7 @@ export default function SessionsPage() {
             <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '32px', fontWeight: '700', color: '#FFFFFF', marginBottom: '4px', letterSpacing: '-0.01em' }}>Sessions</h1>
             <p style={{ fontSize: '14px', color: TEXT_SECONDARY }}>{sessions.length} total</p>
           </div>
-          <button onClick={() => setShowModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: '#4ADE80', border: 'none', borderRadius: '12px', color: '#000000', fontSize: '14px', fontWeight: '700', cursor: 'pointer', boxShadow: '0 0 16px rgba(74,222,128,0.3)', transition: 'transform 0.15s, box-shadow 0.15s' }}
+          <button onClick={() => setShowNewSession(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: '#4ADE80', border: 'none', borderRadius: '12px', color: '#000000', fontSize: '14px', fontWeight: '700', cursor: 'pointer', boxShadow: '0 0 16px rgba(74,222,128,0.3)', transition: 'transform 0.15s, box-shadow 0.15s' }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 0 24px rgba(74,222,128,0.4)' }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px rgba(74,222,128,0.3)' }}>
             <Plus className="w-4 h-4" />
@@ -278,7 +363,7 @@ export default function SessionsPage() {
           <div style={{ background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, borderRadius: '16px', textAlign: 'center', padding: '64px', boxShadow: CARD_SHADOW }}>
             <Calendar className="w-10 h-10 mx-auto mb-3" style={{ color: TEXT_SECONDARY, opacity: 0.4 }} />
             <p style={{ fontSize: '14px', color: TEXT_SECONDARY, marginBottom: '12px' }}>{activeFilter === 'all' ? 'No sessions yet' : `No ${activeFilter} sessions`}</p>
-            {activeFilter === 'all' && <button onClick={() => setShowModal(true)} style={{ fontSize: '14px', fontWeight: '500', color: '#4ADE80', background: 'transparent', border: 'none', cursor: 'pointer' }}>Schedule your first session →</button>}
+            {activeFilter === 'all' && <button onClick={() => setShowNewSession(true)} style={{ fontSize: '14px', fontWeight: '500', color: '#4ADE80', background: 'transparent', border: 'none', cursor: 'pointer' }}>Schedule your first session →</button>}
           </div>
         ) : (
           <div style={{ background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, borderRadius: '16px', overflow: 'hidden', boxShadow: CARD_SHADOW }}>
@@ -325,7 +410,12 @@ export default function SessionsPage() {
         )}
       </main>
 
-      {showModal && <AddSessionModal onClose={() => setShowModal(false)} onAdd={s => setSessions(prev => [s, ...prev])} />}
+      {showNewSession && (
+        <NewSessionModal
+          onClose={() => setShowNewSession(false)}
+          onAdd={(s) => { setSessions(prev => [s, ...prev]); setShowNewSession(false) }}
+        />
+      )}
 
       <style>{`
         @media (max-width: 768px) {

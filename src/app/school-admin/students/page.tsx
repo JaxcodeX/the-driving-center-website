@@ -143,6 +143,7 @@ export default function StudentsPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -281,19 +282,19 @@ export default function StudentsPage() {
             {[...Array(4)].map((_, i) => (
               <div key={i} style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 60px', gap: '16px', padding: '16px 24px', borderBottom: `1px solid ${GLASS_BORDER}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+                  <div className="skeleton" style={{ width: '36px', height: '36px', borderRadius: '50%' }} />
                   <div style={{ flex: 1 }}>
-                    <div style={{ height: '14px', width: '60%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', marginBottom: '6px' }} />
-                    <div style={{ height: '12px', width: '40%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} />
+                    <div className="skeleton" style={{ height: '14px', width: '60%', borderRadius: '6px', marginBottom: '6px' }} />
+                    <div className="skeleton" style={{ height: '12px', width: '40%', borderRadius: '6px' }} />
                   </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', paddingTop: '8px' }}>
-                  <div style={{ height: '12px', width: '80%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} />
-                  <div style={{ height: '12px', width: '60%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} />
+                  <div className="skeleton" style={{ height: '12px', width: '80%', borderRadius: '6px' }} />
+                  <div className="skeleton" style={{ height: '12px', width: '60%', borderRadius: '6px' }} />
                 </div>
-                <div style={{ paddingTop: '8px' }}><div style={{ height: '6px', width: '100%', borderRadius: '999px', background: 'rgba(255,255,255,0.05)' }} /></div>
-                <div style={{ paddingTop: '8px' }}><div style={{ height: '24px', width: '80px', borderRadius: '999px', background: 'rgba(255,255,255,0.05)' }} /></div>
-                <div style={{ paddingTop: '8px', display: 'flex', justifyContent: 'flex-end' }}><div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }} /></div>
+                <div style={{ paddingTop: '8px' }}><div className="skeleton" style={{ height: '6px', width: '100%', borderRadius: '999px' }} /></div>
+                <div style={{ paddingTop: '8px' }}><div className="skeleton" style={{ height: '24px', width: '80px', borderRadius: '999px' }} /></div>
+                <div style={{ paddingTop: '8px', display: 'flex', justifyContent: 'flex-end' }}><div className="skeleton" style={{ width: '28px', height: '28px', borderRadius: '8px' }} /></div>
               </div>
             ))}
           </div>
@@ -317,7 +318,7 @@ export default function StudentsPage() {
               const totalHours = student.classroom_hours + student.driving_hours
               const tcaPct = Math.min(100, Math.round((totalHours / 60) * 100))
               return (
-                <div key={student.id} style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 60px', gap: '16px', padding: '16px 24px', alignItems: 'center', borderBottom: `1px solid ${GLASS_BORDER}`, transition: 'background 0.15s' }}
+                <div key={student.id} onClick={() => setSelectedStudent(student)} style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 60px', gap: '16px', padding: '16px 24px', alignItems: 'center', borderBottom: `1px solid ${GLASS_BORDER}`, transition: 'background 0.15s', cursor: 'pointer' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.025)')}
                 onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -357,7 +358,108 @@ export default function StudentsPage() {
 
       {showModal && <AddStudentModal onClose={() => setShowModal(false)} onAdd={s => setStudents(prev => [s as Student, ...prev])} />}
 
+      {/* Student Detail Modal */}
+      {selectedStudent && (
+        <div
+          onClick={() => setSelectedStudent(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 100,
+            background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px',
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              width: '100%', maxWidth: '520px',
+              background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(24px)',
+              border: '1px solid rgba(255,255,255,0.1)', borderRadius: '24px',
+              padding: '32px', position: 'relative',
+            }}
+          >
+            <button
+              onClick={() => setSelectedStudent(null)}
+              style={{
+                position: 'absolute', top: '16px', right: '16px',
+                width: '32px', height: '32px', borderRadius: '50%',
+                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                color: '#9CA3AF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Student avatar + name */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+              <div style={{
+                width: '56px', height: '56px', borderRadius: '50%',
+                background: avatarGradient(selectedStudent.legal_name),
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '18px', fontWeight: '700', color: '#FFFFFF',
+              }}>
+                {getInitials(selectedStudent.legal_name)}
+              </div>
+              <div>
+                <h2 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '20px', fontWeight: '700', color: '#FFFFFF', marginBottom: '2px' }}>
+                  {selectedStudent.legal_name.startsWith('eyJ') ? 'Student Record' : selectedStudent.legal_name}
+                </h2>
+                <p style={{ fontSize: '13px', color: TEXT_SECONDARY }}>{selectedStudent.parent_email || 'No email on file'}</p>
+              </div>
+            </div>
+
+            {/* Details grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              {[
+                { label: 'Email', value: selectedStudent.parent_email || '—' },
+                { label: 'Phone', value: selectedStudent.emergency_contact_phone || '—' },
+                { label: 'Permit #', value: selectedStudent.permit_number || 'PENDING' },
+                { label: 'DOB', value: selectedStudent.dob ? new Date(selectedStudent.dob + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—' },
+                { label: 'Enrolled', value: selectedStudent.enrollment_date ? new Date(selectedStudent.enrollment_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—' },
+                { label: 'Emergency Contact', value: selectedStudent.emergency_contact_name || '—' },
+              ].map(({ label, value }) => (
+                <div key={label} style={{ background: 'rgba(0,0,0,0.3)', borderRadius: '12px', padding: '12px 14px' }}>
+                  <p style={{ fontSize: '10px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.06em', color: TEXT_SECONDARY, marginBottom: '4px' }}>{label}</p>
+                  <p style={{ fontSize: '13px', fontWeight: '600', color: '#FFFFFF' }}>{value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Progress bars */}
+            <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <span style={{ fontSize: '12px', color: TEXT_SECONDARY }}>Classroom Hours</span>
+                  <span style={{ fontSize: '12px', color: '#FFFFFF', fontWeight: '600' }}>{selectedStudent.classroom_hours}h / 6h</span>
+                </div>
+                <div style={{ height: '6px', borderRadius: '999px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                  <div style={{ width: `${Math.min(100, (selectedStudent.classroom_hours / 6) * 100)}%`, height: '100%', borderRadius: '999px', background: 'linear-gradient(90deg, #38BDF8, #818CF8)' }} />
+                </div>
+              </div>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <span style={{ fontSize: '12px', color: TEXT_SECONDARY }}>Driving Hours</span>
+                  <span style={{ fontSize: '12px', color: '#FFFFFF', fontWeight: '600' }}>{selectedStudent.driving_hours}h / 6h</span>
+                </div>
+                <div style={{ height: '6px', borderRadius: '999px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                  <div style={{ width: `${Math.min(100, (selectedStudent.driving_hours / 6) * 100)}%`, height: '100%', borderRadius: '999px', background: 'linear-gradient(90deg, #4ADE80, #38BDF8)' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>{`
+        @keyframes shimmer {
+          0% { background-position: -200% 0 }
+          100% { background-position: 200% 0 }
+        }
+        .skeleton {
+          background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+          background-size: 200% 100%;
+          animation: shimmer 1.5s infinite;
+          border-radius: 8px;
+        }
         @media (max-width: 768px) {
           .admin-sidebar { display: none !important; }
           .admin-main { margin-left: 0 !important; padding: 24px 16px !important; }

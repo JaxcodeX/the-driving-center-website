@@ -71,16 +71,52 @@ export async function GET() {
   const totalSess = (activeSessions || 0) + (completedSessions || 0)
   const completionRate = totalSess > 0 ? Math.round(((completedSessions || 0) / totalSess) * 100) : 0
 
+  const totalSess = (activeSessions || 0) + (completedSessions || 0)
+  const completionRate = totalSess > 0 ? Math.round(((completedSessions || 0) / totalSess) * 100) : 0
+
+  // ── Real delta calculations ──────────────────────────────────────
+  const now = new Date()
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString()
+  const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0).toISOString()
+
+  const [lastMonthStudentsResult, lastMonthSessionsResult, lastMonthRevenueResult] = await Promise.all([
+    admin.from('students_driver_ed').select('*', { count: 'exact', head: true }).eq('school_id', schoolId).gte('enrollment_date', lastMonthStart).lt('enrollment_date', thisMonthStart),
+    admin.from('sessions').select('*', { count: 'exact', head: true }).eq('school_id', schoolId).eq('status', 'scheduled').gte('start_date', lastMonthStart).lt('start_date', thisMonthStart),
+    admin.from('bookings').select('deposit_amount_cents').eq('school_id', schoolId).eq('status', 'confirmed').gte('created_at', lastMonthStart).lt('created_at', thisMonthStart),
+  ])
+
+  const lastMonthStudents = (lastMonthStudentsResult as any)?.count ?? 0
+  const lastMonthActiveSessions = (lastMonthSessionsResult as any)?.count ?? 0
+  const lastMonthRevenueRows = (lastMonthRevenueResult as any)?.data ?? []
+  const lastMonthRevenue = lastMonthRevenueRows.reduce(
+    (sum: number, b: { deposit_amount_cents: number | null }) => sum + (b.deposit_amount_cents ?? 0), 0) / 100
+
+  const studentsDeltaRaw = lastMonthStudents > 0
+    ? Math.round(((totalStudents - lastMonthStudents) / lastMonthStudents) * 100) : totalStudents > 0 ? 100 : 0
+  const studentsDelta = (studentsDeltaRaw >= 0 ? '+' : '') + studentsDeltaRaw + '%'
+
+  const sessionsDeltaRaw = lastMonthActiveSessions > 0
+    ? Math.round(((activeSessions - lastMonthActiveSessions) / lastMonthActiveSessions) * 100) : activeSessions > 0 ? 100 : 0
+  const sessionsDelta = (sessionsDeltaRaw >= 0 ? '+' : '') + sessionsDeltaRaw + '%'
+
+  const revenueDeltaRaw = lastMonthRevenue > 0
+    ? Math.round(((monthlyRevenue - lastMonthRevenue) / lastMonthRevenue) * 100) : monthlyRevenue > 0 ? 100 : 0
+  const revenueDelta = (revenueDeltaRaw >= 0 ? '+' : '') + revenueDeltaRaw + '%'
+
+  const completionTarget = 70
+  const completionDelta = (completionRate >= completionTarget ? '+' : '') + (completionRate - completionTarget) + '%'
+
   return NextResponse.json({
     stats: {
       totalStudents: totalStudents || 0,
       activeSessions: activeSessions || 0,
       monthlyRevenue,
       completionRate,
-      studentsDelta: totalStudents && totalStudents > 0 ? '+12%' : '+0%',
-      sessionsDelta: activeSessions && activeSessions > 0 ? '+8%' : '+0%',
-      revenueDelta: monthlyRevenue > 0 ? '+15%' : '+0%',
-      completionDelta: completionRate > 0 ? `+${Math.max(0, completionRate - 72)}%` : '+0%',
+      studentsDelta,
+      sessionsDelta,
+      revenueDelta,
+      completionDelta,
     },
     schoolId,
     schoolName: (schoolData as any)?.name || '',

@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
-import { validateEmail, validatePhone } from '@/lib/security'
-import { isLikelyValidEmail } from '@/lib/email'
 
 // ── POST /api/bookings ─────────────────────────────────────────────────
 export async function POST(request: Request) {
@@ -17,17 +15,18 @@ export async function POST(request: Request) {
     )
   }
 
-  const emailCheck = validateEmail(student_email)
-  if (!emailCheck.valid) return new NextResponse(emailCheck.error, { status: 400 })
-
-  // Bounce protection — reject fake/placeholder emails before they hit Resend
-  if (!isLikelyValidEmail(student_email)) {
-    return NextResponse.json({ error: 'Invalid or disallowed email address' }, { status: 400 })
+  // Permissive email validation — accept any RFC 5321-compatible format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+  if (!emailRegex.test(student_email)) {
+    return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
   }
 
+  // Permissive phone validation — accept any format with at least 10 digits
   if (student_phone) {
-    const phoneCheck = validatePhone(student_phone)
-    if (!phoneCheck.valid) return new NextResponse(phoneCheck.error, { status: 400 })
+    const digits = student_phone.replace(/\D/g, '')
+    if (digits.length < 10) {
+      return NextResponse.json({ error: 'Phone number must have at least 10 digits' }, { status: 400 })
+    }
   }
 
   // Use any to bypass Supabase generated types that don't match actual DB schema
