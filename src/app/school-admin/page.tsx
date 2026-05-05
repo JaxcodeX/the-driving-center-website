@@ -883,6 +883,93 @@ export default function DashboardPage() {
         </div>
       </main>
 
+      {/* Mobile hamburger button */}
+      <button
+        onClick={() => setMobileMenuOpen(true)}
+        className="admin-hamburger"
+        style={{
+          display: 'none',
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          zIndex: 50,
+          width: '52px',
+          height: '52px',
+          borderRadius: '50%',
+          background: `linear-gradient(135deg, ${ACCENT_GREEN}, ${ACCENT_CYAN})`,
+          border: 'none',
+          cursor: 'pointer',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 4px 20px rgba(74,222,128,0.4)',
+        }}
+      >
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M3 6h16M3 11h16M3 16h16" stroke="#000" strokeWidth="2.2" strokeLinecap="round"/>
+        </svg>
+      </button>
+
+      {/* Mobile slide-in menu */}
+      {mobileMenuOpen && (
+        <>
+          <div
+            onClick={() => setMobileMenuOpen(false)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 200,
+              background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
+            }}
+          />
+          <nav style={{
+            position: 'fixed', top: 0, left: 0, height: '100vh', zIndex: 201,
+            width: '260px',
+            background: 'rgba(13,13,18,0.98)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            borderRight: `1px solid ${GLASS_BORDER}`,
+            padding: '28px 16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: `linear-gradient(135deg, ${ACCENT_GREEN}, ${ACCENT_CYAN})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Car className="w-4 h-4" style={{ color: '#000' }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: '700', color: '#FFFFFF', lineHeight: 1.2 }}>Driving Center</div>
+                  <div style={{ fontSize: '10px', color: TEXT_SECONDARY }}>School Admin</div>
+                </div>
+              </div>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#9CA3AF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            {NAV_ITEMS.map(({ icon: NavIcon, label, href, active }) => (
+              <Link
+                key={label}
+                href={href}
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 16px',
+                  borderRadius: '12px', textDecoration: 'none',
+                  background: active ? 'rgba(255,255,255,0.06)' : 'transparent',
+                  color: active ? '#FFFFFF' : TEXT_SECONDARY,
+                  fontWeight: active ? '600' : '500',
+                  fontSize: '14px',
+                }}
+              >
+                <NavIcon className="w-4 h-4" style={{ color: active ? ACCENT_GREEN : TEXT_SECONDARY }} />
+                {label}
+              </Link>
+            ))}
+          </nav>
+        </>
+      )}
+
       {/* KPI Detail Modal */}
       {activeModal && (
         <div
@@ -1044,6 +1131,9 @@ export default function DashboardPage() {
             padding: 24px 16px !important;
           }
           .admin-nav-pills {
+            display: flex !important;
+          }
+          .admin-hamburger {
             display: flex !important;
           }
           .admin-kpi-grid {

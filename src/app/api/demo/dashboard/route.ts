@@ -71,9 +71,6 @@ export async function GET() {
   const totalSess = (activeSessions || 0) + (completedSessions || 0)
   const completionRate = totalSess > 0 ? Math.round(((completedSessions || 0) / totalSess) * 100) : 0
 
-  const totalSess = (activeSessions || 0) + (completedSessions || 0)
-  const completionRate = totalSess > 0 ? Math.round(((completedSessions || 0) / totalSess) * 100) : 0
-
   // ── Real delta calculations ──────────────────────────────────────
   const now = new Date()
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()

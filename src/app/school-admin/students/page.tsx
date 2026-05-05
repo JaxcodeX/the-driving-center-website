@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Plus, Search, Pencil, Shield, Mail, Phone, Calendar, Users, CreditCard, Settings, LayoutDashboard, GraduationCap, Car, Clock } from 'lucide-react'
+import { Plus, Search, Pencil, Shield, Mail, Phone, Calendar, Users, CreditCard, Settings, LayoutDashboard, GraduationCap, Car, Clock, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 type Student = {
