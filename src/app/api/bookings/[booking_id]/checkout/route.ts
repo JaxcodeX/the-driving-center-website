@@ -62,54 +62,72 @@ export async function POST(request: Request) {
     return NextResponse.json({ confirmed: true })
   }
 
-  const stripe = getStripe()
+  let stripeUrl: string | null = null
 
-  // Get school name for Stripe description
-  const { data: school } = await supabaseAdmin
-    .from('schools')
-    .select('name')
-    .eq('id', booking.session.school_id)
-    .single()
+  try {
+    const stripe = getStripe()
 
-  const sessionTypeName = booking.session.session_type?.name ?? 'Lesson'
-  const dateStr = new Date(`${booking.session.start_date}T12:00:00`).toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric',
-  })
+    // Get school name for Stripe description
+    const { data: school } = await supabaseAdmin
+      .from('schools')
+      .select('name')
+      .eq('id', booking.session.school_id)
+      .single()
 
-  const checkoutSession = await stripe.checkout.sessions.create({
-    mode: 'payment',
-    line_items: [
-      {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: `${sessionTypeName} — ${dateStr}`,
-            description: `${school?.name ?? 'Driving Lesson'} deposit — credited toward total`,
-          },
-          unit_amount: booking.deposit_amount_cents,
-        },
-        quantity: 1,
-      },
-    ],
-    customer_email: booking.student_email,
-    metadata: {
-      booking_id: booking.id,
-      session_id: booking.session.id,
-      school_id: booking.session.school_id,
-      student_email: booking.student_email,
-      student_name: booking.student_name,
-    },
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/book/confirmation?token=${booking.confirmation_token}`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/book/cancel?token=${booking.confirmation_token}`,
-  })
-
-  await supabaseAdmin.from('audit_logs').insert(
-    auditLog('STRIPE_CHECKOUT_CREATED', booking.student_email, {
-      booking_id: booking.id,
-      deposit_cents: booking.deposit_amount_cents,
-      checkout_session_id: checkoutSession.id,
+    const sessionTypeName = booking.session.session_type?.name ?? 'Lesson'
+    const dateStr = new Date(`${booking.session.start_date}T12:00:00`).toLocaleDateString('en-US', {
+      weekday: 'long', month: 'long', day: 'numeric',
     })
-  )
 
-  return NextResponse.json({ url: checkoutSession.url })
+    const checkoutSession = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: `${sessionTypeName} — ${dateStr}`,
+              description: `${school?.name ?? 'Driving Lesson'} deposit — credited toward total`,
+            },
+            unit_amount: booking.deposit_amount_cents,
+          },
+          quantity: 1,
+        },
+      ],
+      customer_email: booking.student_email,
+      metadata: {
+        booking_id: booking.id,
+        session_id: booking.session.id,
+        school_id: booking.session.school_id,
+        student_email: booking.student_email,
+        student_name: booking.student_name,
+      },
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/book/confirmation?token=${booking.confirmation_token}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/book/cancel?token=${booking.confirmation_token}`,
+    })
+
+    stripeUrl = checkoutSession.url
+
+    await supabaseAdmin.from('audit_logs').insert(
+      auditLog('STRIPE_CHECKOUT_CREATED', booking.student_email, {
+        booking_id: booking.id,
+        deposit_cents: booking.deposit_amount_cents,
+        checkout_session_id: checkoutSession.id,
+      })
+    )
+  } catch (stripeError: any) {
+    // Stripe not configured — this is fine for demo mode
+    if (stripeError.message?.includes('STRIPE_SECRET_KEY') || stripeError.message?.includes('No API key provided')) {
+      // Demo mode: confirm the booking directly without payment
+      await supabaseAdmin
+        .from('bookings')
+        .update({ status: 'confirmed' })
+        .eq('id', booking_id)
+      return NextResponse.json({ demo: true, confirmed: true })
+    }
+    // Real error — rethrow
+    throw stripeError
+  }
+
+  return NextResponse.json({ url: stripeUrl })
 }
