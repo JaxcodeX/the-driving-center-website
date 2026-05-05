@@ -199,8 +199,7 @@ export default function LoginPage() {
                   Email address
                 </label>
                 <Mail size='15' style={{
-                  position: 'absolute', left: '14px', top: emailFocused || email ? '14px' : '50%',
-                  transform: emailFocused || email ? 'none' : 'translateY(-50%)',
+                  position: 'absolute', left: '14px', top: '17px',
                   color: '#9CA3AF', pointerEvents: 'none',
                   transition: 'all 0.2s',
                 }} />
@@ -410,7 +409,9 @@ export default function LoginPage() {
               fontSize: '13px', color: '#6B7280', fontFamily: 'Inter, sans-serif',
             }}>
               Don&apos;t have an account?{' '}
-              <Link href='/signup' style={{ color: '#4ADE80', fontWeight: '600', textDecoration: 'none' }}>
+              <Link href='/signup' style={{ color: '#4ADE80', fontWeight: '600', textDecoration: 'none', transition: 'text-shadow 0.15s' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.textShadow = '0 0 12px rgba(74,222,128,0.6)'; el.style.textDecorationLine = 'underline' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.textShadow = 'none'; el.style.textDecorationLine = 'none' }}>
                 Sign up
               </Link>
             </p>
@@ -429,7 +430,8 @@ export default function LoginPage() {
         }}>
           {/* LIVE DEMO badge */}
           <div style={{
-            position: 'absolute', top: '24px', right: '24px',
+            position: 'absolute', top: '50%', right: '24px',
+            transform: 'translateY(-50%)',
             padding: '6px 12px', borderRadius: '20px',
             background: 'rgba(255,255,255,0.15)',
             border: '1px solid rgba(255,255,255,0.25)',

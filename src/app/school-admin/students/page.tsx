@@ -213,8 +213,8 @@ export default function StudentsPage() {
         </nav>
 
         {/* School name */}
-        <div style={{ padding: '16px 20px', borderTop: `1px solid ${GLASS_BORDER}` }}>
-          <p style={{ fontSize: '10px', color: TEXT_SECONDARY, fontWeight: '500' }}>Your Driving School</p>
+        <div style={{ padding: '12px 16px', borderTop: `1px solid ${GLASS_BORDER}` }}>
+          <p style={{ fontSize: '10px', color: TEXT_SECONDARY, fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Your Driving School</p>
         </div>
       </aside>
 
@@ -343,9 +343,9 @@ export default function StudentsPage() {
                   </div>
                   <div><StatusBadge status={status} /></div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                    <Link href={`/school-admin/students/${student.id}`} style={{ padding: '8px', borderRadius: '8px', transition: 'background 0.15s', color: TEXT_SECONDARY, display: 'flex', alignItems: 'center' }}
-                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)')}
-                    onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}>
+                    <Link href={`/school-admin/students/${student.id}`} style={{ padding: '8px', borderRadius: '8px', transition: 'background 0.15s, box-shadow 0.15s', color: TEXT_SECONDARY, display: 'flex', alignItems: 'center', textDecoration: 'none' }}
+                    onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'rgba(74,222,128,0.15)'; el.style.boxShadow = '0 0 12px rgba(74,222,128,0.35)' }}
+                    onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.boxShadow = 'none' }}>
                       <Pencil className="w-4 h-4" />
                     </Link>
                   </div>

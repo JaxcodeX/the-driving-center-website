@@ -426,48 +426,7 @@ export default function DashboardPage() {
             </h1>
             <p style={{ fontSize: '14px', color: TEXT_SECONDARY }}>{today}</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <button style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '12px',
-              background: GLASS_BG,
-              backdropFilter: GLASS_BLUR,
-              WebkitBackdropFilter: GLASS_BLUR,
-              border: `1px solid ${GLASS_BORDER}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              color: TEXT_SECONDARY,
-              transition: 'background 0.15s, border-color 0.15s',
-            }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)'
-              ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.15)'
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.background = GLASS_BG
-              ;(e.currentTarget as HTMLElement).style.borderColor = GLASS_BORDER
-            }}
-            >
-              <Bell className="w-4 h-4" />
-            </button>
-            <div style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '50%',
-              background: `linear-gradient(135deg, ${ACCENT_GREEN}, ${ACCENT_CYAN})`,
-              color: '#000',
-              fontSize: '14px',
-              fontWeight: '700',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              S
-            </div>
-          </div>
+          {/* Note: bell + avatar are in the layout topbar, no duplicates needed here */}
         </div>
 
         {/* KPI Row */}
@@ -643,9 +602,10 @@ export default function DashboardPage() {
                   {upcomingSessions.slice(0, 5).map(session => {
                     const date = new Date(session.start_date + 'T12:00:00')
                     const statusConfig: Record<string, { dot: string }> = {
-                      scheduled: { dot: ACCENT_GREEN },
-                      completed: { dot: ACCENT_GREEN },
+                      scheduled: { dot: '#38BDF8' },
+                      completed: { dot: '#4ADE80' },
                       pending: { dot: '#FBBF24' },
+                      cancelled: { dot: '#EF4444' },
                     }
                     const sc = statusConfig[session.status] ?? { dot: TEXT_SECONDARY }
                     return (

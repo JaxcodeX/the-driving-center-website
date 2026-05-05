@@ -34,12 +34,13 @@ export default function SignupPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F3F4F6', padding: '24px' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0D0D12', padding: '24px', position: 'relative' }}>
+      <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)', pointerEvents: 'none' }} />
       {/* Split container */}
-      <div style={{ display: 'flex', width: '100%', maxWidth: '1100px', minHeight: '620px', borderRadius: '28px', overflow: 'hidden', boxShadow: '0 25px 80px rgba(0,0,0,0.25)', animation: 'fadeIn 0.5s ease-out' }}>
+      <div style={{ display: 'flex', width: '100%', maxWidth: '1100px', minHeight: '620px', borderRadius: '28px', overflow: 'hidden', boxShadow: '0 25px 80px rgba(0,0,0,0.5)', animation: 'fadeIn 0.5s ease-out', position: 'relative', zIndex: 1 }}>
 
-        {/* LEFT SIDE — white, form */}
-        <div style={{ flex: 1, background: '#FFFFFF', padding: '48px 56px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        {/* LEFT SIDE — dark glass, form */}
+        <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.06)', padding: '48px 56px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           {/* Logo */}
           <Link href='/' style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', marginBottom: '40px' }}>
             <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#4ADE80', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -48,20 +49,20 @@ export default function SignupPage() {
                 <path d='M3 5.5V10.5L8 14V8.5H13V5.5H3Z' fill='white' fillOpacity='0.7' />
               </svg>
             </div>
-            <span style={{ fontSize: '16px', fontWeight: '700', color: '#1F2937', fontFamily: 'Outfit, sans-serif' }}>The Driving Center</span>
+            <span style={{ fontSize: '16px', fontWeight: '700', color: '#FFFFFF', fontFamily: 'Outfit, sans-serif' }}>The Driving Center</span>
           </Link>
 
           {/* Back link */}
           <Link href='/login' style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#6B7280', textDecoration: 'none', marginBottom: '24px', fontFamily: 'Inter, sans-serif', transition: 'color 0.15s' }}
           onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#111827')}
-          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#6B7280')}>
+          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#9CA3AF')}>
             <ArrowLeft className="w-4 h-4" />Back to login
           </Link>
 
           {/* Header */}
           <div style={{ marginBottom: '32px' }}>
-            <h1 style={{ fontSize: '28px', fontFamily: 'Outfit, sans-serif', fontWeight: '700', color: '#111827', letterSpacing: '-0.02em', marginBottom: '8px' }}>Create your school account</h1>
-            <p style={{ fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>Start your 14-day free trial. No credit card required.</p>
+            <h1 style={{ fontSize: '28px', fontFamily: 'Outfit, sans-serif', fontWeight: '700', color: '#FFFFFF', letterSpacing: '-0.02em', marginBottom: '8px' }}>Create your school account</h1>
+            <p style={{ fontSize: '14px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif' }}>Start your 14-day free trial. No credit card required.</p>
           </div>
 
           {/* Step indicator */}
@@ -73,12 +74,12 @@ export default function SignupPage() {
                   <div style={{
                     width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '13px', fontWeight: '700',
-                    background: i === 0 ? '#4ADE80' : i < 0 ? '#4ADE80' : 'rgba(255,255,255,0.03)',
-                    color: i === 0 ? '#FFFFFF' : '#6B7280',
-                    border: i === 0 ? 'none' : '1px solid rgba(0,0,0,0.1)',
+                    background: i === 0 ? '#4ADE80' : i < 0 ? '#4ADE80' : 'rgba(255,255,255,0.06)',
+                    color: i === 0 ? '#FFFFFF' : '#9CA3AF',
+                    border: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.1)',
                     fontFamily: 'Inter, sans-serif',
                   }}>{i + 1}</div>
-                  <span style={{ fontSize: '10px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.08em', color: i === 0 ? '#6B7280' : 'rgba(0,0,0,0.3)' }}>{step}</span>
+                  <span style={{ fontSize: '10px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.08em', color: i === 0 ? '#9CA3AF' : 'rgba(255,255,255,0.3)' }}>{step}</span>
                 </div>
               </div>
             ))}
@@ -158,7 +159,7 @@ export default function SignupPage() {
           </form>
 
           {/* Sign in link */}
-          <div style={{ marginTop: '28px', padding: '14px 16px', borderRadius: '12px', background: '#F9FAFB', border: '1px solid #E5E7EB', textAlign: 'center' }}>
+          <div style={{ marginTop: '28px', padding: '14px 16px', borderRadius: '12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
             <p style={{ fontSize: '13px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
               Already have an account?{' '}
               <Link href='/login' style={{ color: '#4ADE80', fontWeight: '600', textDecoration: 'none' }}>Sign in</Link>
@@ -169,7 +170,7 @@ export default function SignupPage() {
         {/* RIGHT SIDE — blue bg, dashboard preview */}
         <div style={{ flex: 1, background: 'linear-gradient(135deg, #4179E8 0%, #1E5BD6 100%)', padding: '40px', display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative' }}>
           {/* LIVE DEMO badge */}
-          <div style={{ position: 'absolute', top: '24px', right: '24px', padding: '6px 12px', borderRadius: '20px', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>
+          <div style={{ position: 'absolute', top: '50%', right: '24px', transform: 'translateY(-50%)', padding: '6px 12px', borderRadius: '20px', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>
             <span style={{ fontSize: '11px', fontWeight: '600', color: '#FFFFFF', fontFamily: 'Inter, sans-serif', letterSpacing: '0.05em' }}>SCHOOL ADMIN</span>
           </div>
 
