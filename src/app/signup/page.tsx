@@ -53,8 +53,8 @@ export default function SignupPage() {
           </Link>
 
           {/* Back link */}
-          <Link href='/login' style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#6B7280', textDecoration: 'none', marginBottom: '24px', fontFamily: 'Inter, sans-serif', transition: 'color 0.15s' }}
-          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#111827')}
+          <Link href='/login' style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#9CA3AF', textDecoration: 'none', marginBottom: '24px', fontFamily: 'Inter, sans-serif', transition: 'color 0.15s' }}
+          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#FFFFFF')}
           onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#9CA3AF')}>
             <ArrowLeft className="w-4 h-4" />Back to login
           </Link>
@@ -88,55 +88,55 @@ export default function SignupPage() {
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {/* Full name */}
             <div style={{ position: 'relative' }}>
-              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(0,0,0,0.3)' }}><User size={16} /></div>
+              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }}><User size={16} /></div>
               <input type='text' value={form.ownerName} onChange={e => set('ownerName', e.target.value)} placeholder='Your full name' required style={{
-                width: '100%', height: '50px', borderRadius: '12px', background: '#FFFFFF',
-                border: '1px solid #E5E7EB', color: '#111827', fontSize: '15px', fontFamily: 'Inter, sans-serif',
+                width: '100%', height: '50px', borderRadius: '12px', background: '#0D0D0D',
+                border: '1px solid rgba(255,255,255,0.1)', color: '#FFFFFF', fontSize: '15px', fontFamily: 'Inter, sans-serif',
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none', transition: 'border-color 0.2s',
               }}
               onFocus={e => (e.target.style.borderColor = '#4ADE80')}
-              onBlur={e => (e.target.style.borderColor = '#E5E7EB')} />
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')} />
             </div>
 
             {/* School name */}
             <div style={{ position: 'relative' }}>
-              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center' }}>
+              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center' }}>
                 <svg width='16' height='16' viewBox='0 0 16 16' fill='none'>
                   <path d='M8 2L13 5.5H3L8 2Z' fill='currentColor' />
                   <path d='M3 5.5V10.5L8 14V8.5H13V5.5H3Z' fill='currentColor' fillOpacity='0.7' />
                 </svg>
               </div>
               <input type='text' value={form.schoolName} onChange={e => set('schoolName', e.target.value)} placeholder='Driving school name' required style={{
-                width: '100%', height: '50px', borderRadius: '12px', background: '#FFFFFF',
-                border: '1px solid #E5E7EB', color: '#111827', fontSize: '15px', fontFamily: 'Inter, sans-serif',
+                width: '100%', height: '50px', borderRadius: '12px', background: '#0D0D0D',
+                border: '1px solid rgba(255,255,255,0.1)', color: '#FFFFFF', fontSize: '15px', fontFamily: 'Inter, sans-serif',
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none', transition: 'border-color 0.2s',
               }}
               onFocus={e => (e.target.style.borderColor = '#4ADE80')}
-              onBlur={e => (e.target.style.borderColor = '#E5E7EB')} />
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')} />
             </div>
 
             {/* Email */}
             <div style={{ position: 'relative' }}>
-              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(0,0,0,0.3)' }}><Mail size={16} /></div>
+              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }}><Mail size={16} /></div>
               <input type='email' value={form.email} onChange={e => set('email', e.target.value)} placeholder='you@yourdrivingschool.com' required style={{
-                width: '100%', height: '50px', borderRadius: '12px', background: '#FFFFFF',
-                border: '1px solid #E5E7EB', color: '#111827', fontSize: '15px', fontFamily: 'Inter, sans-serif',
+                width: '100%', height: '50px', borderRadius: '12px', background: '#0D0D0D',
+                border: '1px solid rgba(255,255,255,0.1)', color: '#FFFFFF', fontSize: '15px', fontFamily: 'Inter, sans-serif',
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none', transition: 'border-color 0.2s',
               }}
               onFocus={e => (e.target.style.borderColor = '#4ADE80')}
-              onBlur={e => (e.target.style.borderColor = '#E5E7EB')} />
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')} />
             </div>
 
             {/* Password (optional) */}
             <div style={{ position: 'relative' }}>
-              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(0,0,0,0.3)' }}><Lock size={16} /></div>
+              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }}><Lock size={16} /></div>
               <input type='password' placeholder='Create a password (optional)' style={{
-                width: '100%', height: '50px', borderRadius: '12px', background: '#FFFFFF',
-                border: '1px solid #E5E7EB', color: '#111827', fontSize: '15px', fontFamily: 'Inter, sans-serif',
+                width: '100%', height: '50px', borderRadius: '12px', background: '#0D0D0D',
+                border: '1px solid rgba(255,255,255,0.1)', color: '#FFFFFF', fontSize: '15px', fontFamily: 'Inter, sans-serif',
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none', transition: 'border-color 0.2s',
               }}
               onFocus={e => (e.target.style.borderColor = '#4ADE80')}
-              onBlur={e => (e.target.style.borderColor = '#E5E7EB')} />
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')} />
             </div>
 
             {error && (
@@ -160,7 +160,7 @@ export default function SignupPage() {
 
           {/* Sign in link */}
           <div style={{ marginTop: '28px', padding: '14px 16px', borderRadius: '12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
-            <p style={{ fontSize: '13px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+            <p style={{ fontSize: '13px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif' }}>
               Already have an account?{' '}
               <Link href='/login' style={{ color: '#4ADE80', fontWeight: '600', textDecoration: 'none' }}>Sign in</Link>
             </p>
