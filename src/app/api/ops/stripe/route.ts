@@ -3,6 +3,9 @@ import { createClient } from '@/lib/supabase/server'
 import Stripe from 'stripe'
 
 export async function GET() {
+  if (process.env.DEMO_MODE !== 'true') {
+    return NextResponse.json({ error: 'Internal' }, { status: 403 })
+  }
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 

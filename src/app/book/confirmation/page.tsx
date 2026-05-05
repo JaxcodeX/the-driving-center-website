@@ -75,9 +75,9 @@ function ConfirmationContent() {
 
   function handleAddToCalendar() {
     if (!booking?.session) return
-    const start_date = booking.session?.start_date ?? booking.session_date
-    const start_time = booking.session_time
-    const start = new Date(`${start_date}T${start_time}:00`)
+    const session_date = booking.session_date ?? booking.session?.start_date
+    const session_time = booking.session_time ?? booking.session?.start_time
+    const start = new Date(`${session_date}T${session_time}:00`)
     const end = new Date(start.getTime() + 60 * 60 * 1000)
     const ics = [
       'BEGIN:VCALENDAR', 'VERSION:2.0',
@@ -125,8 +125,10 @@ function ConfirmationContent() {
     )
   }
 
-  const { session, student_name, student_email, session_time } = booking
-  const { session_type, instructor, school, start_date, location } = session
+  const { session, student_name, student_email } = booking
+  const { session_type, instructor, school, location } = session ?? {}
+  const session_date = booking.session_date ?? booking.session?.start_date
+  const session_time = booking.session_time ?? booking.session?.start_time
   const start_time = session_time
 
   return (
@@ -153,11 +155,11 @@ function ConfirmationContent() {
           </div>
           <div className="flex items-center gap-3 text-sm mb-2" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.6)' }}>
             <span>📅</span>
-            <span>{formatDate(start_date)}</span>
+            <span>{formatDate(session_date)}</span>
           </div>
           <div className="flex items-center gap-3 text-sm mb-2" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.6)' }}>
             <span>🕐</span>
-            <span>{formatTime(start_time)}</span>
+            <span>{formatTime(session_time)}</span>
           </div>
           {location && (
             <div className="flex items-center gap-3 text-sm mb-2" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.6)' }}>

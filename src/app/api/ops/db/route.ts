@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 
 export async function GET() {
+  if (process.env.DEMO_MODE !== 'true') {
+    return NextResponse.json({ error: 'Internal' }, { status: 403 })
+  }
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
