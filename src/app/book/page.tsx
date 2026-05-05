@@ -377,18 +377,37 @@ function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, b
   selectedType: SessionType; selectedSlot: Slot; studentName: string; studentEmail: string
   bookingId: string | null; checkoutUrl: string | null
 }) {
+  // Auto-redirect countdown when checkoutUrl is present
+  useEffect(() => {
+    if (!checkoutUrl) return
+    if (!document.getElementById('checkout-redirect-style')) {
+      const s = document.createElement('style')
+      s.id = 'checkout-redirect-style'
+      s.textContent = `@keyframes shrinkBar { from { width: 100% } to { width: 0% } }`
+      document.head.appendChild(s)
+    }
+    const timer = setTimeout(() => { window.location.href = checkoutUrl }, 2000)
+    return () => clearTimeout(timer)
+  }, [checkoutUrl])
+
   if (checkoutUrl) {
     return (
       <motion.div key="step-payment" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-8">
         <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: ACCENT_DIM }}>
           <BookOpen className="w-8 h-8" style={{ color: ACCENT }} />
         </div>
-        <h1 className="text-2xl font-bold mb-2" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Secure Checkout</h1>
+        <h1 className="text-2xl font-bold mb-2" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Redirecting to secure checkout...</h1>
         <p className="mb-8" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>Complete your payment to confirm your booking.</p>
+        {/* Countdown bar */}
+        <div className="w-full max-w-xs mx-auto h-1 rounded-full overflow-hidden mb-6" style={{ background: 'rgba(255,255,255,0.08)' }}>
+          <div className="h-full rounded-full" style={{ background: `linear-gradient(90deg, ${ACCENT}, #FF6B1E)`, animation: 'shrinkBar 2s linear forwards' }} />
+        </div>
         <a href={checkoutUrl}
-          style={{ background: SUCCESS, color: '#000', padding: '16px 32px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '16px', textDecoration: 'none', fontFamily: 'Outfit, sans-serif' }}>
+          style={{ background: SUCCESS, color: '#000', padding: '16px 32px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '16px', textDecoration: 'none', fontFamily: 'Outfit, sans-serif' }}
+          className="hover:opacity-90 transition-opacity">
           Pay Now <ArrowRight className="w-4 h-4" />
         </a>
+        <p className="text-xs mt-4" style={{ color: 'rgba(255,255,255,0.25)' }}>Or <a href={checkoutUrl} className="underline hover:text-white" style={{ color: ACCENT }}>click here if not redirected</a></p>
       </motion.div>
     )
   }
@@ -574,11 +593,11 @@ function BookContent() {
       const bookData = await bookRes.json()
       if (!bookRes.ok) { setFormError(bookData.error ?? 'Booking failed'); setSubmitting(false); return }
       setBookingId(bookData.booking_id)
-      if (bookData.status === 'pending_payment' && selectedType!.deposit_cents > 0) {
-        const cr = await fetch(`/api/bookings/${bookData.booking_id}/checkout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ booking_id: bookData.booking_id }) })
-        const cd = await cr.json()
-        if (cd.url) { setCheckoutUrl(cd.url); setStep(3) } else setStep(3)
-      } else setStep(3)
+      setStep(3)
+      // Always call checkout endpoint — if Stripe is configured it returns a URL; if not, it returns { confirmed: true }
+      const cr = await fetch(`/api/bookings/${bookData.booking_id}/checkout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ booking_id: bookData.booking_id }) })
+      const cd = await cr.json()
+      if (cd.url) { setCheckoutUrl(cd.url) } else if (cd.confirmed) { /* confirmed, no checkout needed */ }
       setSubmitting(false)
       return
     }
@@ -589,11 +608,11 @@ function BookContent() {
     const bookData = await bookRes.json()
     if (!bookRes.ok) { setFormError(bookData.error ?? 'Booking failed'); setSubmitting(false); return }
     setBookingId(bookData.booking_id)
-    if (bookData.status === 'pending_payment' && selectedType!.deposit_cents > 0) {
-      const cr = await fetch(`/api/bookings/${bookData.booking_id}/checkout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ booking_id: bookData.booking_id }) })
-      const cd = await cr.json()
-      if (cd.url) { setCheckoutUrl(cd.url); setStep(3) } else setStep(3)
-    } else setStep(3)
+    setStep(3)
+    // Always call checkout endpoint — if Stripe is configured it returns a URL; if not, it returns { confirmed: true }
+    const cr = await fetch(`/api/bookings/${bookData.booking_id}/checkout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ booking_id: bookData.booking_id }) })
+    const cd = await cr.json()
+    if (cd.url) { setCheckoutUrl(cd.url) } else if (cd.confirmed) { /* confirmed, no checkout needed */ }
     setSubmitting(false)
   }
 

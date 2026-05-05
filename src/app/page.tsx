@@ -246,7 +246,7 @@ function Hero() {
             lineHeight: '1.05', letterSpacing: '-0.03em',
             color: '#FFFFFF', margin: '0 0 24px',
           }}>
-            Stop losing hours<br />to scheduling chaos
+            Run Your Driving School<br />Without Running Yourself Ragged
           </h1>
 
           {/* Subheadline */}
@@ -254,7 +254,7 @@ function Hero() {
             fontSize: '18px', color: '#9CA3AF', lineHeight: '1.7',
             margin: '0 0 40px', maxWidth: '540px', marginLeft: 'auto', marginRight: 'auto',
           }}>
-            Your students book and pay online. You get automated reminders and a dashboard that actually tells you what's happening. No-shows drop. Revenue goes up. You stop playing phone tag.
+            The all-in-one platform for driving schools to manage bookings, students, instructors, and payments — without the chaos.
           </p>
 
           {/* CTAs */}
@@ -628,6 +628,71 @@ function DashboardMockup() {
         </div>
       </div>
     </Section>
+  )
+}
+
+// ─── For Schools CTA ─────────────────────────────────────────────────
+
+function ForSchoolsCTA() {
+  return (
+    <section style={{ padding: '120px 0', background: '#050505', position: 'relative', overflow: 'hidden' }}>
+      <div style={{
+        position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+        width: '600px', height: '400px',
+        background: 'radial-gradient(ellipse at center, rgba(74,222,128,0.07) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+      <Container style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{
+          background: '#0F1117',
+          border: '1px solid #1A1A1A',
+          borderRadius: '32px',
+          padding: '64px 56px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '48px',
+        }}>
+          <div style={{ flex: 1 }}>
+            <p style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              fontSize: '11px', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase',
+              color: '#4ADE80', marginBottom: '16px',
+            }}>
+              <span style={{ display: 'block', width: '20px', height: '2px', background: '#4ADE80', borderRadius: '2px' }} />
+              For School Owners
+            </p>
+            <h2 style={{
+              fontSize: 'clamp(28px, 3.5vw, 40px)', fontFamily: "'Outfit', sans-serif", fontWeight: '700',
+              color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: '1.15',
+              marginBottom: '16px',
+            }}>
+              Already own a driving school?
+            </h2>
+            <p style={{
+              fontSize: '16px', color: '#9CA3AF', lineHeight: '1.7',
+              marginBottom: '32px', maxWidth: '520px',
+            }}>
+              See how The Driving Center helps schools like yours fill sessions faster, cut admin time in half, and protect revenue with automatic deposits.
+            </p>
+            <Link href='/signup' style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              padding: '14px 28px',
+              background: 'linear-gradient(135deg, #4ADE80, #22C55E)',
+              color: '#FFFFFF', fontWeight: '700',
+              fontSize: '14px', borderRadius: '12px', textDecoration: 'none',
+              boxShadow: '0 4px 24px rgba(74,222,128,0.3)',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              fontFamily: "'Inter', sans-serif",
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(74,222,128,0.4)' }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(74,222,128,0.3)' }}
+            >
+              See how it works <ArrowRight size={14} />
+            </Link>
+          </div>
+        </div>
+      </Container>
+    </section>
   )
 }
 
@@ -1205,6 +1270,7 @@ export default function HomePage() {
       <Features />
       <HowItWorks />
       <DashboardMockup />
+      <ForSchoolsCTA />
       <StatsBar />
       <Pricing />
       <FAQ />

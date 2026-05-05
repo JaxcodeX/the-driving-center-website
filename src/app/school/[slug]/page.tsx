@@ -292,6 +292,18 @@ function SchoolContent() {
                   <span>{school.profile.address}, {school.profile.city} {school.profile.zip}</span>
                 </div>
               )}
+              {school.profile?.address && (
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(school.profile.address + ' ' + school.profile.city + ' ' + (school.profile.state || 'TN') + ' ' + (school.profile.zip || ''))}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 text-sm hover:text-white transition-colors"
+                  style={{ color: '#4ADE80', textDecoration: 'none' }}
+                >
+                  <MapPin className="w-4 h-4 shrink-0" />
+                  <span>View on Google Maps →</span>
+                </a>
+              )}
               {school.school.phone && (
                 <div className="flex items-center gap-3 text-sm" style={{ color: '#94A3B8' }}>
                   <Phone className="w-4 h-4 shrink-0" style={{ color: '#4ADE80' }} />
@@ -323,7 +335,7 @@ function SchoolContent() {
 
         {/* Footer */}
         <footer className="text-center text-xs pt-6 border-t" style={{ color: '#64748B', borderColor: 'rgba(255,255,255,0.06)' }}>
-          Powered by <span style={{ color: '#94A3B8' }}>The Driving Center SaaS</span>
+          Powered by <span style={{ color: '#4ADE80' }}>The Driving Center</span>
         </footer>
       </div>
     </div>
