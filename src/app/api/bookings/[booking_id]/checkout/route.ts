@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
   const supabaseAdmin = getSupabaseAdmin() as any
 
-  // Get booking + session info (admin to bypass RLS on bookings table)
+  // Get booking (admin to bypass RLS on bookings table)
   const { data: booking, error: bookingError } = await supabaseAdmin
     .from('bookings')
     .select(`
@@ -44,30 +44,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Booking is not pending payment' }, { status: 409 })
   }
 
-  if (!booking.deposit_amount_cents || booking.deposit_amount_cents <= 0) {
-    // No deposit needed — confirm directly
-    await supabaseAdmin
-      .from('bookings')
-      .update({ status: 'confirmed' })
-      .eq('id', booking_id)
-
-    return NextResponse.json({ confirmed: true })
-  }
-
+  // Check Stripe BEFORE fetching other data
   const hasStripeKey = !!process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.startsWith('sk_')
 
-  // No Stripe key configured — confirm in demo mode
+  // No Stripe — confirm directly in demo mode
   if (!hasStripeKey) {
     await supabaseAdmin
       .from('bookings')
       .update({ status: 'confirmed' })
       .eq('id', booking_id)
+
     return NextResponse.json({ demo: true, confirmed: true })
   }
 
+  // Stripe is configured — create checkout session
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
-  // Get school name for Stripe description
   const { data: school } = await supabaseAdmin
     .from('schools')
     .select('name')
