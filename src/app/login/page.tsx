@@ -82,7 +82,7 @@ export default function LoginPage() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: '#F3F4F6',
+      background: '#0D0D12',
       padding: '24px',
     }}>
       {/* Split container */}
@@ -97,10 +97,11 @@ export default function LoginPage() {
         animation: 'fadeIn 0.5s ease-out',
       }}>
 
-        {/* LEFT SIDE — white, form */}
+        {/* LEFT SIDE — dark, form */}
         <div style={{
           flex: 1,
-          background: '#FFFFFF',
+          background: '#0F1117',
+          borderRight: '1px solid rgba(255,255,255,0.06)',
           padding: '48px 56px',
           display: 'flex',
           flexDirection: 'column',
@@ -121,7 +122,7 @@ export default function LoginPage() {
               </svg>
             </div>
             <span style={{
-              fontSize: '16px', fontWeight: '700', color: '#1F2937', fontFamily: 'Outfit, sans-serif',
+              fontSize: '16px', fontWeight: '700', color: '#FFFFFF', fontFamily: 'Outfit, sans-serif',
             }}>
               The Driving Center
             </span>
@@ -131,11 +132,11 @@ export default function LoginPage() {
           <div style={{ marginBottom: '32px' }}>
             <h1 style={{
               fontSize: '28px', fontFamily: 'Outfit, sans-serif', fontWeight: '700',
-              color: '#111827', letterSpacing: '-0.02em', marginBottom: '8px',
+              color: '#FFFFFF', letterSpacing: '-0.02em', marginBottom: '8px',
             }}>
               Welcome back
             </h1>
-            <p style={{ fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+            <p style={{ fontSize: '14px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif' }}>
               Sign in to your school dashboard
             </p>
           </div>
@@ -144,7 +145,7 @@ export default function LoginPage() {
           {isDemoMode && (
             <div style={{
               display: 'flex', gap: '0', marginBottom: '24px',
-              background: '#F3F4F6', borderRadius: '10px',
+              background: 'rgba(255,255,255,0.05)', borderRadius: '10px',
               padding: '4px',
               position: 'relative',
             }}>
@@ -155,7 +156,7 @@ export default function LoginPage() {
                 width: 'calc(50% - 4px)',
                 height: 'calc(100% - 8px)',
                 borderRadius: '8px',
-                background: '#FFFFFF',
+                background: 'rgba(255,255,255,0.08)',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                 transition: 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
               }} />
@@ -167,7 +168,7 @@ export default function LoginPage() {
                     flex: 1, padding: '8px 12px', borderRadius: '8px', border: 'none',
                     fontSize: '13px', fontWeight: '600', fontFamily: 'Inter, sans-serif', cursor: 'pointer',
                     background: 'transparent',
-                    color: activeTab === tab ? '#111827' : '#6B7280',
+                    color: activeTab === tab ? '#FFFFFF' : '#9CA3AF',
                     transition: 'color 0.2s',
                     position: 'relative', zIndex: 1,
                   }}
@@ -193,7 +194,7 @@ export default function LoginPage() {
                   fontFamily: 'Inter, sans-serif',
                   pointerEvents: 'none',
                   transition: 'all 0.2s',
-                  background: emailFocused || email ? '#FFFFFF' : 'transparent',
+                  background: emailFocused || email ? '#0F1117' : 'transparent',
                   padding: emailFocused || email ? '0 4px' : '0',
                 }}>
                   Email address
@@ -213,9 +214,9 @@ export default function LoginPage() {
                   onBlur={() => setEmailFocused(false)}
                   style={{
                     width: '100%', height: '52px', borderRadius: '12px',
-                    background: '#FFFFFF',
-                    border: `1px solid ${emailFocused ? '#4ADE80' : '#E5E7EB'}`,
-                    color: '#111827', fontSize: '14px', fontFamily: 'Inter, sans-serif',
+                    background: '#0D0D0D',
+                    border: `1px solid ${emailFocused ? '#4ADE80' : 'rgba(255,255,255,0.1)'}`,
+                    color: '#FFFFFF', fontSize: '14px', fontFamily: 'Inter, sans-serif',
                     paddingLeft: '42px', paddingRight: '16px', outline: 'none',
                     transition: 'border-color 0.2s',
                     paddingTop: emailFocused || email ? '14px' : '0',
@@ -267,13 +268,13 @@ export default function LoginPage() {
               </div>
               <h2 style={{
                 fontSize: '20px', fontFamily: 'Outfit, sans-serif', fontWeight: '600',
-                color: '#111827', marginBottom: '10px',
+                color: '#FFFFFF', marginBottom: '10px',
               }}>
                 Check your inbox
               </h2>
-              <p style={{ fontSize: '14px', color: '#6B7280', lineHeight: '1.6', fontFamily: 'Inter, sans-serif' }}>
+              <p style={{ fontSize: '14px', color: '#9CA3AF', lineHeight: '1.6', fontFamily: 'Inter, sans-serif' }}>
                 We sent a magic link to{' '}
-                <span style={{ color: '#111827', fontWeight: '600' }}>{email}</span>
+                <span style={{ color: '#FFFFFF', fontWeight: '600' }}>{email}</span>
                 <br />Click it to sign in.
               </p>
             </div>
@@ -295,7 +296,7 @@ export default function LoginPage() {
                     fontFamily: 'Inter, sans-serif',
                     pointerEvents: 'none',
                     transition: 'all 0.2s',
-                    background: demoEmailFocused || demoEmail ? '#FFFFFF' : 'transparent',
+                    background: demoEmailFocused || demoEmail ? '#0F1117' : 'transparent',
                     padding: demoEmailFocused || demoEmail ? '0 4px' : '0',
                   }}>
                     School owner email
@@ -315,9 +316,9 @@ export default function LoginPage() {
                     onBlur={() => setDemoEmailFocused(false)}
                     style={{
                       width: '100%', height: '52px', borderRadius: '12px',
-                      background: '#FFFFFF',
-                      border: `1px solid ${demoEmailFocused ? '#4ADE80' : '#E5E7EB'}`,
-                      color: '#111827', fontSize: '14px', fontFamily: 'Inter, sans-serif',
+                      background: '#0D0D0D',
+                      border: `1px solid ${demoEmailFocused ? '#4ADE80' : 'rgba(255,255,255,0.1)'}`,
+                      color: '#FFFFFF', fontSize: '14px', fontFamily: 'Inter, sans-serif',
                       paddingLeft: '42px', paddingRight: '16px', outline: 'none',
                       transition: 'border-color 0.2s',
                       paddingTop: demoEmailFocused || demoEmail ? '14px' : '0',
@@ -335,7 +336,7 @@ export default function LoginPage() {
                     color: '#9CA3AF', fontFamily: 'Inter, sans-serif',
                     pointerEvents: 'none',
                     transition: 'all 0.2s',
-                    background: demoPin ? '#FFFFFF' : 'transparent',
+                    background: demoPin ? '#0F1117' : 'transparent',
                     padding: demoPin ? '0 4px' : '0',
                   }}>
                     Demo PIN
@@ -348,9 +349,9 @@ export default function LoginPage() {
                     required
                     style={{
                       width: '100%', height: '52px', borderRadius: '12px',
-                      background: '#FFFFFF',
-                      border: '1px solid #E5E7EB',
-                      color: '#111827', fontSize: '16px', fontWeight: '600', fontFamily: 'Inter, sans-serif',
+                      background: '#0D0D0D',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      color: '#FFFFFF', fontSize: '16px', fontWeight: '600', fontFamily: 'Inter, sans-serif',
                       textAlign: 'center', letterSpacing: '0.3em',
                       paddingLeft: '16px', paddingRight: '48px', outline: 'none',
                       transition: 'border-color 0.2s',
@@ -401,12 +402,12 @@ export default function LoginPage() {
           <div style={{
             marginTop: '28px',
             padding: '14px 16px', borderRadius: '12px',
-            background: '#F9FAFB',
-            border: '1px solid #E5E7EB',
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.06)',
             textAlign: 'center',
           }}>
             <p style={{
-              fontSize: '13px', color: '#6B7280', fontFamily: 'Inter, sans-serif',
+              fontSize: '13px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif',
             }}>
               Don&apos;t have an account?{' '}
               <Link href='/signup' style={{ color: '#4ADE80', fontWeight: '600', textDecoration: 'none', transition: 'text-shadow 0.15s' }}
