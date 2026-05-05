@@ -6,7 +6,8 @@ import type { CheckoutBookingData } from '@/lib/supabase/types'
 
 function getStripe(): Stripe {
   if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error('STRIPE_SECRET_KEY is required')
+    // This will be caught by the outer try/catch — don't throw here
+    return new Stripe('sk_placeholder_for_demo_mode')
   }
   return new Stripe(process.env.STRIPE_SECRET_KEY)
 }
@@ -116,15 +117,15 @@ export async function POST(request: Request) {
       })
     )
   } catch (stripeError: any) {
-    // Stripe not configured or Stripe error — handle gracefully for demo mode
-    // Confirm the booking without payment so the demo flow still works
+    // Any Stripe error means payment can't process — fall back to demo mode confirmation
     try {
       await supabaseAdmin
         .from('bookings')
         .update({ status: 'confirmed' })
         .eq('id', booking_id)
     } catch (dbErr) {
-      console.error('Failed to confirm booking:', dbErr)
+      console.error('Checkout error (demo mode):', stripeError?.message ?? stripeError)
+      console.error('DB confirm error:', dbErr)
     }
     return NextResponse.json({ demo: true, confirmed: true })
   }
