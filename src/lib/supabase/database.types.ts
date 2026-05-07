@@ -151,3 +151,36 @@ export interface CheckoutBookingData extends BookingsRow {
     session_type: Pick<SessionTypesRow, 'name'>
   }
 }
+
+// ─── Mission Control tables ────────────────────────────────────────────────────────
+
+export interface McTasksRow {
+  id: string
+  title: string
+  project: string
+  assigned_to: string
+  status: string
+  last_activity: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface McCalendarEventsRow {
+  id: string
+  title: string
+  start_time: string
+  end_time: string | null
+  event_type: string
+  source: string
+  recurring: boolean
+  metadata: Record<string, any> | null
+}
+
+export interface McActivityLogRow {
+  id: string
+  action: string
+  details: string | null
+  source: string
+  status: string
+  created_at: string
+}
