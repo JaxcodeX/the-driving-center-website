@@ -1,30 +1,19 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import Link from 'next/link'
-import { BookOpen, LayoutDashboard, LogOut, ChevronRight, Clock, CheckCircle2, AlertCircle, PlayCircle, Plus } from 'lucide-react'
+import { LayoutGrid, Calendar, FolderKanban, Brain, FileText, Armchair, Users, Plus, X, ChevronDown } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────
 type Task = {
   id: string
   title: string
-  project: 'saas' | 'fso' | 'personal' | 'admin'
-  assigned_to: 'me' | 'everest' | 'subagent'
-  status: 'todo' | 'in_progress' | 'done'
-  last_activity: string | null
+  description?: string | null
+  project: string
+  assigned_to: string
+  status: string
+  last_activity?: string | null
   created_at: string
   updated_at: string
-}
-
-type CalendarEvent = {
-  id: string
-  title: string
-  start_time: string
-  end_time: string | null
-  event_type: 'work_window' | 'cron' | 'deadline' | 'scheduled'
-  source: string
-  recurring: boolean
-  metadata: Record<string, any> | null
 }
 
 type ActivityEntry = {
@@ -36,14 +25,64 @@ type ActivityEntry = {
   created_at: string
 }
 
-// ── Supabase Client ─────────────────────────────────────────────────
-function createClient() {
-  return {
-    tasks: { url: '/api/mc/tasks', get: null as any, post: null as any },
-    events: { url: '/api/mc/events', get: null as any, post: null as any },
-    activity: { url: '/api/mc/activity', get: null as any, post: null as any },
-  }
+type AgentStatus = Record<string, 'online' | 'offline' | 'standby'>
+
+type CurrentView = 'tasks' | 'office'
+
+// ── Design Tokens ────────────────────────────────────────────────────
+const TOKENS = {
+  bg: '#0F0F0F',
+  surface: '#1A1A1A',
+  border: 'rgba(255,255,255,0.06)',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#94A3B8',
+  textMuted: '#64748B',
+  blue: '#006FFF',
+  purple: '#818CF8',
+  red: '#EF4444',
+  amber: '#F59E0B',
+  emerald: '#10B981',
+  cyan: '#22D3EE',
+  violet: '#A78BFA',
+  orange: '#F97316',
 }
+
+// ── Column Config ────────────────────────────────────────────────────
+const COLUMNS = [
+  { key: 'recurring', label: 'Recurring', color: TOKENS.purple },
+  { key: 'backlog', label: 'Backlog', color: TOKENS.red },
+  { key: 'in_progress', label: 'In Progress', color: TOKENS.blue },
+  { key: 'review', label: 'Review', color: TOKENS.amber },
+  { key: 'done', label: 'Done', color: TOKENS.emerald },
+]
+
+const PROJECT_COLORS: Record<string, { bg: string; text: string }> = {
+  saas: { bg: 'rgba(0,111,255,0.12)', text: TOKENS.blue },
+  fso: { bg: 'rgba(129,140,248,0.12)', text: TOKENS.purple },
+  personal: { bg: 'rgba(16,185,129,0.12)', text: TOKENS.emerald },
+  admin: { bg: 'rgba(255,255,255,0.05)', text: TOKENS.textMuted },
+  openclaw: { bg: 'rgba(249,115,22,0.12)', text: TOKENS.orange },
+}
+
+const ASSIGNEE_COLORS: Record<string, string> = {
+  cayden: TOKENS.emerald,
+  everest: TOKENS.blue,
+  codex: TOKENS.purple,
+  subagent: TOKENS.amber,
+  minimax: TOKENS.cyan,
+  deepseek: TOKENS.violet,
+  claudecode: TOKENS.orange,
+}
+
+const USER_FILTERS = [
+  { id: 'all', label: 'All', color: TOKENS.textMuted },
+  { id: 'cayden', label: 'Cayden', color: TOKENS.emerald },
+  { id: 'everest', label: 'Everest', color: TOKENS.blue },
+  { id: 'codex', label: 'Codex', color: TOKENS.purple },
+  { id: 'subagent', label: 'Subagent', color: TOKENS.amber },
+]
+
+const PROJECT_OPTIONS = ['All Projects', 'SaaS', 'FSO', 'Personal', 'Admin', 'OpenClaw']
 
 // ── API Helpers ─────────────────────────────────────────────────────
 async function fetchTasks(): Promise<Task[]> {
@@ -72,18 +111,18 @@ async function updateTask(id: string, data: Partial<Task>): Promise<void> {
   })
 }
 
-async function fetchEvents(): Promise<CalendarEvent[]> {
-  const res = await fetch('/api/mc/events')
-  if (!res.ok) return []
-  const json = await res.json()
-  return json.events ?? []
-}
-
 async function fetchActivity(): Promise<ActivityEntry[]> {
   const res = await fetch('/api/mc/activity')
   if (!res.ok) return []
   const json = await res.json()
   return json.entries ?? []
+}
+
+async function fetchAgentStatus(): Promise<AgentStatus> {
+  const res = await fetch('/api/mc/agent-status')
+  if (!res.ok) return {}
+  const json = await res.json()
+  return json.agents ?? {}
 }
 
 async function logActivity(action: string, details?: string, source = 'Everest'): Promise<void> {
@@ -94,118 +133,710 @@ async function logActivity(action: string, details?: string, source = 'Everest')
   })
 }
 
-// ── Components ───────────────────────────────────────────────────────
-
-function StatusDot({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    active: 'bg-[#10B981]',
-    in_progress: 'bg-[#006FFF]',
-    todo: 'bg-[#94A3B8]',
-    done: 'bg-[#10B981]',
-    error: 'bg-[#EF4444]',
-    pending: 'bg-[#F59E0B]',
-    idle: 'bg-[#94A3B8]',
-  }
-  return <span className={`w-2 h-2 rounded-full ${colors[status] ?? 'bg-[#94A3B8]'} flex-shrink-0`} />
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  return `${Math.floor(hrs / 24)}d ago`
 }
 
-function TaskCard({ task, onStatusChange }: { task: Task; onStatusChange: (id: string, status: string) => void }) {
-  const statusColors: Record<string, { bg: string; text: string }> = {
-    todo: { bg: 'rgba(255,255,255,0.05)', text: '#94A3B8' },
-    in_progress: { bg: 'rgba(0,111,255,0.12)', text: '#006FFF' },
-    done: { bg: 'rgba(16,185,129,0.12)', text: '#4ADE80' },
-  }
-  const colors = statusColors[task.status] ?? statusColors.todo
+// ── Sidebar Component ───────────────────────────────────────────────
+const SIDEBAR_ITEMS = [
+  { id: 'tasks', label: 'Tasks', icon: LayoutGrid },
+  { id: 'calendar', label: 'Calendar', icon: Calendar },
+  { id: 'projects', label: 'Projects', icon: FolderKanban },
+  { id: 'memory', label: 'Memory', icon: Brain },
+  { id: 'docs', label: 'Docs', icon: FileText },
+  { id: 'office', label: 'Office', icon: Armchair },
+  { id: 'team', label: 'Team', icon: Users },
+]
 
-  const projectColors: Record<string, { bg: string; text: string }> = {
-    saas: { bg: 'rgba(0,111,255,0.12)', text: '#006FFF' },
-    fso: { bg: 'rgba(129,140,248,0.12)', text: '#818CF8' },
-    personal: { bg: 'rgba(16,185,129,0.12)', text: '#4ADE80' },
-    admin: { bg: 'rgba(255,255,255,0.05)', text: '#94A3B8' },
-  }
-  const pColors = projectColors[task.project] ?? projectColors.admin
+function Sidebar({ currentView, onViewChange }: { currentView: CurrentView; onViewChange: (v: CurrentView) => void }) {
+  return (
+    <aside
+      className="flex flex-col h-screen flex-shrink-0"
+      style={{
+        width: 200,
+        background: TOKENS.surface,
+        borderRight: `1px solid ${TOKENS.border}`,
+      }}
+    >
+      {/* Logo */}
+      <div className="px-4 py-5" style={{ borderBottom: `1px solid ${TOKENS.border}` }}>
+        <p className="text-base font-bold tracking-tight" style={{ color: TOKENS.textPrimary, fontFamily: 'Outfit, sans-serif' }}>
+          Mission Control
+        </p>
+      </div>
+
+      {/* Nav */}
+      <nav className="flex-1 px-3 py-4 space-y-0.5">
+        {SIDEBAR_ITEMS.map(item => {
+          const Icon = item.icon
+          const isActive = item.id === currentView
+          const isClickable = item.id === 'tasks' || item.id === 'office'
+          return (
+            <button
+              key={item.id}
+              onClick={() => isClickable && onViewChange(item.id as CurrentView)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all"
+              style={{
+                background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
+                color: isActive ? TOKENS.textPrimary : isClickable ? TOKENS.textSecondary : TOKENS.textMuted,
+                cursor: isClickable ? 'pointer' : 'default',
+                opacity: isClickable ? 1 : 0.5,
+              }}
+            >
+              <Icon size={15} />
+              {item.label}
+            </button>
+          )
+        })}
+      </nav>
+
+      {/* Bottom badge */}
+      <div
+        className="px-4 py-4 flex items-center gap-2"
+        style={{ borderTop: `1px solid ${TOKENS.border}` }}
+      >
+        <div
+          className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+          style={{ background: TOKENS.blue, color: TOKENS.bg }}
+        >
+          E
+        </div>
+        <span className="text-xs" style={{ color: TOKENS.textMuted }}>Everest</span>
+      </div>
+    </aside>
+  )
+}
+
+// ── KPI Header ──────────────────────────────────────────────────────
+function KpiRow({ tasks }: { tasks: Task[] }) {
+  const now = new Date()
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+
+  const weekCount = tasks.filter(t => new Date(t.created_at) >= weekAgo).length
+  const inProgressCount = tasks.filter(t => t.status === 'in_progress').length
+  const totalCount = tasks.length
+  const doneCount = tasks.filter(t => t.status === 'done').length
+  const completionPct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0
+
+  const pills = [
+    { label: 'This week', value: weekCount, color: TOKENS.textPrimary },
+    { label: 'In progress', value: inProgressCount, color: TOKENS.blue },
+    { label: 'Total', value: totalCount, color: TOKENS.textSecondary },
+    { label: 'Completion', value: `${completionPct}%`, color: TOKENS.emerald },
+  ]
 
   return (
-    <div className="glass-card" style={{ padding: '14px' }}>
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-sm font-medium flex-1 leading-snug" style={{ color: '#ffffff' }}>{task.title}</p>
-        <span className="text-xs px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: colors.bg, color: colors.text }}>
-          {task.status === 'in_progress' ? 'in progress' : task.status}
-        </span>
-      </div>
-      {task.last_activity && (
-        <p className="text-xs mt-2 leading-relaxed line-clamp-2" style={{ color: '#64748B' }}>{task.last_activity}</p>
-      )}
-      <div className="flex items-center gap-2 mt-2">
-        <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: pColors.bg, color: pColors.text }}>{task.project}</span>
-        <span className="text-xs flex-shrink-0" style={{ color: '#64748B' }}>{new Date(task.updated_at).toLocaleDateString()}</span>
-      </div>
-      {/* Quick status change */}
-      <div className="mt-3 pt-3 flex gap-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        {(['todo', 'in_progress', 'done'] as const).map(s => (
-          <button key={s} onClick={() => onStatusChange(task.id, s)}
-            className="flex-1 text-xs py-1.5 rounded-md transition-colors"
+    <div className="flex items-center gap-3 mb-5">
+      {pills.map(pill => (
+        <div
+          key={pill.label}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+          style={{ background: TOKENS.surface, border: `1px solid ${TOKENS.border}` }}
+        >
+          <span className="text-xs" style={{ color: TOKENS.textMuted }}>{pill.label}</span>
+          <span className="text-sm font-bold" style={{ color: pill.color }}>{pill.value}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ── Filter Row ──────────────────────────────────────────────────────
+function FilterRow({
+  userFilter,
+  projectFilter,
+  onUserChange,
+  onProjectChange,
+  onNewTask,
+}: {
+  userFilter: string
+  projectFilter: string
+  onUserChange: (v: string) => void
+  onProjectChange: (v: string) => void
+  onNewTask: () => void
+}) {
+  return (
+    <div className="flex items-center gap-3 mb-4 flex-wrap">
+      {/* New task */}
+      <button
+        onClick={onNewTask}
+        className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all"
+        style={{ background: TOKENS.blue, color: '#FFFFFF' }}
+      >
+        <Plus size={14} />
+        New task
+      </button>
+
+      {/* User filters */}
+      <div className="flex items-center gap-1.5">
+        {USER_FILTERS.map(user => (
+          <button
+            key={user.id}
+            onClick={() => onUserChange(user.id)}
+            className="px-3 py-1.5 rounded-full text-xs font-medium transition-all"
             style={{
-              background: task.status === s ? colors.bg : 'rgba(255,255,255,0.03)',
-              color: task.status === s ? colors.text : '#64748B',
-            }}>
-            {s === 'in_progress' ? '▶' : s === 'done' ? '✓' : '○'} {s}
+              background: userFilter === user.id ? `${user.color}22` : 'transparent',
+              border: `1px solid ${userFilter === user.id ? user.color : 'rgba(255,255,255,0.1)'}`,
+              color: userFilter === user.id ? user.color : TOKENS.textMuted,
+            }}
+          >
+            {user.label}
           </button>
         ))}
+      </div>
+
+      {/* Project dropdown */}
+      <div className="relative ml-auto">
+        <button
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium"
+          style={{
+            background: projectFilter !== 'All Projects' ? `${TOKENS.blue}22` : 'transparent',
+            border: `1px solid ${projectFilter !== 'All Projects' ? TOKENS.blue : 'rgba(255,255,255,0.1)'}`,
+            color: projectFilter !== 'All Projects' ? TOKENS.blue : TOKENS.textMuted,
+          }}
+        >
+          {projectFilter}
+          <ChevronDown size={12} />
+        </button>
       </div>
     </div>
   )
 }
 
-function EventRow({ event }: { event: CalendarEvent }) {
-  const typeColors: Record<string, string> = {
-    work_window: 'bg-[#10B981]',
-    cron: 'bg-[#006FFF]',
-    deadline: 'bg-[#EF4444]',
-    scheduled: 'bg-[#818CF8]',
-  }
+// ── Task Card ────────────────────────────────────────────────────────
+function TaskCard({ task, onStatusChange }: { task: Task; onStatusChange: (id: string, status: string) => void }) {
+  const col = COLUMNS.find(c => c.key === task.status)
+  const statusColor = col?.color ?? TOKENS.textMuted
+  const pColors = PROJECT_COLORS[task.project.toLowerCase()] ?? PROJECT_COLORS.admin
+  const assigneeColor = ASSIGNEE_COLORS[task.assigned_to.toLowerCase()] ?? TOKENS.textMuted
+  const assigneeInitial = (task.assigned_to.charAt(0) || '?').toUpperCase()
+
   return (
-    <div className="flex items-center justify-between py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-      <div className="flex items-center gap-3 flex-1 min-w-0">
-        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${typeColors[event.event_type] ?? 'bg-[#94A3B8]'}`} />
-        <div className="flex-1 min-w-0">
-          <p className="text-sm truncate" style={{ color: '#E2E8F0' }}>{event.title}</p>
-          <p className="text-xs mt-0.5" style={{ color: '#64748B' }}>
-            {event.start_time ? new Date(event.start_time).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—'}
-            {event.recurring && ' · 🔄'}
-          </p>
+    <div
+      className="p-3 rounded-xl cursor-pointer transition-all"
+      style={{
+        background: TOKENS.surface,
+        border: `1px solid ${TOKENS.border}`,
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(255,255,255,0.12)'
+        ;(e.currentTarget as HTMLDivElement).style.transform = 'translateY(-1px)'
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLDivElement).style.borderColor = TOKENS.border
+        ;(e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'
+      }}
+    >
+      {/* Status dot + Title */}
+      <div className="flex items-start gap-2 mb-1.5">
+        <span
+          className="w-2 h-2 rounded-full mt-0.5 flex-shrink-0"
+          style={{ background: statusColor }}
+        />
+        <p className="text-sm font-medium leading-snug" style={{ color: TOKENS.textPrimary }}>
+          {task.title.length > 80 ? task.title.slice(0, 80) + '…' : task.title}
+        </p>
+      </div>
+
+      {/* Description */}
+      {task.description && (
+        <p
+          className="text-xs leading-relaxed line-clamp-2 mb-2"
+          style={{ color: TOKENS.textMuted }}
+        >
+          {task.description}
+        </p>
+      )}
+
+      {/* Footer */}
+      <div className="flex items-center justify-between mt-2">
+        <div className="flex items-center gap-1.5">
+          <span
+            className="text-xs px-2 py-0.5 rounded-full"
+            style={{ background: pColors.bg, color: pColors.text }}
+          >
+            {task.project}
+          </span>
+          <span className="text-xs" style={{ color: '#475569' }}>
+            {timeAgo(task.updated_at)}
+          </span>
+        </div>
+        <span
+          className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+          style={{ background: assigneeColor, color: TOKENS.bg }}
+        >
+          {assigneeInitial}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+// ── Kanban Column ────────────────────────────────────────────────────
+function KanbanColumn({
+  column,
+  tasks,
+  onAddToColumn,
+  onStatusChange,
+}: {
+  column: (typeof COLUMNS)[0]
+  tasks: Task[]
+  onAddToColumn: (status: string) => void
+  onStatusChange: (id: string, status: string) => void
+}) {
+  return (
+    <div
+      className="flex flex-col flex-shrink-0 rounded-xl overflow-hidden"
+      style={{
+        width: 280,
+        background: 'rgba(255,255,255,0.02)',
+        border: `1px solid ${TOKENS.border}`,
+      }}
+    >
+      {/* Column header */}
+      <div
+        className="flex items-center gap-2 px-3 py-2.5"
+        style={{ borderBottom: `1px solid ${TOKENS.border}` }}
+      >
+        <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: column.color }} />
+        <span className="text-sm font-semibold" style={{ color: TOKENS.textPrimary }}>{column.label}</span>
+        <span
+          className="text-xs px-1.5 py-0.5 rounded-md"
+          style={{ background: 'rgba(255,255,255,0.06)', color: TOKENS.textMuted }}
+        >
+          {tasks.length}
+        </span>
+        <button
+          className="ml-auto text-sm transition-colors"
+          style={{ color: TOKENS.textMuted }}
+          onClick={() => onAddToColumn(column.key)}
+          onMouseEnter={e => (e.currentTarget.style.color = TOKENS.textPrimary)}
+          onMouseLeave={e => (e.currentTarget.style.color = TOKENS.textMuted)}
+        >
+          +
+        </button>
+      </div>
+
+      {/* Cards */}
+      <div className="flex-1 overflow-y-auto p-2 space-y-2" style={{ maxHeight: 'calc(100vh - 220px)' }}>
+        {tasks.length === 0 ? (
+          <p className="text-xs text-center py-6" style={{ color: TOKENS.textMuted }}>No tasks</p>
+        ) : (
+          tasks.map(task => (
+            <TaskCard key={task.id} task={task} onStatusChange={onStatusChange} />
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── Add Task Modal ───────────────────────────────────────────────────
+function AddTaskModal({
+  defaultStatus,
+  onClose,
+  onSubmit,
+}: {
+  defaultStatus: string
+  onClose: () => void
+  onSubmit: (data: Partial<Task>) => void
+}) {
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [project, setProject] = useState('personal')
+  const [assigned_to, setAssignedTo] = useState('everest')
+  const [status, setStatus] = useState(defaultStatus || 'backlog')
+
+  const handleSubmit = () => {
+    if (!title.trim()) return
+    onSubmit({ title, description: description || null, project, assigned_to, status })
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}
+      onClick={e => e.target === e.currentTarget && onClose()}
+    >
+      <div
+        className="w-full max-w-md rounded-2xl p-6"
+        style={{ background: TOKENS.surface, border: `1px solid ${TOKENS.border}` }}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-base font-semibold" style={{ color: TOKENS.textPrimary }}>New Task</h2>
+          <button onClick={onClose} style={{ color: TOKENS.textMuted }}><X size={16} /></button>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs mb-1.5" style={{ color: TOKENS.textSecondary }}>Title *</label>
+            <input
+              type="text"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="Task title"
+              className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+              style={{
+                background: TOKENS.bg,
+                border: `1px solid ${TOKENS.border}`,
+                color: TOKENS.textPrimary,
+              }}
+              autoFocus
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs mb-1.5" style={{ color: TOKENS.textSecondary }}>Description</label>
+            <textarea
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              placeholder="Optional description"
+              rows={3}
+              className="w-full px-3 py-2.5 rounded-lg text-sm outline-none resize-none"
+              style={{
+                background: TOKENS.bg,
+                border: `1px solid ${TOKENS.border}`,
+                color: TOKENS.textPrimary,
+              }}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs mb-1.5" style={{ color: TOKENS.textSecondary }}>Project</label>
+              <select
+                value={project}
+                onChange={e => setProject(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                style={{ background: TOKENS.bg, border: `1px solid ${TOKENS.border}`, color: TOKENS.textPrimary }}
+              >
+                {PROJECT_OPTIONS.filter(p => p !== 'All Projects').map(p => (
+                  <option key={p} value={p.toLowerCase()}>{p}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs mb-1.5" style={{ color: TOKENS.textSecondary }}>Assignee</label>
+              <select
+                value={assigned_to}
+                onChange={e => setAssignedTo(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                style={{ background: TOKENS.bg, border: `1px solid ${TOKENS.border}`, color: TOKENS.textPrimary }}
+              >
+                {USER_FILTERS.filter(u => u.id !== 'all').map(u => (
+                  <option key={u.id} value={u.id}>{u.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs mb-1.5" style={{ color: TOKENS.textSecondary }}>Status</label>
+            <select
+              value={status}
+              onChange={e => setStatus(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+              style={{ background: TOKENS.bg, border: `1px solid ${TOKENS.border}`, color: TOKENS.textPrimary }}
+            >
+              {COLUMNS.map(col => (
+                <option key={col.key} value={col.key}>{col.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-end gap-3 mt-6">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-full text-sm"
+            style={{ color: TOKENS.textSecondary }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 rounded-full text-sm font-medium"
+            style={{ background: TOKENS.blue, color: '#FFFFFF' }}
+          >
+            Create Task
+          </button>
         </div>
       </div>
-      <span className="text-xs px-2 py-0.5 rounded-full flex-shrink-0 ml-2" style={{ background: 'rgba(255,255,255,0.05)', color: '#64748B' }}>
-        {event.event_type}
+    </div>
+  )
+}
+
+// ── Office View ─────────────────────────────────────────────────────
+const AGENT_DESKS = [
+  { id: 'cayden', name: 'Cayden', color: TOKENS.emerald, subtitle: 'Product · You' },
+  { id: 'everest', name: 'Everest', color: TOKENS.blue, subtitle: 'Operator · Me' },
+  { id: 'minimax', name: 'Minimax', color: TOKENS.cyan, subtitle: 'Model Agent' },
+  { id: 'deepseek', name: 'DeepSeek', color: TOKENS.violet, subtitle: 'Model Agent' },
+  { id: 'claudecode', name: 'Claude Code', color: TOKENS.orange, subtitle: 'Coding Agent' },
+  { id: 'codex', name: 'Codex', color: TOKENS.purple, subtitle: 'Coding Agent' },
+  { id: 'subagent', name: 'Subagent', color: TOKENS.amber, subtitle: 'Worker' },
+]
+
+function PixelAvatar({ agent, status }: { agent: typeof AGENT_DESKS[0]; status: string }) {
+  const isOnline = status === 'online'
+  const isStandby = status === 'standby'
+
+  return (
+    <div
+      className="flex flex-col items-center gap-1"
+      style={{ opacity: status === 'offline' ? 0.4 : 1 }}
+    >
+      <div
+        className="relative flex items-center justify-center rounded-lg"
+        style={{
+          width: 40,
+          height: 40,
+          background: status === 'offline' ? '#3A3A3A' : agent.color,
+          transition: 'background 0.3s',
+        }}
+      >
+        <span
+          className="text-sm font-bold"
+          style={{ color: status === 'offline' ? '#666' : TOKENS.bg, fontFamily: 'monospace' }}
+        >
+          {agent.name.charAt(0)}
+        </span>
+        {isStandby && (
+          <span
+            className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full"
+            style={{ background: TOKENS.amber }}
+          />
+        )}
+        {isOnline && (
+          <span
+            className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full"
+            style={{ background: TOKENS.emerald }}
+          />
+        )}
+      </div>
+      <span
+        className="text-xs font-medium"
+        style={{
+          color: status === 'offline' ? TOKENS.textMuted : TOKENS.textSecondary,
+          fontFamily: 'monospace',
+          fontSize: 10,
+        }}
+      >
+        {agent.name}
       </span>
     </div>
   )
 }
 
-function ActivityRow({ entry }: { entry: ActivityEntry }) {
-  const statusMap: Record<string, string> = {
-    active: 'text-[#10B981]',
-    done: 'text-[#10B981]',
-    pending: 'text-[#F59E0B]',
-    error: 'text-[#EF4444]',
-    idle: 'text-[#94A3B8]',
-  }
+function OfficeView({ agentStatus }: { agentStatus: AgentStatus }) {
   return (
-    <div className="flex items-start gap-3 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-      <StatusDot status={entry.status} />
-      <div className="flex-1 min-w-0">
-        <p className="text-sm leading-relaxed" style={{ color: '#E2E8F0' }}>{entry.action}</p>
-        {entry.details && <p className="text-xs mt-1 line-clamp-2" style={{ color: '#64748B' }}>{entry.details}</p>}
-        <div className="flex items-center gap-2 mt-1.5">
-          <span className="text-xs" style={{ color: '#475569' }}>{entry.source}</span>
-          <span className="text-xs" style={{ color: '#334155' }}>·</span>
-          <span className={`text-xs font-medium ${statusMap[entry.status] ?? 'text-[#94A3B8]'}`}>{entry.status}</span>
-          <span className="text-xs" style={{ color: '#334155' }}>·</span>
-          <span className="text-xs" style={{ color: '#334155' }}>
-            {new Date(entry.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
-          </span>
+    <div className="flex h-full gap-4" style={{ height: 'calc(100vh - 120px)' }}>
+      {/* Office floor */}
+      <div
+        className="flex-1 rounded-xl p-5 overflow-hidden"
+        style={{
+          background: TOKENS.surface,
+          border: `1px solid ${TOKENS.border}`,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 16,
+        }}
+      >
+        {/* Top bar */}
+        <div className="flex items-center justify-between">
+          <button
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium"
+            style={{ background: TOKENS.blue, color: '#FFFFFF' }}
+          >
+            <Plus size={14} />
+            Start Chat
+          </button>
+          <div className="flex gap-2">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="w-10 h-10 rounded-lg"
+                style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${TOKENS.border}` }}
+              />
+            ))}
+          </div>
         </div>
+
+        {/* Office grid */}
+        <div
+          className="flex-1 rounded-lg p-6 relative overflow-hidden"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
+            `,
+            backgroundSize: '32px 32px',
+            backgroundColor: '#141414',
+          }}
+        >
+          {/* Top row desks */}
+          <div className="flex gap-6 justify-center mb-8">
+            {AGENT_DESKS.slice(0, 3).map(agent => (
+              <div key={agent.id} className="flex flex-col items-center gap-2">
+                <div
+                  className="w-16 h-12 rounded-lg flex items-center justify-center"
+                  style={{ background: '#2A2A2A', border: `1px solid rgba(255,255,255,0.06)` }}
+                >
+                  <PixelAvatar
+                    agent={agent}
+                    status={agentStatus[agent.id] ?? 'offline'}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Conference table */}
+          <div className="flex justify-center mb-8">
+            <div className="flex flex-col items-center gap-1">
+              <span
+                className="text-xs px-2 py-0.5 rounded-full"
+                style={{
+                  background: 'transparent',
+                  border: '1px dashed rgba(255,255,255,0.15)',
+                  color: TOKENS.textMuted,
+                  fontSize: 10,
+                }}
+              >
+                Build Council
+              </span>
+              <div
+                className="w-32 h-16 rounded-lg"
+                style={{ background: '#2A2A2A', border: `1px solid rgba(255,255,255,0.08)` }}
+              />
+            </div>
+          </div>
+
+          {/* Bottom row desks */}
+          <div className="flex gap-6 justify-center">
+            {AGENT_DESKS.slice(3).map(agent => (
+              <div key={agent.id} className="flex flex-col items-center gap-2">
+                <div
+                  className="w-16 h-12 rounded-lg flex items-center justify-center"
+                  style={{ background: '#2A2A2A', border: `1px solid rgba(255,255,255,0.06)` }}
+                >
+                  <PixelAvatar
+                    agent={agent}
+                    status={agentStatus[agent.id] ?? 'offline'}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Server rack bottom-right */}
+          <div
+            className="absolute bottom-4 right-4 flex flex-col items-center gap-1"
+          >
+            <div
+              className="w-8 h-16 rounded-md"
+              style={{ background: '#1A1A1A', border: `1px solid rgba(255,255,255,0.08)` }}
+            >
+              <div
+                className="w-1.5 h-1.5 rounded-full m-1"
+                style={{ background: TOKENS.emerald, animation: 'blink 2s ease-in-out infinite' }}
+              />
+            </div>
+            <span className="text-xs" style={{ color: TOKENS.textMuted, fontSize: 9 }}>OpenClaw</span>
+          </div>
+
+          {/* Water cooler bottom-left */}
+          <div
+            className="absolute bottom-4 left-4 flex flex-col items-center gap-1"
+          >
+            <div
+              className="w-6 h-10 rounded-md"
+              style={{ background: '#3A3A3A', border: `1px solid rgba(255,255,255,0.06)` }}
+            />
+            <span className="text-xs" style={{ color: TOKENS.textMuted, fontSize: 9 }}>H₂O</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Live Activity Panel */}
+      <LiveActivityPanel />
+    </div>
+  )
+}
+
+// ── Live Activity Panel ─────────────────────────────────────────────
+function LiveActivityPanel() {
+  const [activity, setActivity] = useState<ActivityEntry[]>([])
+
+  useEffect(() => {
+    fetchActivity().then(setActivity)
+    const interval = setInterval(() => fetchActivity().then(setActivity), 15000)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div
+      className="flex flex-col rounded-xl overflow-hidden flex-shrink-0"
+      style={{
+        width: 280,
+        background: TOKENS.surface,
+        border: `1px solid ${TOKENS.border}`,
+      }}
+    >
+      {/* Header */}
+      <div
+        className="flex items-center gap-2 px-4 py-3"
+        style={{ borderBottom: `1px solid ${TOKENS.border}` }}
+      >
+        <div
+          className="w-2 h-2 rounded-full"
+          style={{ background: TOKENS.emerald, animation: 'pulse-dot 2s ease-in-out infinite' }}
+        />
+        <span className="text-sm font-semibold" style={{ color: TOKENS.textPrimary }}>Live Activity</span>
+      </div>
+
+      {/* Feed */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-0">
+        {activity.length === 0 ? (
+          <p className="text-xs text-center py-8" style={{ color: TOKENS.textMuted }}>
+            No recent activity
+          </p>
+        ) : (
+          activity.map(entry => (
+            <div
+              key={entry.id}
+              className="flex items-start gap-2 py-2.5"
+              style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full mt-1 flex-shrink-0"
+                style={{ background: entry.status === 'active' ? TOKENS.emerald : TOKENS.textMuted }}
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs leading-relaxed" style={{ color: TOKENS.textSecondary }}>
+                  {entry.action}
+                </p>
+                {entry.details && (
+                  <p
+                    className="text-xs mt-0.5 truncate"
+                    style={{ color: TOKENS.textMuted }}
+                  >
+                    {entry.details}
+                  </p>
+                )}
+                <p className="text-xs mt-1" style={{ color: '#334155' }}>
+                  {entry.source} · {timeAgo(entry.created_at)}
+                </p>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   )
@@ -213,277 +844,129 @@ function ActivityRow({ entry }: { entry: ActivityEntry }) {
 
 // ── Main Page ────────────────────────────────────────────────────────
 export default function MissionControlPage() {
+  const [currentView, setCurrentView] = useState<CurrentView>('tasks')
   const [tasks, setTasks] = useState<Task[]>([])
-  const [events, setEvents] = useState<CalendarEvent[]>([])
-  const [activity, setActivity] = useState<ActivityEntry[]>([])
+  const [agentStatus, setAgentStatus] = useState<AgentStatus>({})
   const [loading, setLoading] = useState(true)
-  const [showAddTask, setShowAddTask] = useState(false)
-  const [newTask, setNewTask] = useState({ title: '', project: 'saas' as Task['project'], assigned_to: 'everest' as Task['assigned_to'] })
-  const [lastRefresh, setLastRefresh] = useState(new Date())
+  const [userFilter, setUserFilter] = useState('all')
+  const [projectFilter, setProjectFilter] = useState('All Projects')
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [addModalStatus, setAddModalStatus] = useState('backlog')
 
   const loadAll = useCallback(async () => {
-    const [tasksData, eventsData, activityData] = await Promise.all([
+    const [tasksData, statusData] = await Promise.all([
       fetchTasks(),
-      fetchEvents(),
-      fetchActivity(),
+      fetchAgentStatus(),
     ])
     setTasks(tasksData)
-    setEvents(eventsData)
-    setActivity(activityData)
+    setAgentStatus(statusData)
     setLoading(false)
-    setLastRefresh(new Date())
   }, [])
 
   useEffect(() => {
     loadAll()
-    const interval = setInterval(loadAll, 30000) // refresh every 30s
+    const interval = setInterval(loadAll, 30000)
     return () => clearInterval(interval)
   }, [loadAll])
 
   const handleStatusChange = async (id: string, status: string) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, status: status as Task['status'] } : t))
-    await updateTask(id, { status: status as Task['status'] })
-    await logActivity(`Task status updated`, `Moved to ${status}`, 'Everest')
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, status } : t))
+    await updateTask(id, { status })
+    await logActivity('Task status updated', `Moved to ${status}`, 'Everest')
   }
 
-  const handleAddTask = async () => {
-    if (!newTask.title.trim()) return
-    const task = await createTask({ ...newTask, status: 'todo' })
+  const handleAddTask = async (data: Partial<Task>) => {
+    const task = await createTask(data)
     if (task) {
       setTasks(prev => [task, ...prev])
-      setNewTask({ title: '', project: 'saas', assigned_to: 'everest' })
-      setShowAddTask(false)
-      await logActivity(`Task created`, newTask.title, 'Everest')
+      setShowAddModal(false)
+      await logActivity('Task created', task.title, 'Everest')
     }
   }
 
-  const myTasks = tasks.filter(t => t.assigned_to === 'me')
-  const everestTasks = tasks.filter(t => t.assigned_to !== 'me')
-  const upcomingEvents = events.filter(e => e.start_time && new Date(e.start_time) > new Date()).slice(0, 6)
+  const handleAddToColumn = (status: string) => {
+    setAddModalStatus(status)
+    setShowAddModal(true)
+  }
+
+  // Filter tasks
+  const filteredTasks = tasks.filter(t => {
+    if (userFilter !== 'all' && t.assigned_to !== userFilter) return false
+    if (projectFilter !== 'All Projects' && t.project.toLowerCase() !== projectFilter.toLowerCase()) return false
+    return true
+  })
+
+  const tasksByColumn = COLUMNS.reduce((acc, col) => {
+    acc[col.key] = filteredTasks.filter(t => t.status === col.key)
+    return acc
+  }, {} as Record<string, Task[]>)
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(0,111,255,0.06) 0%, transparent 55%)' }}>
-      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+    <div className="flex h-screen overflow-hidden" style={{ background: TOKENS.bg }}>
+      {/* Sidebar */}
+      <Sidebar currentView={currentView} onViewChange={setCurrentView} />
 
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Mission Control</h1>
-            <p className="mt-1 text-sm" style={{ color: '#64748B' }}>
-              {tasks.length} tasks · {upcomingEvents.length} upcoming · updated {lastRefresh.toLocaleTimeString()}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm transition-colors" style={{ background: 'rgba(255,255,255,0.05)', color: '#94A3B8' }}>
-              <LayoutDashboard size={14} />
-              Dashboard
-            </Link>
-            <button onClick={loadAll} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm transition-colors" style={{ background: 'rgba(255,255,255,0.05)', color: '#94A3B8' }}>
-              ↻ Refresh
-            </button>
-          </div>
-        </div>
+      {/* Main content */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Top padding */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {loading ? (
+            <p className="text-sm" style={{ color: TOKENS.textMuted }}>Loading…</p>
+          ) : currentView === 'tasks' ? (
+            <>
+              <KpiRow tasks={tasks} />
+              <FilterRow
+                userFilter={userFilter}
+                projectFilter={projectFilter}
+                onUserChange={setUserFilter}
+                onProjectChange={setProjectFilter}
+                onNewTask={() => { setAddModalStatus('backlog'); setShowAddModal(true) }}
+              />
 
-        {loading ? (
-          <p className="text-sm" style={{ color: '#94A3B8' }}>Loading mission control...</p>
-        ) : (
-          <>
-            {/* Tasks Grid — Mine + Everest side by side */}
-            <div className="grid grid-cols-2 gap-5 mb-6">
-              {/* My Tasks */}
-              <div className="glass-card" style={{ padding: '20px' }}>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-base font-semibold flex items-center gap-2" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>
-                    <span className="w-2 h-2 rounded-full bg-[#10B981]" />
-                    My Tasks
-                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.12)', color: '#10B981' }}>{myTasks.length}</span>
-                  </h2>
-                  <button onClick={() => setShowAddTask(true)} className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-colors" style={{ background: 'rgba(16,185,129,0.1)', color: '#10B981' }}>
-                    <Plus size={12} /> Add Task
-                  </button>
-                </div>
-                <div className="space-y-3">
-                  {myTasks.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-sm" style={{ color: '#64748B' }}>No tasks assigned to you</p>
-                      <button onClick={() => setShowAddTask(true)} className="mt-2 text-xs" style={{ color: '#10B981' }}>+ Add your first task</button>
-                    </div>
-                  ) : (
-                    myTasks.map(task => <TaskCard key={task.id} task={task} onStatusChange={handleStatusChange} />)
-                  )}
-                </div>
-              </div>
-
-              {/* Everest / Subagent Tasks */}
-              <div className="glass-card" style={{ padding: '20px' }}>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-base font-semibold flex items-center gap-2" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>
-                    <span className="w-2 h-2 rounded-full bg-[#006FFF]" />
-                    Everest & Agents
-                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(0,111,255,0.12)', color: '#006FFF' }}>{everestTasks.length}</span>
-                  </h2>
-                </div>
-                <div className="space-y-3">
-                  {everestTasks.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-sm" style={{ color: '#64748B' }}>Everest is up to date — no active tasks</p>
-                      <p className="text-xs mt-1" style={{ color: '#475569' }}>Tasks will appear here as work is assigned</p>
-                    </div>
-                  ) : (
-                    everestTasks.map(task => <TaskCard key={task.id} task={task} onStatusChange={handleStatusChange} />)
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Add Task Form */}
-            {showAddTask && (
-              <div className="glass-card mb-6" style={{ padding: '20px', border: '1px solid rgba(0,111,255,0.3)' }}>
-                <h3 className="text-sm font-semibold mb-4" style={{ color: '#E2E8F0' }}>Add New Task</h3>
-                <div className="space-y-3">
-                  <input
-                    value={newTask.title}
-                    onChange={e => setNewTask({ ...newTask, title: e.target.value })}
-                    placeholder="Task title..."
-                    className="w-full px-4 py-2.5 rounded-lg text-sm outline-none transition-colors"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#ffffff' }}
-                    onKeyDown={e => e.key === 'Enter' && handleAddTask()}
+              {/* Kanban board */}
+              <div
+                className="flex gap-4 overflow-x-auto pb-4"
+                style={{ scrollbarWidth: 'thin', scrollbarColor: `${TOKENS.surface} transparent` }}
+              >
+                {COLUMNS.map(col => (
+                  <KanbanColumn
+                    key={col.key}
+                    column={col}
+                    tasks={tasksByColumn[col.key] ?? []}
+                    onAddToColumn={handleAddToColumn}
+                    onStatusChange={handleStatusChange}
                   />
-                  <div className="flex items-center gap-3">
-                    <select
-                      value={newTask.project}
-                      onChange={e => setNewTask({ ...newTask, project: e.target.value as Task['project'] })}
-                      className="px-3 py-2 rounded-lg text-sm outline-none"
-                      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#94A3B8' }}>
-                      <option value="saas">SaaS</option>
-                      <option value="fso">FSO</option>
-                      <option value="personal">Personal</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                    <select
-                      value={newTask.assigned_to}
-                      onChange={e => setNewTask({ ...newTask, assigned_to: e.target.value as Task['assigned_to'] })}
-                      className="px-3 py-2 rounded-lg text-sm outline-none"
-                      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#94A3B8' }}>
-                      <option value="everest">Everest</option>
-                      <option value="me">Me</option>
-                      <option value="subagent">Subagent</option>
-                    </select>
-                  </div>
-                  <div className="flex gap-2">
-                    <button onClick={handleAddTask} className="px-4 py-2 rounded-lg text-sm font-medium transition-colors" style={{ background: '#006FFF', color: '#ffffff' }}>
-                      Create Task
-                    </button>
-                    <button onClick={() => setShowAddTask(false)} className="px-4 py-2 rounded-lg text-sm" style={{ color: '#64748B' }}>
-                      Cancel
-                    </button>
-                  </div>
-                </div>
+                ))}
               </div>
-            )}
-
-            {/* Calendar + Agent Status */}
-            <div className="grid grid-cols-3 gap-5 mb-6">
-              {/* Calendar */}
-              <div className="glass-card" style={{ padding: '20px' }}>
-                <h2 className="text-base font-semibold mb-4 flex items-center gap-2" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>
-                  <Clock size={15} />
-                  Upcoming
-                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)', color: '#64748B' }}>{upcomingEvents.length}</span>
-                </h2>
-                <div>
-                  {upcomingEvents.length === 0 ? (
-                    <p className="text-sm py-4 text-center" style={{ color: '#64748B' }}>No upcoming events scheduled</p>
-                  ) : (
-                    upcomingEvents.map(event => <EventRow key={event.id} event={event} />)
-                  )}
-                </div>
-              </div>
-
-              {/* Agent Status */}
-              <div className="glass-card" style={{ padding: '20px' }}>
-                <h2 className="text-base font-semibold mb-4 flex items-center gap-2" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>
-                  <PlayCircle size={15} />
-                  Agent Status
-                </h2>
-                <div className="space-y-3">
-                  {[
-                    { name: 'Everest (Main)', status: 'active', color: '#10B981', detail: 'MiniMax-M2.7 · Online now', pulse: true },
-                    { name: 'Codex', status: 'standby', color: '#006FFF', detail: 'DeepSeek V4 · Ready on demand', pulse: false },
-                    { name: 'Subagents', status: 'ready', color: '#818CF8', detail: 'Spawned on demand · MiniMax + DeepSeek', pulse: false },
-                  ].map(agent => (
-                    <div key={agent.name} className="flex items-center gap-3" style={{ padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                      <div className="relative flex-shrink-0">
-                        <span className="w-2.5 h-2.5 rounded-full block" style={{ background: agent.color }} />
-                        {agent.pulse && <span className="absolute inset-0 w-2.5 h-2.5 rounded-full animate-ping opacity-60" style={{ background: agent.color }} />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium" style={{ color: '#E2E8F0' }}>{agent.name}</p>
-                        <p className="text-xs" style={{ color: '#64748B' }}>{agent.detail}</p>
-                      </div>
-                      <span className="text-xs capitalize" style={{ color: agent.color }}>{agent.status}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Quick Stats */}
-              <div className="glass-card" style={{ padding: '20px' }}>
-                <h2 className="text-base font-semibold mb-4 flex items-center gap-2" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>
-                  <CheckCircle2 size={15} />
-                  At a Glance
-                </h2>
-                <div className="space-y-4">
-                  {[
-                    { label: 'Open Tasks', value: tasks.filter(t => t.status !== 'done').length, color: '#006FFF' },
-                    { label: 'In Progress', value: tasks.filter(t => t.status === 'in_progress').length, color: '#F59E0B' },
-                    { label: 'Completed', value: tasks.filter(t => t.status === 'done').length, color: '#10B981' },
-                    { label: 'Scheduled Events', value: events.length, color: '#818CF8' },
-                  ].map(stat => (
-                    <div key={stat.label} className="flex items-center justify-between">
-                      <span className="text-sm" style={{ color: '#64748B' }}>{stat.label}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full" style={{ background: stat.color }} />
-                        <span className="text-lg font-bold" style={{ color: stat.color }}>{stat.value}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Activity Feed */}
-            <div className="glass-card" style={{ padding: '20px' }}>
-              <h2 className="text-base font-semibold mb-4 flex items-center gap-2" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>
-                <AlertCircle size={15} />
-                Live Activity Feed
-                <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)', color: '#64748B' }}>{activity.length} recent</span>
-              </h2>
-              <div className="max-h-80 overflow-y-auto pr-2">
-                {activity.length === 0 ? (
-                  <p className="text-sm py-4 text-center" style={{ color: '#64748B' }}>No activity yet. Everest's actions will appear here.</p>
-                ) : (
-                  activity.map(entry => <ActivityRow key={entry.id} entry={entry} />)
-                )}
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Footer note */}
-        <div className="mt-8 text-center">
-          <p className="text-xs" style={{ color: '#334155' }}>
-            Mission Control · The Driving Center SaaS · Powered by Everest + OpenClaw
-          </p>
+            </>
+          ) : (
+            <OfficeView agentStatus={agentStatus} />
+          )}
         </div>
-      </div>
+      </main>
 
+      {/* Add Task Modal */}
+      {showAddModal && (
+        <AddTaskModal
+          defaultStatus={addModalStatus}
+          onClose={() => setShowAddModal(false)}
+          onSubmit={handleAddTask}
+        />
+      )}
+
+      {/* Global animations */}
       <style jsx global>{`
-        .glass-card {
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 16px;
+        @keyframes blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
         }
+        @keyframes pulse-dot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.6; transform: scale(0.85); }
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
       `}</style>
     </div>
   )
