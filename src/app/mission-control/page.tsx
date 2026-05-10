@@ -9,7 +9,7 @@ type Task = {
   title: string
   description?: string | null
   project: string
-  assigned_to: string
+  assignee: string
   status: string
   last_activity?: string | null
   created_at: string
@@ -50,7 +50,7 @@ const TOKENS = {
 // ── Column Config ────────────────────────────────────────────────────
 const COLUMNS = [
   { key: 'recurring', label: 'Recurring', color: TOKENS.purple },
-  { key: 'backlog', label: 'Backlog', color: TOKENS.red },
+  { key: 'todo', label: 'Backlog', color: TOKENS.red },
   { key: 'in_progress', label: 'In Progress', color: TOKENS.blue },
   { key: 'review', label: 'Review', color: TOKENS.amber },
   { key: 'done', label: 'Done', color: TOKENS.emerald },
@@ -314,8 +314,8 @@ function TaskCard({ task, onStatusChange }: { task: Task; onStatusChange: (id: s
   const col = COLUMNS.find(c => c.key === task.status)
   const statusColor = col?.color ?? TOKENS.textMuted
   const pColors = PROJECT_COLORS[task.project.toLowerCase()] ?? PROJECT_COLORS.admin
-  const assigneeColor = ASSIGNEE_COLORS[task.assigned_to.toLowerCase()] ?? TOKENS.textMuted
-  const assigneeInitial = (task.assigned_to.charAt(0) || '?').toUpperCase()
+  const assigneeColor = ASSIGNEE_COLORS[(task.assignee || '').toLowerCase()] ?? TOKENS.textMuted
+  const assigneeInitial = (task.assignee?.charAt(0) || '?').toUpperCase()
 
   return (
     <div
@@ -450,12 +450,12 @@ function AddTaskModal({
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [project, setProject] = useState('personal')
-  const [assigned_to, setAssignedTo] = useState('everest')
+  const [assignee, setAssignee] = useState('everest')
   const [status, setStatus] = useState(defaultStatus || 'backlog')
 
   const handleSubmit = () => {
     if (!title.trim()) return
-    onSubmit({ title, description: description || null, project, assigned_to, status })
+    onSubmit({ title, description: description || null, project, assignee, status })
   }
 
   return (
@@ -524,8 +524,8 @@ function AddTaskModal({
             <div>
               <label className="block text-xs mb-1.5" style={{ color: TOKENS.textSecondary }}>Assignee</label>
               <select
-                value={assigned_to}
-                onChange={e => setAssignedTo(e.target.value)}
+                value={assignee}
+                onChange={e => setAssignee(e.target.value)}
                 className="w-full px-3 py-2 rounded-lg text-sm outline-none"
                 style={{ background: TOKENS.bg, border: `1px solid ${TOKENS.border}`, color: TOKENS.textPrimary }}
               >
@@ -851,7 +851,7 @@ export default function MissionControlPage() {
   const [userFilter, setUserFilter] = useState('all')
   const [projectFilter, setProjectFilter] = useState('All Projects')
   const [showAddModal, setShowAddModal] = useState(false)
-  const [addModalStatus, setAddModalStatus] = useState('backlog')
+  const [addModalStatus, setAddModalStatus] = useState('todo')
 
   const loadAll = useCallback(async () => {
     const [tasksData, statusData] = await Promise.all([
@@ -891,7 +891,7 @@ export default function MissionControlPage() {
 
   // Filter tasks
   const filteredTasks = tasks.filter(t => {
-    if (userFilter !== 'all' && t.assigned_to !== userFilter) return false
+    if (userFilter !== 'all' && t.assignee !== userFilter) return false
     if (projectFilter !== 'All Projects' && t.project.toLowerCase() !== projectFilter.toLowerCase()) return false
     return true
   })
