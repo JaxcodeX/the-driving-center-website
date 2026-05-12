@@ -18,7 +18,7 @@ export default function LoginPage() {
   const [demoLoading, setDemoLoading] = useState(false)
   const [demoError, setDemoError] = useState('')
 
-  // Floating label state
+  // Input focus states
   const [emailFocused, setEmailFocused] = useState(false)
   const [demoEmailFocused, setDemoEmailFocused] = useState(false)
 
@@ -77,62 +77,52 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: '#0D0D12',
-      padding: '24px',
-    }}>
-      {/* Split container */}
+    <div className="login-bg">
       <div style={{
+        minHeight: '100vh',
         display: 'flex',
-        width: '100%',
-        maxWidth: '1100px',
-        minHeight: '620px',
-        borderRadius: '28px',
-        overflow: 'hidden',
-        boxShadow: '0 25px 80px rgba(0,0,0,0.25)',
-        animation: 'fadeIn 0.5s ease-out',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px',
+        position: 'relative',
+        zIndex: 1,
       }}>
-
-        {/* LEFT SIDE — dark, form */}
-        <div style={{
-          flex: 1,
-          background: '#0F1117',
-          borderRight: '1px solid rgba(255,255,255,0.06)',
-          padding: '48px 56px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
+        {/* Glassmorphic Modal */}
+        <div className="login-modal" style={{
+          width: '100%',
+          maxWidth: '420px',
+          padding: '40px',
+          animation: 'fadeInUp 0.5s ease-out',
         }}>
-          {/* Logo */}
-          <Link href='/' style={{
-            display: 'flex', alignItems: 'center', gap: '10px',
-            textDecoration: 'none', marginBottom: '40px',
-          }}>
-            <div style={{
-              width: '36px', height: '36px', borderRadius: '10px',
-              background: '#4ADE80', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <svg width='18' height='18' viewBox='0 0 16 16' fill='none'>
-                <path d="M8 2L13 5.5H3L8 2Z" fill='white' />
-                <path d="M3 5.5V10.5L8 14V8.5H13V5.5H3Z" fill='white' fillOpacity='0.7' />
-              </svg>
-            </div>
-            <span style={{
-              fontSize: '16px', fontWeight: '700', color: '#FFFFFF', fontFamily: 'Outfit, sans-serif',
-            }}>
-              The Driving Center
-            </span>
-          </Link>
 
-          {/* Header */}
-          <div style={{ marginBottom: '32px' }}>
+          {/* Logo */}
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <Link href='/' style={{
+              display: 'inline-flex', alignItems: 'center', gap: '10px',
+              textDecoration: 'none',
+            }}>
+              <div style={{
+                width: '40px', height: '40px', borderRadius: '12px',
+                background: 'var(--success)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <svg width='20' height='20' viewBox='0 0 16 16' fill='none'>
+                  <path d="M8 2L13 5.5H3L8 2Z" fill='white' />
+                  <path d="M3 5.5V10.5L8 14V8.5H13V5.5H3Z" fill='white' fillOpacity='0.7' />
+                </svg>
+              </div>
+              <span style={{
+                fontSize: '17px', fontWeight: '700', color: '#FFFFFF', fontFamily: 'Outfit, sans-serif',
+              }}>
+                The Driving Center
+              </span>
+            </Link>
+          </div>
+
+          {/* Headline */}
+          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
             <h1 style={{
-              fontSize: '28px', fontFamily: 'Outfit, sans-serif', fontWeight: '700',
-              color: '#FFFFFF', letterSpacing: '-0.02em', marginBottom: '8px',
+              fontSize: '26px', fontFamily: 'Inter, sans-serif', fontWeight: '700',
+              color: '#FFFFFF', letterSpacing: '-0.02em', marginBottom: '6px',
             }}>
               Welcome back
             </h1>
@@ -145,7 +135,7 @@ export default function LoginPage() {
           {isDemoMode && (
             <div style={{
               display: 'flex', gap: '0', marginBottom: '24px',
-              background: 'rgba(255,255,255,0.05)', borderRadius: '10px',
+              background: 'rgba(255,255,255,0.05)', borderRadius: '999px',
               padding: '4px',
               position: 'relative',
             }}>
@@ -155,8 +145,8 @@ export default function LoginPage() {
                 left: activeTab === 'magic' ? '4px' : 'calc(50% + 2px)',
                 width: 'calc(50% - 4px)',
                 height: 'calc(100% - 8px)',
-                borderRadius: '8px',
-                background: 'rgba(255,255,255,0.08)',
+                borderRadius: '999px',
+                background: 'rgba(255,255,255,0.10)',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                 transition: 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
               }} />
@@ -165,7 +155,7 @@ export default function LoginPage() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   style={{
-                    flex: 1, padding: '8px 12px', borderRadius: '8px', border: 'none',
+                    flex: 1, padding: '8px 12px', borderRadius: '999px', border: 'none',
                     fontSize: '13px', fontWeight: '600', fontFamily: 'Inter, sans-serif', cursor: 'pointer',
                     background: 'transparent',
                     color: activeTab === tab ? '#FFFFFF' : '#9CA3AF',
@@ -179,30 +169,18 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Magic Link */}
+          {/* Magic Link Form */}
           {(!isDemoMode || activeTab === 'magic') && !sent && (
-            <form onSubmit={handleMagicLink} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              {/* Floating email label */}
+            <form onSubmit={handleMagicLink} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Email input — pill-shaped */}
               <div style={{ position: 'relative' }}>
-                <label style={{
-                  position: 'absolute', left: '14px',
-                  top: emailFocused || email ? '10px' : '50%',
-                  transform: emailFocused || email ? 'none' : 'translateY(-50%)',
-                  fontSize: emailFocused || email ? '11px' : '14px',
-                  fontWeight: emailFocused || email ? '600' : '400',
-                  color: emailFocused ? '#4ADE80' : '#9CA3AF',
-                  fontFamily: 'Inter, sans-serif',
-                  pointerEvents: 'none',
-                  transition: 'all 0.2s',
-                  background: emailFocused || email ? '#0F1117' : 'transparent',
-                  padding: emailFocused || email ? '0 4px' : '0',
-                }}>
-                  Email address
-                </label>
                 <Mail size='15' style={{
-                  position: 'absolute', left: '14px', top: '17px',
-                  color: '#9CA3AF', pointerEvents: 'none',
-                  transition: 'all 0.2s',
+                  position: 'absolute', left: '16px', top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: emailFocused ? 'var(--accent)' : '#9CA3AF',
+                  pointerEvents: 'none',
+                  transition: 'color 0.2s',
+                  zIndex: 1,
                 }} />
                 <input
                   type='email'
@@ -210,16 +188,19 @@ export default function LoginPage() {
                   onChange={e => setEmail(e.target.value)}
                   required
                   autoComplete='email'
+                  placeholder="Email address"
                   onFocus={() => setEmailFocused(true)}
                   onBlur={() => setEmailFocused(false)}
+                  className="admin-input"
                   style={{
-                    width: '100%', height: '52px', borderRadius: '12px',
-                    background: '#0D0D0D',
-                    border: `1px solid ${emailFocused ? '#4ADE80' : 'rgba(255,255,255,0.1)'}`,
-                    color: '#FFFFFF', fontSize: '14px', fontFamily: 'Inter, sans-serif',
-                    paddingLeft: '42px', paddingRight: '16px', outline: 'none',
-                    transition: 'border-color 0.2s',
-                    paddingTop: emailFocused || email ? '14px' : '0',
+                    paddingLeft: '44px',
+                    paddingRight: '16px',
+                    height: '52px',
+                    borderRadius: '999px',
+                    border: emailFocused ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.06)',
+                    boxShadow: emailFocused ? '0 0 0 3px var(--accent-glow)' : 'none',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                    fontSize: '14px',
                   }}
                 />
               </div>
@@ -231,16 +212,12 @@ export default function LoginPage() {
               <button
                 type='submit'
                 disabled={loading}
+                className="login-btn-primary"
                 style={{
-                  width: '100%', height: '52px', borderRadius: '12px',
-                  background: '#4ADE80', color: '#FFFFFF',
-                  fontSize: '14px', fontWeight: '700', fontFamily: 'Inter, sans-serif',
-                  border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                  height: '52px',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                  opacity: loading ? 0.6 : 1, transition: 'box-shadow 0.2s, opacity 0.2s',
+                  opacity: loading ? 0.6 : 1,
                 }}
-                onMouseEnter={e => { if (!loading) (e.target as HTMLButtonElement).style.boxShadow = '0 4px 16px rgba(74,222,128,0.35)' } }
-                onMouseLeave={e => { (e.target as HTMLButtonElement).style.boxShadow = 'none' }}
               >
                 {loading ? 'Sending link...' : 'Continue'}
                 {!loading && <ArrowRight size='15' />}
@@ -248,13 +225,13 @@ export default function LoginPage() {
             </form>
           )}
 
-          {/* Success */}
+          {/* Success State */}
           {(!isDemoMode || activeTab === 'magic') && sent && (
             <div style={{ textAlign: 'center', padding: '20px 0' }}>
               <div style={{
                 width: '64px', height: '64px', borderRadius: '50%',
-                background: 'rgba(74,222,128,0.1)',
-                border: '1px solid rgba(74,222,128,0.2)',
+                background: 'rgba(74,222,128,0.10)',
+                border: '1px solid rgba(74,222,128,0.20)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 margin: '0 auto 20px',
                 position: 'relative',
@@ -262,7 +239,7 @@ export default function LoginPage() {
                 <CheckCircle size='30' style={{ color: '#4ADE80' }} />
                 <div style={{
                   position: 'absolute', inset: '-4px', borderRadius: '50%',
-                  border: '1px solid rgba(74,222,128,0.2)',
+                  border: '1px solid rgba(74,222,128,0.20)',
                   animation: 'ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
                 }} />
               </div>
@@ -280,31 +257,32 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Demo Login */}
+          {/* Demo Login Form */}
           {isDemoMode && activeTab === 'demo' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <form onSubmit={handleDemoLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {/* Floating email label */}
                 <div style={{ position: 'relative' }}>
                   <label style={{
-                    position: 'absolute', left: '14px',
+                    position: 'absolute', left: '16px',
                     top: demoEmailFocused || demoEmail ? '10px' : '50%',
                     transform: demoEmailFocused || demoEmail ? 'none' : 'translateY(-50%)',
                     fontSize: demoEmailFocused || demoEmail ? '11px' : '14px',
                     fontWeight: demoEmailFocused || demoEmail ? '600' : '400',
-                    color: demoEmailFocused ? '#4ADE80' : '#9CA3AF',
+                    color: demoEmailFocused ? 'var(--accent)' : '#9CA3AF',
                     fontFamily: 'Inter, sans-serif',
                     pointerEvents: 'none',
                     transition: 'all 0.2s',
-                    background: demoEmailFocused || demoEmail ? '#0F1117' : 'transparent',
+                    background: demoEmailFocused || demoEmail ? 'var(--bg-surface)' : 'transparent',
                     padding: demoEmailFocused || demoEmail ? '0 4px' : '0',
                   }}>
                     School owner email
                   </label>
                   <Mail size='15' style={{
-                    position: 'absolute', left: '14px', top: demoEmailFocused || demoEmail ? '14px' : '50%',
+                    position: 'absolute', left: '16px', top: demoEmailFocused || demoEmail ? '14px' : '50%',
                     transform: demoEmailFocused || demoEmail ? 'none' : 'translateY(-50%)',
-                    color: '#9CA3AF', pointerEvents: 'none',
+                    color: demoEmailFocused ? 'var(--accent)' : '#9CA3AF',
+                    pointerEvents: 'none',
                     transition: 'all 0.2s',
                   }} />
                   <input
@@ -315,12 +293,13 @@ export default function LoginPage() {
                     onFocus={() => setDemoEmailFocused(true)}
                     onBlur={() => setDemoEmailFocused(false)}
                     style={{
-                      width: '100%', height: '52px', borderRadius: '12px',
-                      background: '#0D0D0D',
-                      border: `1px solid ${demoEmailFocused ? '#4ADE80' : 'rgba(255,255,255,0.1)'}`,
+                      width: '100%', height: '52px', borderRadius: '999px',
+                      background: 'var(--bg-elevated)',
+                      border: `1px solid ${demoEmailFocused ? 'var(--accent)' : 'rgba(255,255,255,0.06)'}`,
                       color: '#FFFFFF', fontSize: '14px', fontFamily: 'Inter, sans-serif',
-                      paddingLeft: '42px', paddingRight: '16px', outline: 'none',
-                      transition: 'border-color 0.2s',
+                      paddingLeft: '44px', paddingRight: '16px', outline: 'none',
+                      boxShadow: demoEmailFocused ? '0 0 0 3px var(--accent-glow)' : 'none',
+                      transition: 'border-color 0.2s, box-shadow 0.2s',
                       paddingTop: demoEmailFocused || demoEmail ? '14px' : '0',
                     }}
                   />
@@ -329,14 +308,14 @@ export default function LoginPage() {
                 {/* PIN field */}
                 <div style={{ position: 'relative' }}>
                   <label style={{
-                    position: 'absolute', left: '14px',
+                    position: 'absolute', left: '16px',
                     top: demoPin ? '10px' : '50%',
                     transform: demoPin ? 'none' : 'translateY(-50%)',
                     fontSize: '11px', fontWeight: '600',
                     color: '#9CA3AF', fontFamily: 'Inter, sans-serif',
                     pointerEvents: 'none',
                     transition: 'all 0.2s',
-                    background: demoPin ? '#0F1117' : 'transparent',
+                    background: demoPin ? 'var(--bg-surface)' : 'transparent',
                     padding: demoPin ? '0 4px' : '0',
                   }}>
                     Demo PIN
@@ -348,9 +327,9 @@ export default function LoginPage() {
                     onChange={e => setDemoPin(e.target.value)}
                     required
                     style={{
-                      width: '100%', height: '52px', borderRadius: '12px',
-                      background: '#0D0D0D',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      width: '100%', height: '52px', borderRadius: '999px',
+                      background: 'var(--bg-elevated)',
+                      border: '1px solid rgba(255,255,255,0.06)',
                       color: '#FFFFFF', fontSize: '16px', fontWeight: '600', fontFamily: 'Inter, sans-serif',
                       textAlign: 'center', letterSpacing: '0.3em',
                       paddingLeft: '16px', paddingRight: '48px', outline: 'none',
@@ -362,7 +341,7 @@ export default function LoginPage() {
                     type='button'
                     onClick={() => setShowPin(!showPin)}
                     style={{
-                      position: 'absolute', right: '14px', top: '50%',
+                      position: 'absolute', right: '16px', top: '50%',
                       transform: 'translateY(-50%)', background: 'none',
                       border: 'none', cursor: 'pointer',
                       color: '#9CA3AF',
@@ -380,16 +359,12 @@ export default function LoginPage() {
                 <button
                   type='submit'
                   disabled={demoLoading}
+                  className="login-btn-primary"
                   style={{
-                    width: '100%', height: '52px', borderRadius: '12px',
-                    background: '#4ADE80', color: '#FFFFFF',
-                    fontSize: '14px', fontWeight: '700', fontFamily: 'Inter, sans-serif',
-                    border: 'none', cursor: demoLoading ? 'not-allowed' : 'pointer',
+                    height: '52px',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                    opacity: demoLoading ? 0.6 : 1, transition: 'box-shadow 0.2s, opacity 0.2s',
+                    opacity: demoLoading ? 0.6 : 1,
                   }}
-                  onMouseEnter={e => { if (!demoLoading) (e.target as HTMLButtonElement).style.boxShadow = '0 4px 16px rgba(74,222,128,0.35)' } }
-                  onMouseLeave={e => { (e.target as HTMLButtonElement).style.boxShadow = 'none' }}
                 >
                   {demoLoading ? 'Signing in...' : 'Demo Login'}
                   {!demoLoading && <ArrowRight size='15' />}
@@ -398,10 +373,37 @@ export default function LoginPage() {
             </div>
           )}
 
+          {/* Links */}
+          <div style={{
+            marginTop: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '16px',
+          }}>
+            <Link href='/forgot-password' style={{
+              fontSize: '13px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif',
+              textDecoration: 'none', transition: 'color 0.15s',
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#FFFFFF' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#9CA3AF' }}>
+              Forgot password?
+            </Link>
+            <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: '13px' }}>•</span>
+            <Link href='/signup' style={{
+              fontSize: '13px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif',
+              textDecoration: 'none', transition: 'color 0.15s',
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#FFFFFF' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#9CA3AF' }}>
+              Create account
+            </Link>
+          </div>
+
           {/* Sign up link */}
           <div style={{
-            marginTop: '28px',
-            padding: '14px 16px', borderRadius: '12px',
+            marginTop: '20px',
+            padding: '14px 16px', borderRadius: '999px',
             background: 'rgba(255,255,255,0.03)',
             border: '1px solid rgba(255,255,255,0.06)',
             textAlign: 'center',
@@ -410,7 +412,7 @@ export default function LoginPage() {
               fontSize: '13px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif',
             }}>
               Don&apos;t have an account?{' '}
-              <Link href='/signup' style={{ color: '#4ADE80', fontWeight: '600', textDecoration: 'none', transition: 'text-shadow 0.15s' }}
+              <Link href='/signup' style={{ color: 'var(--success)', fontWeight: '600', textDecoration: 'none', transition: 'text-shadow 0.15s' }}
               onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.textShadow = '0 0 12px rgba(74,222,128,0.6)'; el.style.textDecorationLine = 'underline' }}
               onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.textShadow = 'none'; el.style.textDecorationLine = 'none' }}>
                 Sign up
@@ -418,212 +420,17 @@ export default function LoginPage() {
             </p>
           </div>
         </div>
-
-        {/* RIGHT SIDE — blue bg, dashboard preview */}
-        <div style={{
-          flex: 1,
-          background: 'linear-gradient(135deg, #4179E8 0%, #1E5BD6 100%)',
-          padding: '40px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-          position: 'relative',
-        }}>
-          {/* LIVE DEMO badge */}
-          <div style={{
-            position: 'absolute', top: '50%', right: '24px',
-            transform: 'translateY(-50%)',
-            padding: '6px 12px', borderRadius: '20px',
-            background: 'rgba(255,255,255,0.15)',
-            border: '1px solid rgba(255,255,255,0.25)',
-            backdropFilter: 'blur(8px)',
-          }}>
-            <span style={{
-              fontSize: '11px', fontWeight: '600', color: '#FFFFFF',
-              fontFamily: 'Inter, sans-serif', letterSpacing: '0.05em',
-            }}>
-              LIVE DEMO
-            </span>
-          </div>
-
-          {/* KPI Cards Row */}
-          <div style={{
-            display: 'flex', gap: '16px', marginTop: '20px',
-          }}>
-            {[
-              { label: 'Active Students', value: '8', icon: '🎓' },
-              { label: 'Monthly Revenue', value: '$1,240', icon: '💰' },
-              { label: 'Sessions Today', value: '6', icon: '📅' },
-            ].map((kpi) => (
-              <div key={kpi.label} style={{
-                flex: 1,
-                background: 'rgba(255,255,255,0.12)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                borderRadius: '20px',
-                padding: '18px 14px',
-                backdropFilter: 'blur(12px)',
-              }}>
-                <div style={{ fontSize: '20px', marginBottom: '6px' }}>{kpi.icon}</div>
-                <div style={{
-                  fontSize: '22px', fontWeight: '700', color: '#FFFFFF',
-                  fontFamily: 'Outfit, sans-serif', marginBottom: '2px',
-                }}>
-                  {kpi.value}
-                </div>
-                <div style={{
-                  fontSize: '11px', color: 'rgba(255,255,255,0.65)',
-                  fontFamily: 'Inter, sans-serif',
-                }}>
-                  {kpi.label}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Upcoming Sessions Card */}
-          <div style={{
-            background: 'rgba(255,255,255,0.12)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            borderRadius: '20px',
-            padding: '22px',
-            backdropFilter: 'blur(12px)',
-          }}>
-            <h3 style={{
-              fontSize: '14px', fontWeight: '600', color: '#FFFFFF',
-              fontFamily: 'Inter, sans-serif', marginBottom: '14px',
-            }}>
-              Upcoming Sessions
-            </h3>
-            {[
-              { time: '9:00 AM', student: 'Alex Johnson', type: 'Road Test Prep' },
-              { time: '11:30 AM', student: 'Maria Garcia', type: 'Parallel Parking' },
-              { time: '2:00 PM', student: 'James Wilson', type: 'Highway Driving' },
-            ].map((session, i) => (
-              <div key={i} style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '10px 0',
-                borderBottom: i < 2 ? '1px solid rgba(255,255,255,0.1)' : 'none',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{
-                    width: '36px', height: '36px', borderRadius: '10px',
-                    background: 'rgba(255,255,255,0.15)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '14px',
-                  }}>
-                    {session.student.charAt(0)}
-                  </div>
-                  <div>
-                    <div style={{
-                      fontSize: '13px', fontWeight: '600', color: '#FFFFFF',
-                      fontFamily: 'Inter, sans-serif',
-                    }}>
-                      {session.student}
-                    </div>
-                    <div style={{
-                      fontSize: '11px', color: 'rgba(255,255,255,0.55)',
-                      fontFamily: 'Inter, sans-serif',
-                    }}>
-                      {session.type}
-                    </div>
-                  </div>
-                </div>
-                <div style={{
-                  fontSize: '12px', fontWeight: '500', color: 'rgba(255,255,255,0.7)',
-                  fontFamily: 'Inter, sans-serif',
-                }}>
-                  {session.time}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Recent Activity */}
-          <div style={{
-            background: 'rgba(255,255,255,0.12)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            borderRadius: '20px',
-            padding: '22px',
-            backdropFilter: 'blur(12px)',
-          }}>
-            <h3 style={{
-              fontSize: '14px', fontWeight: '600', color: '#FFFFFF',
-              fontFamily: 'Inter, sans-serif', marginBottom: '14px',
-            }}>
-              Recent Activity
-            </h3>
-            {[
-              { text: 'New booking from Sarah Miller', time: '2 min ago' },
-              { text: 'Payment received — $120', time: '15 min ago' },
-              { text: 'Session completed with Tom Lee', time: '1 hour ago' },
-            ].map((item, i) => (
-              <div key={i} style={{
-                display: 'flex', alignItems: 'center', gap: '10px',
-                padding: '8px 0',
-                borderBottom: i < 2 ? '1px solid rgba(255,255,255,0.1)' : 'none',
-              }}>
-                <div style={{
-                  width: '6px', height: '6px', borderRadius: '50%',
-                  background: '#4ADE80', flexShrink: 0,
-                }} />
-                <span style={{
-                  fontSize: '12px', color: 'rgba(255,255,255,0.8)',
-                  fontFamily: 'Inter, sans-serif',
-                }}>
-                  {item.text}
-                </span>
-                <span style={{
-                  fontSize: '11px', color: 'rgba(255,255,255,0.4)',
-                  fontFamily: 'Inter, sans-serif', marginLeft: 'auto',
-                }}>
-                  {item.time}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* Bottom branding */}
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: '8px',
-            marginTop: 'auto', paddingTop: '8px',
-          }}>
-            <div style={{
-              width: '24px', height: '24px', borderRadius: '7px',
-              background: 'rgba(255,255,255,0.2)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <svg width='12' height='12' viewBox='0 0 16 16' fill='none'>
-                <path d="M8 2L13 5.5H3L8 2Z" fill='white' />
-                <path d="M3 5.5V10.5L8 14V8.5H13V5.5H3Z" fill='white' fillOpacity='0.7' />
-              </svg>
-            </div>
-            <span style={{
-              fontSize: '13px', fontWeight: '600', color: 'rgba(255,255,255,0.7)',
-              fontFamily: 'Outfit, sans-serif',
-            }}>
-              The Driving Center
-            </span>
-          </div>
-        </div>
       </div>
 
       <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(16px); }
           to { opacity: 1; transform: translateY(0); }
         }
         @keyframes ping {
           75%, 100% {
             transform: scale(1.4);
             opacity: 0;
-          }
-        }
-        @media (max-width: 768px) {
-          .split-container {
-            flex-direction: column !important;
-          }
-          .right-side {
-            display: none !important;
           }
         }
       `}</style>
