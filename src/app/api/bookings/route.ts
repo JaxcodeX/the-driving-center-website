@@ -2,26 +2,27 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
+import { validateRequired, validatePositiveInt } from '@/lib/validation'
 
 // ── POST /api/bookings ─────────────────────────────────────────────────
 export async function POST(request: Request) {
   const body = await request.json()
   const { session_id, session_date, session_time, student_name, student_email, student_phone } = body
 
-  if (!session_date || !session_time || !student_name || !student_email) {
-    return NextResponse.json(
-      { error: 'session_date, session_time, student_name, and student_email are required' },
-      { status: 400 }
-    )
+  // ── Input validation ──
+  try {
+    validateRequired(body, ['session_date', 'session_time', 'student_name', 'student_email'])
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 400 })
   }
 
-  // Permissive email validation — accept any RFC 5321-compatible format
+  // Email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
   if (!emailRegex.test(student_email)) {
     return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
   }
 
-  // Permissive phone validation — accept any format with at least 10 digits
+  // Phone digits check
   if (student_phone) {
     const digits = student_phone.replace(/\D/g, '')
     if (digits.length < 10) {
@@ -29,14 +30,11 @@ export async function POST(request: Request) {
     }
   }
 
-  // Use any to bypass Supabase generated types that don't match actual DB schema
-  // Actual DB: sessions has id, school_id, seats_booked, max_seats, session_type_id
   const admin: any = getSupabaseAdmin()
-  let sessionSchoolId: string | null = null
-  let sessionTypeId: string | null = null
-  let sessionInstructorId: string | null = null
   let depositAmount = 2500
+  let sessionSchoolId: string | null = null
 
+  // Resolve session metadata (deposit amount, school) before atomic booking
   if (session_id) {
     const { data: rawSession } = await admin
       .from('sessions')
@@ -45,26 +43,24 @@ export async function POST(request: Request) {
       .eq('status', 'scheduled')
       .single()
 
-    if (!rawSession) return NextResponse.json({ error: 'Session not found or not available' }, { status: 404 })
-    if (rawSession.seats_booked >= rawSession.max_seats) {
-      return NextResponse.json({ error: 'This session is fully booked' }, { status: 409 })
+    if (!rawSession) {
+      return NextResponse.json({ error: 'Session not found or not available' }, { status: 404 })
     }
 
     sessionSchoolId = rawSession.school_id
-    sessionTypeId = rawSession.session_type_id
-    sessionInstructorId = rawSession.instructor_id ?? null
 
-    if (sessionTypeId) {
+    // Get deposit from session type
+    if (rawSession.session_type_id) {
       const { data: st } = await admin
         .from('session_types')
         .select('deposit_cents')
-        .eq('id', sessionTypeId)
+        .eq('id', rawSession.session_type_id)
         .maybeSingle()
       if (st?.deposit_cents) depositAmount = st.deposit_cents
     }
   }
 
-  // Check for duplicate booking
+  // Check for duplicate booking (idempotency)
   const { data: existing } = await admin
     .from('bookings')
     .select('id')
@@ -73,42 +69,59 @@ export async function POST(request: Request) {
     .eq('student_email', student_email)
     .in('status', ['pending', 'confirmed'])
     .single()
-  if (existing) return NextResponse.json({ error: 'You have already booked this session' }, { status: 409 })
+  if (existing) {
+    return NextResponse.json({ error: 'You have already booked this session' }, { status: 409 })
+  }
 
   const bookingToken = crypto.randomUUID()
+  const status = depositAmount > 0 ? 'pending' : 'confirmed'
+  const paymentStatus = depositAmount > 0 ? 'pending' : 'paid'
 
-  const insertPayload: Record<string, unknown> = {
-    student_name,
-    student_email,
-    student_phone: student_phone ?? null,
-    session_date,
-    session_time,
-    status: depositAmount > 0 ? 'pending' : 'confirmed',
-    booking_token: bookingToken,
-    confirmation_token: bookingToken,  // FIX: was missing — confirmations looked up by confirmation_token
-    payment_status: depositAmount > 0 ? 'pending' : 'paid',
-    deposit_amount_cents: depositAmount,
+  // ── Atomic seat booking via PostgreSQL function (race-condition safe) ──
+  // book_seat() acquires a row lock on the session, checks seats, inserts booking,
+  // and increments seats_booked — all in one atomic transaction.
+  let bookingId: string
+  try {
+    const { data, error: rpcError } = await admin.rpc('book_seat', {
+      p_session_id: session_id ?? null,
+      p_student_name: student_name,
+      p_student_email: student_email,
+      p_student_phone: student_phone ?? null,
+      p_session_date: session_date,
+      p_session_time: session_time,
+      p_status: status,
+      p_payment_status: paymentStatus,
+      p_deposit_cents: depositAmount,
+      p_school_id: sessionSchoolId,
+      p_session_type_id: null,
+      p_instructor_id: null,
+      p_booking_token: bookingToken,
+    })
+
+    if (rpcError) {
+      // PostgreSQL raised an exception
+      const msg = (rpcError as any).message ?? ''
+      if (msg.includes('SESSION_FULL')) {
+        return NextResponse.json({ error: 'This session is fully booked' }, { status: 409 })
+      }
+      if (msg.includes('SESSION_NOT_FOUND')) {
+        return NextResponse.json({ error: 'Session not found or not available' }, { status: 404 })
+      }
+      console.error('book_seat RPC error:', rpcError)
+      return NextResponse.json({ error: 'Booking failed — please try again' }, { status: 500 })
+    }
+
+    bookingId = data as string
+  } catch (e) {
+    console.error('book_seat exception:', e)
+    return NextResponse.json({ error: 'Booking failed — please try again' }, { status: 500 })
   }
-  if (session_id) insertPayload.session_id = session_id
-  if (sessionSchoolId) insertPayload.school_id = sessionSchoolId
-  if (sessionTypeId) insertPayload.session_type_id = sessionTypeId
-  if (sessionInstructorId) insertPayload.instructor_id = sessionInstructorId
 
-  const { data: booking, error: bookingError } = await admin
-    .from('bookings')
-    .insert(insertPayload)
-    .select()
-    .single()
-
-  if (bookingError) {
-    console.error('Booking insert error:', bookingError)
-    return NextResponse.json({ error: bookingError.message }, { status: 500 })
-  }
-
+  // Audit log
   if (sessionSchoolId) {
     await admin.from('audit_logs').insert(
       auditLog('BOOKING_CREATED', student_email, {
-        booking_id: booking.id,
+        booking_id: bookingId,
         session_id: session_id ?? null,
         school_id: sessionSchoolId,
         deposit_cents: depositAmount,
@@ -117,7 +130,7 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({
-    booking_id: booking.id,
+    booking_id: bookingId,
     booking_token: bookingToken,
     status: depositAmount > 0 ? 'pending_payment' : 'confirmed',
     deposit_amount_cents: depositAmount,

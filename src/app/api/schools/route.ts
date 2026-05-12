@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { createClient } from '@/lib/supabase/server'
+import { validateRequired } from '@/lib/validation'
 import Stripe from 'stripe'
 
 export async function GET() {
@@ -16,6 +17,7 @@ export async function GET() {
 // Auth: DEMO_MODE skips auth (open demo signups). Non-demo REQUIRES Bearer token.
 export async function POST(request: Request) {
   const body = await request.json()
+  validateRequired(body, ['schoolName', 'email'])
   const { schoolName, ownerName, email, phone, state } = body
 
   if (!schoolName || !email) {

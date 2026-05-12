@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 import { auditLog } from '@/lib/security'
+import { validateRequired } from '@/lib/validation'
 import type { Instructor } from '@/lib/supabase/types'
 
 export async function GET(request: Request) {
@@ -39,9 +40,8 @@ export async function POST(request: Request) {
   if (!schoolId) return new NextResponse('Missing x-school-id', { status: 400 })
 
   const body = await request.json()
+  validateRequired(body, ['name'])
   const { name, email, phone, license_number, license_expiry } = body
-
-  if (!name) return new NextResponse('Name required', { status: 400 })
 
   const supabaseAdmin = getSupabaseAdmin()
   const { data: instructor, error } = await (supabaseAdmin as any)

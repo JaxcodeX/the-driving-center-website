@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 import { encryptField, decryptField, validateDOB, validatePermitNumber, validateEmail, validatePhone, auditLog } from '@/lib/security'
 import { isLikelyValidEmail } from '@/lib/email'
+import { validateRequired } from '@/lib/validation'
 import type { StudentsDriverEd, AuditLog } from '@/lib/supabase/types'
 
 // Workaround: Supabase-generated types only include tables known at codegen time.
@@ -84,7 +85,9 @@ export async function POST(request: Request) {
     .single()
   if (!school) return new NextResponse('Forbidden', { status: 403 })
 
-  const { legal_name, dob, permit_number, parent_email, emergency_contact_name, emergency_contact_phone } = await request.json()
+  const body = await request.json()
+  validateRequired(body, ['legal_name', 'dob'])
+  const { legal_name, dob, permit_number, parent_email, emergency_contact_name, emergency_contact_phone } = body
 
   if (!legal_name || !dob) {
     return NextResponse.json({ error: 'legal_name and dob are required' }, { status: 400 })

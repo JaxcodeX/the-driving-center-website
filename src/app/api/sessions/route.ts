@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import { auditLog } from '@/lib/security'
+import { validateRequired } from '@/lib/validation'
 
 // ── GET /api/sessions?school_id=X ──────────────────────────────────────
 export async function GET(request: Request) {
@@ -37,11 +38,8 @@ export async function GET(request: Request) {
 // ── POST /api/sessions ─────────────────────────────────────────────────
 export async function POST(request: Request) {
   const body = await request.json()
+  validateRequired(body, ['start_date', 'end_date', 'max_seats'])
   const { start_date, end_date, instructor_id, max_seats, price_cents, location, session_type_id } = body
-
-  if (!start_date || !end_date || !max_seats) {
-    return NextResponse.json({ error: 'start_date, end_date, and max_seats are required' }, { status: 400 })
-  }
 
   const admin: any = getSupabaseAdmin()
   let schoolId = request.headers.get('x-school-id')
