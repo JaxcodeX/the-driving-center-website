@@ -31,20 +31,20 @@ type CurrentView = 'tasks' | 'office'
 
 // ── Design Tokens ────────────────────────────────────────────────────
 const TOKENS = {
-  bg: '#0F0F0F',
-  surface: '#1A1A1A',
-  border: 'rgba(255,255,255,0.06)',
-  textPrimary: '#FFFFFF',
-  textSecondary: '#94A3B8',
-  textMuted: '#64748B',
-  blue: '#006FFF',
-  purple: '#818CF8',
-  red: '#EF4444',
-  amber: '#F59E0B',
-  emerald: '#10B981',
-  cyan: '#22D3EE',
-  violet: '#A78BFA',
-  orange: '#F97316',
+  bg: 'var(--mc-bg)',
+  surface: 'var(--mc-surface)',
+  border: 'var(--glass-border)',
+  textPrimary: 'var(--text-primary)',
+  textSecondary: 'var(--text-secondary)',
+  textMuted: 'var(--text-muted)',
+  blue: 'var(--status-blue)',
+  purple: 'var(--status-purple)',
+  red: 'var(--status-red)',
+  amber: 'var(--status-amber)',
+  emerald: 'var(--status-emerald)',
+  cyan: 'var(--status-cyan)',
+  violet: 'var(--status-violet)',
+  orange: 'var(--status-orange)',
 }
 
 // ── Column Config ────────────────────────────────────────────────────
