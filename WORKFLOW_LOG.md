@@ -445,6 +445,26 @@ Root has 6 files (was 13+):
 
 **ALL 4 PHASES COMPLETE. Build clean.**
 
+### Phase 5 Refactor — CSS Variables Applied to Pages (2026-05-12)
+
+Pages refactored (hardcoded hex → CSS variables):
+- `page.tsx` — 163 style={} occurrences, committed 3748dc1
+- `billing/page.tsx` — 46 style={} occurrences, committed 22f6be4
+- `mission-control/page.tsx` — 77 style={} occurrences, committed d5d2051
+
+Other pages with significant inline styles (not yet refactored):
+- `school-admin/page.tsx` — 138
+- `demo/page.tsx` — 130
+- `book/page.tsx` — 121
+- `school-admin/students/page.tsx` — 97
+- `school-admin/sessions/page.tsx` — 80
+- `login/page.tsx` — 66
+- `school/[slug]/page.tsx` — 63
+- `signup/page.tsx` — 62
+- `school-admin/instructors/page.tsx` — 62
+
+Recommendation: Next FSO session or deep work window should finish the remaining pages. The shared token infrastructure is in place — remaining pages follow the same pattern.
+
 ### Phase 4 — Extended Palette Added (2026-05-12)
 
 - Added extended palette CSS vars to globals.css for all 12 colors previously missing from page.tsx
