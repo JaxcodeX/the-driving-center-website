@@ -1,162 +1,164 @@
-# SPEC — Landing Page Redesign
-# DesignJoy Reference Implementation
+# SPEC — Full Redesign: Dark Premium (DesignJoy-Inspired)
+# The Driving Center SaaS
 
-## Reference Screens Analyzed
-- `design1.png` — SaaS split-screen login/signup (EASY-O dashboard)
-- `design2.png` — SaaS split-screen login/signup (EASY-O dashboard)
-- `design3.png` — Dark landing page (Calendr.com, dark mode)
-- `design4.png` — Dark calendar dashboard (beatgig)
-- `design5.png` — DesignJoy landing page (light, mesh gradients)
-- `design6.png` — DesignJoy hero section (warm off-white)
-- `design7.png` — DesignJoy membership benefits (mesh gradient cards)
-- `design8.png` — DesignJoy testimonials (editorial serif typography)
-- `design9.png` — DesignJoy booking page (dark with candy color accents)
-
-## Design Direction: "Warm Premium Dark-Light Hybrid"
-Take DesignJoy's premium warmth + generous whitespace, adapt for a driving school SaaS.
-Not a dark-only site. Not flat corporate blue. Warm, confident, premium.
+## Reference: DesignJoy Screenshots
+- Hero: Massive editorial typography, asymmetric split, floating glassmorphic card with mesh gradient, generous whitespace
+- Process: Three-column Subscribe/Request/Receive cards with product mockups inside
+- Benefits: Editorial serif italic headlines, vibrant mesh gradient feature cards
+- Booking: True black (#000000), neon accent colors (pink/blue/green), pill-shaped UI
+- Login: Dark glassmorphic modal, frosted glass blur, subtle mesh gradient background
+- Admin dashboard: Dark glassmorphic, frosted glass overlays, clean data cards
 
 ---
 
-## Global Design Tokens
+## DESIGN DIRECTION: Dark Premium
 
-### Colors — Warm Mode (default for landing)
-```css
---bg-base: #F5F4F0;           /* Warm off-white (DesignJoy "paper" background) */
---bg-surface: #FFFFFF;         /* Pure white for cards */
---bg-dark: #0B0B0E;            /* Near-black for dark sections */
---text-primary: #0A0A0A;       /* Deep charcoal (not pure black) */
---text-secondary: #6B6B6B;      /* Muted gray */
---text-muted: #9B9B9B;         /* Light gray */
---border: rgba(0,0,0,0.08);     /* Very subtle borders */
---accent: #1A56FF;              /* Keep blue accent */
---accent-secondary: #F97316;   /* Vibrant orange */
---success: #16A34A;
+### Philosophy
+- True black background (#000000) for maximum depth
+- Vibrant accent colors pop against black — like neon signs
+- Editorial typography creates premium feel
+- Generous whitespace (negative space = confidence)
+- Glassmorphic cards with subtle blur for depth
+- Mesh gradient accents for energy without overwhelming
+
+---
+
+## COLOR PALETTE (Dark Only)
+
+```
+--bg-base: #000000           /* True black */
+--bg-surface: #0F0F0F         /* Card backgrounds */
+--bg-elevated: #141414        /* Elevated elements */
+--text-primary: #FFFFFF       /* White */
+--text-secondary: #9CA3AF      /* Muted */
+--text-muted: #6B7280         /* Dim */
+--border: rgba(255,255,255,0.06)
+--border-hover: rgba(255,255,255,0.12)
+
+--accent: #1A56FF             /* Vibrant blue (primary CTA) */
+--accent-glow: rgba(26,86,255,0.20)
+--accent-secondary: #F97316   /* Vibrant orange */
+--success: #4ADE80            /* Green */
+--danger: #EF4444             /* Red */
+--warning: #F59E0B            /* Amber */
+
+--admin-bg: #000000
+--admin-surface: #0F0F0F
+--admin-elevated: #141414
+--admin-border: rgba(255,255,255,0.06)
+--admin-accent: #4ADE80
+--admin-accent-secondary: #3B82F6
+
+/* Mesh gradient accents */
+--mesh-purple: #8B5CF6
+--mesh-pink: #EC4899
+--mesh-blue: #3B82F6
+--mesh-orange: #F97316
+--mesh-yellow: #FACC15
 ```
 
-### Dark Sections (for contrast blocks)
-```css
---dark-bg: #0B0B0E;
---dark-surface: #131316;
---dark-border: rgba(255,255,255,0.07);
---dark-text: #FFFFFF;
---dark-text-secondary: #8A8F98;
-```
+---
+
+## LANDING PAGE
 
 ### Typography
-- **Display:** Inter 800 weight, massive size (clamp 56px–96px), tight letter-spacing (-0.03em)
-- **Headlines:** Inter 700, large, tight letter-spacing
-- **Emphasis words:** Inter italic or serif italic for accent words in headlines (like DesignJoy)
-- **Body:** Inter 400, generous line-height (1.7), comfortable size (16-17px)
-- **Labels:** Inter 500-600, small, uppercase, wide letter-spacing (0.08em)
+- **Display:** Inter 800, clamp(56px, 7vw, 88px), letter-spacing -0.03em, line-height 1.0
+- **Headlines:** Outfit 700, 36-48px, letter-spacing -0.02em
+- **Body:** Inter 400, 17px, line-height 1.7, text-secondary color
+- **Labels:** Inter 600, 12px, all-caps, letter-spacing 0.08em
 
-### Spacing System
-- Section padding: 100px–140px vertical (massive whitespace)
-- Container max-width: 1100px (centered)
-- Card gap: 24px
-- Generous margins between elements within sections
+### Hero Section
+- **Background:** True black (#000000) with subtle mesh gradient overlay (purple top-left, pink bottom-right at low opacity)
+- **Headline:** Massive (clamp 56-88px), Inter 800, tight tracking. Punchy, benefit-driven. NO cheesy "get paid" language.
+- **Accent word in headline:** Italic or gradient-colored word for emphasis
+- **Subheadline:** 18px, text-secondary, max 50ch, short and punchy
+- **CTA:** Pill button, accent blue, arrow icon
+- **Floating card (right side):** Glassmorphic card with mesh gradient header strip, soft shadow, showing admin dashboard preview inside
+- **Navbar:** Fixed, transparent, logo left, nav links center, CTA right
 
-### Border Radius
-- Cards: 20px (DesignJoy "squircle" feel)
-- Buttons: 999px (pill)
-- Inputs: 999px (pill)
-- Feature cards: 20px
+### Features Section
+- **Section header:** Large, centered, Inter 700
+- **Cards:** 3-column grid, dark surface, subtle border, mesh gradient strip at top of each card
+- **Icon + title + 2-line description per card**
 
-### Shadows
-- Cards: `0 8px 40px rgba(0,0,0,0.08)` (light), `0 8px 40px rgba(0,0,0,0.3)` (dark bg)
-- Soft, large radius, low opacity — not harsh
+### Process Section
+- **Three columns:** Subscribe → Request → Receive
+- **Each card:** Dark surface, large number, title, short description, product preview mockup
 
----
+### Social Proof
+- Muted brand logo strip (grayscale, 40% opacity)
+- Large testimonial cards with serif italic quotes
 
-## Section-by-Section Implementation
-
-### 1. Navbar (transparent, sticky)
-- Logo left: "The Driving Center" text mark or small icon + wordmark
-- Nav center (desktop): Features, Pricing, FAQ (text links, no background)
-- Right: "Login" (text link) + "Start free trial" (pill button, dark fill)
-- On scroll: add subtle backdrop blur or border-bottom
-- Height: 64px
-
-### 2. Hero Section (light/warm bg)
-- **Layout**: Asymmetric — headline left, feature card right (like DesignJoy hero)
-- **Eyebrow**: Small pill badge "Scheduling Software for Driving Schools"
-- **Headline**: Two-line massive headline (80px+) using gradient-text for key word
-  - "The simplest way to run your driving school"
-- **Subheadline**: 1-2 lines, text-secondary color, 18px
-- **CTA row**: Primary "Start free trial" (dark pill) + Secondary "See demo" (outlined pill)
-- **Trust line**: Small gray text below CTAs — "Trusted by 50+ driving schools"
-- **Right side**: Feature highlight card (bento-style) with mesh gradient background showing dashboard preview or abstract graphic
-- **Spacing**: Massive — top 120px padding, bottom 80px
-
-### 3. Features Section (bento grid, light bg)
-- **Layout**: Bento asymmetric grid — 2 large cards + 3 small metric cards
-- **Background**: Warm off-white (--bg-base)
-- **Section label**: Small eyebrow text "EVERYTHING YOUR SCHOOL NEEDS"
-- **Feature cards**: 
-  - Glassmorphism with warm tint + subtle shadow
-  - Icon at top (Lucide icon, 24px)
-  - Bold title + description
-  - Feature 1 (large): Online Booking
-  - Feature 2 (large): Automated Reminders
-  - Features 3-6 (small): Student Tracking, Stripe Billing, Instructor Management, Multi-tenant Security
-- **Small metric cards**: Show "50+ schools", "10,000+ sessions booked" with large bold numbers
-
-### 4. How It Works (dark bg section)
-- **Background**: Dark (#0B0B0E) for contrast
-- **Layout**: Centered, 3 steps horizontal
-- **Step cards**: Dark glassmorphism card per step
-  - Large step number (muted, huge 80px)
-  - Step title
-  - Step description
-- **Visual style**: Clean, minimal, high contrast white text on dark
-- **Spacing**: 100px+ vertical padding
-
-### 5. Testimonials / Social Proof (light bg, editorial)
-- **Background**: Warm off-white
-- **Layout**: Large quote centered, editorial serif italic typography
-- **Quote**: Huge serif italic quote text
-- **Attribution**: Name + school below in small caps
-- **Style**: Magazine editorial layout, not card-based grid
-
-### 6. Pricing (light bg)
-- **Background**: Warm off-white
-- **Layout**: 3-column grid, center tier highlighted
-- **Cards**: White cards with soft shadow, large rounded corners (20px)
-- **Middle card**: Dark fill, white text, "Most Popular" pill badge
-- **Cards should look like DesignJoy pricing**: large numbers, clear feature lists, pill CTAs
-
-### 7. CTA Section (dark bg)
-- **Background**: Dark (#0B0B0E)
-- **Layout**: Centered, single headline + subheadline + CTAs
-- **Text**: Large, white, centered
-- **CTAs**: Primary pill (white fill, dark text) + Secondary pill (outlined white)
-
-### 8. Footer
-- **Background**: Dark border top on warm off-white
-- **Layout**: Simple centered footer with logo + links
+### CTA Section
+- **Background:** #0F0F0F or mesh-subtle gradient
+- **Massive centered headline, single pill CTA**
 
 ---
 
-## Animation & Micro-interactions
-- Cards: subtle translateY(-4px) + shadow deepen on hover
-- Buttons: scale(0.98) on press, slight glow on hover
-- Scroll: fade-up animation on sections entering viewport (IntersectionObserver)
-- FAQ accordion: smooth height transition
+## LOGIN PAGE
 
-## Implementation Order
-1. Design tokens in globals.css (warm palette + dark palette)
-2. Navbar component
-3. Hero section (with bento card right side)
-4. Features bento grid
-5. How It Works (dark section)
-6. Testimonials (editorial)
-7. Pricing cards
-8. CTA section (dark)
-9. Footer
+### Design
+- **Background:** #000000 with mesh gradient radial blurs (purple top-left, pink bottom-right, blue center)
+- **Modal:** Centered glassmorphic card, backdrop-blur 32px, soft white border glow
+- **Logo:** Top center
+- **Headline:** "Welcome back" or similar, Inter 700
+- **Inputs:** Dark fill (#0F0F0F), subtle border, pill-shaped, focus glow in accent color
+- **Primary CTA:** White solid button (high contrast against dark)
+- **Social login:** Google button, pill-shaped, same style as inputs
+- **Links:** "Forgot password?", "Create account" — text-secondary, small
 
-## Build Rules
-- `npm run build` must pass after each section
-- Use existing design system classes where possible (`glass-card`, `btn-glow`, etc.)
-- Do NOT modify API routes or database schemas
-- Font: Inter is already loaded via next/font in layout.tsx — use it
-- For serif: import Playfair Display from Google Fonts for editorial quotes
+---
+
+## SCHOOL ADMIN — ALL PAGES (Consistent Design)
+
+### Sidebar (shared across ALL admin pages)
+- **Background:** #0F0F0F, 240px wide, fixed left
+- **Logo at top**
+- **Nav items:** Icon + label, full width, 44px height
+- **Active state:** Left border accent, slightly lighter background
+- **Hover:** Subtle background change
+- **Bottom:** User avatar + name
+
+### Top Bar (shared across ALL admin pages)
+- **Page title:** Left side, Outfit 600, 24px
+- **Right:** Notification bell, user avatar
+- **Background:** transparent (content area is dark)
+
+### Content Area
+- **Background:** #000000
+- **Max-width:** 1200px, padding 32px
+- **Cards:** #0F0F0F, border 1px rgba(255,255,255,0.06), border-radius 16px
+
+### ALL Sub-pages MUST match:
+`/school-admin` + `/students` + `/instructors` + `/sessions` + `/calendar` + `/billing` + `/profile` + `/availability` + `/ops` + `/import`
+
+### Component Standards
+- **Buttons:** Pill-shaped (border-radius 999px)
+- **Tables:** Dark header (#141414), hover rows, status pills in cells
+- **Forms:** admin-input class, consistent focus states
+- **Modals:** Glassmorphic overlay, centered, blur backdrop
+
+---
+
+## ARCHITECTURE
+
+### Shared Components to Build
+- `@/components/admin/Sidebar.tsx` — reusable sidebar
+- `@/components/admin/TopBar.tsx` — reusable top bar
+- `@/components/ui/GlassCard.tsx` — already exists
+- `@/components/ui/Button.tsx` — already exists
+- `@/components/ui/StatusPill.tsx` — already exists
+
+### CSS Classes
+All utility classes already in globals.css: `.glass-card`, `.admin-sidebar`, `.admin-card`, `.admin-input`, `.btn-pill`, `.status-pill`, `.login-bg`, `.login-modal`, `.hero-gradient`, `.mesh-gradient`, `.mesh-subtle`
+
+### Rules
+- NO hardcoded colors — use CSS variables or globals.css classes
+- All admin pages use shared Sidebar + TopBar components
+- Landing page uses landing-* utility classes from globals.css
+
+---
+
+## MISSION CONTROL
+- Stays dark, separate from admin design
+- Not part of this redesign
