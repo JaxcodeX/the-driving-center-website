@@ -379,3 +379,76 @@ Booking confirmed in DB with booking_token = confirmation_token ✅
 | Sessions table has no `start_time` column | Slot times default to '09:00' — needs schema change |
 | Email templates hardcoded "The Driving Center SaaS" in footer | Cosmetic — not blocking |
 
+
+## Phase 2 — Spec Files Cleaned (2026-05-12)
+
+**Implemented by:** Everest
+**Result:** ✅ Passed — committed
+
+### What was done
+
+Archived 7 stale spec/documentation files into `docs/archived/`:
+- `SPEC_ADMIN_GLASS_DARK.md` (May 4, 2026 — superseded by SPEC_FULL_REDESIGN.md)
+- `SPEC_DARK_MESH.md` (May 3, 2026 — design reference only)
+- `SPEC_DARK_REDESIGN.md` (May 3, 2026 — superseded)
+- `SPEC_DEMO_POLISH.md` (May 4, 2026 — session-specific, not ongoing)
+- `SPEC_FOUNDATION_FIX.md` (May 3, 2026 — superseded)
+- `AUDIT.md` (not a spec — documentation)
+- `BLUEPRINT.md` (not a spec — documentation)
+
+### Root cause
+WORKFLOW_LOG.md shows 8 stale specs were deleted in Cycle 6 and 8 more in Cycle 8 — but new ones kept getting created per-session without cleaning up old ones. The archive accumulated 6 more since then.
+
+### Lesson
+Every new SPEC.md written should explicitly supersede or replace the previous one. The author of the new spec is responsible for archiving the old one.
+
+### Current state
+Root has 6 files (was 13+):
+- `CLAUDE.md` — source of truth for workflow
+- `STATUS.md` — build state + what works/pending
+- `WORKFLOW_LOG.md` — every cycle logged
+- `SPEC_FULL_REDESIGN.md` — current active spec (most recent)
+- `ACTUAL_SCHEMA.md` — DB schema verified
+- `README.md` — project overview
+
+---
+
+
+## Phase 4 — Design Consistency + Full Audit Complete (2026-05-12)
+
+**Implemented by:** Everest
+**Result:** ✅ Passed — build clean, all phases executed
+
+### What was done
+
+**Phase 1 — Shared UI Components:**
+- Created `src/components/ui/` with `tokens.ts`, `GlassCard.tsx`, `StatusPill.tsx`, `Button.tsx`
+- All design tokens mapped from hardcoded hex → CSS variables
+- Build: ✅ 0 errors, 22 routes
+
+**Phase 2 — Spec File Cleanup:**
+- Archived 7 stale files to `docs/archived/`: SPEC_ADMIN_GLASS_DARK.md, SPEC_DARK_MESH.md, SPEC_DARK_REDESIGN.md, SPEC_DEMO_POLISH.md, SPEC_FOUNDATION_FIX.md, AUDIT.md, BLUEPRINT.md
+- Root reduced from 13+ files to 6: CLAUDE.md, STATUS.md, WORKFLOW_LOG.md, SPEC_FULL_REDESIGN.md, ACTUAL_SCHEMA.md, README.md
+
+**Phase 3 — DB Verification:**
+- Verified `deposit_paid_at` not referenced in active API routes (STATUS.md warning was stale)
+- `start_time` confirmed in `instructor_availability` table only, not in `sessions` table
+- Booking confirmation flow uses correct `booking_token` + `confirmation_token` dual-lookup
+- `mc_activity_log` table confirmed present
+
+**Phase 4 — Build Verification:**
+- Build: ✅ 0 errors, 0 warnings (just Turbopack deprecation notice about middleware→proxy)
+- All 22 routes compile and deploy
+- No TypeScript errors
+
+---
+
+**ALL 4 PHASES COMPLETE. Build clean.**
+
+### Phase 4 — Extended Palette Added (2026-05-12)
+
+- Added extended palette CSS vars to globals.css for all 12 colors previously missing from page.tsx
+- Colors now have semantic names: `--gray-50` through `--green-600`, plus `--status-*` for kanban colors
+- mission-control exact palette mapped: `--mc-bg: #0F0F0F`, `--mc-surface: #1A1A1A`
+- Build: ✅ 0 errors
+

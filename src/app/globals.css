@@ -36,6 +36,36 @@
   --pricing-bg: #0F1117;
   --purple-glow: rgba(45,27,78,0.5);
   --indigo-glow: rgba(26,26,59,0.5);
+  /* ── Extended palette (page.tsx, billing, mission-control) ── */
+  --gray-50: #0A0A0F;
+  --gray-100: #0B0C10;
+  --gray-200: #0D1017;
+  --gray-300: #13161F;
+  --gray-400: #1A1A1A;
+  --gray-500: #1A1A3B;
+  --gray-600: #2A2A3A;
+  --gray-700: #52525B;
+  --gray-800: #71717A;
+  --red-500: #EF4444;
+  --orange-500: #F97316;
+  --amber-500: #F59E0B;
+  --yellow-500: #FACC15;
+  --yellow-600: #FBBF24;
+  --green-500: #4ADE80;
+  --green-600: #22C55E;
+  /* ── Mission Control palette (exact values from mc/page.tsx) ── */
+  --mc-bg: #0F0F0F;
+  --mc-surface: #1A1A1A;
+  /* ── Status colors (shared across all surfaces) ── */
+  --status-blue: #006FFF;
+  --status-purple: #818CF8;
+  --status-red: #EF4444;
+  --status-amber: #F59E0B;
+  --status-emerald: #10B981;
+  --status-cyan: #22D3EE;
+  --status-violet: #A78BFA;
+  --status-orange: #F97316;
+  /* ── Kanban column colors (mission-control) ── */
 }
 
 [data-theme="light"] {
