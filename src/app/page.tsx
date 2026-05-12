@@ -54,9 +54,9 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
     <p style={{
       display: 'inline-flex', alignItems: 'center', gap: '8px',
       fontSize: '12px', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase',
-      color: '#4ADE80', marginBottom: '16px',
+      color: 'var(--accent)', marginBottom: '16px',
     }}>
-      <span style={{ display: 'block', width: '20px', height: '2px', background: '#4ADE80', borderRadius: '2px' }} />
+      <span style={{ display: 'block', width: '20px', height: '2px', background: 'var(--accent)', borderRadius: '2px' }} />
       {children}
     </p>
   )
@@ -66,7 +66,7 @@ function SectionHeadline({ children, mb = '16px', ta = 'left' as const }: { chil
   return (
     <h2 style={{
       fontSize: 'clamp(36px, 4vw, 48px)', fontFamily: "'Outfit', sans-serif", fontWeight: '700',
-      color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: '1.15',
+      color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: '1.15',
       marginBottom: mb, textAlign: ta,
     }}>
       {children}
@@ -77,7 +77,7 @@ function SectionHeadline({ children, mb = '16px', ta = 'left' as const }: { chil
 function SectionSub({ children, ta = 'left' as const, mb = '48px' }: { children: React.ReactNode; ta?: 'left' | 'center'; mb?: string }) {
   return (
     <p style={{
-      fontSize: '17px', color: '#9CA3AF', lineHeight: '1.7',
+      fontSize: '17px', color: 'var(--text-secondary)', lineHeight: '1.7',
       marginBottom: mb, textAlign: ta,
     }}>
       {children}
@@ -104,7 +104,7 @@ function Navbar() {
       background: scrolled ? 'rgba(5,5,5,0.8)' : 'rgba(5,5,5,0)',
       backdropFilter: scrolled ? 'blur(20px)' : 'none',
       WebkitBackdropFilter: scrolled ? 'blur(20px)' : 'none',
-      borderBottom: scrolled ? '1px solid #1A1A1A' : '1px solid transparent',
+      borderBottom: scrolled ? '1px solid var(--gray-400)' : '1px solid transparent',
       transition: 'background 0.3s, backdrop-filter 0.3s, border-color 0.3s',
     }}>
       <Container style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -113,7 +113,7 @@ function Navbar() {
         <Link href='/' style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
           <div style={{
             width: '32px', height: '32px', borderRadius: '10px',
-            background: '#4ADE80', display: 'flex',
+            background: 'var(--accent)', display: 'flex',
             alignItems: 'center', justifyContent: 'center',
           }}>
             <svg width='16' height='16' viewBox='0 0 16 16' fill='none'>
@@ -121,18 +121,18 @@ function Navbar() {
               <path d='M3 5.5V10.5L8 14V8.5H13V5.5H3Z' fill='white' fillOpacity='0.7' />
             </svg>
           </div>
-          <span style={{ fontSize: '15px', fontWeight: '700', color: '#FFFFFF', letterSpacing: '-0.01em', fontFamily: "'Outfit', sans-serif" }}>The Driving Center</span>
+          <span style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-0.01em', fontFamily: "'Outfit', sans-serif" }}>The Driving Center</span>
         </Link>
 
         {/* Desktop Nav links */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }} className='desktop-nav'>
           {['Features', 'Pricing', 'FAQ'].map(label => (
             <a key={label} href={`#${label.toLowerCase()}`} style={{
-              fontSize: '14px', color: '#9CA3AF', textDecoration: 'none', fontWeight: '500',
+              fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: '500',
               transition: 'color 0.2s',
             }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#FFFFFF')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#9CA3AF')}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}
             >
               {label}
             </a>
@@ -141,14 +141,14 @@ function Navbar() {
 
         {/* Desktop CTA */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }} className='desktop-nav'>
-          <Link href='/login' style={{ fontSize: '14px', color: '#9CA3AF', textDecoration: 'none', fontWeight: '500', transition: 'color 0.2s' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#FFFFFF')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#9CA3AF')}
+          <Link href='/login' style={{ fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: '500', transition: 'color 0.2s' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}
           >Log in</Link>
           <Link href='/signup' style={{
             display: 'inline-flex', alignItems: 'center',
             padding: '10px 20px',
-            background: '#FFFFFF', color: '#000000', fontWeight: '600',
+            background: 'var(--text-primary)', color: '#000000', fontWeight: '600',
             fontSize: '13px', borderRadius: '12px', textDecoration: 'none',
             transition: 'transform 0.2s',
             fontFamily: "'Inter', sans-serif",
@@ -163,7 +163,7 @@ function Navbar() {
         {/* Mobile hamburger */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          style={{ background: 'none', border: 'none', color: '#FFFFFF', cursor: 'pointer', padding: '4px', display: 'none' }}
+          style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', padding: '4px', display: 'none' }}
           className='mobile-menu-btn'
         >
           {mobileOpen ? <X size={22} /> : <Menu size={22} />}
@@ -174,21 +174,21 @@ function Navbar() {
       {mobileOpen && (
         <div style={{
           background: 'rgba(5,5,5,0.98)', backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid #1A1A1A',
+          borderBottom: '1px solid var(--gray-400)',
           padding: '16px 24px 24px',
           display: 'flex', flexDirection: 'column', gap: '16px',
         }}>
           {['Features', 'Pricing', 'FAQ'].map(label => (
             <a key={label} href={`#${label.toLowerCase()}`} onClick={() => setMobileOpen(false)} style={{
-              fontSize: '15px', color: '#9CA3AF', textDecoration: 'none', fontWeight: '500',
+              fontSize: '15px', color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: '500',
             }}>
               {label}
             </a>
           ))}
-          <Link href='/login' style={{ fontSize: '15px', color: '#9CA3AF', textDecoration: 'none', fontWeight: '500' }}>Log in</Link>
+          <Link href='/login' style={{ fontSize: '15px', color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: '500' }}>Log in</Link>
           <Link href='/signup' style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            padding: '12px', background: '#FFFFFF', color: '#000000', fontWeight: '600',
+            padding: '12px', background: 'var(--text-primary)', color: '#000000', fontWeight: '600',
             fontSize: '14px', borderRadius: '12px', textDecoration: 'none',
           }}>
             Start free trial
@@ -205,7 +205,7 @@ function Hero() {
   return (
     <section style={{
       padding: '160px 0 120px', position: 'relative', overflow: 'hidden',
-      background: '#050505',
+      background: 'var(--bg-base)',
     }}>
       {/* Purple radial glow */}
       <div style={{
@@ -218,7 +218,7 @@ function Hero() {
       {/* Dot pattern */}
       <div style={{
         position: 'absolute', inset: 0,
-        backgroundImage: `radial-gradient(circle, #1A1A1A 1px, transparent 1px)`,
+        backgroundImage: `radial-gradient(circle, var(--gray-400) 1px, transparent 1px)`,
         backgroundSize: '28px 28px',
         opacity: 0.5,
         pointerEvents: 'none',
@@ -232,11 +232,11 @@ function Hero() {
           <div className='hero-content' style={{
             display: 'inline-flex', alignItems: 'center', gap: '8px',
             padding: '6px 16px', borderRadius: '100px',
-            background: '#0F1117', border: '1px solid #1A1A1A',
-            fontSize: '11px', fontWeight: '600', color: '#FFFFFF',
+            background: 'var(--bg-surface)', border: '1px solid var(--gray-400)',
+            fontSize: '11px', fontWeight: '600', color: 'var(--text-primary)',
             letterSpacing: '0.06em', marginBottom: '32px',
           }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 8px #4ADE80' }} />
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent)', boxShadow: '0 0 8px var(--accent)' }} />
             DRIVING SCHOOL MANAGEMENT SOFTWARE
           </div>
 
@@ -244,14 +244,14 @@ function Hero() {
           <h1 className='hero-content' style={{
             fontSize: 'clamp(52px, 7vw, 80px)', fontFamily: "'Outfit', sans-serif", fontWeight: '800',
             lineHeight: '1.05', letterSpacing: '-0.03em',
-            color: '#FFFFFF', margin: '0 0 24px',
+            color: 'var(--text-primary)', margin: '0 0 24px',
           }}>
             Run Your Driving School<br />Without Running Yourself Ragged
           </h1>
 
           {/* Subheadline */}
           <p className='hero-content' style={{
-            fontSize: '18px', color: '#9CA3AF', lineHeight: '1.7',
+            fontSize: '18px', color: 'var(--text-secondary)', lineHeight: '1.7',
             margin: '0 0 40px', maxWidth: '540px', marginLeft: 'auto', marginRight: 'auto',
           }}>
             The all-in-one platform for driving schools to manage bookings, students, instructors, and payments — without the chaos.
@@ -262,8 +262,8 @@ function Hero() {
             <Link href='/signup' style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
               padding: '14px 32px',
-              background: 'linear-gradient(135deg, #4ADE80, #22C55E)',
-              color: '#FFFFFF', fontWeight: '700',
+              background: 'linear-gradient(135deg, var(--accent), var(--green-600))',
+              color: 'var(--text-primary)', fontWeight: '700',
               fontSize: '15px', borderRadius: '12px', textDecoration: 'none',
               boxShadow: '0 4px 24px rgba(74,222,128,0.4)',
               transition: 'transform 0.2s, box-shadow 0.2s',
@@ -276,20 +276,20 @@ function Hero() {
             </Link>
             <Link href='/demo' style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
-              padding: '14px 32px', background: 'transparent', color: '#FFFFFF', fontWeight: '600',
+              padding: '14px 32px', background: 'transparent', color: 'var(--text-primary)', fontWeight: '600',
               fontSize: '15px', borderRadius: '12px', textDecoration: 'none',
-              border: '1px solid #1A1A1A',
+              border: '1px solid var(--gray-400)',
               transition: 'background 0.2s, border-color 0.2s',
               fontFamily: "'Inter', sans-serif",
             }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor = '#2A2A3A' }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = '#1A1A1A' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor = 'var(--gray-600)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'var(--gray-400)' }}
             >
               Book a demo
             </Link>
           </div>
 
-          <p style={{ fontSize: '13px', color: '#6B7280', marginTop: '24px' }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '24px' }}>
             Built for driving school owners. Not another generic scheduling tool.
           </p>
         </div>
@@ -310,12 +310,12 @@ function LogoStrip() {
   ]
 
   return (
-    <section style={{ padding: '100px 0', background: '#050505' }}>
+    <section style={{ padding: '100px 0', background: 'var(--bg-base)' }}>
       <Container>
         <p style={{
           textAlign: 'center', fontSize: '11px', fontWeight: '600',
           letterSpacing: '0.1em', textTransform: 'uppercase',
-          color: '#6B7280', marginBottom: '40px',
+          color: 'var(--text-muted)', marginBottom: '40px',
         }}>
           Trusted by schools across Tennessee
         </p>
@@ -325,7 +325,7 @@ function LogoStrip() {
         }}>
           {schools.map(name => (
             <span key={name} style={{
-              fontSize: '14px', fontWeight: '600', color: '#71717A',
+              fontSize: '14px', fontWeight: '600', color: 'var(--gray-800)',
               opacity: 0.5, filter: 'grayscale(1)',
               transition: 'opacity 0.2s, filter 0.2s',
               cursor: 'default',
@@ -350,49 +350,49 @@ const features = [
     icon: <CalendarCheck size={20} />,
     title: 'Online Booking',
     desc: 'Students book 24/7, choose session types and instructors, and pay upfront — automatically.',
-    color: '#4ADE80',
+    color: 'var(--accent)',
     bg: 'rgba(74,222,128,0.1)',
   },
   {
     icon: <Users size={20} />,
     title: 'Student Tracking',
     desc: 'TCA progress, session history, and certification docs in one place.',
-    color: '#4ADE80',
+    color: 'var(--accent)',
     bg: 'rgba(74,222,128,0.1)',
   },
   {
     icon: <CreditCard size={20} />,
     title: 'Stripe Payments',
     desc: 'Accept payments online. Instant receipts. Automatic dispute handling.',
-    color: '#4ADE80',
+    color: 'var(--accent)',
     bg: 'rgba(74,222,128,0.1)',
   },
   {
     icon: <BellRing size={20} />,
     title: 'Automated Reminders',
     desc: 'SMS and email reminders cut no-shows by 60%. Custom timing rules per session type.',
-    color: '#4ADE80',
+    color: 'var(--accent)',
     bg: 'rgba(74,222,128,0.1)',
   },
   {
     icon: <UserCog size={20} />,
     title: 'Instructor Management',
     desc: 'Assign schedules, track hours, and manage instructor availability.',
-    color: '#4ADE80',
+    color: 'var(--accent)',
     bg: 'rgba(74,222,128,0.1)',
   },
   {
     icon: <ShieldCheck size={20} />,
     title: 'Enterprise Security',
     desc: 'SOC 2 Type II infrastructure. AES-256 encryption. GDPR compliant.',
-    color: '#4ADE80',
+    color: 'var(--accent)',
     bg: 'rgba(74,222,128,0.1)',
   },
 ]
 
 function Features() {
   return (
-    <Section id='features' pt={140} pb={140} style={{ background: '#050505' }}>
+    <Section id='features' pt={140} pb={140} style={{ background: 'var(--bg-base)' }}>
       <div style={{ textAlign: 'center', marginBottom: '64px' }}>
         <Eyebrow>Features</Eyebrow>
         <SectionHeadline mb='8px'>Everything your school needs to grow</SectionHeadline>
@@ -405,8 +405,8 @@ function Features() {
             <div className='feature-icon'>
               {f.icon}
             </div>
-            <h3 style={{ fontSize: '18px', fontFamily: "'Outfit', sans-serif", fontWeight: '600', color: '#FFFFFF', letterSpacing: '-0.01em', margin: 0 }}>{f.title}</h3>
-            <p style={{ fontSize: '14px', color: '#9CA3AF', lineHeight: '1.7', margin: 0 }}>{f.desc}</p>
+            <h3 style={{ fontSize: '18px', fontFamily: "'Outfit', sans-serif", fontWeight: '600', color: 'var(--text-primary)', letterSpacing: '-0.01em', margin: 0 }}>{f.title}</h3>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: '1.7', margin: 0 }}>{f.desc}</p>
           </div>
         ))}
       </div>
@@ -439,7 +439,7 @@ const steps = [
 
 function HowItWorks() {
   return (
-    <Section pt={140} pb={140} style={{ background: '#0A0A0F' }}>
+    <Section pt={140} pb={140} style={{ background: 'var(--gray-50)' }}>
       <div style={{ textAlign: 'center', marginBottom: '80px' }}>
         <Eyebrow>How It Works</Eyebrow>
         <SectionHeadline mb='8px'>The automation that pays for itself</SectionHeadline>
@@ -448,14 +448,14 @@ function HowItWorks() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px', position: 'relative' }}>
         {steps.map((step, i) => (
-          <div key={step.num} className='step-card' data-animate style={{ animationDelay: `${i * 150}ms`, background: '#0F1117', borderRadius: '16px', padding: '40px 32px', border: '1px solid #1A1A1A', display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative', transition: 'transform 0.3s, border-color 0.3s' }}
-            onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = 'translateY(-4px)'; el.style.borderColor = '#2A2A3A' }}
-            onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = 'translateY(0)'; el.style.borderColor = '#1A1A1A' }}
+          <div key={step.num} className='step-card' data-animate style={{ animationDelay: `${i * 150}ms`, background: 'var(--bg-surface)', borderRadius: '16px', padding: '40px 32px', border: '1px solid var(--gray-400)', display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative', transition: 'transform 0.3s, border-color 0.3s' }}
+            onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = 'translateY(-4px)'; el.style.borderColor = 'var(--gray-600)' }}
+            onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = 'translateY(0)'; el.style.borderColor = 'var(--gray-400)' }}
           >
             {/* Step number */}
             <span style={{
               fontSize: '64px', fontFamily: "'Outfit', sans-serif", fontWeight: '800',
-              color: '#1A1A1A', lineHeight: '1', letterSpacing: '-0.04em',
+              color: 'var(--gray-400)', lineHeight: '1', letterSpacing: '-0.04em',
               position: 'absolute', top: '24px', right: '24px',
             }}>
               {step.num}
@@ -463,15 +463,15 @@ function HowItWorks() {
 
             <div style={{
               width: '48px', height: '48px', borderRadius: '12px',
-              background: '#1A1A3B', display: 'flex',
-              alignItems: 'center', justifyContent: 'center', color: '#4ADE80',
+              background: 'var(--gray-500)', display: 'flex',
+              alignItems: 'center', justifyContent: 'center', color: 'var(--accent)',
             }}>
               {step.icon}
             </div>
 
             <div>
-              <h3 style={{ fontSize: '20px', fontFamily: "'Outfit', sans-serif", fontWeight: '600', color: '#FFFFFF', marginBottom: '8px' }}>{step.title}</h3>
-              <p style={{ fontSize: '15px', color: '#9CA3AF', lineHeight: '1.7', margin: 0 }}>{step.desc}</p>
+              <h3 style={{ fontSize: '20px', fontFamily: "'Outfit', sans-serif", fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }}>{step.title}</h3>
+              <p style={{ fontSize: '15px', color: 'var(--text-secondary)', lineHeight: '1.7', margin: 0 }}>{step.desc}</p>
             </div>
           </div>
         ))}
@@ -484,7 +484,7 @@ function HowItWorks() {
 
 function DashboardMockup() {
   return (
-    <Section pt={140} pb={140} style={{ background: '#050505' }}>
+    <Section pt={140} pb={140} style={{ background: 'var(--bg-base)' }}>
       <div style={{ textAlign: 'center', marginBottom: '64px' }}>
         <Eyebrow>Dashboard</Eyebrow>
         <SectionHeadline mb='8px'>A dashboard that actually makes sense</SectionHeadline>
@@ -495,45 +495,45 @@ function DashboardMockup() {
       <div style={{
         borderRadius: '24px',
         overflow: 'hidden',
-        border: '1px solid #1A1A1A',
+        border: '1px solid var(--gray-400)',
         boxShadow: '0 40px 80px rgba(0,0,0,0.6)',
-        background: '#0B0C10',
+        background: 'var(--gray-100)',
       }}>
         {/* Top bar */}
         <div style={{
-          height: '48px', background: '#0F1117',
-          borderBottom: '1px solid #1A1A1A',
+          height: '48px', background: 'var(--bg-surface)',
+          borderBottom: '1px solid var(--gray-400)',
           display: 'flex', alignItems: 'center', padding: '0 20px', gap: '8px',
         }}>
-          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#EF4444' }} />
-          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#F59E0B' }} />
-          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ADE80' }} />
-          <div style={{ marginLeft: '12px', flex: 1, maxWidth: '320px', height: '24px', borderRadius: '6px', background: '#1A1A1A' }} />
+          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--red-500)' }} />
+          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--amber-500)' }} />
+          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent)' }} />
+          <div style={{ marginLeft: '12px', flex: 1, maxWidth: '320px', height: '24px', borderRadius: '6px', background: 'var(--gray-400)' }} />
         </div>
 
         {/* Body */}
         <div style={{ display: 'flex', height: '480px' }}>
           {/* Sidebar */}
           <div style={{
-            width: '200px', background: '#0D1017',
-            borderRight: '1px solid #1A1A1A',
+            width: '200px', background: 'var(--gray-200)',
+            borderRight: '1px solid var(--gray-400)',
             padding: '20px 12px', flexShrink: 0,
             display: 'flex', flexDirection: 'column', gap: '4px',
           }}>
             {/* Logo area */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 8px 16px' }}>
-              <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#4ADE80', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <svg width='12' height='12' viewBox='0 0 16 16' fill='none'>
                   <path d='M8 2L13 5.5H3L8 2Z' fill='white' />
                   <path d='M3 5.5V10.5L8 14V8.5H13V5.5H3Z' fill='white' fillOpacity='0.7' />
                 </svg>
               </div>
-              <span style={{ fontSize: '12px', fontWeight: '700', color: '#FFFFFF', fontFamily: "'Outfit', sans-serif" }}>TDC</span>
+              <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>TDC</span>
             </div>
             {['Dashboard', 'Bookings', 'Students', 'Instructors', 'Billing', 'Settings'].map((item, i) => (
               <div key={item} style={{
                 padding: '8px 12px', borderRadius: '8px', fontSize: '13px',
-                fontWeight: i === 0 ? '600' : '400', color: i === 0 ? '#FFFFFF' : '#6B7280',
+                fontWeight: i === 0 ? '600' : '400', color: i === 0 ? 'var(--text-primary)' : 'var(--text-muted)',
                 background: i === 0 ? 'rgba(74,222,128,0.1)' : 'transparent',
                 cursor: 'default',
               }}>
@@ -547,12 +547,12 @@ function DashboardMockup() {
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <div>
-                <div style={{ fontSize: '18px', fontFamily: "'Outfit', sans-serif", fontWeight: '700', color: '#FFFFFF', marginBottom: '4px' }}>Good morning, Mark</div>
-                <div style={{ fontSize: '13px', color: '#6B7280' }}>Here&apos;s what&apos;s happening today</div>
+                <div style={{ fontSize: '18px', fontFamily: "'Outfit', sans-serif", fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' }}>Good morning, Mark</div>
+                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Here&apos;s what&apos;s happening today</div>
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
-                <div style={{ width: '80px', height: '32px', borderRadius: '8px', background: '#1A1A1A' }} />
-                <div style={{ width: '80px', height: '32px', borderRadius: '8px', background: '#4ADE80' }} />
+                <div style={{ width: '80px', height: '32px', borderRadius: '8px', background: 'var(--gray-400)' }} />
+                <div style={{ width: '80px', height: '32px', borderRadius: '8px', background: 'var(--accent)' }} />
               </div>
             </div>
 
@@ -565,12 +565,12 @@ function DashboardMockup() {
                 { label: 'No-show Rate', value: '4.2%', delta: '-2.1%', up: true },
               ].map(kpi => (
                 <div key={kpi.label} style={{
-                  background: '#0F1117', borderRadius: '12px', padding: '16px',
-                  border: '1px solid #1A1A1A',
+                  background: 'var(--bg-surface)', borderRadius: '12px', padding: '16px',
+                  border: '1px solid var(--gray-400)',
                 }}>
-                  <div style={{ fontSize: '11px', color: '#6B7280', fontWeight: '500', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{kpi.label}</div>
-                  <div style={{ fontSize: '24px', fontFamily: "'Outfit', sans-serif", fontWeight: '800', color: '#FFFFFF', letterSpacing: '-0.02em', marginBottom: '4px' }}>{kpi.value}</div>
-                  <div style={{ fontSize: '12px', fontWeight: '600', color: kpi.up ? '#4ADE80' : '#EF4444' }}>{kpi.delta}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '500', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{kpi.label}</div>
+                  <div style={{ fontSize: '24px', fontFamily: "'Outfit', sans-serif", fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '4px' }}>{kpi.value}</div>
+                  <div style={{ fontSize: '12px', fontWeight: '600', color: kpi.up ? 'var(--accent)' : 'var(--red-500)' }}>{kpi.delta}</div>
                 </div>
               ))}
             </div>
@@ -578,27 +578,27 @@ function DashboardMockup() {
             {/* Chart area + table */}
             <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '16px' }}>
               {/* Bar chart */}
-              <div style={{ background: '#0F1117', borderRadius: '12px', padding: '16px', border: '1px solid #1A1A1A' }}>
-                <div style={{ fontSize: '13px', fontFamily: "'Outfit', sans-serif", fontWeight: '600', color: '#FFFFFF', marginBottom: '16px' }}>Weekly Bookings</div>
+              <div style={{ background: 'var(--bg-surface)', borderRadius: '12px', padding: '16px', border: '1px solid var(--gray-400)' }}>
+                <div style={{ fontSize: '13px', fontFamily: "'Outfit', sans-serif", fontWeight: '600', color: 'var(--text-primary)', marginBottom: '16px' }}>Weekly Bookings</div>
                 <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', height: '80px' }}>
                   {[40, 65, 45, 80, 55, 90, 70].map((h, i) => (
                     <div key={i} style={{
                       flex: 1, height: `${h}%`, borderRadius: '4px 4px 0 0',
-                      background: i === 5 ? '#4ADE80' : '#1A1A1A',
+                      background: i === 5 ? 'var(--accent)' : 'var(--gray-400)',
                       transition: 'background 0.2s',
                     }} />
                   ))}
                 </div>
                 <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
                   {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
-                    <div key={d} style={{ flex: 1, textAlign: 'center', fontSize: '10px', color: '#6B7280' }}>{d}</div>
+                    <div key={d} style={{ flex: 1, textAlign: 'center', fontSize: '10px', color: 'var(--text-muted)' }}>{d}</div>
                   ))}
                 </div>
               </div>
 
               {/* Recent sessions */}
-              <div style={{ background: '#0F1117', borderRadius: '12px', padding: '16px', border: '1px solid #1A1A1A' }}>
-                <div style={{ fontSize: '13px', fontFamily: "'Outfit', sans-serif", fontWeight: '600', color: '#FFFFFF', marginBottom: '12px' }}>Upcoming</div>
+              <div style={{ background: 'var(--bg-surface)', borderRadius: '12px', padding: '16px', border: '1px solid var(--gray-400)' }}>
+                <div style={{ fontSize: '13px', fontFamily: "'Outfit', sans-serif", fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px' }}>Upcoming</div>
                 {[
                   { name: 'Jake Thompson', type: 'Behind Wheel', time: '9:00 AM', status: 'Confirmed' },
                   { name: 'Sarah Miller', type: 'Observation', time: '10:30 AM', status: 'Confirmed' },
@@ -607,16 +607,16 @@ function DashboardMockup() {
                 ].map(s => (
                   <div key={s.name} style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '8px 0', borderBottom: '1px solid #1A1A1A',
+                    padding: '8px 0', borderBottom: '1px solid var(--gray-400)',
                   }}>
                     <div>
-                      <div style={{ fontSize: '12px', fontWeight: '600', color: '#FFFFFF' }}>{s.name}</div>
-                      <div style={{ fontSize: '10px', color: '#6B7280' }}>{s.type} · {s.time}</div>
+                      <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>{s.name}</div>
+                      <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{s.type} · {s.time}</div>
                     </div>
                     <span style={{
                       fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '999px',
                       background: s.status === 'Confirmed' ? 'rgba(74,222,128,0.15)' : 'rgba(251,191,36,0.15)',
-                      color: s.status === 'Confirmed' ? '#4ADE80' : '#FBBF24',
+                      color: s.status === 'Confirmed' ? 'var(--accent)' : 'var(--yellow-600)',
                     }}>
                       {s.status}
                     </span>
@@ -635,7 +635,7 @@ function DashboardMockup() {
 
 function ForSchoolsCTA() {
   return (
-    <section style={{ padding: '120px 0', background: '#050505', position: 'relative', overflow: 'hidden' }}>
+    <section style={{ padding: '120px 0', background: 'var(--bg-base)', position: 'relative', overflow: 'hidden' }}>
       <div style={{
         position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
         width: '600px', height: '400px',
@@ -644,8 +644,8 @@ function ForSchoolsCTA() {
       }} />
       <Container style={{ position: 'relative', zIndex: 1 }}>
         <div style={{
-          background: '#0F1117',
-          border: '1px solid #1A1A1A',
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--gray-400)',
           borderRadius: '32px',
           padding: '64px 56px',
           display: 'flex',
@@ -656,20 +656,20 @@ function ForSchoolsCTA() {
             <p style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
               fontSize: '11px', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase',
-              color: '#4ADE80', marginBottom: '16px',
+              color: 'var(--accent)', marginBottom: '16px',
             }}>
-              <span style={{ display: 'block', width: '20px', height: '2px', background: '#4ADE80', borderRadius: '2px' }} />
+              <span style={{ display: 'block', width: '20px', height: '2px', background: 'var(--accent)', borderRadius: '2px' }} />
               For School Owners
             </p>
             <h2 style={{
               fontSize: 'clamp(28px, 3.5vw, 40px)', fontFamily: "'Outfit', sans-serif", fontWeight: '700',
-              color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: '1.15',
+              color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: '1.15',
               marginBottom: '16px',
             }}>
               Already own a driving school?
             </h2>
             <p style={{
-              fontSize: '16px', color: '#9CA3AF', lineHeight: '1.7',
+              fontSize: '16px', color: 'var(--text-secondary)', lineHeight: '1.7',
               marginBottom: '32px', maxWidth: '520px',
             }}>
               See how The Driving Center helps schools like yours fill sessions faster, cut admin time in half, and protect revenue with automatic deposits.
@@ -677,8 +677,8 @@ function ForSchoolsCTA() {
             <Link href='/signup' style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
               padding: '14px 28px',
-              background: 'linear-gradient(135deg, #4ADE80, #22C55E)',
-              color: '#FFFFFF', fontWeight: '700',
+              background: 'linear-gradient(135deg, var(--accent), var(--green-600))',
+              color: 'var(--text-primary)', fontWeight: '700',
               fontSize: '14px', borderRadius: '12px', textDecoration: 'none',
               boxShadow: '0 4px 24px rgba(74,222,128,0.3)',
               transition: 'transform 0.2s, box-shadow 0.2s',
@@ -707,7 +707,7 @@ function StatsBar() {
   ]
 
   return (
-    <section style={{ padding: '100px 0', background: '#0A0A0F', borderTop: '1px solid #1A1A1A', borderBottom: '1px solid #1A1A1A' }}>
+    <section style={{ padding: '100px 0', background: 'var(--gray-50)', borderTop: '1px solid var(--gray-400)', borderBottom: '1px solid var(--gray-400)' }}>
       <Container>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0' }}>
           {stats.map((stat, i) => (
@@ -718,17 +718,17 @@ function StatsBar() {
               {i > 0 && (
                 <div style={{
                   position: 'absolute', left: 0, top: '15%', bottom: '15%',
-                  width: '1px', background: '#1A1A1A',
+                  width: '1px', background: 'var(--gray-400)',
                 }} />
               )}
               <span style={{
                 fontSize: 'clamp(36px, 4vw, 56px)', fontFamily: "'Outfit', sans-serif", fontWeight: '800',
-                color: '#FFFFFF', letterSpacing: '-0.03em', lineHeight: '1',
+                color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: '1',
               }}>
                 {stat.value}
               </span>
               <span style={{
-                fontSize: '12px', color: '#6B7280', fontWeight: '600',
+                fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600',
                 textTransform: 'uppercase', letterSpacing: '0.08em',
               }}>
                 {stat.label}
@@ -749,34 +749,34 @@ const testimonials = [
     name: 'Matt Reedy',
     role: 'Owner, The Driving Center',
     initials: 'MR',
-    color: '#4ADE80',
+    color: 'var(--accent)',
   },
   {
     quote: "We cut our admin work in half. Parents love being able to book and pay online. It's been a complete game changer for our school.",
     name: 'Renee Holloway',
     role: 'Owner, Smokey Mountain Drivers',
     initials: 'RH',
-    color: '#4ADE80',
+    color: 'var(--accent)',
   },
   {
     quote: "The automated reminders alone saved us thousands in rescheduling costs. This is exactly what every driving school needs.",
     name: 'Marcus Webb',
     role: 'Director, Volunteer Auto School',
     initials: 'MW',
-    color: '#4ADE80',
+    color: 'var(--accent)',
   },
   {
     quote: "Student tracking and TCA compliance used to be a nightmare. Now it's just... seamless. Worth every penny.",
     name: 'David Park',
     role: 'Founder, Summit Traffic School',
     initials: 'DP',
-    color: '#4ADE80',
+    color: 'var(--accent)',
   },
 ]
 
 function Testimonials() {
   return (
-    <Section pt={140} pb={140} id='testimonials' style={{ background: '#050505' }}>
+    <Section pt={140} pb={140} id='testimonials' style={{ background: 'var(--bg-base)' }}>
       <div style={{ textAlign: 'center', marginBottom: '64px' }}>
         <Eyebrow>Testimonials</Eyebrow>
         <SectionHeadline mb='8px'>Loved by driving schools</SectionHeadline>
@@ -785,17 +785,17 @@ function Testimonials() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px', maxWidth: '900px', margin: '0 auto' }}>
         {testimonials.map((t, i) => (
-          <div key={t.name} className='testimonial-card' data-animate style={{ animationDelay: `${i * 120}ms`, background: '#0F1117', borderRadius: '16px', padding: '32px', border: '1px solid #1A1A1A', display: 'flex', flexDirection: 'column', gap: '16px', transition: 'transform 0.3s, border-color 0.3s' }}
-            onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = 'translateY(-4px)'; el.style.borderColor = '#2A2A3A' }}
-            onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = 'translateY(0)'; el.style.borderColor = '#1A1A1A' }}
+          <div key={t.name} className='testimonial-card' data-animate style={{ animationDelay: `${i * 120}ms`, background: 'var(--bg-surface)', borderRadius: '16px', padding: '32px', border: '1px solid var(--gray-400)', display: 'flex', flexDirection: 'column', gap: '16px', transition: 'transform 0.3s, border-color 0.3s' }}
+            onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = 'translateY(-4px)'; el.style.borderColor = 'var(--gray-600)' }}
+            onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = 'translateY(0)'; el.style.borderColor = 'var(--gray-400)' }}
           >
             {/* Stars */}
             <div style={{ display: 'flex', gap: '3px' }}>
-              {[...Array(5)].map((_, j) => <Star key={j} size={14} style={{ color: '#FACC15', fill: '#FACC15' }} />)}
+              {[...Array(5)].map((_, j) => <Star key={j} size={14} style={{ color: 'var(--yellow-500)', fill: '#FACC15' }} />)}
             </div>
 
             {/* Quote */}
-            <p style={{ fontSize: '15px', color: '#9CA3AF', lineHeight: '1.75', margin: 0, flex: 1 }}>
+            <p style={{ fontSize: '15px', color: 'var(--text-secondary)', lineHeight: '1.75', margin: 0, flex: 1 }}>
               &ldquo;{t.quote}&rdquo;
             </p>
 
@@ -804,14 +804,14 @@ function Testimonials() {
               <div style={{
                 width: '40px', height: '40px', borderRadius: '50%',
                 background: `rgba(74,222,128,0.15)`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '13px', fontWeight: '700', color: '#4ADE80',
+                fontSize: '13px', fontWeight: '700', color: 'var(--accent)',
                 flexShrink: 0,
               }}>
                 {t.initials}
               </div>
               <div>
-                <div style={{ fontSize: '13px', fontWeight: '600', color: '#FFFFFF' }}>{t.name}</div>
-                <div style={{ fontSize: '12px', color: '#6B7280' }}>{t.role}</div>
+                <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>{t.name}</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.role}</div>
               </div>
             </div>
           </div>
@@ -855,7 +855,7 @@ const plans = [
 
 function Pricing() {
   return (
-    <Section id='pricing' pt={140} pb={140} style={{ background: '#0A0A0F' }}>
+    <Section id='pricing' pt={140} pb={140} style={{ background: 'var(--gray-50)' }}>
       <div style={{ textAlign: 'center', marginBottom: '64px' }}>
         <Eyebrow>Pricing</Eyebrow>
         <SectionHeadline mb='8px'>Simple, transparent pricing</SectionHeadline>
@@ -864,7 +864,7 @@ function Pricing() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', alignItems: 'start' }}>
         {plans.map((p, i) => (
-          <div key={p.name} className='pricing-card' data-animate style={{ animationDelay: `${i * 100}ms`, background: p.highlighted ? '#13161F' : '#0F1117', borderRadius: '24px', padding: '32px', border: p.highlighted ? '1px solid rgba(74,222,128,0.3)' : '1px solid #1A1A1A', boxShadow: p.highlighted ? '0 0 60px rgba(74,222,128,0.1)' : 'none', display: 'flex', flexDirection: 'column', position: 'relative', transition: 'transform 0.3s, box-shadow 0.3s' }}
+          <div key={p.name} className='pricing-card' data-animate style={{ animationDelay: `${i * 100}ms`, background: p.highlighted ? 'var(--gray-300)' : 'var(--bg-surface)', borderRadius: '24px', padding: '32px', border: p.highlighted ? '1px solid rgba(74,222,128,0.3)' : '1px solid var(--gray-400)', boxShadow: p.highlighted ? '0 0 60px rgba(74,222,128,0.1)' : 'none', display: 'flex', flexDirection: 'column', position: 'relative', transition: 'transform 0.3s, box-shadow 0.3s' }}
             onMouseEnter={e => {
               const el = e.currentTarget as HTMLDivElement
               el.style.transform = 'translateY(-6px)'
@@ -880,7 +880,7 @@ function Pricing() {
               <div style={{
                 position: 'absolute', top: '-1px', left: '20px', right: '20px',
                 height: '2px',
-                background: 'linear-gradient(90deg, transparent, #4ADE80, transparent)',
+                background: 'linear-gradient(90deg, transparent, var(--accent), transparent)',
                 borderRadius: '0 0 2px 2px',
               }} />
             )}
@@ -890,28 +890,28 @@ function Pricing() {
                 display: 'inline-block', fontSize: '11px', fontWeight: '700',
                 padding: '4px 12px', borderRadius: '999px',
                 background: 'linear-gradient(135deg, rgba(74,222,128,0.2), rgba(34,197,94,0.2))',
-                color: '#4ADE80', letterSpacing: '0.05em', marginBottom: '16px', alignSelf: 'flex-start',
+                color: 'var(--accent)', letterSpacing: '0.05em', marginBottom: '16px', alignSelf: 'flex-start',
                 border: '1px solid rgba(74,222,128,0.3)',
               }}>
                 Most Popular
               </span>
             )}
 
-            <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#6B7280', marginBottom: '12px' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '12px' }}>
               {p.name}
             </p>
 
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '12px' }}>
-              <span style={{ fontSize: '48px', fontFamily: "'Outfit', sans-serif", fontWeight: '800', color: '#FFFFFF', lineHeight: '1', letterSpacing: '-0.03em' }}>{p.price}</span>
-              <span style={{ fontSize: '13px', color: '#6B7280' }}>/mo</span>
+              <span style={{ fontSize: '48px', fontFamily: "'Outfit', sans-serif", fontWeight: '800', color: 'var(--text-primary)', lineHeight: '1', letterSpacing: '-0.03em' }}>{p.price}</span>
+              <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>/mo</span>
             </div>
 
-            <p style={{ fontSize: '13px', color: '#9CA3AF', marginBottom: '24px', lineHeight: '1.55' }}>{p.desc}</p>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: '1.55' }}>{p.desc}</p>
 
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
               {p.features.map(f => (
-                <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', color: '#9CA3AF' }}>
-                  <Check size={14} style={{ color: '#4ADE80', flexShrink: 0 }} />
+                <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', color: 'var(--text-secondary)' }}>
+                  <Check size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
                   {f}
                 </li>
               ))}
@@ -920,7 +920,7 @@ function Pricing() {
             {p.highlighted ? (
               <Link href={p.href} style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                padding: '14px 28px', background: '#FFFFFF', color: '#000000', fontWeight: '700',
+                padding: '14px 28px', background: 'var(--text-primary)', color: '#000000', fontWeight: '700',
                 fontSize: '14px', borderRadius: '12px', border: 'none', cursor: 'pointer',
                 textDecoration: 'none', whiteSpace: 'nowrap',
                 fontFamily: "'Inter', sans-serif",
@@ -934,14 +934,14 @@ function Pricing() {
             ) : (
               <Link href={p.href} style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                padding: '14px 28px', background: 'transparent', color: '#FFFFFF', fontWeight: '600',
-                fontSize: '14px', borderRadius: '12px', border: '1px solid #1A1A1A',
+                padding: '14px 28px', background: 'transparent', color: 'var(--text-primary)', fontWeight: '600',
+                fontSize: '14px', borderRadius: '12px', border: '1px solid var(--gray-400)',
                 cursor: 'pointer', textDecoration: 'none', whiteSpace: 'nowrap',
                 fontFamily: "'Inter', sans-serif",
                 transition: 'background 0.2s, border-color 0.2s',
               }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = '#2A2A3A' }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = '#1A1A1A' }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = 'var(--gray-600)' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'var(--gray-400)' }}
               >
                 {p.cta}
               </Link>
@@ -959,27 +959,27 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div style={{ borderBottom: '1px solid #1A1A1A' }}>
+    <div style={{ borderBottom: '1px solid var(--gray-400)' }}>
       <button
         onClick={() => setOpen(!open)}
         style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           width: '100%', padding: '20px 0', cursor: 'pointer', background: 'none', border: 'none',
-          fontSize: '15px', fontWeight: '600', color: '#FFFFFF', textAlign: 'left',
+          fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)', textAlign: 'left',
           fontFamily: "'Inter', sans-serif",
           transition: 'color 0.15s',
         }}
-        onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#4ADE80'}
-        onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#FFFFFF'}
+        onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--accent)'}
+        onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)'}
       >
         {question}
         <ChevronDown size={16} style={{
           flexShrink: 0, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-          color: '#6B7280',
+          color: 'var(--text-muted)',
         }} />
       </button>
       {open && (
-        <div style={{ padding: '0 0 20px', fontSize: '14px', color: '#9CA3AF', lineHeight: '1.75' }}>
+        <div style={{ padding: '0 0 20px', fontSize: '14px', color: 'var(--text-secondary)', lineHeight: '1.75' }}>
           {answer}
         </div>
       )}
@@ -998,7 +998,7 @@ function FAQ() {
   ]
 
   return (
-    <Section id='faq' pt={120} pb={120} style={{ background: '#050505' }}>
+    <Section id='faq' pt={120} pb={120} style={{ background: 'var(--bg-base)' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '56px' }}>
           <Eyebrow>FAQ</Eyebrow>
@@ -1014,7 +1014,7 @@ function FAQ() {
 
 function CTASection() {
   return (
-    <Section pt={120} pb={120} style={{ background: '#050505', position: 'relative', overflow: 'hidden' }}>
+    <Section pt={120} pb={120} style={{ background: 'var(--bg-base)', position: 'relative', overflow: 'hidden' }}>
       {/* Green glow behind */}
       <div style={{
         position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
@@ -1025,18 +1025,18 @@ function CTASection() {
       <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
         <h2 style={{
           fontSize: 'clamp(36px, 4vw, 52px)', fontFamily: "'Outfit', sans-serif", fontWeight: '700',
-          color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: '1.15',
+          color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: '1.15',
           marginBottom: '16px',
         }}>
           Ready to run your school better?
         </h2>
-        <p style={{ fontSize: '17px', color: '#9CA3AF', lineHeight: '1.7', marginBottom: '40px' }}>
+        <p style={{ fontSize: '17px', color: 'var(--text-secondary)', lineHeight: '1.7', marginBottom: '40px' }}>
           Join 50+ driving schools across Tennessee already using The Driving Center.
           <br />14-day free trial. No credit card required.
         </p>
         <Link href='/signup' style={{
           display: 'inline-flex', alignItems: 'center', gap: '10px',
-          padding: '16px 36px', background: '#FFFFFF', color: '#000000', fontWeight: '700',
+          padding: '16px 36px', background: 'var(--text-primary)', color: '#000000', fontWeight: '700',
           fontSize: '16px', borderRadius: '12px', textDecoration: 'none',
           fontFamily: "'Inter', sans-serif",
           transition: 'transform 0.2s',
@@ -1055,7 +1055,7 @@ function CTASection() {
 
 function Footer() {
   return (
-    <footer style={{ borderTop: '1px solid #1A1A1A', background: '#050505', padding: '64px 0 32px' }}>
+    <footer style={{ borderTop: '1px solid var(--gray-400)', background: 'var(--bg-base)', padding: '64px 0 32px' }}>
       <Container>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '40px', marginBottom: '48px' }}>
           {/* Brand */}
@@ -1063,23 +1063,23 @@ function Footer() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
               <div style={{
                 width: '28px', height: '28px', borderRadius: '8px',
-                background: '#4ADE80', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 <svg width='14' height='14' viewBox='0 0 16 16' fill='none'>
                   <path d='M8 2L13 5.5H3L8 2Z' fill='white' />
                   <path d='M3 5.5V10.5L8 14V8.5H13V5.5H3Z' fill='white' fillOpacity='0.7' />
                 </svg>
               </div>
-              <span style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', fontFamily: "'Outfit', sans-serif" }}>The Driving Center</span>
+              <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>The Driving Center</span>
             </div>
-            <p style={{ fontSize: '13px', color: '#6B7280', lineHeight: '1.6', maxWidth: '260px' }}>
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.6', maxWidth: '260px' }}>
               Modern software for driving schools. Book more students, automate reminders, and grow your business.
             </p>
           </div>
 
           {/* Product links */}
           <div>
-            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#71717A', marginBottom: '16px' }}>Product</p>
+            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gray-800)', marginBottom: '16px' }}>Product</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {[
                 { label: 'Features', href: '#features' },
@@ -1087,9 +1087,9 @@ function Footer() {
                 { label: 'FAQ', href: '#faq' },
                 { label: 'Blog', href: '/blog' },
               ].map(link => (
-                <a key={link.label} href={link.href} style={{ fontSize: '13px', color: '#6B7280', textDecoration: 'none', transition: 'color 0.15s' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#FFFFFF')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#6B7280')}
+                <a key={link.label} href={link.href} style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
                 >
                   {link.label}
                 </a>
@@ -1099,7 +1099,7 @@ function Footer() {
 
           {/* Company links */}
           <div>
-            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#71717A', marginBottom: '16px' }}>Company</p>
+            <p style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gray-800)', marginBottom: '16px' }}>Company</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {[
                 { label: 'About', href: '/about' },
@@ -1107,9 +1107,9 @@ function Footer() {
                 { label: 'Privacy Policy', href: '/legal/privacy' },
                 { label: 'Terms of Service', href: '/legal/terms' },
               ].map(link => (
-                <a key={link.label} href={link.href} style={{ fontSize: '13px', color: '#6B7280', textDecoration: 'none', transition: 'color 0.15s' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#FFFFFF')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#6B7280')}
+                <a key={link.label} href={link.href} style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
                 >
                   {link.label}
                 </a>
@@ -1118,9 +1118,9 @@ function Footer() {
           </div>
         </div>
 
-        <div style={{ borderTop: '1px solid #1A1A1A', paddingTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-          <span style={{ fontSize: '13px', color: '#6B7280' }}>© 2026 The Driving Center. All rights reserved.</span>
-          <span style={{ fontSize: '13px', color: '#52525B' }}>Built with ▲ by Everest</span>
+        <div style={{ borderTop: '1px solid var(--gray-400)', paddingTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+          <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>© 2026 The Driving Center. All rights reserved.</span>
+          <span style={{ fontSize: '13px', color: 'var(--gray-700)' }}>Built with ▲ by Everest</span>
         </div>
       </Container>
     </footer>
@@ -1155,7 +1155,7 @@ export default function HomePage() {
   }, [])
 
   return (
-    <main style={{ background: '#050505', color: '#FFFFFF', fontFamily: "'Inter', sans-serif", overflowX: 'hidden' }}>
+    <main style={{ background: 'var(--bg-base)', color: 'var(--text-primary)', fontFamily: "'Inter', sans-serif", overflowX: 'hidden' }}>
       <style>{`
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(30px); }
@@ -1194,14 +1194,14 @@ export default function HomePage() {
         .hero-image { animation: fadeInUp 0.8s ease-out 0.35s forwards; opacity: 0; }
 
         .feature-card {
-          background: #0F1117; border-radius: 16px; padding: 32px;
-          border: 1px solid #1A1A1A; display: flex; flex-direction: column; gap: 12px;
+          background: var(--bg-surface); border-radius: 16px; padding: 32px;
+          border: 1px solid var(--gray-400); display: flex; flex-direction: column; gap: 12px;
           transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
           cursor: default;
         }
         .feature-card:hover {
           transform: translateY(-4px);
-          border-color: #2A2A3A;
+          border-color: var(--gray-600);
           box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(74,222,128,0.08);
         }
         .feature-icon {
@@ -1209,33 +1209,33 @@ export default function HomePage() {
           background: rgba(74,222,128,0.1);
           border: 1px solid rgba(74,222,128,0.15);
           display: flex; align-items: center; justify-content: center;
-          color: #4ADE80;
+          color: var(--accent);
         }
 
         .step-card {
-          background: #0F1117; border-radius: 16px; padding: 40px 32px;
-          border: 1px solid #1A1A1A; display: flex; flex-direction: column; gap: 20px;
+          background: var(--bg-surface); border-radius: 16px; padding: 40px 32px;
+          border: 1px solid var(--gray-400); display: flex; flex-direction: column; gap: 20px;
           position: relative;
           transition: transform 0.3s, border-color 0.3s;
         }
         .step-card:hover {
           transform: translateY(-4px);
-          border-color: #2A2A3A;
+          border-color: var(--gray-600);
         }
 
         .testimonial-card {
-          background: #0F1117; border-radius: 16px; padding: 32px;
-          border: 1px solid #1A1A1A; display: flex; flex-direction: column; gap: 16px;
+          background: var(--bg-surface); border-radius: 16px; padding: 32px;
+          border: 1px solid var(--gray-400); display: flex; flex-direction: column; gap: 16px;
           transition: transform 0.3s, border-color 0.3s;
         }
         .testimonial-card:hover {
           transform: translateY(-4px);
-          border-color: #2A2A3A;
+          border-color: var(--gray-600);
         }
 
         .pricing-card {
-          background: #0F1117; border-radius: 24px; padding: 32px;
-          border: 1px solid #1A1A1A; display: flex; flex-direction: column;
+          background: var(--bg-surface); border-radius: 24px; padding: 32px;
+          border: 1px solid var(--gray-400); display: flex; flex-direction: column;
           position: relative;
           transition: transform 0.3s, box-shadow 0.3s;
         }
