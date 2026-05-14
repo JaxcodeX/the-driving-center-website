@@ -11,9 +11,15 @@
 
 **Rule 2 — Run `npm run build` before committing.** Must pass. Fix TypeScript errors first.
 
-**Rule 3 — Log failures in WORKFLOW_LOG.md.** Every broken cycle, what failed, what fixed it.
+**Rule 3 — Run Playwright tests before announcing completion.** After a build passes:
+   1. `npm run build` — TypeScript compiles (must pass)
+   2. `npx playwright test --reporter=line` — functional tests (all must pass)
+   3. Only announce "done" after both pass
+   4. If tests fail, fix first then re-run before announcing
 
-**Rule 4 — Never change schema without verifying against ACTUAL_SCHEMA.md first.** Migration files and live DB drift. Always check the REST API to confirm actual columns.
+**Rule 4 — Log failures in WORKFLOW_LOG.md.** Every broken cycle, what failed, what fixed it.
+
+**Rule 5 — Never change schema without verifying against ACTUAL_SCHEMA.md first.** Migration files and live DB drift. Always check the REST API to confirm actual columns.
 
 ---
 
