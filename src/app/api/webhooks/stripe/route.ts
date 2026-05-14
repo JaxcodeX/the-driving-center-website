@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
 import { auditLog } from '@/lib/security'
+import { isEmailConfigured } from '@/lib/email'
 
 function getStripe(): Stripe {
   if (!process.env.STRIPE_SECRET_KEY) throw new Error('STRIPE_SECRET_KEY required')
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
       // ── Booking deposit payment ─────────────────────────────────────
       const { data: booking } = await supabaseAdmin
         .from('bookings')
-        .select('id, status, session_id')
+        .select('id, status, session_id, student_name, student_email, confirmation_token, session_time, session_date')
         .eq('id', bookingId)
         .eq('status', 'pending')
         .single()
@@ -77,7 +78,7 @@ export async function POST(req: Request) {
         if (booking.session_id) {
           const { data: sess } = await supabaseAdmin
             .from('sessions')
-            .select('seats_booked')
+            .select('seats_booked, start_date, location, school_id, session_type:session_type_id(name)')
             .eq('id', booking.session_id)
             .single()
           if (sess) {
@@ -85,6 +86,54 @@ export async function POST(req: Request) {
               .from('sessions')
               .update({ seats_booked: (sess.seats_booked ?? 0) + 1 })
               .eq('id', booking.session_id)
+
+            // Send booking confirmation email (non-blocking — failures log but don't break the flow)
+            try {
+              if (isEmailConfigured()) {
+                const { sendBookingConfirmationEmail } = await import('@/lib/email')
+
+                const { data: school } = await supabaseAdmin
+                  .from('schools')
+                  .select('name, phone')
+                  .eq('id', sess.school_id)
+                  .single()
+
+                const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+                const token = booking.confirmation_token ?? bookingId
+                const sessionTypeName = (sess.session_type as any)?.name ?? 'Driving Lesson'
+                const date = new Date(`${sess.start_date}T12:00:00`)
+                  .toLocaleDateString('en-US', {
+                    weekday: 'long', month: 'long', day: 'numeric',
+                  })
+
+                await sendBookingConfirmationEmail(
+                  booking.student_email,
+                  booking.student_name,
+                  sessionTypeName,
+                  school?.name ?? 'Driving School',
+                  school?.phone ?? '',
+                  date,
+                  booking.session_time ?? '9:00 AM',
+                  sess.location,
+                  `${appUrl}/book/reschedule/${token}`,
+                  `${appUrl}/book/cancel/${token}`
+                )
+
+                await supabaseAdmin.from('audit_logs').insert(
+                  auditLog('BOOKING_CONFIRMATION_EMAIL_SENT', booking.student_email, {
+                    booking_id: bookingId,
+                  })
+                )
+              }
+            } catch (emailErr) {
+              console.error('[Stripe Webhook] Failed to send booking confirmation email:', emailErr)
+              await supabaseAdmin.from('audit_logs').insert(
+                auditLog('BOOKING_CONFIRMATION_EMAIL_FAILED', booking.student_email, {
+                  booking_id: bookingId,
+                  error: (emailErr as Error).message,
+                })
+              )
+            }
           }
         }
       }

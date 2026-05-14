@@ -12,12 +12,17 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [signupSuccess, setSignupSuccess] = useState<string | null>(null)
   const [isDemoMode, setIsDemoMode] = useState(false)
-  const [activeTab, setActiveTab] = useState<'magic' | 'demo'>('magic')
+  const [activeTab, setActiveTab] = useState<'magic' | 'password' | 'demo'>('magic')
   const [demoEmail, setDemoEmail] = useState('')
   const [demoPin, setDemoPin] = useState('0000')
   const [showPin, setShowPin] = useState(false)
   const [demoLoading, setDemoLoading] = useState(false)
   const [demoError, setDemoError] = useState('')
+  const [password, setPassword] = useState('')
+  const [passwordLoading, setPasswordLoading] = useState(false)
+  const [passwordError, setPasswordError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [passwordFocused, setPasswordFocused] = useState(false)
 
   // Input focus states
   const [emailFocused, setEmailFocused] = useState(false)
@@ -59,6 +64,23 @@ export default function LoginPage() {
       setSent(true)
     }
     setLoading(false)
+  }
+
+  async function handlePasswordLogin(e: React.FormEvent) {
+    e.preventDefault()
+    setPasswordLoading(true)
+    setPasswordError('')
+    const supabase = createClient()
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+    if (error) {
+      setPasswordError(error.message)
+    } else {
+      window.location.href = '/school-admin'
+    }
+    setPasswordLoading(false)
   }
 
   async function handleDemoLogin(e: React.FormEvent) {
@@ -162,8 +184,7 @@ export default function LoginPage() {
           </div>
 
           {/* Tabs */}
-          {isDemoMode && (
-            <div style={{
+          <div style={{
               display: 'flex', gap: '0', marginBottom: '24px',
               background: 'rgba(255,255,255,0.05)', borderRadius: '999px',
               padding: '4px',
@@ -172,18 +193,22 @@ export default function LoginPage() {
               <div style={{
                 position: 'absolute',
                 top: '4px',
-                left: activeTab === 'magic' ? '4px' : 'calc(50% + 2px)',
-                width: 'calc(50% - 4px)',
+                left: activeTab === 'magic'
+                  ? '4px'
+                  : activeTab === 'password'
+                    ? 'calc(33.33% + 2px)'
+                    : 'calc(66.66% + 2px)',
+                width: isDemoMode ? 'calc(33.33% - 4px)' : 'calc(50% - 4px)',
                 height: 'calc(100% - 8px)',
                 borderRadius: '999px',
                 background: 'rgba(255,255,255,0.10)',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                transition: 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                transition: 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
               }} />
-              {(['magic', 'demo'] as const).map(tab => (
+              {(isDemoMode ? ['magic', 'password', 'demo'] : ['magic', 'password']).map(tab => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab)}
+                  onClick={() => setActiveTab(tab as 'magic' | 'password' | 'demo')}
                   style={{
                     flex: 1, padding: '8px 12px', borderRadius: '999px', border: 'none',
                     fontSize: '13px', fontWeight: '600', fontFamily: 'Inter, sans-serif', cursor: 'pointer',
@@ -193,14 +218,13 @@ export default function LoginPage() {
                     position: 'relative', zIndex: 1,
                   }}
                 >
-                  {tab === 'magic' ? 'Magic Link' : 'Demo Login'}
+                  {tab === 'magic' ? 'Magic Link' : tab === 'password' ? 'Password' : 'Demo Login'}
                 </button>
               ))}
             </div>
-          )}
 
           {/* Magic Link Form */}
-          {(!isDemoMode || activeTab === 'magic') && !sent && (
+          {activeTab === 'magic' && !sent && (
             <form onSubmit={handleMagicLink} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {/* Email input — pill-shaped */}
               <div style={{ position: 'relative' }}>
@@ -256,7 +280,7 @@ export default function LoginPage() {
           )}
 
           {/* Success State */}
-          {(!isDemoMode || activeTab === 'magic') && sent && (
+          {activeTab === 'magic' && sent && (
             <div style={{ textAlign: 'center', padding: '20px 0' }}>
               <div style={{
                 width: '64px', height: '64px', borderRadius: '50%',
@@ -285,6 +309,101 @@ export default function LoginPage() {
                 <br />Click it to sign in.
               </p>
             </div>
+          )}
+
+          {/* Password Form */}
+          {activeTab === 'password' && (
+            <form onSubmit={handlePasswordLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Email input */}
+              <div style={{ position: 'relative' }}>
+                <Mail size='15' style={{
+                  position: 'absolute', left: '16px', top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: emailFocused ? 'var(--accent)' : '#9CA3AF',
+                  pointerEvents: 'none',
+                  transition: 'color 0.2s',
+                  zIndex: 1,
+                }} />
+                <input
+                  type='email'
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                  autoComplete='email'
+                  placeholder="Email address"
+                  onFocus={() => setEmailFocused(true)}
+                  onBlur={() => setEmailFocused(false)}
+                  className="admin-input"
+                  style={{
+                    paddingLeft: '44px',
+                    paddingRight: '16px',
+                    height: '52px',
+                    borderRadius: '999px',
+                    border: emailFocused ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.06)',
+                    boxShadow: emailFocused ? '0 0 0 3px var(--accent-glow)' : 'none',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                    fontSize: '14px',
+                  }}
+                />
+              </div>
+
+              {/* Password input */}
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  autoComplete='current-password'
+                  placeholder="Password"
+                  onFocus={() => setPasswordFocused(true)}
+                  onBlur={() => setPasswordFocused(false)}
+                  className="admin-input"
+                  style={{
+                    paddingLeft: '16px',
+                    paddingRight: '48px',
+                    height: '52px',
+                    borderRadius: '999px',
+                    border: passwordFocused ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.06)',
+                    boxShadow: passwordFocused ? '0 0 0 3px var(--accent-glow)' : 'none',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                    fontSize: '14px',
+                  }}
+                />
+                <button
+                  type='button'
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute', right: '16px', top: '50%',
+                    transform: 'translateY(-50%)', background: 'none',
+                    border: 'none', cursor: 'pointer',
+                    color: passwordFocused ? 'var(--accent)' : '#9CA3AF',
+                    padding: '4px',
+                    transition: 'color 0.2s',
+                  }}
+                >
+                  {showPassword ? <EyeOff size='15' /> : <Eye size='15' />}
+                </button>
+              </div>
+
+              {passwordError && (
+                <p style={{ fontSize: '13px', color: '#EF4444', textAlign: 'center', fontFamily: 'Inter, sans-serif' }}>{passwordError}</p>
+              )}
+
+              <button
+                type='submit'
+                disabled={passwordLoading}
+                className="login-btn-primary"
+                style={{
+                  height: '52px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  opacity: passwordLoading ? 0.6 : 1,
+                }}
+              >
+                {passwordLoading ? 'Signing in...' : 'Sign In'}
+                {!passwordLoading && <ArrowRight size='15' />}
+              </button>
+            </form>
           )}
 
           {/* Demo Login Form */}
