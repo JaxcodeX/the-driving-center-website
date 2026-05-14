@@ -264,7 +264,7 @@ export default function SchoolAdminLayout({ children }: { children: ReactNode })
       </button>
 
       {/* Main Content */}
-      <main style={{
+      <main className="admin-main" style={{
         flex: 1,
         marginLeft: '240px',
         padding: '40px 48px',
