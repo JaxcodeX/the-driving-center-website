@@ -2,22 +2,22 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Plus, Search, Pencil, Shield, Mail, Phone, Calendar, Users, CreditCard, Settings, LayoutDashboard, GraduationCap, Car, Clock, X } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { Plus, Search, Pencil, Shield, Mail, Phone, Users, X } from 'lucide-react'
 
 type Student = {
   id: string
   legal_name: string
-  permit_number: string | null
-  dob: string
+  permit_number?: string | null
+  dob?: string
   parent_email: string | null
   classroom_hours: number
   driving_hours: number
   certificate_issued_at: string | null
-  enrollment_date: string
-  emergency_contact_name: string | null
-  emergency_contact_phone: string | null
+  enrollment_date?: string
+  emergency_contact_name?: string | null
+  emergency_contact_phone?: string | null
   created_at: string
+  school_id?: string
 }
 
 function getStudentStatus(s: Student): string {
@@ -52,15 +52,7 @@ function getInitials(name: string): string {
   return display.slice(0, 2).toUpperCase()
 }
 
-const NAV_ITEMS = [
-  { icon: LayoutDashboard, label: 'Dashboard', href: '/school-admin' },
-  { icon: GraduationCap, label: 'Students', href: '/school-admin/students', active: true },
-  { icon: Calendar, label: 'Sessions', href: '/school-admin/sessions' },
-  { icon: Car, label: 'Instructors', href: '/school-admin/instructors' },
-  { icon: Clock, label: 'Calendar', href: '/school-admin/calendar' },
-  { icon: CreditCard, label: 'Billing', href: '/school-admin/billing' },
-  { icon: Settings, label: 'Settings', href: '/school-admin/settings' },
-]
+// NAV_ITEMS removed — layout provides the sidebar
 
 const BG = 'var(--admin-bg)'
 const BG_GRADIENT = 'var(--mesh-subtle)'
@@ -86,53 +78,49 @@ function StatusBadge({ status }: { status: string }) {
   )
 }
 
-function AddStudentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: Partial<Student>) => void }) {
+function AddStudentModal({ onClose, onAdd, schoolId: propSchoolId }: { onClose: () => void; onAdd: (s: Partial<Student>) => void; schoolId?: string | null }) {
   const [form, setForm] = useState({ legal_name: '', dob: '', parent_email: '', emergency_contact_name: '', emergency_contact_phone: '' })
   const [loading, setLoading] = useState(false)
-  const supabase = createClient()
+  const [error, setError] = useState('')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
+    setError('')
 
-    // In demo mode, use the API route (bypasses RLS with service role key)
     const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
     const isDemo = !!demoCookie
 
-    if (isDemo) {
-      try {
-        const res = await fetch('/api/demo/students', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            legal_name: form.legal_name,
-            dob: form.dob,
-            parent_email: form.parent_email || null,
-            emergency_contact_name: form.emergency_contact_name || null,
-            emergency_contact_phone: form.emergency_contact_phone || null,
-          }),
-        })
-        const data = await res.json()
-        if (res.ok && data) { onAdd(data); onClose() }
-      } catch {}
-      setLoading(false)
-      return
+    // Always use API route (bypasses RLS with service role key)
+    const endpoint = isDemo ? '/api/demo/students' : '/api/students'
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    if (!isDemo) {
+      // Resolve school_id from prop, demo cookie, or auth
+      let sid: string | null = propSchoolId ?? null
+      if (!sid && demoCookie) {
+        try { sid = JSON.parse(atob(decodeURIComponent(demoCookie.split('=')[1]))).schoolId } catch {}
+      }
+      if (sid) headers['x-school-id'] = sid
     }
 
-    const { data: { user } } = await supabase.auth.getUser()
-    let schoolId: string | null = null
-    if (demoCookie) { try { schoolId = JSON.parse(atob(decodeURIComponent(demoCookie.split('=')[1]))).schoolId } catch {} }
-    if (!schoolId) {
-      const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user!.id).single()
-      if (!school) { setLoading(false); return }
-      schoolId = school.id
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          legal_name: form.legal_name,
+          dob: form.dob,
+          parent_email: form.parent_email || null,
+          emergency_contact_name: form.emergency_contact_name || null,
+          emergency_contact_phone: form.emergency_contact_phone || null,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setError(data.error || 'Failed to add student'); setLoading(false); return }
+      if (data) { onAdd(data); onClose() }
+    } catch (err) {
+      setError('Something went wrong')
     }
-    const { data, error } = await supabase.from('students_driver_ed').insert({
-      legal_name: form.legal_name, dob: form.dob, parent_email: form.parent_email || null,
-      emergency_contact_name: form.emergency_contact_name || null, emergency_contact_phone: form.emergency_contact_phone || null,
-      school_id: schoolId, enrollment_date: new Date().toISOString().split('T')[0], classroom_hours: 0, driving_hours: 0,
-    }).select().single()
-    if (!error && data) { onAdd(data); onClose() }
     setLoading(false)
   }
 
@@ -152,6 +140,7 @@ function AddStudentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: P
               <input type={type} value={(form as any)[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} placeholder={placeholder} required style={inputStyle} onFocus={e => (e.target.style.borderColor = '#4ADE80')} onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')} />
             </div>
           ))}
+          {error && <p style={{ fontSize: '13px', color: '#F97316', margin: 0, padding: '8px 12px', background: 'rgba(249,115,22,0.1)', borderRadius: '8px' }}>{error}</p>}
           <div style={{ display: 'flex', gap: '12px', paddingTop: '8px' }}>
             <button type="button" onClick={onClose} style={{ flex: 1, padding: '12px', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#FFFFFF', fontSize: '14px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.15s' }} onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)')} onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}>Cancel</button>
             <button type="submit" disabled={loading} style={{ flex: 1, padding: '12px', background: '#4ADE80', border: 'none', borderRadius: '12px', color: '#000000', fontSize: '14px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.5 : 1 }}>{loading ? 'Adding...' : 'Add Student →'}</button>
@@ -168,7 +157,8 @@ export default function StudentsPage() {
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
-  const supabase = createClient()
+  const [selectedStudentLoading, setSelectedStudentLoading] = useState(false)
+  const [schoolId, setSchoolId] = useState<string | null>(null)
 
   useEffect(() => {
     async function load() {
@@ -180,84 +170,57 @@ export default function StudentsPage() {
         } catch {}
         setStudents([]); setLoading(false); return
       }
+      // Non-demo: resolve school_id, then use API route
+      const supabase = (await import('@/lib/supabase/client')).createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { window.location.href = '/login'; return }
-      const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
+      const { data: school } = await supabase.from('schools').select('id').eq('owner_email', user.email).single()
       if (!school) { setLoading(false); return }
-      const { data } = await supabase.from('students_driver_ed').select('id, legal_name, parent_email, classroom_hours, driving_hours, certificate_issued_at, emergency_contact_phone, enrollment_date, created_at').eq('school_id', school.id)
-      setStudents((data as any[]) || []); setLoading(false)
+      const sid = school.id
+      setSchoolId(sid)
+      // Use API route to bypass RLS
+      try {
+        const res = await fetch('/api/students?school_id=' + encodeURIComponent(sid), {
+          headers: { 'x-school-id': sid },
+        })
+        if (res.ok) { setStudents(await res.json()); setLoading(false); return }
+      } catch {}
+      setStudents([]); setLoading(false)
     }
     load()
   }, [])
 
+  // Fetch full student detail when selected
+  useEffect(() => {
+    if (!selectedStudent) return
+    const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
+    if (demoCookie || !selectedStudent?.legal_name) return // demo already has full data
+    // Check if detail modal fields are present; if not, lazy-load from API
+    if (selectedStudent.dob && selectedStudent.permit_number) return
+    setSelectedStudentLoading(true)
+    fetch('/api/students/' + selectedStudent.id, {
+      headers: schoolId ? { 'x-school-id': schoolId } : {},
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data) setSelectedStudent(data)
+        setSelectedStudentLoading(false)
+      })
+      .catch(() => setSelectedStudentLoading(false))
+  }, [selectedStudent?.id ?? null, schoolId])
+
   const filtered = students.filter(s => s.legal_name.toLowerCase().includes(search.toLowerCase()) || (s.parent_email || '').toLowerCase().includes(search.toLowerCase()))
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: BG, fontFamily: 'Inter, sans-serif', position: 'relative' }}>
-      {/* Background gradient */}
-      <div style={{ position: 'fixed', inset: 0, background: BG_GRADIENT, pointerEvents: 'none', zIndex: 0 }} />
+    <>
 
-      {/* Sidebar */}
-      <aside style={{
-        width: '220px', flexShrink: 0, background: GLASS_BG, backdropFilter: GLASS_BLUR,
-        WebkitBackdropFilter: GLASS_BLUR, borderRight: `1px solid ${GLASS_BORDER}`,
-        display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, left: 0, height: '100vh', overflowY: 'auto', zIndex: 10,
-      }}>
-        {/* Logo */}
-        <div style={{ padding: '28px 20px 20px', borderBottom: `1px solid ${GLASS_BORDER}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: `linear-gradient(135deg, ${ACCENT_GREEN}, ${ACCENT_CYAN})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Car className="w-4 h-4" style={{ color: '#000' }} />
-            </div>
-            <div>
-              <div style={{ fontSize: '13px', fontWeight: '700', color: '#FFFFFF', lineHeight: 1.2 }}>Driving Center</div>
-              <div style={{ fontSize: '10px', color: TEXT_SECONDARY, fontWeight: '500' }}>School Admin</div>
-            </div>
-          </div>
-        </div>
 
-        {/* Nav */}
-        <nav style={{ padding: '16px 12px', flex: 1 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            {NAV_ITEMS.map(({ icon: NavIcon, label, href, active }) => (
-              <Link key={label} href={href} style={{
-                display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '12px',
-                textDecoration: 'none', background: active ? 'rgba(255,255,255,0.06)' : 'transparent',
-                borderLeft: active ? `3px solid ${ACCENT_GREEN}` : '3px solid transparent',
-                boxShadow: active ? `0 0 12px rgba(74,222,128,0.3)` : 'none', transition: 'background 0.15s',
-              }}
-              onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)' }}
-              onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
-              >
-                <NavIcon className="w-4 h-4" style={{ color: active ? ACCENT_GREEN : TEXT_SECONDARY, flexShrink: 0 }} />
-                <span style={{ fontSize: '13px', fontWeight: active ? '600' : '500', color: active ? '#FFFFFF' : TEXT_SECONDARY }}>{label}</span>
-              </Link>
-            ))}
-          </div>
-        </nav>
 
-        {/* School name */}
-        <div style={{ padding: '12px 16px', borderTop: `1px solid ${GLASS_BORDER}` }}>
-          <p style={{ fontSize: '10px', color: TEXT_SECONDARY, fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Your Driving School</p>
-        </div>
-      </aside>
 
-      {/* Mobile nav pills */}
-      <nav style={{ display: 'none', padding: '12px 16px', gap: '8px', overflowX: 'auto', borderBottom: `1px solid ${GLASS_BORDER}`, background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, position: 'sticky', top: 0, zIndex: 20 }} className="admin-nav-pills">
-        {NAV_ITEMS.map(({ icon: NavIcon, label, href, active }) => (
-          <Link key={label} href={href} style={{
-            display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '999px',
-            textDecoration: 'none', background: active ? 'rgba(74,222,128,0.15)' : 'rgba(255,255,255,0.04)',
-            border: `1px solid ${active ? ACCENT_GREEN : GLASS_BORDER}`, transition: 'background 0.15s', flexShrink: 0,
-          }}>
-            <NavIcon className="w-3.5 h-3.5" style={{ color: active ? ACCENT_GREEN : TEXT_SECONDARY }} />
-            <span style={{ fontSize: '12px', fontWeight: active ? '600' : '500', color: active ? ACCENT_GREEN : TEXT_SECONDARY }}>{label}</span>
-          </Link>
-        ))}
-      </nav>
+
 
       {/* Main Content */}
-      <main style={{ flex: 1, marginLeft: '220px', padding: '40px 48px', maxWidth: '1100px', position: 'relative', zIndex: 1 }} className="admin-main">
+      <div className="admin-main">
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
@@ -378,9 +341,9 @@ export default function StudentsPage() {
             })}
           </div>
         )}
-      </main>
+      </div>
 
-      {showModal && <AddStudentModal onClose={() => setShowModal(false)} onAdd={s => setStudents(prev => [s as Student, ...prev])} />}
+      {showModal && <AddStudentModal onClose={() => setShowModal(false)} onAdd={s => setStudents(prev => [s as Student, ...prev])} schoolId={schoolId} />}
 
       {/* Student Detail Modal */}
       {selectedStudent && (
@@ -484,13 +447,7 @@ export default function StudentsPage() {
           animation: shimmer 1.5s infinite;
           border-radius: 8px;
         }
-        @media (max-width: 768px) {
-          .admin-sidebar { display: none !important; }
-          .admin-main { margin-left: 0 !important; padding: 24px 16px !important; }
-          .admin-nav-pills { display: flex !important; }
-        }
-        @media (min-width: 769px) { .admin-nav-pills { display: none !important; } }
       `}</style>
-    </div>
+    </>
   )
 }

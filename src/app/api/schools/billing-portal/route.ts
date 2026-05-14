@@ -50,5 +50,5 @@ export async function GET(request: NextRequest) {
     return_url: `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/school-admin`,
   })
 
-  return NextResponse.redirect(session.url)
+  return NextResponse.json({ url: session.url })
 }

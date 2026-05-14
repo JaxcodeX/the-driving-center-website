@@ -2,18 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ChevronLeft, ChevronRight, Clock, LayoutDashboard, GraduationCap, Calendar, Car, Settings, DollarSign } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Clock } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-const NAV_ITEMS = [
-  { icon: LayoutDashboard, label: 'Dashboard', href: '/school-admin' },
-  { icon: GraduationCap, label: 'Students', href: '/school-admin/students' },
-  { icon: Calendar, label: 'Sessions', href: '/school-admin/sessions' },
-  { icon: Car, label: 'Instructors', href: '/school-admin/instructors' },
-  { icon: Clock, label: 'Calendar', href: '/school-admin/calendar', active: true },
-  { icon: DollarSign, label: 'Billing', href: '/school-admin/billing' },
-  { icon: Settings, label: 'Settings', href: '/school-admin/settings' },
-]
+// NAV_ITEMS removed — layout provides the sidebar
 
 const BG = 'var(--admin-bg)'
 const BG_GRADIENT = 'var(--mesh-subtle)'
@@ -32,19 +24,30 @@ export default function CalendarPage() {
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient()
-      let schoolId: string | null = null
       const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
-      if (demoCookie) { try { schoolId = JSON.parse(atob(decodeURIComponent(demoCookie.split('=')[1]))).schoolId } catch {} }
-      if (!schoolId) {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) { window.location.href = '/login'; return }
-        const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user.id).single()
-        if (!school) { setLoading(false); return }
-        schoolId = school.id
+      if (demoCookie) {
+        try {
+          const res = await fetch('/api/demo/sessions')
+          if (res.ok) { setSessions((await res.json()).sessions || []); setLoading(false); return }
+        } catch {}
+        setSessions([]); setLoading(false); return
       }
-      const { data } = await supabase.from('sessions').select('id, start_date, end_date, max_seats, instructor_id, session_type_id, status, location, instructor:instructors(name), session_type:session_types(name)').eq('school_id', schoolId)
-      setSessions((data as any[]) || []); setLoading(false)
+      // Non-demo: resolve school_id, use API
+      const supabase = (await import('@/lib/supabase/client')).createClient()
+      let schoolId: string | null = null
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { window.location.href = '/login'; return }
+      const { data: school } = await supabase.from('schools').select('id').eq('owner_email', user.email).single()
+      if (!school) { setLoading(false); return }
+      schoolId = school.id
+      if (!schoolId) { setSessions([]); setLoading(false); return }
+      try {
+        const res = await fetch('/api/sessions?school_id=' + encodeURIComponent(schoolId), {
+          headers: { 'x-school-id': schoolId },
+        })
+        if (res.ok) { setSessions(await res.json()); setLoading(false); return }
+      } catch {}
+      setSessions([]); setLoading(false)
     }
     load()
   }, [])
@@ -72,48 +75,13 @@ export default function CalendarPage() {
   const today = new Date()
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: BG, fontFamily: 'Inter, sans-serif', position: 'relative' }}>
-      <div style={{ position: 'fixed', inset: 0, background: BG_GRADIENT, pointerEvents: 'none', zIndex: 0 }} />
+    <>
 
-      {/* Sidebar */}
-      <aside style={{ width: '220px', flexShrink: 0, background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, borderRight: `1px solid ${GLASS_BORDER}`, display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, left: 0, height: '100vh', overflowY: 'auto', zIndex: 10 }}>
-        <div style={{ padding: '28px 20px 20px', borderBottom: `1px solid ${GLASS_BORDER}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: `linear-gradient(135deg, ${ACCENT_GREEN}, #67E8F9)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Car className="w-4 h-4" style={{ color: '#000' }} />
-            </div>
-            <div>
-              <div style={{ fontSize: '13px', fontWeight: '700', color: '#FFFFFF', lineHeight: 1.2 }}>Driving Center</div>
-              <div style={{ fontSize: '10px', color: TEXT_SECONDARY, fontWeight: '500' }}>School Admin</div>
-            </div>
-          </div>
-        </div>
-        <nav style={{ padding: '16px 12px', flex: 1 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            {NAV_ITEMS.map(({ icon: NavIcon, label, href, active }) => (
-              <Link key={label} href={href} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '12px', textDecoration: 'none', background: active ? 'rgba(255,255,255,0.06)' : 'transparent', borderLeft: active ? `3px solid ${ACCENT_GREEN}` : '3px solid transparent', boxShadow: active ? `0 0 12px rgba(74,222,128,0.3)` : 'none', transition: 'background 0.15s' }}
-              onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)' }}
-              onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent' }}>
-                <NavIcon className="w-4 h-4" style={{ color: active ? ACCENT_GREEN : TEXT_SECONDARY, flexShrink: 0 }} />
-                <span style={{ fontSize: '13px', fontWeight: active ? '600' : '500', color: active ? '#FFFFFF' : TEXT_SECONDARY }}>{label}</span>
-              </Link>
-            ))}
-          </div>
-        </nav>
-        <div style={{ padding: '16px 20px', borderTop: `1px solid ${GLASS_BORDER}` }}><p style={{ fontSize: '10px', color: TEXT_SECONDARY, fontWeight: '500' }}>Your Driving School</p></div>
-      </aside>
 
-      {/* Mobile nav */}
-      <nav style={{ display: 'none', padding: '12px 16px', gap: '8px', overflowX: 'auto', borderBottom: `1px solid ${GLASS_BORDER}`, background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, position: 'sticky', top: 0, zIndex: 20 }} className="admin-nav-pills">
-        {NAV_ITEMS.map(({ icon: NavIcon, label, href, active }) => (
-          <Link key={label} href={href} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '999px', textDecoration: 'none', background: active ? 'rgba(74,222,128,0.15)' : 'rgba(255,255,255,0.04)', border: `1px solid ${active ? ACCENT_GREEN : GLASS_BORDER}`, transition: 'background 0.15s', flexShrink: 0 }}>
-            <NavIcon className="w-3.5 h-3.5" style={{ color: active ? ACCENT_GREEN : TEXT_SECONDARY }} />
-            <span style={{ fontSize: '12px', fontWeight: active ? '600' : '500', color: active ? ACCENT_GREEN : TEXT_SECONDARY }}>{label}</span>
-          </Link>
-        ))}
-      </nav>
 
-      <div style={{ flex: 1, marginLeft: '220px', padding: '40px 48px', maxWidth: '1100px', position: 'relative', zIndex: 1 }} className="admin-main">
+
+
+      <div className="admin-main">
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
@@ -193,14 +161,6 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      <style>{`
-        @media (max-width: 768px) {
-          aside { display: none !important; }
-          .admin-main { margin-left: 0 !important; padding: 24px 16px !important; }
-          .admin-nav-pills { display: flex !important; }
-        }
-        @media (min-width: 769px) { .admin-nav-pills { display: none !important; } }
-      `}</style>
-    </div>
+    </>
   )
 }

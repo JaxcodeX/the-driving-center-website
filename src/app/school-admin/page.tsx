@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
-  Calendar, Users, CreditCard, TrendingUp, Plus, Mail, Bell,
-  Clock, Car, Settings, BarChart3, ChevronRight,
-  ArrowRight, LayoutDashboard, GraduationCap, DollarSign, X,
+  Calendar, Users, CreditCard, TrendingUp, Plus, Mail, Clock, X, ArrowRight
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
@@ -19,15 +17,7 @@ type UpcomingSession = {
 
 type ModalType = 'revenue' | 'students' | 'sessions' | 'completion' | null
 
-const NAV_ITEMS = [
-  { icon: LayoutDashboard, label: 'Dashboard', href: '/school-admin', active: true },
-  { icon: GraduationCap, label: 'Students', href: '/school-admin/students', active: false },
-  { icon: Calendar, label: 'Sessions', href: '/school-admin/sessions', active: false },
-  { icon: Car, label: 'Instructors', href: '/school-admin/instructors', active: false },
-  { icon: Clock, label: 'Calendar', href: '/school-admin/calendar', active: false },
-  { icon: DollarSign, label: 'Billing', href: '/school-admin/billing', active: false },
-  { icon: Settings, label: 'Settings', href: '/school-admin/settings', active: false },
-]
+// NAV_ITEMS removed — layout provides the sidebar
 
 // Design tokens
 const BG = '#0D0D12'
@@ -62,7 +52,7 @@ export default function DashboardPage() {
   const [unconfirmedSessions, setUnconfirmedSessions] = useState(0)
   const [needsReminder, setNeedsReminder] = useState(0)
   const [activeModal, setActiveModal] = useState<ModalType>(null)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  // mobile nav handled by layout
 
   useEffect(() => {
     async function load() {
@@ -268,143 +258,12 @@ export default function DashboardPage() {
         zIndex: 0,
       }} />
 
-      {/* Sidebar */}
-      <aside className="admin-sidebar" style={{
-        width: '220px',
-        flexShrink: 0,
-        background: GLASS_BG,
-        backdropFilter: GLASS_BLUR,
-        WebkitBackdropFilter: GLASS_BLUR,
-        borderRight: `1px solid ${GLASS_BORDER}`,
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        height: '100vh',
-        overflowY: 'auto',
-        zIndex: 10,
-      }}>
-        {/* Logo */}
-        <div style={{
-          padding: '28px 20px 20px',
-          borderBottom: `1px solid ${GLASS_BORDER}`,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '10px',
-              background: `linear-gradient(135deg, ${ACCENT_GREEN}, ${ACCENT_CYAN})`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              <Car className="w-4 h-4" style={{ color: '#000' }} />
-            </div>
-            <div>
-              <div style={{ fontSize: '13px', fontWeight: '700', color: '#FFFFFF', lineHeight: 1.2 }}>Driving Center</div>
-              <div style={{ fontSize: '10px', color: TEXT_SECONDARY, fontWeight: '500' }}>School Admin</div>
-            </div>
-          </div>
-        </div>
 
-        {/* Nav */}
-        <nav style={{ padding: '16px 12px', flex: 1 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            {NAV_ITEMS.map(({ icon: NavIcon, label, href, active }) => (
-              <Link
-                key={label}
-                href={href}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  padding: '10px 12px',
-                  borderRadius: '12px',
-                  textDecoration: 'none',
-                  background: active ? 'rgba(255,255,255,0.06)' : 'transparent',
-                  borderLeft: active ? `3px solid ${ACCENT_GREEN}` : '3px solid transparent',
-                  boxShadow: active ? `0 0 12px rgba(74,222,128,0.3)` : 'none',
-                  transition: 'background 0.15s',
-                }}
-                onMouseEnter={e => {
-                  if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'
-                }}
-                onMouseLeave={e => {
-                  if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent'
-                }}
-              >
-                <NavIcon className="w-4 h-4" style={{ color: active ? ACCENT_GREEN : TEXT_SECONDARY, flexShrink: 0 }} />
-                <span style={{
-                  fontSize: '13px',
-                  fontWeight: active ? '600' : '500',
-                  color: active ? '#FFFFFF' : TEXT_SECONDARY,
-                }}>
-                  {label}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </nav>
 
-        {/* School name */}
-        <div style={{
-          padding: '16px 20px',
-          borderTop: `1px solid ${GLASS_BORDER}`,
-        }}>
-          <p style={{ fontSize: '10px', color: TEXT_SECONDARY, fontWeight: '500' }}>Your Driving School</p>
-        </div>
-      </aside>
 
-      {/* Mobile nav pills */}
-      <nav className="admin-nav-pills" style={{
-        display: 'none',
-        padding: '12px 16px',
-        gap: '8px',
-        overflowX: 'auto',
-        borderBottom: `1px solid ${GLASS_BORDER}`,
-        background: GLASS_BG,
-        backdropFilter: GLASS_BLUR,
-        WebkitBackdropFilter: GLASS_BLUR,
-        position: 'sticky',
-        top: 0,
-        zIndex: 20,
-      }}>
-        {NAV_ITEMS.map(({ icon: NavIcon, label, href, active }) => (
-          <Link
-            key={label}
-            href={href}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 14px',
-              borderRadius: '999px',
-              textDecoration: 'none',
-              background: active ? 'rgba(74,222,128,0.15)' : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${active ? ACCENT_GREEN : GLASS_BORDER}`,
-              transition: 'background 0.15s',
-              flexShrink: 0,
-            }}
-          >
-            <NavIcon className="w-3.5 h-3.5" style={{ color: active ? ACCENT_GREEN : TEXT_SECONDARY }} />
-            <span style={{ fontSize: '12px', fontWeight: active ? '600' : '500', color: active ? ACCENT_GREEN : TEXT_SECONDARY }}>
-              {label}
-            </span>
-          </Link>
-        ))}
-      </nav>
 
       {/* Main Content */}
-      <main className="admin-main" style={{
-        flex: 1,
-        marginLeft: '220px',
-        padding: '40px 48px',
-        maxWidth: '1100px',
-        position: 'relative',
-        zIndex: 1,
-      }}>
+      <div className="admin-main">
 
         {/* Top bar */}
         <div style={{
@@ -841,94 +700,12 @@ export default function DashboardPage() {
 
           </div>
         </div>
-      </main>
+      </div>
 
       {/* Mobile hamburger button */}
-      <button
-        onClick={() => setMobileMenuOpen(true)}
-        className="admin-hamburger"
-        style={{
-          display: 'none',
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          zIndex: 50,
-          width: '52px',
-          height: '52px',
-          borderRadius: '50%',
-          background: `linear-gradient(135deg, ${ACCENT_GREEN}, ${ACCENT_CYAN})`,
-          border: 'none',
-          cursor: 'pointer',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 4px 20px rgba(74,222,128,0.4)',
-        }}
-      >
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-          <path d="M3 6h16M3 11h16M3 16h16" stroke="#000" strokeWidth="2.2" strokeLinecap="round"/>
-        </svg>
-      </button>
 
-      {/* Mobile slide-in menu */}
-      {mobileMenuOpen && (
-        <>
-          <div
-            onClick={() => setMobileMenuOpen(false)}
-            style={{
-              position: 'fixed', inset: 0, zIndex: 200,
-              background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
-            }}
-          />
-          <nav style={{
-            position: 'fixed', top: 0, left: 0, height: '100vh', zIndex: 201,
-            width: '260px',
-            background: 'rgba(13,13,18,0.98)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            borderRight: `1px solid ${GLASS_BORDER}`,
-            padding: '28px 16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '4px',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: `linear-gradient(135deg, ${ACCENT_GREEN}, ${ACCENT_CYAN})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Car className="w-4 h-4" style={{ color: '#000' }} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: '700', color: '#FFFFFF', lineHeight: 1.2 }}>Driving Center</div>
-                  <div style={{ fontSize: '10px', color: TEXT_SECONDARY }}>School Admin</div>
-                </div>
-              </div>
-              <button
-                onClick={() => setMobileMenuOpen(false)}
-                style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#9CA3AF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            {NAV_ITEMS.map(({ icon: NavIcon, label, href, active }) => (
-              <Link
-                key={label}
-                href={href}
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 16px',
-                  borderRadius: '12px', textDecoration: 'none',
-                  background: active ? 'rgba(255,255,255,0.06)' : 'transparent',
-                  color: active ? '#FFFFFF' : TEXT_SECONDARY,
-                  fontWeight: active ? '600' : '500',
-                  fontSize: '14px',
-                }}
-              >
-                <NavIcon className="w-4 h-4" style={{ color: active ? ACCENT_GREEN : TEXT_SECONDARY }} />
-                {label}
-              </Link>
-            ))}
-          </nav>
-        </>
-      )}
+
+
 
       {/* KPI Detail Modal */}
       {activeModal && (
@@ -1083,19 +860,6 @@ export default function DashboardPage() {
 
       <style>{`
         @media (max-width: 768px) {
-          .admin-sidebar {
-            display: none !important;
-          }
-          .admin-main {
-            margin-left: 0 !important;
-            padding: 24px 16px !important;
-          }
-          .admin-nav-pills {
-            display: flex !important;
-          }
-          .admin-hamburger {
-            display: flex !important;
-          }
           .admin-kpi-grid {
             grid-template-columns: repeat(2, 1fr) !important;
           }
@@ -1103,12 +867,7 @@ export default function DashboardPage() {
             grid-template-columns: 1fr !important;
           }
         }
-        @media (min-width: 769px) {
-          .admin-nav-pills {
-            display: none !important;
-          }
-        }
       `}</style>
-    </div>
+    </>
   )
 }
