@@ -44,11 +44,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Booking is not pending payment' }, { status: 409 })
   }
 
-  // Check Stripe BEFORE fetching other data
+  // Bug fix: Production requires Stripe OR explicit demo mode — never silently confirm without payment
   const hasStripeKey = !!process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.startsWith('sk_')
 
-  // No Stripe — confirm directly in demo mode
+  // No Stripe — only allow in DEMO_MODE (local dev or explicit demo deployments)
   if (!hasStripeKey) {
+    if (process.env.DEMO_MODE !== 'true') {
+      return NextResponse.json(
+        { error: 'Payment not configured. Please configure Stripe to process bookings.' },
+        { status: 503 }
+      )
+    }
+    // DEMO_MODE=true: confirm directly without payment
     await supabaseAdmin
       .from('bookings')
       .update({ status: 'confirmed' })
