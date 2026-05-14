@@ -126,7 +126,7 @@ function SchoolContent() {
 
       {/* Hero Header */}
       <div className="relative z-10 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
-        <div className="max-w-3xl mx-auto px-6 py-10 text-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10 text-center">
           {/* Logo */}
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: 'linear-gradient(135deg, #4ADE80, #22C55E)' }}>
             <span className="text-white font-bold text-xl">DC</span>

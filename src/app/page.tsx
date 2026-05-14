@@ -199,7 +199,7 @@ function Hero() {
       <div className='hero-gradient' style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
 
       <Container style={{ position: 'relative', zIndex: 1 }}>
-        <div style={{
+        <div className='hero-grid' style={{
           display: 'grid',
           gridTemplateColumns: '55% 1fr',
           gap: '64px',
@@ -256,7 +256,7 @@ function Hero() {
           </div>
 
           {/* Right: floating glassmorphic dashboard preview card */}
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: 'relative' }} className='hero-preview-card'>
             <div className='glass-card' style={{ padding: '0', overflow: 'hidden', borderRadius: '24px' }}>
               {/* Mesh gradient strip at top */}
               <div className='mesh-gradient' style={{ height: '6px' }} />
@@ -446,7 +446,7 @@ function Features() {
         <SectionSub mb='0' ta='center'>From booking to billing — run your entire school from one dashboard.</SectionSub>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+      <div className='features-grid' style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
         {features.map((f, i) => (
           <div key={f.title} data-animate style={{
             animationDelay: `${i * 100}ms`,
@@ -526,7 +526,7 @@ function Process() {
         <SectionSub mb='0' ta='center'>Every feature built around the problems that actually cost you time and money.</SectionSub>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', maxWidth: '960px', margin: '0 auto' }}>
+      <div className='process-grid' style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', maxWidth: '960px', margin: '0 auto' }}>
         {processSteps.map((step, i) => (
           <div key={step.num} data-animate style={{
             animationDelay: `${i * 120}ms`,
@@ -618,7 +618,7 @@ function Testimonials() {
         <SectionSub mb='0' ta='center'>Don&apos;t take our word for it. Here&apos;s what school owners have to say.</SectionSub>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', maxWidth: '900px', margin: '0 auto' }}>
+      <div className='testimonials-grid' style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', maxWidth: '900px', margin: '0 auto' }}>
         {testimonials.map((t, i) => (
           <div key={t.name} data-animate style={{
             animationDelay: `${i * 100}ms`,
@@ -681,7 +681,7 @@ function StatsBar() {
   return (
     <section style={{ padding: '80px 0', background: 'var(--bg-surface)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
       <Container>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0' }}>
+        <div className='stats-grid' style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0' }}>
           {stats.map((stat, i) => (
             <div key={stat.label} style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
@@ -754,7 +754,7 @@ function Pricing() {
         <SectionSub mb='0' ta='center'>No setup fees. No per-seat surprises. Cancel anytime.</SectionSub>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', alignItems: 'start' }}>
+      <div className='pricing-grid' style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', alignItems: 'start' }}>
         {plans.map((p, i) => (
           <div key={p.name} data-animate style={{
             animationDelay: `${i * 100}ms`,
@@ -927,7 +927,7 @@ function Footer() {
   return (
     <footer style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-base)', padding: '64px 0 32px' }}>
       <Container>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '40px', marginBottom: '48px' }}>
+        <div className='footer-grid' style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '40px', marginBottom: '48px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
               <div style={{
@@ -1041,6 +1041,20 @@ export default function HomePage() {
         }
         @media (max-width: 900px) {
           .hero-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 640px) {
+          .hero-preview-card { display: none !important; }
+          .hero-grid { gap: 0 !important; }
+          .features-grid { grid-template-columns: 1fr !important; }
+          .pricing-grid { grid-template-columns: 1fr !important; }
+          .process-grid { grid-template-columns: 1fr !important; }
+          .testimonials-grid { grid-template-columns: 1fr !important; }
+          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .footer-grid { grid-template-columns: 1fr !important; }
+          section[style*='padding: 140px 0 120px'] { padding: 80px 0 60px !important; }
+          section[style*='padding: 120px 0'] { padding: 60px 0 60px !important; }
+          section[style*='padding: 80px 0'] { padding: 48px 0 !important; }
+          div[style*='padding: 64px 0 32px'] { padding: 40px 0 24px !important; }
         }
       `}</style>
       <Navbar />

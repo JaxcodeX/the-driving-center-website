@@ -867,6 +867,15 @@ export default function DashboardPage() {
             grid-template-columns: 1fr !important;
           }
         }
+        @media (max-width: 640px) {
+          .admin-kpi-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 10px !important;
+          }
+          .admin-main div[style*='marginBottom: 40px'] {
+            margin-bottom: 24px !important;
+          }
+        }
       `}</style>
     </div>
   )

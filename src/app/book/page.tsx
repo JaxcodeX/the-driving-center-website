@@ -639,7 +639,7 @@ function BookContent() {
 
       {/* Header */}
       <div className="border-b relative z-10" style={{ borderColor: GLASS_BORDER }}>
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center gap-2">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold" style={{ background: `linear-gradient(135deg, ${ACCENT}, #FF6B1E)` }}>DC</div>
             <span className="font-semibold text-sm" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>The Driving Center</span>
@@ -648,8 +648,8 @@ function BookContent() {
       </div>
 
       {/* Content: 2-column on desktop */}
-      <div className="max-w-5xl mx-auto px-6 py-8 relative z-10">
-        <div className="flex gap-8 items-start">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 relative z-10">
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
           {/* Left: form */}
           <div className="flex-1 min-w-0">
             {step < 3 && <StepIndicator current={step} />}

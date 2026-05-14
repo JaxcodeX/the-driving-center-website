@@ -260,7 +260,7 @@ export default function StudentsPage() {
 
         {/* Table */}
         {loading ? (
-          <div style={{ background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, borderRadius: '16px', overflow: 'hidden', boxShadow: CARD_SHADOW }}>
+          <div className='students-table' style={{ background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, borderRadius: '16px', overflow: 'hidden', boxShadow: CARD_SHADOW }}>
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 60px', gap: '16px', padding: '12px 24px', borderBottom: `1px solid ${GLASS_BORDER}` }}>
               {['Name', 'Contact', 'TCA Progress', 'Status', ''].map((_, i) => (
                 <div key={i} style={{ height: '12px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', animation: 'pulse 1.5s ease-in-out infinite' }} />
@@ -291,8 +291,9 @@ export default function StudentsPage() {
             {!search && <button onClick={() => setShowModal(true)} style={{ fontSize: '14px', fontWeight: '500', color: '#4ADE80', background: 'transparent', border: 'none', cursor: 'pointer' }}>Add your first student →</button>}
           </div>
         ) : (
-          <div style={{ background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, borderRadius: '16px', overflow: 'hidden', boxShadow: CARD_SHADOW }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 60px', gap: '16px', padding: '12px 24px', borderBottom: `1px solid ${GLASS_BORDER}` }}>
+          <div className='students-table-container' style={{ background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, borderRadius: '16px', overflow: 'hidden', boxShadow: CARD_SHADOW }}>
+            {/* Desktop header */}
+            <div className='students-table-header' style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 60px', gap: '16px', padding: '12px 24px', borderBottom: `1px solid ${GLASS_BORDER}` }}>
               {['Name', 'Contact', 'TCA Progress', 'Status', ''].map((h, i) => (
                 <div key={i} style={{ fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: TEXT_SECONDARY }}>{h}</div>
               ))}
@@ -305,7 +306,7 @@ export default function StudentsPage() {
               const totalHours = student.classroom_hours + student.driving_hours
               const tcaPct = Math.min(100, Math.round((totalHours / 60) * 100))
               return (
-                <div key={student.id} onClick={() => setSelectedStudent(student)} style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 60px', gap: '16px', padding: '16px 24px', alignItems: 'center', borderBottom: `1px solid ${GLASS_BORDER}`, transition: 'background 0.15s', cursor: 'pointer' }}
+                <div key={student.id} onClick={() => setSelectedStudent(student)} className='students-table-row' style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 60px', gap: '16px', padding: '16px 24px', alignItems: 'center', borderBottom: `1px solid ${GLASS_BORDER}`, transition: 'background 0.15s', cursor: 'pointer' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.025)')}
                 onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -318,18 +319,18 @@ export default function StudentsPage() {
                       </div>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div className='students-table-contact' style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     {student.parent_email && <div style={{ fontSize: '12px', color: TEXT_SECONDARY, display: 'flex', alignItems: 'center', gap: '6px' }}><Mail className="w-3 h-3" style={{ color: TEXT_SECONDARY, flexShrink: 0 }} /><span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{student.parent_email}</span></div>}
                     {student.emergency_contact_phone && <div style={{ fontSize: '12px', color: TEXT_SECONDARY, display: 'flex', alignItems: 'center', gap: '6px' }}><Phone className="w-3 h-3" style={{ color: TEXT_SECONDARY, flexShrink: 0 }} />{student.emergency_contact_phone}</div>}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div className='students-table-progress' style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div style={{ height: '6px', borderRadius: '999px', background: 'rgba(255,255,255,0.08)', flex: 1, minWidth: '60px', overflow: 'hidden' }}>
                       <div style={{ width: `${tcaPct}%`, height: '100%', borderRadius: '999px', background: 'linear-gradient(90deg, #38BDF8, #818CF8)' }} />
                     </div>
                     <span style={{ fontSize: '12px', color: TEXT_SECONDARY, flexShrink: 0 }}>{tcaPct}%</span>
                   </div>
-                  <div><StatusBadge status={status} /></div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                  <div className='students-table-status'><StatusBadge status={status} /></div>
+                  <div className='students-table-actions' style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                     <Link href={`/school-admin/students/${student.id}`} style={{ padding: '8px', borderRadius: '8px', transition: 'background 0.15s, box-shadow 0.15s', color: TEXT_SECONDARY, display: 'flex', alignItems: 'center', textDecoration: 'none' }}
                     onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'rgba(74,222,128,0.15)'; el.style.boxShadow = '0 0 12px rgba(74,222,128,0.35)' }}
                     onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.boxShadow = 'none' }}>
@@ -446,6 +447,23 @@ export default function StudentsPage() {
           background-size: 200% 100%;
           animation: shimmer 1.5s infinite;
           border-radius: 8px;
+        }
+        @media (max-width: 768px) {
+          .students-table-header { display: none !important; }
+          .students-table-row {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 10px !important;
+            padding: 16px !important;
+            position: relative;
+          }
+          .students-table-row > div { width: 100% !important; }
+          .students-table-contact { margin-top: 0 !important; }
+          .students-table-actions {
+            position: absolute !important;
+            top: 16px !important;
+            right: 16px !important;
+          }
         }
       `}</style>
     </>

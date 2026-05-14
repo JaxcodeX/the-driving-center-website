@@ -324,12 +324,12 @@ export default function SessionsPage() {
 
         {/* Sessions Table */}
         {loading ? (
-          <div style={{ background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, borderRadius: '16px', overflow: 'hidden', boxShadow: CARD_SHADOW }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 80px', gap: '16px', padding: '12px 24px', borderBottom: `1px solid ${GLASS_BORDER}` }}>
+          <div className='sessions-table-container' style={{ background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, borderRadius: '16px', overflow: 'hidden', boxShadow: CARD_SHADOW }}>
+            <div className='sessions-table-header' style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 80px', gap: '16px', padding: '12px 24px', borderBottom: `1px solid ${GLASS_BORDER}` }}>
               {['Date', 'Session', 'Details', 'Status', ''].map((_, i) => (<div key={i} style={{ height: '12px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} />))}
             </div>
             {[...Array(4)].map((_, i) => (
-              <div key={i} style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 80px', gap: '16px', padding: '16px 24px', alignItems: 'center', borderBottom: `1px solid ${GLASS_BORDER}` }}>
+              <div key={i} className='sessions-table-row' style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 80px', gap: '16px', padding: '16px 24px', alignItems: 'center', borderBottom: `1px solid ${GLASS_BORDER}` }}>
                 <div><div style={{ height: '11px', width: '30px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)', marginBottom: '4px' }} /><div style={{ height: '28px', width: '30px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', marginBottom: '4px' }} /><div style={{ height: '11px', width: '30px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)' }} /></div>
                 <div><div style={{ height: '14px', width: '70%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', marginBottom: '6px' }} /><div style={{ height: '12px', width: '50%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} /></div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}><div style={{ height: '12px', width: '80%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} /><div style={{ height: '12px', width: '60%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} /></div>
@@ -345,37 +345,37 @@ export default function SessionsPage() {
             {activeFilter === 'all' && <button onClick={() => setShowNewSession(true)} style={{ fontSize: '14px', fontWeight: '500', color: '#4ADE80', background: 'transparent', border: 'none', cursor: 'pointer' }}>Schedule your first session →</button>}
           </div>
         ) : (
-          <div style={{ background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, borderRadius: '16px', overflow: 'hidden', boxShadow: CARD_SHADOW }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 80px', gap: '16px', padding: '12px 24px', borderBottom: `1px solid ${GLASS_BORDER}` }}>
+          <div className='sessions-table-container' style={{ background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, borderRadius: '16px', overflow: 'hidden', boxShadow: CARD_SHADOW }}>
+            <div className='sessions-table-header' style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 80px', gap: '16px', padding: '12px 24px', borderBottom: `1px solid ${GLASS_BORDER}` }}>
               {['Date', 'Session', 'Details', 'Status', ''].map((h, i) => (<div key={i} style={{ fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: TEXT_SECONDARY }}>{h}</div>))}
             </div>
             {filteredSessions.map(session => {
               const date = new Date(session.start_date + 'T12:00:00')
               const leftColor = borderColor(session.status)
               return (
-                <div key={session.id} style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 80px', gap: '16px', padding: '16px 24px', alignItems: 'center', borderLeft: `3px solid ${leftColor}`, transition: 'background 0.15s' }}
+                <div key={session.id} className='sessions-table-row' style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 80px', gap: '16px', padding: '16px 24px', alignItems: 'center', borderLeft: `3px solid ${leftColor}`, transition: 'background 0.15s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.025)')}
                 onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}>
-                  <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                  <div className='sessions-date-col' style={{ textAlign: 'center', flexShrink: 0 }}>
                     <div style={{ fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', color: leftColor }}>{date.toLocaleDateString('en-US', { month: 'short' })}</div>
                     <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '28px', fontWeight: '800', color: '#FFFFFF', lineHeight: 1.2 }}>{date.getDate()}</div>
                     <div style={{ fontSize: '11px', color: TEXT_SECONDARY }}>{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
                   </div>
-                  <div>
+                  <div className='sessions-info-col'>
                     <div style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', marginBottom: '2px' }}>{session.session_type?.name || 'Session'}</div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: TEXT_SECONDARY }}>
                       {session.instructor?.name && <span>{session.instructor.name}</span>}
                       {session.location && <><span>·</span><span>{session.location}</span></>}
                     </div>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div className='sessions-details-col' style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: TEXT_SECONDARY }}><Clock className="w-3 h-3" style={{ color: TEXT_SECONDARY }} />{session.session_type?.duration_minutes || 60} min</div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: TEXT_SECONDARY }}><Users className="w-3 h-3" style={{ color: TEXT_SECONDARY }} />{session.seats_booked}/{session.max_seats} seats</div>
                   </div>
-                  <div>
+                  <div className='sessions-status-col'>
                     <span style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: '600', background: session.status === 'scheduled' ? 'rgba(74,222,128,0.15)' : session.status === 'completed' ? 'rgba(96,165,250,0.15)' : 'rgba(249,115,22,0.15)', color: session.status === 'scheduled' ? '#4ADE80' : session.status === 'completed' ? '#60A5FA' : '#F97316' }}>{session.status}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
+                  <div className='sessions-actions-col' style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
                     <button onClick={() => handleStatusToggle(session.id, session.status)} style={{ padding: '8px', borderRadius: '8px', background: 'transparent', border: 'none', cursor: 'pointer', color: TEXT_SECONDARY, display: 'flex', alignItems: 'center', transition: 'background 0.15s' }}
                     onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)')}
                     onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')} title={session.status === 'scheduled' ? 'Cancel session' : 'Reactivate session'}>
@@ -397,6 +397,37 @@ export default function SessionsPage() {
         />
       )}
 
+      <style>{`
+        @media (max-width: 768px) {
+          .sessions-table-header { display: none !important; }
+          .sessions-table-row {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 8px !important;
+            padding: 16px !important;
+            border-left: none !important;
+            position: relative;
+          }
+          .sessions-table-row > div { width: 100% !important; }
+          .sessions-actions-col {
+            position: absolute !important;
+            top: 12px !important;
+            right: 12px !important;
+          }
+          .sessions-date-col {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            text-align: left !important;
+          }
+          .sessions-date-col div:first-child { display: none; }
+          .sessions-date-col div:nth-child(3) { display: none; }
+          .sessions-date-col div:nth-child(2) {
+            font-size: 20px !important;
+            line-height: 1 !important;
+          }
+        }
+      `}</style>
     </>
   )
 }

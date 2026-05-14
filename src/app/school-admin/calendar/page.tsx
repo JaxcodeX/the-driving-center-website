@@ -103,7 +103,7 @@ export default function CalendarPage() {
 
         {/* Calendar grid */}
         <div style={{ borderRadius: '16px', overflow: 'hidden', background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, boxShadow: CARD_SHADOW, marginBottom: '24px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', background: 'rgba(0,0,0,0.3)', borderBottom: `1px solid ${GLASS_BORDER}` }}>
+          <div className='calendar-header' style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', background: 'rgba(0,0,0,0.3)', borderBottom: `1px solid ${GLASS_BORDER}` }}>
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
               <div key={d} style={{ padding: '12px', textAlign: 'center', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: TEXT_SECONDARY }}>{d}</div>
             ))}
@@ -161,6 +161,16 @@ export default function CalendarPage() {
         </div>
       </div>
 
+      <style>{`
+        @media (max-width: 640px) {
+          .calendar-grid { grid-template-columns: repeat(7, 1fr) !important; }
+          .calendar-grid > div { min-height: 64px !important; padding: 4px !important; }
+          .calendar-grid > div > div:first-child { font-size: 10px !important; width: 20px !important; height: 20px !important; }
+        }
+        @media (max-width: 480px) {
+          .calendar-month-sessions { display: none !important; }
+        }
+      `}</style>
     </>
   )
 }

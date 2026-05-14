@@ -118,7 +118,7 @@ export default function LoginPage() {
         zIndex: 1,
       }}>
         {/* Glassmorphic Modal */}
-        <div className="login-modal" style={{
+        <div className="login-modal login-modal-mobile" style={{
           width: '100%',
           maxWidth: '420px',
           padding: '40px',
@@ -581,6 +581,10 @@ export default function LoginPage() {
             transform: scale(1.4);
             opacity: 0;
           }
+        }
+        @media (max-width: 640px) {
+          .login-modal-mobile { padding: 24px 16px !important; max-width: 100% !important; margin: 0 8px !important; border-radius: 16px !important; }
+          .login-bg div[style*='padding: 24px'] { padding: 12px !important; }
         }
       `}</style>
     </div>

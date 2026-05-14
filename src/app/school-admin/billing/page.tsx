@@ -62,7 +62,7 @@ export default function BillingPage() {
   const statusIcon = status === 'active' ? <CheckCircle className="w-5 h-5" style={{ color: 'var(--accent)' }} /> : status === 'past_due' ? <AlertCircle className="w-5 h-5" style={{ color: 'var(--accent-secondary)' }} /> : <CreditCard className="w-5 h-5" style={{ color: 'var(--accent-secondary)' }} />
 
   return (
-      <div className="admin-main">
+      <div className="admin-main billing-page">
 
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>

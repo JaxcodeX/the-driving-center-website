@@ -55,13 +55,13 @@ export default function SignupPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0D0D12', padding: '24px', position: 'relative' }}>
+    <div className='signup-page' style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0D0D12', padding: '24px', position: 'relative' }}>
       <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)', pointerEvents: 'none' }} />
       {/* Split container */}
-      <div style={{ display: 'flex', width: '100%', maxWidth: '1100px', minHeight: '620px', borderRadius: '28px', overflow: 'hidden', boxShadow: '0 25px 80px rgba(0,0,0,0.5)', animation: 'fadeIn 0.5s ease-out', position: 'relative', zIndex: 1 }}>
+      <div className='signup-split' style={{ display: 'flex', width: '100%', maxWidth: '1100px', minHeight: '620px', borderRadius: '28px', overflow: 'hidden', boxShadow: '0 25px 80px rgba(0,0,0,0.5)', animation: 'fadeIn 0.5s ease-out', position: 'relative', zIndex: 1 }}>
 
         {/* LEFT SIDE — dark glass, form */}
-        <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.06)', padding: '48px 56px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div className='signup-left' style={{ flex: 1, background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.06)', padding: '48px 56px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           {/* Logo */}
           <Link href='/' style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', marginBottom: '40px' }}>
             <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#4ADE80', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -189,7 +189,7 @@ export default function SignupPage() {
         </div>
 
         {/* RIGHT SIDE — blue bg, dashboard preview */}
-        <div style={{ flex: 1, background: 'linear-gradient(135deg, #4179E8 0%, #1E5BD6 100%)', padding: '40px', display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative' }}>
+        <div className='signup-right' style={{ flex: 1, background: 'linear-gradient(135deg, #4179E8 0%, #1E5BD6 100%)', padding: '40px', display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative' }}>
           {/* LIVE DEMO badge */}
           <div style={{ position: 'absolute', top: '50%', right: '24px', transform: 'translateY(-50%)', padding: '6px 12px', borderRadius: '20px', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>
             <span style={{ fontSize: '11px', fontWeight: '600', color: '#FFFFFF', fontFamily: 'Inter, sans-serif', letterSpacing: '0.05em' }}>SCHOOL ADMIN</span>
@@ -262,7 +262,12 @@ export default function SignupPage() {
 
       <style>{`
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 768px) { .split-container { flex-direction: column !important; } .right-side { display: none !important; } }
+        @media (max-width: 768px) {
+          .signup-split { flex-direction: column !important; min-height: auto !important; border-radius: 16px !important; }
+          .signup-right { display: none !important; }
+          .signup-left { padding: 32px 20px !important; }
+          .signup-page { padding: 12px !important; }
+        }
       `}</style>
     </div>
   )
