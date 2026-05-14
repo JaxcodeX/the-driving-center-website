@@ -9,7 +9,7 @@ const STEPS = ['Account', 'School', 'Ready']
 
 export default function SignupPage() {
   const router = useRouter()
-  const [form, setForm] = useState({ schoolName: '', ownerName: '', email: '' })
+  const [form, setForm] = useState({ schoolName: '', ownerName: '', email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -26,10 +26,31 @@ export default function SignupPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); setLoading(true); setError('')
     try {
-      const res = await fetch('/api/schools', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          schoolName: form.schoolName,
+          ownerName: form.ownerName,
+          email: form.email,
+          password: form.password || undefined,
+        }),
+      })
       const data = await res.json()
       if (!res.ok) { setError(data.error || 'Something went wrong'); setLoading(false); return }
-      router.push(`/onboarding?school=${data.slug}`)
+
+      if (data.demoMode) {
+        // DEMO_MODE: redirect to login demo tab so user gets session cookies
+        router.push('/login?demo=true')
+      } else if (form.password) {
+        // Production + password: sign in directly, then go to onboarding
+        const supabase = (await import('@/lib/supabase/client')).createClient()
+        await supabase.auth.signInWithPassword({ email: form.email, password: form.password })
+        router.push('/school-admin/onboarding')
+      } else {
+        // Production + no password: redirect to login with success message
+        router.push(`/login?signup=success&email=${encodeURIComponent(form.email)}`)
+      }
     } catch { setError('Network error — try again'); setLoading(false) }
   }
 
@@ -130,7 +151,7 @@ export default function SignupPage() {
             {/* Password (optional) */}
             <div style={{ position: 'relative' }}>
               <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }}><Lock size={16} /></div>
-              <input type='password' placeholder='Create a password (optional)' style={{
+              <input type='password' value={form.password} onChange={e => set('password', e.target.value)} placeholder='Create a password (optional)' style={{
                 width: '100%', height: '50px', borderRadius: '12px', background: '#0D0D0D',
                 border: '1px solid rgba(255,255,255,0.1)', color: '#FFFFFF', fontSize: '15px', fontFamily: 'Inter, sans-serif',
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none', transition: 'border-color 0.2s',

@@ -10,6 +10,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
+  const [signupSuccess, setSignupSuccess] = useState<string | null>(null)
   const [isDemoMode, setIsDemoMode] = useState(false)
   const [activeTab, setActiveTab] = useState<'magic' | 'demo'>('magic')
   const [demoEmail, setDemoEmail] = useState('')
@@ -34,6 +35,13 @@ export default function LoginPage() {
     fetch('/api/schools').then(r => r.json()).then(d => {
       if (d.DEMO_MODE) setIsDemoMode(true)
     }).catch(() => {})
+    // Check for signup success redirect
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('signup') === 'success') {
+      const signupEmail = params.get('email')
+      setSignupSuccess(signupEmail || 'Account created!')
+      if (signupEmail) setEmail(signupEmail)
+    }
   }, [])
 
   async function handleMagicLink(e: React.FormEvent) {
@@ -117,6 +125,28 @@ export default function LoginPage() {
               </span>
             </Link>
           </div>
+
+          {/* Signup success banner */}
+          {signupSuccess && (
+            <div style={{
+              marginBottom: '20px',
+              padding: '12px 16px',
+              borderRadius: '12px',
+              background: 'rgba(74,222,128,0.10)',
+              border: '1px solid rgba(74,222,128,0.25)',
+              textAlign: 'center',
+            }}>
+              <CheckCircle size="20" style={{ color: '#4ADE80', marginBottom: '6px' }} />
+              <p style={{ fontSize: '13px', fontWeight: '600', color: '#4ADE80', marginBottom: '2px', fontFamily: 'Inter, sans-serif' }}>
+                Account created successfully!
+              </p>
+              <p style={{ fontSize: '12px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif' }}>
+                {typeof signupSuccess === 'string' && signupSuccess.includes('@')
+                  ? `Enter the magic link sent to ${signupSuccess}`
+                  : 'Check your email for a sign-in link.'}
+              </p>
+            </div>
+          )}
 
           {/* Headline */}
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
