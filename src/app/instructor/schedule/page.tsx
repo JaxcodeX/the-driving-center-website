@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { Save, CheckCircle } from 'lucide-react'
 
 const DAYS = [
@@ -31,47 +30,43 @@ export default function InstructorSchedulePage() {
   }>>({})
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const iid = params.get('instructor_id')
-    const sid = params.get('school')
-
-    if (!iid || !sid) {
-      setError('Invalid schedule link. Ask your school administrator for a new link.')
-      setLoading(false)
-      return
-    }
-
-    setInstructorId(iid)
-    setSchoolId(sid)
-
-    const supabase = createClient()
-
     async function load() {
-      const [{ data: instructorData }, { data: availabilityData }, { data: schoolData }] = await Promise.all([
-        supabase.from('instructors').select('name, school_id').eq('id', iid).single(),
-        supabase.from('instructor_availability').select('*').eq('instructor_id', iid),
-        supabase.from('schools').select('name').eq('id', sid).single(),
-      ])
-
-      setInstructorName(instructorData?.name ?? 'Instructor')
-      setSchoolName(schoolData?.name ?? 'Your school')
-
-      const initState: Record<number, { active: boolean; start_time: string; end_time: string }> = {}
-      DAYS.forEach(d => {
-        initState[d.value] = { active: false, start_time: '09:00', end_time: '17:00' }
-      })
-
-      ;(availabilityData ?? []).forEach((row: any) => {
-        if (initState[row.day_of_week]) {
-          initState[row.day_of_week] = {
-            active: row.active,
-            start_time: row.start_time ?? '09:00',
-            end_time: row.end_time ?? '17:00',
-          }
+      try {
+        // Fetch instructor identity + schedule from the API
+        const res = await fetch('/api/instructor/schedule')
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}))
+          setError(data.error ?? 'Failed to load your schedule. Please log in.')
+          setLoading(false)
+          return
         }
-      })
 
-      setAvailability(initState)
+        const data = await res.json()
+
+        setInstructorId(data.instructor_id)
+        setSchoolId(data.school_id)
+        setInstructorName(data.instructor_name ?? 'Instructor')
+
+        // Build availability state from API response
+        const initState: Record<number, { active: boolean; start_time: string; end_time: string }> = {}
+        DAYS.forEach(d => {
+          initState[d.value] = { active: false, start_time: '09:00', end_time: '17:00' }
+        })
+
+        ;(data.availability ?? []).forEach((row: any) => {
+          if (initState[row.day_of_week]) {
+            initState[row.day_of_week] = {
+              active: row.active,
+              start_time: row.start_time ?? '09:00',
+              end_time: row.end_time ?? '17:00',
+            }
+          }
+        })
+
+        setAvailability(initState)
+      } catch {
+        setError('Failed to connect. Please try again.')
+      }
       setLoading(false)
     }
 
@@ -125,7 +120,7 @@ export default function InstructorSchedulePage() {
     )
   }
 
-  if (error) {
+  if (error && !instructorId) {
     return (
       <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-6" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)' }}>
         <p className="text-sm text-center" style={{ color: '#F87171' }}>{error}</p>
@@ -141,7 +136,9 @@ export default function InstructorSchedulePage() {
         <div className="mb-6">
           <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: '#4ADE80', fontFamily: 'Outfit, sans-serif' }}>Instructor Schedule</div>
           <h1 className="text-2xl font-bold" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>{instructorName}</h1>
-          <p className="text-sm mt-0.5" style={{ color: '#94A3B8' }}>{schoolName}</p>
+          {schoolName && (
+            <p className="text-sm mt-0.5" style={{ color: '#94A3B8' }}>{schoolName}</p>
+          )}
         </div>
 
         {/* Instructions */}
