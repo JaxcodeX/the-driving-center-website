@@ -84,7 +84,7 @@ All admin pages share the same shell:
 - **Cards:** #0F0F0F, border 1px rgba(255,255,255,0.06), border-radius 16px
 
 **Sub-pages (MUST match shell exactly):**
-`/students`, `/instructors`, `/sessions`, `/calendar`, `/billing`, `/profile`, `/availability`, `/ops`, `/import`
+`/students`, `/instructors`, `/sessions`, `/calendar`, `/billing`, `/profile`, `/availability`, `/ops`, `/import`, `/onboarding`
 
 ### Rule: All sub-pages use shared Sidebar + TopBar components
 `@/components/admin/Sidebar.tsx`, `@/components/admin/TopBar.tsx`
@@ -160,6 +160,8 @@ Student picks from cards showing [Date + Time + Instructor] as one unit
 | Multi-tenant RLS | ✅ Audited April 2026 |
 | Demo mode booking bypass | ❌ **BUG — needs fix** |
 | `deposit_paid_at` column | ❌ **Referenced but doesn't exist in DB** |
+| CSV Import Tool | ✅ Upgraded — file upload + preview + progress |
+| Onboarding Wizard | ✅ `/school-admin/onboarding` — 4 steps + Stripe |
 
 ---
 
@@ -190,8 +192,12 @@ Student picks from cards showing [Date + Time + Instructor] as one unit
 ### P0 — STABLE CORE (current)
 Fix bugs 1-4. Sub-page consistency. Playwright tests.
 
-### P1 — SCHOOL MIGRATION
-CSV import tool. Onboarding wizard wired to live Stripe.
+### P0 — STABLE CORE ✅
+Fixed: booking flow Stripe confirmation, deposit_paid_at column, sub-page consistency.
+
+### P1 — SCHOOL MIGRATION ✅
+- **CSV Import Tool** (`/school-admin/import`): File upload + text paste, browser-side preview, row-by-row progress, dedup by DOB, encrypted PII storage
+- **Onboarding Wizard** (`/school-admin/onboarding`): 4-step flow (school info→instructors→session types→Stripe checkout), demo bypass for demo school, service-role API endpoints
 
 ### P2 — AGENT INFRASTRUCTURE
 Onboarding agent. Migration agent. Ops digest agent.

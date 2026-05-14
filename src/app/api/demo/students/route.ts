@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'legal_name is required' }, { status: 400 })
   }
 
-  const admin = getSupabaseAdmin()
+  const admin = getSupabaseAdmin() as any
 
   const { data, error } = await admin
     .from('students_driver_ed')
