@@ -9,6 +9,11 @@ export async function POST(request: Request) {
   const body = await request.json()
   const { session_id, session_date, session_time, student_name, student_email, student_phone } = body
 
+  // Require session_id for new booking (must pick a specific session)
+  if (!session_id) {
+    return NextResponse.json({ error: 'session_id is required to book a slot' }, { status: 400 })
+  }
+
   // ── Input validation ──
   try {
     validateRequired(body, ['session_date', 'session_time', 'student_name', 'student_email'])

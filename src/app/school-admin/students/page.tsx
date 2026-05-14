@@ -94,9 +94,33 @@ function AddStudentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (s: P
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
+
+    // In demo mode, use the API route (bypasses RLS with service role key)
+    const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
+    const isDemo = !!demoCookie
+
+    if (isDemo) {
+      try {
+        const res = await fetch('/api/demo/students', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            legal_name: form.legal_name,
+            dob: form.dob,
+            parent_email: form.parent_email || null,
+            emergency_contact_name: form.emergency_contact_name || null,
+            emergency_contact_phone: form.emergency_contact_phone || null,
+          }),
+        })
+        const data = await res.json()
+        if (res.ok && data) { onAdd(data); onClose() }
+      } catch {}
+      setLoading(false)
+      return
+    }
+
     const { data: { user } } = await supabase.auth.getUser()
     let schoolId: string | null = null
-    const demoCookie = document.cookie.split('; ').find(c => c.startsWith('demo_user='))
     if (demoCookie) { try { schoolId = JSON.parse(atob(decodeURIComponent(demoCookie.split('=')[1]))).schoolId } catch {} }
     if (!schoolId) {
       const { data: school } = await supabase.from('schools').select('id').eq('owner_user_id', user!.id).single()

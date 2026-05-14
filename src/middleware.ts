@@ -38,9 +38,10 @@ export async function middleware(request: NextRequest) {
         return response
       }
     }
-    // No demo cookie in DEMO_MODE → still let through (subscription checks skipped)
-    // Auth is handled client-side via the demo-login endpoint
-    return NextResponse.next()
+    // No demo cookie in DEMO_MODE → redirect to login so tests/auth-flow can detect unauthenticated state
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('demo', 'true')
+    return NextResponse.redirect(loginUrl)
   }
 
   // ── NON-DEMO_MODE: Full auth + subscription check ──────────────────────

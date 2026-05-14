@@ -4,7 +4,24 @@ DeepSeek Surgical Edit Agent for The Driving Center.
 Uses DeepSeek V4 Flash to generate code changes.
 
 Usage:
-  python3 deepseek-task "Add scroll-to-top button" [spec_file]
+  python3 deepseek-task "Add scroll-to-top button"
+  python3 deepseek-task "Fix the booking API" ./SPEC.md
+
+KEY FEATURE: Master context injection.
+Every task automatically gets:
+  1. SPEC.md (current spec, full)
+  2. CLAUDE.md (architecture + workflow rules)
+  3. Design tokens (globals.css)
+  4. ACTUAL_SCHEMA.md (DB schema, when relevant)
+  5. Existing files relevant to the task (smart keyword matching)
+
+SURGICAL EDIT STRATEGY:
+- NEW files → full file output with // FILE: marker
+- EXISTING files → SURGICAL directives only (describe what to change, not full file)
+- This avoids the "full replacement causes TS errors" problem
+
+This mirrors Dan Martell's "Master Prompt Architecture" — give the AI
+five-year-colleague context in one shot.
 """
 
 import sys, os, json, shutil, subprocess, re
@@ -15,9 +32,7 @@ PROJECT_DIR = "/Users/cayden/Projects/the-driving-center-website"
 
 SYSTEM_PROMPT = """You are a senior Next.js/React/TypeScript engineer on The Driving Center SaaS project.
 
-RULES:
-- FOR NEW FILES: Start with // FILE: <filepath> then the full file content
-- FOR EXISTING FILES YOU ARE MODIFYING: Start with ## EDIT: <filepath> then the full new file content, then ## END on its own line
+GOVERNANCE:
 - Never modify files not explicitly mentioned in the task
 - Build must pass before commit — fix errors yourself if they occur
 - Tag commits: 'prov: everest prov: deepseek'
@@ -25,28 +40,128 @@ RULES:
 
 STACK: Next.js 16, React 19, TypeScript, Tailwind CSS v4, CSS custom properties for dark/light theming.
 
-OUTPUT FORMAT EXAMPLES:
+OUTPUT FORMAT — TWO MODES ONLY:
 
-New file:
-```javascript
-// FILE: src/components/ScrollToTop.tsx
-'use client'
-import { useState, useEffect } from 'react'
-export default function ScrollToTop() {
-  ...
-}
-```
+MODE 1 — NEW FILES (files that don't exist yet):
+Output the COMPLETE file with this marker:
+// FILE: src/components/NewComponent.tsx
+[full file content]
 
-Existing file (full replacement):
-```javascript
-## EDIT: src/app/page.tsx
-// ... full file content ...
+MODE 2 — EXISTING FILES (surgical edits only):
+For files that already exist, describe EXACTLY what to change using surgical directives.
+DO NOT output the full file — describe the surgical edit.
+
+Surgical directive format:
+## SURGICAL: src/components/Features.tsx
+
+## ADD_AFTER: <motion.div\n              key={feature.title}
+Add a new card item before the closing of the features array:
+              <motion.div
+                key="comparison"
+                variants={cardVariants}
+                whileHover={{ scale: 1.03 }}
+                className="glass-card rounded-2xl p-8 cursor-pointer group"
+              >
+                <div className="text-4xl mb-5">⚖️</div>
+                <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-cyan-400 transition-colors">Feature Comparison</h3>
+                <p className="text-gray-400 leading-relaxed">Compare pricing tiers side-by-side.</p>
+              </motion.div>
+
 ## END
-```
 
-IMPORTANT: For existing files, include the COMPLETE file — we replace the whole file with your output.
-For new files, include the complete file.
+OR a simple ADD_TO_ARRAY directive:
+## SURGICAL: src/components/Features.tsx
+## APPEND_TO_ARRAY: features
+  {
+    title: "Deposit Collection",
+    description: "Collect a deposit when students book. No-show protection built in.",
+    icon: "💳",
+  },
+## END
+
+KEY RULE: For existing files, NEVER dump the full file content.
+Always describe surgical changes: ADD_AFTER, REPLACE_LINES, APPEND_TO_ARRAY.
+Think "find-and-replace instructions" not "full file output".
 """
+
+# ─── Master Context Files ─────────────────────────────────────────────────────
+
+def load_master_context() -> dict:
+    ctx = {}
+    base = PROJECT_DIR
+
+    for spec_name in ["SPEC_FULL_REDESIGN.md", "SPEC.md", "CURRENT_SPEC.md"]:
+        spec_path = os.path.join(base, spec_name)
+        if os.path.exists(spec_path):
+            with open(spec_path) as f:
+                content = f.read()
+            ctx["SPEC"] = f"# SPEC.md ({len(content)} chars)\n{content}"
+            break
+
+    claude_path = os.path.join(base, "CLAUDE.md")
+    if os.path.exists(claude_path):
+        with open(claude_path) as f:
+            ctx["ARCHITECTURE"] = f"# CLAUDE.md\n{f.read()}"
+
+    css_path = os.path.join(base, "src/app/globals.css")
+    if os.path.exists(css_path):
+        with open(css_path) as f:
+            ctx["DESIGN_TOKENS"] = f"# DESIGN TOKENS: globals.css\n{f.read()[:5000]}"
+
+    schema_path = os.path.join(base, "ACTUAL_SCHEMA.md")
+    if os.path.exists(schema_path):
+        with open(schema_path) as f:
+            ctx["SCHEMA"] = f"# DATABASE SCHEMA\n{f.read()[:4000]}"
+
+    return ctx
+
+
+def get_task_relevant_files(task: str) -> list:
+    task_lower = task.lower()
+    files = []
+
+    if any(k in task_lower for k in ['book', 'booking', 'slot', 'checkout', 'stripe', 'confirm']):
+        files.extend(["src/app/book/page.tsx", "src/app/api/bookings/route.ts",
+                       "src/app/api/slots/route.ts", "src/app/api/bookings/[booking_id]/checkout/route.ts"])
+    if any(k in task_lower for k in ['school', 'admin', 'dashboard', 'student', 'session', 'instructor']):
+        files.extend(["src/app/school-admin/page.tsx", "src/app/school-admin/students/page.tsx",
+                       "src/app/school-admin/sessions/page.tsx"])
+    if any(k in task_lower for k in ['home', 'page', 'landing', 'hero', 'navbar', 'nav', 'pricing', 'faq', 'features']):
+        files.extend(["src/app/page.tsx", "src/components/Navbar.tsx", "src/components/Hero.tsx",
+                       "src/components/Pricing.tsx", "src/components/FAQ.tsx", "src/components/Features.tsx"])
+    if any(k in task_lower for k in ['style', 'css', 'theme', 'color', 'animation', 'scroll', 'button', 'glow']):
+        files.append("src/app/globals.css")
+    if any(k in task_lower for k in ['layout', 'root']):
+        files.append("src/app/layout.tsx")
+    if any(k in task_lower for k in ['auth', 'login', 'demo']):
+        files.extend(["src/app/api/auth/demo-login/route.ts", "src/middleware.ts"])
+    if any(k in task_lower for k in ['email', 'reminder', 'resend']):
+        files.append("src/lib/email.ts")
+
+    seen = set()
+    result = []
+    for rel_path in files:
+        if rel_path in seen:
+            continue
+        seen.add(rel_path)
+        full = os.path.join(PROJECT_DIR, rel_path)
+        if os.path.exists(full):
+            result.append(rel_path)
+    return result[:8]
+
+
+def read_files_for_context(file_paths: list) -> str:
+    parts = []
+    for rel_path in file_paths:
+        full = os.path.join(PROJECT_DIR, rel_path)
+        if os.path.exists(full):
+            with open(full) as f:
+                content = f.read()
+            parts.append(f"# EXISTING: {rel_path} ({len(content)} bytes)\n{content[:4500]}")
+    return "\n\n".join(parts)
+
+
+# ─── API Call ─────────────────────────────────────────────────────────────────
 
 def call_ds(system: str, user: str, max_tokens: int = 4000) -> str:
     import urllib.request
@@ -64,9 +179,11 @@ def call_ds(system: str, user: str, max_tokens: int = 4000) -> str:
     with urllib.request.urlopen(req, timeout=180) as resp:
         return json.loads(resp.read())["choices"][0]["message"]["content"]
 
+
 def run(cmd: str) -> tuple:
     r = subprocess.run(cmd, shell=True, cwd=PROJECT_DIR, capture_output=True, text=True)
     return r.returncode, r.stdout, r.stderr
+
 
 def build() -> bool:
     code, out, err = run("npm run build 2>&1")
@@ -79,113 +196,120 @@ def build() -> bool:
     print("Build PASSED")
     return True
 
-def parse_response(content: str) -> tuple:
+
+# ─── Response Parsing ───────────────────────────────────────────────────────────
+
+def parse_surgical_response(content: str, project_dir: str) -> tuple:
     """
-    Parse DeepSeek response.
-    Returns (edits dict, new_files dict).
-    Edits = {filepath: full_file_content} for existing files (full replacement)
-    New_files = {filepath: full_file_content} for brand new files
+    Parse two modes:
+    - NEW files: // FILE: marker → full content
+    - EXISTING files: ## SURGICAL: → surgical edit directives (no full file dump)
+    Returns (edits dict, new_files dict)
+    edits = {filepath: {'type': 'surgical', 'directive': 'ADD_AFTER|REPLACE|APPEND', ...}}
     """
     edits = {}
     new_files = {}
 
-    # Split into blocks by // FILE: and ## EDIT: markers
-    parts = re.split(r'(?=// FILE:|^## EDIT:)', content, flags=re.MULTILINE)
+    # Mode 1: new files
+    file_pattern = re.compile(r'^// FILE:\s*(.+?)\s*$', re.MULTILINE)
+    for m in file_pattern.finditer(content):
+        filepath = m.group(1).strip()
+        start = m.end()
+        # Next // FILE: or end of content
+        next_m = file_pattern.search(content, m.end())
+        end = next_m.start() if next_m else len(content)
+        file_content = content[start:end].strip()
+        if filepath and file_content:
+            new_files[filepath] = file_content
 
-    current_filepath = None
-    current_content = None
-    current_type = None  # 'new' or 'edit'
-    buf = []
-
-    for part in parts:
-        part = part.strip()
-        if not part:
-            continue
-
-        if part.startswith("// FILE:"):
-            # Save previous block
-            if current_filepath and current_content:
-                if current_type == 'new':
-                    new_files[current_filepath] = current_content.strip()
-                elif current_type == 'edit':
-                    edits[current_filepath] = current_content.strip()
-
-            # Start new new file block
-            lines = part.replace("// FILE:", "", 1).strip().split("\n", 1)
-            current_filepath = lines[0].strip()
-            current_content = lines[1] if len(lines) > 1 else ""
-            current_type = 'new'
-
-        elif part.startswith("## EDIT:"):
-            # Save previous block
-            if current_filepath and current_content:
-                if current_type == 'new':
-                    new_files[current_filepath] = current_content.strip()
-                elif current_type == 'edit':
-                    edits[current_filepath] = current_content.strip()
-
-            # Find filepath and content
-            # Format: ## EDIT: <filepath>\n<content>\n## END
-            end_marker_match = re.search(r'\n## END', part)
-            if end_marker_match:
-                rest = part.replace("## EDIT:", "", 1).strip()
-                end_idx = rest.find("\n## END")
-                filepath = rest[:end_idx].strip()
-                file_content = rest[end_idx + 6:].strip()  # 6 = len("\n## END")
-            else:
-                # No ## END — treat as filepath only, no content yet
-                filepath = part.replace("## EDIT:", "").strip()
-                file_content = ""
-                # Keep reading from subsequent parts
-                continue
-
-            if filepath:
-                # Check if existing
-                full_path = os.path.join(PROJECT_DIR, filepath)
-                if os.path.exists(full_path):
-                    edits[filepath] = file_content
-                else:
-                    new_files[filepath] = file_content
-
-            current_filepath = None
-            current_content = None
-            current_type = None
-        else:
-            # Accumulate content for current block
-            if current_filepath:
-                current_content += "\n" + part
-
-    # Save last block
-    if current_filepath and current_content:
-        if current_type == 'new':
-            new_files[current_filepath] = current_content.strip()
-        elif current_type == 'edit':
-            edits[current_filepath] = current_content.strip()
+    # Mode 2: surgical edits
+    surgical_pattern = re.compile(r'^## SURGICAL:\s*(.+?)\s*$(.*?)^## END', re.MULTILINE | re.DOTALL)
+    for m in surgical_pattern.finditer(content):
+        filepath = m.group(1).strip()
+        directive_block = m.group(2).strip()
+        if filepath:
+            full_path = os.path.join(project_dir, filepath)
+            if os.path.exists(full_path):
+                edits[filepath] = {'type': 'surgical', 'directive': directive_block}
 
     return edits, new_files
 
+
+def apply_surgical_edit(filepath: str, directive: str) -> bool:
+    """
+    Apply a surgical edit to an existing file.
+    Supports: ADD_AFTER, APPEND_TO_ARRAY, REPLACE_LINES
+    """
+    full = os.path.join(PROJECT_DIR, filepath)
+    with open(full) as f:
+        lines = f.readlines()
+
+    directive = directive.strip()
+
+    # ADD_AFTER: add content after first line matching a pattern
+    m = re.match(r'## ADD_AFTER:\s*(.+?)\s*\n(.*)## END', directive, re.DOTALL)
+    if m:
+        pattern = m.group(1).strip()
+        insert_content = m.group(2).strip()
+        for i, line in enumerate(lines):
+            if pattern in line:
+                # Insert after this line
+                insert_pos = i + 1
+                # Indent insert_content to match surrounding context
+                indent = len(line) - len(line.lstrip())
+                indented = '\n'.join(' ' * indent + l for l in insert_content.split('\n'))
+                lines.insert(insert_pos, indented + '\n')
+                with open(full, 'w') as f:
+                    f.write(''.join(lines))
+                print(f"  ADD_AFTER applied after line {i+1}: {filepath}")
+                return True
+
+    # APPEND_TO_ARRAY: append items to a JS array in the file
+    m = re.match(r'## APPEND_TO_ARRAY:\s*(\w+).*?\n([\s\S]+?)(?=\n## END|$)', directive, re.DOTALL)
+    if m:
+        array_name = m.group(1)
+        new_items = m.group(2).strip()
+        # Strip markdown code fences if present
+        new_items = re.sub(r'```(?:typescript|javascript|json)?\s*', '', new_items).strip()
+        content = ''.join(lines)
+        # Find the array and append to it
+        array_pattern = re.compile(rf'({re.escape(array_name)}\s*=\s*\[)([^\]]+)\]', re.DOTALL)
+        def append_replacer(m):
+            return m.group(1) + m.group(2)[:-1] + ',\n  ' + new_items.replace('\n', '\n  ') + '\n]'
+        new_content, n = array_pattern.subn(append_replacer, content)
+        if n > 0:
+            with open(full, 'w') as f:
+                f.write(new_content)
+            print(f"  APPEND_TO_ARRAY applied: {filepath}.{array_name}")
+            return True
+        else:
+            print(f"  APPEND_TO_ARRAY: array '{array_name}' not found in {filepath}")
+            return False
+
+    print(f"  Unknown directive type in {filepath}: {directive[:100]}")
+    return False
+
+
 def apply_and_build(edits: dict, new_files: dict) -> bool:
-    # Backup existing files
     for filepath in edits:
         full = os.path.join(PROJECT_DIR, filepath)
         if os.path.exists(full):
             shutil.copy(full, full + ".bak")
-            print(f"Backed up: {filepath}")
+            print(f"  Backed up: {filepath}")
 
-    # Write edits (full replacement)
-    for filepath, content in edits.items():
-        full = os.path.join(PROJECT_DIR, filepath)
-        with open(full, "w") as f:
-            f.write(content.strip() + "\n")
-        print(f"Updated: {filepath} ({len(content)} chars)")
+    for filepath, spec in edits.items():
+        if spec['type'] == 'surgical':
+            ok = apply_surgical_edit(filepath, spec['directive'])
+            if not ok:
+                print(f"  Surgical edit failed: {filepath}")
+                return False
 
-    # Write new files
     for filepath, content in new_files.items():
         full = os.path.join(PROJECT_DIR, filepath)
         os.makedirs(os.path.dirname(full), exist_ok=True)
-        with open(full, "w") as f:
+        with open(full, 'w') as f:
             f.write(content.strip() + "\n")
-        print(f"Created: {filepath} ({len(content)} chars)")
+        print(f"  Created: {filepath} ({len(content)} chars)")
 
     print("\nBuilding...")
     ok = build()
@@ -204,6 +328,9 @@ def apply_and_build(edits: dict, new_files: dict) -> bool:
 
     return True
 
+
+# ─── Main ────────────────────────────────────────────────────────────────────────
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: deepseek-task <task> [spec_file]")
@@ -213,44 +340,36 @@ def main():
     spec_path = sys.argv[2] if len(sys.argv) > 2 else None
 
     print(f"Task: {task}")
-    spec_content = ""
+    print("\n=== MASTER CONTEXT INJECTION ===")
+
+    master_ctx = load_master_context()
+    for key, content in master_ctx.items():
+        print(f"  Loaded {key}: {len(content)} chars")
+
+    relevant_files = get_task_relevant_files(task)
+    task_context = read_files_for_context(relevant_files)
+    if relevant_files:
+        print(f"  Loaded {len(relevant_files)} task-relevant files: {relevant_files}")
+
     if spec_path and os.path.exists(spec_path):
         with open(spec_path) as f:
             spec_content = f.read()
-        print(f"Spec: {spec_path} ({len(spec_content)} chars)")
-
-    # Load context from relevant existing files
-    context = []
-    task_lower = task.lower()
-
-    files_to_read = set()
-    if any(k in task_lower for k in ['page', 'home', 'landing', 'hero', 'pricing', 'faq', 'booking']):
-        files_to_read.add("src/app/page.tsx")
-    if any(k in task_lower for k in ['style', 'css', 'theme', 'color', 'animation', 'transition']):
-        files_to_read.add("src/app/globals.css")
-    if any(k in task_lower for k in ['layout', 'root']):
-        files_to_read.add("src/app/layout.tsx")
-    if any(k in task_lower for k in ['navbar', 'nav', 'header']):
-        files_to_read.add("src/components/NavBar.tsx")
-    if any(k in task_lower for k in ['dashboard', 'admin', 'school']):
-        files_to_read.add("src/app/school-admin/page.tsx")
-
-    for rel_path in files_to_read:
-        full = os.path.join(PROJECT_DIR, rel_path)
-        if os.path.exists(full):
-            with open(full) as f:
-                content = f.read()
-            context.append(f"# EXISTING FILE: {rel_path} ({len(content)} bytes, first 4000 chars shown)\n{content[:4000]}")
-            print(f"Loaded: {rel_path} ({len(content)} bytes)")
+        master_ctx["SPEC"] = f"# SPEC (manual override)\n{spec_content}"
+        print(f"  Manual spec: {spec_path} ({len(spec_content)} chars)")
 
     user_msg = f"Task: {task}\n\n"
-    if spec_content:
-        user_msg += f"## SPEC:\n{spec_content}\n\n"
-    if context:
-        user_msg += "\n\n".join(context) + "\n\n"
-    user_msg += "Output your changes using // FILE: for new files and ## EDIT: + ## END for existing files."
+    for key in ["SPEC", "ARCHITECTURE", "SCHEMA", "DESIGN_TOKENS"]:
+        if key in master_ctx:
+            user_msg += master_ctx[key] + "\n\n"
+    if task_context:
+        user_msg += task_context + "\n\n"
 
-    print(f"Context: {len(context)} files, ~{sum(len(c) for c in context)} chars")
+    user_msg += ("\nOUTPUT RULES:\n"
+                 "NEW FILE → // FILE: <filepath> + full content\n"
+                 "EXISTING FILE → ## SURGICAL: <filepath> + surgical directive (NO full file dump)\n"
+                 "KEY: For existing files, describe WHAT to change not the full file.\n")
+
+    print(f"\nTotal context: ~{len(user_msg)} chars")
     print("Calling DeepSeek...")
 
     try:
@@ -260,14 +379,15 @@ def main():
         sys.exit(1)
 
     print(f"Response: {len(response)} chars")
+    print(f"\nResponse preview (first 500 chars):\n{response[:500]}")
 
-    edits, new_files = parse_response(response)
-    print(f"Edits (existing files): {list(edits.keys())}")
+    edits, new_files = parse_surgical_response(response, PROJECT_DIR)
+    print(f"\nEdits (surgical): {list(edits.keys())}")
     print(f"New files: {list(new_files.keys())}")
 
     if not edits and not new_files:
-        print("Nothing parsed. First 800 chars of response:")
-        print(response[:800])
+        print("\nNothing parsed. Full response:")
+        print(response[:2000])
         return
 
     if apply_and_build(edits, new_files):
@@ -277,6 +397,7 @@ def main():
         print("Done!")
     else:
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

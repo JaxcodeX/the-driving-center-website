@@ -1,18 +1,21 @@
 #!/usr/bin/env python3
 """
-DeepSeek Agent — task executor with file-awareness.
+DeepSeek Agent — task executor with full project context.
 Usage:
-  python3 deepseek-agent "Add scroll-to-top button" ./SPEC.md
+  python3 deepseek-agent "Add scroll-to-top button"
 
-Before calling DeepSeek, reads existing files that will be modified
-so DeepSeek has context and makes precise edits instead of overwrites.
+Every call automatically receives:
+  1. SPEC.md (current feature spec)
+  2. CLAUDE.md (architecture + workflow rules)
+  3. Design tokens (globals.css)
+  4. ACTUAL_SCHEMA.md (DB schema, when relevant)
+  5. Existing files relevant to the task
+
+Mirrors Dan Martell's "Master Prompt Architecture" — give the AI
+five-year-colleague context in one shot.
 """
 
-import sys
-import os
-import json
-import shutil
-import subprocess
+import sys, os, json, shutil, subprocess, re
 
 DEEPSEEK_API_KEY = "sk-7c4c86239406412ba3385f32db8b959d"
 DEEPSEEK_MODEL = "deepseek-chat"
@@ -33,6 +36,84 @@ RULES:
 STACK: Next.js 16, React 19, TypeScript, Tailwind CSS v4, CSS custom properties for theming.
 CONTEXT: This project uses a dark/light theme system with CSS variables (--bg-base, --bg-surface, etc.)
 """
+
+# ─── Master Context Injection ──────────────────────────────────────────────────
+
+def load_master_context() -> dict:
+    """Load the always-on context files."""
+    ctx = {}
+    base = PROJECT_DIR
+
+    for spec_name in ["SPEC_FULL_REDESIGN.md", "SPEC.md", "CURRENT_SPEC.md"]:
+        spec_path = os.path.join(base, spec_name)
+        if os.path.exists(spec_path):
+            with open(spec_path) as f:
+                content = f.read()
+            ctx["SPEC"] = f"# SPEC.md ({len(content)} chars)\n{content}"
+            break
+
+    claude_path = os.path.join(base, "CLAUDE.md")
+    if os.path.exists(claude_path):
+        with open(claude_path) as f:
+            ctx["ARCHITECTURE"] = f"# CLAUDE.md\n{f.read()}"
+
+    css_path = os.path.join(base, "src/app/globals.css")
+    if os.path.exists(css_path):
+        with open(css_path) as f:
+            ctx["DESIGN_TOKENS"] = f"# DESIGN TOKENS: globals.css\n{f.read()[:5000]}"
+
+    schema_path = os.path.join(base, "ACTUAL_SCHEMA.md")
+    if os.path.exists(schema_path):
+        with open(schema_path) as f:
+            ctx["SCHEMA"] = f"# DATABASE SCHEMA\n{f.read()[:4000]}"
+
+    return ctx
+
+
+def get_task_relevant_files(task: str) -> list:
+    """Map task keywords → files to read for surgical edit context."""
+    task_lower = task.lower()
+    files = []
+
+    if any(k in task_lower for k in ['book', 'booking', 'slot', 'checkout', 'stripe', 'confirm']):
+        files.extend([
+            "src/app/book/page.tsx",
+            "src/app/api/bookings/route.ts",
+            "src/app/api/slots/route.ts",
+            "src/app/api/bookings/[booking_id]/checkout/route.ts",
+        ])
+    if any(k in task_lower for k in ['school', 'admin', 'dashboard', 'student', 'session']):
+        files.extend([
+            "src/app/school-admin/page.tsx",
+            "src/app/school-admin/students/page.tsx",
+        ])
+    if any(k in task_lower for k in ['home', 'page', 'landing', 'hero', 'navbar', 'nav', 'pricing', 'faq', 'features']):
+        files.extend([
+            "src/app/page.tsx",
+            "src/components/Navbar.tsx",
+            "src/components/Hero.tsx",
+        ])
+    if any(k in task_lower for k in ['style', 'css', 'theme', 'color', 'animation', 'scroll', 'button']):
+        files.append("src/app/globals.css")
+    if any(k in task_lower for k in ['layout', 'root']):
+        files.append("src/app/layout.tsx")
+    if any(k in task_lower for k in ['auth', 'login', 'demo']):
+        files.extend(["src/app/api/auth/demo-login/route.ts", "src/middleware.ts"])
+    if any(k in task_lower for k in ['email', 'reminder', 'resend']):
+        files.append("src/lib/email.ts")
+
+    seen = set()
+    result = []
+    for rel_path in files:
+        if rel_path in seen:
+            continue
+        seen.add(rel_path)
+        full = os.path.join(PROJECT_DIR, rel_path)
+        if os.path.exists(full):
+            result.append(rel_path)
+
+    return result[:6]
+
 
 def call_deepseek(system: str, user: str, max_tokens: int = 3500) -> str:
     import urllib.request
@@ -57,9 +138,11 @@ def call_deepseek(system: str, user: str, max_tokens: int = 3500) -> str:
     with urllib.request.urlopen(req, timeout=180) as resp:
         return json.loads(resp.read())["choices"][0]["message"]["content"]
 
+
 def run(cmd: str) -> tuple:
     result = subprocess.run(cmd, shell=True, cwd=PROJECT_DIR, capture_output=True, text=True)
     return result.returncode, result.stdout, result.stderr
+
 
 def build() -> bool:
     code, out, err = run("npm run build 2>&1")
@@ -70,6 +153,7 @@ def build() -> bool:
         return False
     print("Build PASSED")
     return True
+
 
 def parse_files(content: str) -> dict:
     files = {}
@@ -87,29 +171,19 @@ def parse_files(content: str) -> dict:
         files[current] = "\n".join(buf).strip()
     return files
 
+
 def read_existing_files(task: str) -> str:
-    """Inspect the task and read relevant existing files so DeepSeek has context."""
-    task_lower = task.lower()
+    """Read task-relevant existing files so DeepSeek has full surgical context."""
+    relevant_paths = get_task_relevant_files(task)
+    parts = []
+    for rel_path in relevant_paths:
+        full = os.path.join(PROJECT_DIR, rel_path)
+        if os.path.exists(full):
+            with open(full) as f:
+                content = f.read()
+            parts.append(f"# EXISTING: {rel_path} ({len(content)} bytes)\n{content[:4000]}")
+    return "\n\n".join(parts)
 
-    # Always include globals.css if relevant
-    relevant = []
-    relevant_paths = []
-
-    if any(kw in task_lower for kw in ['style', 'css', 'theme', 'color', 'fade', 'transition', 'animation', 'scroll', 'button']):
-        path = os.path.join(PROJECT_DIR, "src/app/globals.css")
-        if os.path.exists(path):
-            with open(path) as f:
-                relevant.append(f"# EXISTING: src/app/globals.css (do not replace, only append/modify)\n{f.read()[:3000]}")
-            relevant_paths.append(path)
-
-    if any(kw in task_lower for kw in ['page', 'landing', 'home', 'hero', 'section', 'navbar', 'pricing', 'faq', 'booking']):
-        path = os.path.join(PROJECT_DIR, "src/app/page.tsx")
-        if os.path.exists(path):
-            with open(path) as f:
-                relevant.append(f"# EXISTING: src/app/page.tsx (do not replace, make surgical edits)\n{f.read()[:4000]}")
-            relevant_paths.append(path)
-
-    return "\n\n".join(relevant)
 
 def main():
     if len(sys.argv) < 2:
@@ -120,27 +194,37 @@ def main():
     spec_path = sys.argv[2] if len(sys.argv) > 2 else None
 
     print(f"Task: {task}")
+    print("\n=== MASTER CONTEXT INJECTION ===")
+
+    master_ctx = load_master_context()
+    for key, content in master_ctx.items():
+        print(f"  Loaded {key}: {len(content)} chars")
+
     spec_content = ""
     if spec_path and os.path.exists(spec_path):
         with open(spec_path) as f:
             spec_content = f.read()
-        print(f"Spec: {spec_path} ({len(spec_content)} chars)")
+        master_ctx["SPEC"] = f"# SPEC (manual override)\n{spec_content}"
+        print(f"  Manual spec: {spec_path} ({len(spec_content)} chars)")
 
-    print("Reading existing files for context...")
+    # Task-relevant existing files
     existing_context = read_existing_files(task)
     if existing_context:
-        print(f"Context loaded: {len(existing_context)} chars from existing files")
+        print(f"  Task-relevant files: {get_task_relevant_files(task)}")
 
-    # Build user message
+    # Build full user message
     user_msg = f"Task: {task}\n\n"
-    if spec_content:
-        user_msg += f"Spec:\n{spec_content}\n\n"
+    for key in ["SPEC", "ARCHITECTURE", "SCHEMA", "DESIGN_TOKENS"]:
+        if key in master_ctx:
+            user_msg += master_ctx[key] + "\n\n"
     if existing_context:
         user_msg += existing_context + "\n\n"
-        user_msg += "IMPORTANT: Read the existing file content above. Make surgical edits — do not replace entire files with boilerplate. Output only the specific files you are changing with // FILE: markers.\n\n"
+    user_msg += "IMPORTANT: Read all context above. Make surgical edits to existing files — do not replace with boilerplate. Output only files being changed with // FILE: markers.\n\n"
     user_msg += "Execute the task now."
 
-    print("\nCalling DeepSeek...")
+    print(f"\nTotal context: ~{len(user_msg)} chars")
+    print("Calling DeepSeek...")
+
     try:
         response = call_deepseek(SYSTEM_PROMPT, user_msg)
     except Exception as e:
@@ -156,11 +240,8 @@ def main():
         print(response[:500])
         return
 
-    # Separate new files from existing file modifications
-    new_files = {}   # files that don't exist yet — DeepSeek can create
-    edit_requests = {}  # existing files — we edit ourselves, not via DeepSeek output
-
-    # Check which files are new vs existing
+    new_files = {}
+    edit_requests = {}
     for filename, content in files.items():
         filepath = os.path.join(PROJECT_DIR, filename)
         if os.path.exists(filepath):
@@ -171,7 +252,6 @@ def main():
     print(f"New files to create: {list(new_files.keys())}")
     print(f"Existing files to edit: {list(edit_requests.keys())}")
 
-    # Write new files with backup
     for filename, content in new_files.items():
         filepath = os.path.join(PROJECT_DIR, filename)
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
@@ -179,30 +259,19 @@ def main():
             f.write(content + "\n")
         print(f"Created: {filename}")
 
-    # For existing files: apply surgical edits myself based on DeepSeek's guidance
-    # DeepSeek's output becomes the "instruction" rather than the file to write
     if edit_requests:
-        print(f"\nApplying edits to existing files manually...")
         for filename, suggested_content in edit_requests.items():
-            # Check if this is a full replacement or surgical edit instruction
             existing_path = os.path.join(PROJECT_DIR, filename)
             with open(existing_path) as f:
                 existing_content = f.read()
-
-            # If DeepSeek's content is shorter than existing, it's probably a partial overwrite
-            # — treat it as a failure and revert
             if len(suggested_content) < len(existing_content) * 0.5:
-                print(f"DEEPSEEK OVERWRITE WARN: {filename} — {len(existing_content)} existing vs {len(suggested_content)} suggested. Reverting to original.")
-                print("DeepSeek should have described WHAT to add, not replaced the file.")
-                # Don't write — keep original
+                print(f"OVERWRITE WARN: {filename} too short — reverting")
             else:
-                # Back up and write — DeepSeek gave a full file replacement
                 shutil.copy(existing_path, existing_path + ".bak")
                 with open(existing_path, "w") as f:
                     f.write(suggested_content + "\n")
                 print(f"Updated: {filename}")
 
-    # Build
     print("\nBuilding...")
     if build():
         run("git add -A")
@@ -213,7 +282,7 @@ def main():
         print("\nAttempting fix...")
         fix_resp = call_deepseek(
             SYSTEM_PROMPT,
-            f"Build failed. Fix the errors in these files: {list(files.keys())}\n\nPrevious output:\n{response[:4000]}\n\nOutput corrected files with // FILE: markers.",
+            f"Build failed. Fix the errors. Files: {list(files.keys())}\n\nPrevious output:\n{response[:4000]}\n\nOutput corrected // FILE: markers.",
             max_tokens=4000
         )
         fix_files = parse_files(fix_resp)
@@ -235,6 +304,7 @@ def main():
                 if os.path.exists(bak):
                     shutil.move(bak, os.path.join(PROJECT_DIR, fn))
             sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

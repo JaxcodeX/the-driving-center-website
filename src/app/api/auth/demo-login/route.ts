@@ -110,10 +110,12 @@ export async function POST(request: Request) {
     userId,
   })
 
+  const isSecure = process.env.NODE_ENV === 'production'
+
   // Supabase JWT session cookie — makes createClient() work in browser
   response.cookies.set(`sb-${projectRef}-access-token`, jwt, {
     httpOnly: true,
-    secure: true,
+    secure: isSecure,
     sameSite: 'lax',
     path: '/',
     maxAge: 7 * 24 * 60 * 60,
@@ -129,7 +131,7 @@ export async function POST(request: Request) {
   })).toString('base64url')
   response.cookies.set(`sb-${projectRef}-refresh-token`, refreshPayload, {
     httpOnly: true,
-    secure: true,
+    secure: isSecure,
     sameSite: 'lax',
     path: '/',
     maxAge: 7 * 24 * 60 * 60,
@@ -145,7 +147,7 @@ export async function POST(request: Request) {
 
   response.cookies.set('demo_session', demoPayload, {
     httpOnly: true,
-    secure: true,
+    secure: isSecure,
     sameSite: 'lax',
     path: '/',
     maxAge: 7 * 24 * 60 * 60,
@@ -153,7 +155,7 @@ export async function POST(request: Request) {
 
   response.cookies.set('demo_user', demoPayload, {
     httpOnly: false,
-    secure: true,
+    secure: isSecure,
     sameSite: 'lax',
     path: '/',
     maxAge: 7 * 24 * 60 * 60,

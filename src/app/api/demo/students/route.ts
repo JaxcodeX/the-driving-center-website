@@ -1,7 +1,22 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { getSupabaseAdmin } from '@/lib/supabase/server'
-import { decryptField } from '@/lib/security'
+import { decryptField, encryptField } from '@/lib/security'
+
+/** Get demo session info from demo_user cookie */
+async function getDemoSession() {
+  const cookieStore = await cookies()
+  const demoUserCookie = cookieStore.get('demo_user')
+  if (!demoUserCookie?.value) return null
+
+  try {
+    const payload = JSON.parse(Buffer.from(demoUserCookie.value, 'base64').toString('utf8'))
+    if (!payload?.schoolId) return null
+    return payload as { schoolId: string; userId: string; email: string }
+  } catch {
+    return null
+  }
+}
 
 /**
  * Demo-mode students endpoint.
@@ -13,22 +28,9 @@ export async function GET() {
     return NextResponse.json({ error: 'Demo only' }, { status: 403 })
   }
 
-  const cookieStore = await cookies()
-  const demoUserCookie = cookieStore.get('demo_user')
-  if (!demoUserCookie?.value) {
+  const session = await getDemoSession()
+  if (!session) {
     return NextResponse.json({ error: 'No demo session' }, { status: 401 })
-  }
-
-  let payload: { schoolId?: string }
-  try {
-    payload = JSON.parse(Buffer.from(demoUserCookie.value, 'base64').toString('utf8'))
-  } catch {
-    return NextResponse.json({ error: 'Invalid demo session' }, { status: 401 })
-  }
-
-  const schoolId = payload?.schoolId
-  if (!schoolId) {
-    return NextResponse.json({ error: 'No school in demo session' }, { status: 400 })
   }
 
   const admin = getSupabaseAdmin()
@@ -50,7 +52,7 @@ export async function GET() {
       emergency_contact_name,
       emergency_contact_phone
     `)
-    .eq('school_id', schoolId) as { data: any[] | null; error: any }
+    .eq('school_id', session.schoolId) as { data: any[] | null; error: any }
 
   if (error) {
     console.error('Demo students query error:', error)
@@ -76,4 +78,54 @@ export async function GET() {
   )
 
   return NextResponse.json(decrypted)
+}
+
+/**
+ * Create a student in demo mode (bypasses RLS with service role key).
+ */
+export async function POST(request: NextRequest) {
+  if (process.env.DEMO_MODE !== 'true') {
+    return NextResponse.json({ error: 'Demo only' }, { status: 403 })
+  }
+
+  const session = await getDemoSession()
+  if (!session) {
+    return NextResponse.json({ error: 'No demo session' }, { status: 401 })
+  }
+
+  const body = await request.json()
+  const { legal_name, dob, parent_email, emergency_contact_name, emergency_contact_phone } = body
+
+  if (!legal_name) {
+    return NextResponse.json({ error: 'legal_name is required' }, { status: 400 })
+  }
+
+  const admin = getSupabaseAdmin()
+
+  const { data, error } = await admin
+    .from('students_driver_ed')
+    .insert({
+      legal_name: await encryptField(legal_name),
+      dob: dob || null,
+      parent_email: parent_email || null,
+      emergency_contact_name: emergency_contact_name || null,
+      emergency_contact_phone: emergency_contact_phone || null,
+      school_id: session.schoolId,
+      enrollment_date: new Date().toISOString().split('T')[0],
+      classroom_hours: 0,
+      driving_hours: 0,
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Demo student insert error:', error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  // Decrypt the returned legal_name
+  return NextResponse.json({
+    ...data,
+    legal_name: await decryptField(data.legal_name),
+  })
 }
