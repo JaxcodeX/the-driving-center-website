@@ -55,15 +55,15 @@ const NAV_ITEMS = [
   { icon: Settings, label: 'Settings', href: '/school-admin/settings' },
 ]
 
-const BG = '#0D0D12'
-const BG_GRADIENT = 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)'
-const GLASS_BG = 'rgba(255,255,255,0.03)'
-const GLASS_BORDER = 'rgba(255,255,255,0.06)'
-const GLASS_BLUR = 'blur(24px)'
-const TEXT_SECONDARY = '#9CA3AF'
-const ACCENT_GREEN = '#4ADE80'
-const CARD_SHADOW = '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)'
-const CARD_SHADOW_HOVER = '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(74,222,128,0.15), inset 0 1px 0 rgba(255,255,255,0.08)'
+const BG = 'var(--admin-bg)'
+const BG_GRADIENT = 'var(--mesh-subtle)'
+const GLASS_BG = 'var(--glass-bg)'
+const GLASS_BORDER = 'var(--glass-border)'
+const GLASS_BLUR = 'var(--glass-blur)'
+const TEXT_SECONDARY = 'var(--admin-text-secondary)'
+const ACCENT_GREEN = 'var(--admin-accent)'
+const CARD_SHADOW = 'var(--glass-shadow)'
+const CARD_SHADOW_HOVER = '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px var(--admin-accent), inset 0 1px 0 rgba(255,255,255,0.08)'
 
 export default function InstructorsPage() {
   const [instructors, setInstructors] = useState<any[]>([])
