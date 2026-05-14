@@ -85,8 +85,8 @@ export default function InstructorsPage() {
       sid = school.id
       setSchoolId(sid)
       try {
-        const res = await fetch('/api/instructors?school_id=' + encodeURIComponent(sid), {
-          headers: { 'x-school-id': sid },
+        const res = await fetch('/api/instructors?school_id=' + encodeURIComponent(sid || ''), {
+          headers: { 'x-school-id': sid || '' },
         })
         if (res.ok) { setInstructors(await res.json()); setLoading(false); return }
       } catch {}
