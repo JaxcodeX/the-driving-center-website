@@ -599,11 +599,11 @@ h1, h2, h3, h4, h5, h6 {
   .faq-item div { font-size: 13px !important; }
 }
 
-/* ── Section padding mobile ─────────────────── */
+/* ── Section padding mobile (main override) ──── */
 @media (max-width: 640px) {
-  .section-large { padding: 64px 0 48px !important; }
-  .section-medium { padding: 48px 0 !important; }
-  .section-small { padding: 40px 0 !important; }
+  .section-large { padding: 80px 0 56px !important; }
+  .section-medium { padding: 64px 0 48px !important; }
+  .section-small { padding: 48px 0 40px !important; }
   .section-hero { padding: 100px 0 64px !important; }
 }
 

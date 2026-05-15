@@ -65,7 +65,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 function SectionHeadline({ children, mb = '16px', ta = 'left' as const }: { children: React.ReactNode; mb?: string; ta?: 'left' | 'center' }) {
   return (
     <h2 style={{
-      fontSize: 'clamp(36px, 4vw, 48px)', fontFamily: "'Outfit', sans-serif", fontWeight: '700',
+      fontSize: 'clamp(28px, 5vw, 48px)', fontFamily: "'Outfit', sans-serif", fontWeight: '700',
       color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: '1.15',
       marginBottom: mb, textAlign: ta,
     }}>
