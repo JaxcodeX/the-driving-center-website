@@ -512,9 +512,10 @@ h1, h2, h3, h4, h5, h6 {
 .section-medium { padding: 120px 0; }
 .section-small { padding: 80px 0; }
 @media (max-width: 640px) {
-  .section-large { padding: 64px 0 48px !important; }
-  .section-medium { padding: 48px 0 !important; }
-  .section-small { padding: 40px 0 !important; }
+  .section-large { padding: 80px 0 56px !important; }
+  .section-medium { padding: 64px 0 48px !important; }
+  .section-small { padding: 48px 0 40px !important; }
+  .section-hero { padding: 100px 0 64px !important; }
 }
 
 .footer-wrapper { padding: 64px 0 32px; }
@@ -537,10 +538,11 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── Book page mobile ──────────────────────────── */
 @media (max-width: 640px) {
-  .book-step-indicator { padding: 12px 16px !important; }
-  .book-calendar-strip { padding: 12px !important; }
-  .book-time-grid { grid-template-columns: 1fr !important; }
-  .book-confirmation-card { max-width: 100% !important; }
+  .book-step-indicator { padding: 16px !important; }
+  .book-calendar-strip { padding: 16px !important; }
+  .book-time-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
+  .book-confirmation-card { max-width: 100% !important; margin: 0 16px !important; }
+  .book-form-card { padding: 24px 16px !important; }
 }
 
 /* ── Hero mobile overrides ──────────────────── */
@@ -666,22 +668,22 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── Login page mobile ──────────────────────────── */
 @media (max-width: 640px) {
-  .login-modal-mobile { padding: 24px 16px !important; max-width: 100% !important; margin: 0 8px !important; border-radius: 16px !important; }
-  .login-bg > div { padding: 12px !important; }
-  .login-modal-mobile h1 { font-size: 22px !important; }
-  .login-modal-mobile .login-btn-primary { height: 48px !important; font-size: 14px !important; }
-  .login-modal-mobile .admin-input { height: 48px !important; font-size: 13px !important; }
+  .login-modal-mobile { padding: 24px 16px !important; max-width: 100% !important; margin: 0 !important; border-radius: 16px !important; }
+  .login-bg > div { padding: 16px !important; }
+  .login-modal-mobile h1 { font-size: 26px !important; }
+  .login-modal-mobile .login-btn-primary { height: 52px !important; font-size: 15px !important; }
+  .login-modal-mobile .admin-input { height: 52px !important; font-size: 15px !important; }
 }
 
 /* ── Signup page mobile ─────────────────────────── */
 @media (max-width: 768px) {
   .signup-split { flex-direction: column !important; min-height: auto !important; border-radius: 16px !important; }
   .signup-right { display: none !important; }
-  .signup-left { padding: 24px 16px !important; }
-  .signup-page { padding: 8px !important; }
-  .signup-left h1 { font-size: 24px !important; }
-  .signup-left input { height: 48px !important; font-size: 14px !important; }
-  .signup-left button[type="submit"] { height: 48px !important; }
+  .signup-left { padding: 32px 16px !important; }
+  .signup-page { padding: 16px !important; }
+  .signup-left h1 { font-size: 28px !important; }
+  .signup-left input { height: 52px !important; font-size: 15px !important; }
+  .signup-left button[type="submit"] { height: 52px !important; font-size: 15px !important; }
 }
 
 /* ── School Admin dashboard mobile ──────────────── */

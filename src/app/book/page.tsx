@@ -258,7 +258,7 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
             return (
               <div key={sec}>
                 <div className="text-xs font-medium mb-2 uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>{sec}</div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 book-time-grid">
                   {ss.map((slot, i) => {
                     const sel = selectedSlot?.session_date === slot.session_date && selectedSlot?.start_time === slot.start_time && selectedSlot?.instructor_id === slot.instructor_id
                     return (
