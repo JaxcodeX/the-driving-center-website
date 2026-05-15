@@ -262,12 +262,6 @@ export default function SignupPage() {
 
       <style>{`
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 768px) {
-          .signup-split { flex-direction: column !important; min-height: auto !important; border-radius: 16px !important; }
-          .signup-right { display: none !important; }
-          .signup-left { padding: 32px 20px !important; }
-          .signup-page { padding: 12px !important; }
-        }
       `}</style>
     </div>
   )

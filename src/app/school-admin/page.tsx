@@ -859,23 +859,7 @@ export default function DashboardPage() {
       )}
 
       <style>{`
-        @media (max-width: 768px) {
-          .admin-kpi-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-          .admin-2col {
-            grid-template-columns: 1fr !important;
-          }
-        }
-        @media (max-width: 640px) {
-          .admin-kpi-grid {
-            grid-template-columns: 1fr 1fr !important;
-            gap: 10px !important;
-          }
-          .admin-main div[style*='marginBottom: 40px'] {
-            margin-bottom: 24px !important;
-          }
-        }
+        /* Dashboard responsive CSS moved to globals.css */
       `}</style>
     </div>
   )

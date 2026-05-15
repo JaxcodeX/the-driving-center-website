@@ -218,8 +218,8 @@ function Hero() {
 
             {/* Headline */}
             <h1 style={{
-              fontSize: 'clamp(36px, 7vw, 88px)', fontFamily: "'Inter', sans-serif", fontWeight: '800',
-              lineHeight: '1.0', letterSpacing: '-0.03em',
+              fontSize: 'clamp(36px, 8vw, 88px)', fontFamily: "'Outfit', sans-serif", fontWeight: '800',
+              lineHeight: '1.05', letterSpacing: '-0.03em',
               color: 'var(--text-primary)', margin: '0 0 28px',
             }}>
               Run Your Driving School{' '}
@@ -236,11 +236,11 @@ function Hero() {
             </p>
 
             {/* CTAs */}
-            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
-              <Link href='/signup' className='btn-pill btn-pill-primary' style={{ fontSize: '15px', padding: '14px 28px' }}>
+            <div className='hero-cta-group' style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <Link href='/signup' className='btn-pill btn-pill-primary btn-pill-mobile-full' style={{ fontSize: '15px', padding: '16px 28px' }}>
                 Start free trial <ArrowRight size={16} />
               </Link>
-              <Link href='/demo' className='btn-pill btn-pill-secondary' style={{ fontSize: '15px', padding: '14px 28px' }}>
+              <Link href='/demo' className='btn-pill btn-pill-secondary btn-pill-mobile-full' style={{ fontSize: '15px', padding: '16px 28px' }}>
                 Book a demo
               </Link>
             </div>
@@ -1035,120 +1035,6 @@ export default function HomePage() {
         }
         @media (min-width: 769px) {
           .mobile-menu-btn { display: none !important; }
-        }
-
-        /* ── Hero Grid ─────────────────────────── */
-        .hero-grid {
-          display: grid;
-          grid-template-columns: 55% 1fr;
-          gap: 64px;
-          align-items: center;
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-        @media (max-width: 900px) {
-          .hero-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
-        }
-        @media (max-width: 640px) {
-          .hero-preview-card { display: none !important; }
-          .hero-grid { gap: 0 !important; }
-        }
-
-        /* ── Features Grid ─────────────────────── */
-        .features-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 20px;
-        }
-        @media (max-width: 640px) {
-          .features-grid { grid-template-columns: 1fr !important; }
-        }
-
-        /* ── Process Grid ──────────────────────── */
-        .process-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 24px;
-          max-width: 960px;
-          margin: 0 auto;
-        }
-        @media (max-width: 640px) {
-          .process-grid { grid-template-columns: 1fr !important; }
-        }
-
-        /* ── Testimonials Grid ─────────────────── */
-        .testimonials-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 20px;
-          max-width: 900px;
-          margin: 0 auto;
-        }
-        @media (max-width: 640px) {
-          .testimonials-grid { grid-template-columns: 1fr !important; }
-        }
-
-        /* ── Stats Grid ────────────────────────── */
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 0;
-        }
-        @media (max-width: 640px) {
-          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-        }
-
-        /* ── Pricing Grid ──────────────────────── */
-        .pricing-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 20px;
-          align-items: start;
-        }
-        @media (max-width: 640px) {
-          .pricing-grid { grid-template-columns: 1fr !important; }
-        }
-
-        /* ── Footer Grid ───────────────────────── */
-        .footer-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr 1fr;
-          gap: 40px;
-          margin-bottom: 48px;
-        }
-        @media (max-width: 640px) {
-          .footer-grid { grid-template-columns: 1fr !important; }
-        }
-
-        /* ── Section Padding Overrides ─────────── */
-        .section-large {
-          padding: 140px 0 120px;
-        }
-        .section-medium {
-          padding: 120px 0;
-        }
-        .section-small {
-          padding: 80px 0;
-        }
-        @media (max-width: 640px) {
-          .section-large { padding: 80px 0 60px !important; }
-          .section-medium { padding: 60px 0 !important; }
-          .section-small { padding: 48px 0 !important; }
-        }
-
-        /* ── Footer padding override ──────────── */
-        .footer-wrapper {
-          padding: 64px 0 32px;
-        }
-        @media (max-width: 640px) {
-          .footer-wrapper { padding: 40px 0 24px !important; }
-        }
-
-        /* ── Mobile text/button safety ────────── */
-        @media (max-width: 640px) {
-          .touch-target { min-height: 44px; min-width: 44px; }
-          .section-hero h1 { margin-bottom: 16px !important; }
-          .section-hero p { margin-bottom: 28px !important; }
         }
       `}</style>
       <Navbar />

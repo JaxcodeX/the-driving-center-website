@@ -577,33 +577,64 @@ function BookContent() {
     if (!studentName || !studentEmail) { setFormError('Name and email are required'); return }
     if (!studentEmail.includes('@')) { setFormError('Please enter a valid email'); return }
     setFormError(''); setSubmitting(true)
-    const sessionRes = await fetch(`/api/sessions?school_id=${schoolId}`)
-    const sessions = await sessionRes.json()
-    const matched = sessions.find((s: any) =>
-      s.start_date === selectedSlot!.session_date &&
-      s.instructor_id === selectedSlot!.instructor_id
-    )
-    if (!matched) {
-      // Fallback: use the session_id from the selected slot directly (skip lookup)
-      const slotSessionId = selectedSlot!.id
-      const bookRes = await fetch('/api/bookings', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: slotSessionId, session_date: selectedSlot!.session_date, session_time: selectedSlot!.start_time, student_name: studentName, student_email: studentEmail, student_phone: studentPhone || undefined, permit_number: permitNumber || undefined }),
-      })
-      const bookData = await bookRes.json()
-      if (!bookRes.ok) { setFormError(bookData.error ?? 'Booking failed'); setSubmitting(false); return }
-      setBookingId(bookData.booking_id)
-      setStep(3)
-      setSubmitting(false)
-      return
-    }
+
+    // Use the slot's session_id directly
+    const sessionId = selectedSlot!.id ?? ''
+
     const bookRes = await fetch('/api/bookings', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ session_id: matched.id, student_name: studentName, student_email: studentEmail, student_phone: studentPhone || undefined, permit_number: permitNumber || undefined }),
+      body: JSON.stringify({
+        session_id: sessionId,
+        session_date: selectedSlot!.session_date,
+        session_time: selectedSlot!.start_time,
+        student_name: studentName,
+        student_email: studentEmail,
+        student_phone: studentPhone || undefined,
+        permit_number: permitNumber || undefined,
+      }),
     })
     const bookData = await bookRes.json()
     if (!bookRes.ok) { setFormError(bookData.error ?? 'Booking failed'); setSubmitting(false); return }
+
     setBookingId(bookData.booking_id)
+
+    // If deposit is required, initiate payment via checkout API
+    if (bookData.deposit_amount_cents > 0) {
+      try {
+        const checkoutRes = await fetch(`/api/bookings/${bookData.booking_id}/checkout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ booking_id: bookData.booking_id }),
+        })
+        const checkoutData = await checkoutRes.json()
+
+        if (checkoutRes.ok && checkoutData.url) {
+          // Stripe checkout URL — Confirmation component auto-redirects
+          setCheckoutUrl(checkoutData.url)
+          setStep(3)
+          setSubmitting(false)
+          return
+        }
+
+        if (checkoutRes.ok && checkoutData.demo) {
+          // Demo mode: booking confirmed directly without payment
+          setStep(3)
+          setSubmitting(false)
+          return
+        }
+
+        // Checkout failed — show error but booking was created
+        setFormError(checkoutData.error ?? 'Could not initiate payment. Please contact the school.')
+        setSubmitting(false)
+        return
+      } catch {
+        setFormError('Payment service unavailable. Please try again.')
+        setSubmitting(false)
+        return
+      }
+    }
+
+    // No deposit required
     setStep(3)
     setSubmitting(false)
   }

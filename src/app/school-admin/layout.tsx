@@ -276,39 +276,7 @@ export default function SchoolAdminLayout({ children }: { children: ReactNode })
       </main>
 
       <style>{`
-        @media (max-width: 767px) {
-          .admin-sidebar {
-            transform: translateX(-100%) !important;
-          }
-          .admin-sidebar--open {
-            transform: translateX(0) !important;
-          }
-          .admin-sidebar-close {
-            display: flex !important;
-          }
-          .admin-main {
-            margin-left: 0 !important;
-            padding: 60px 16px 24px !important;
-          }
-          .admin-nav-pills {
-            display: flex !important;
-          }
-          .admin-hamburger {
-            display: flex !important;
-          }
-        }
-        @media (min-width: 768px) {
-          .admin-nav-pills {
-            display: none !important;
-          }
-          .admin-sidebar {
-            transform: translateX(0) !important;
-          }
-        }
-        /* Hide scrollbar in nav pills */
-        .admin-nav-pills::-webkit-scrollbar {
-          display: none;
-        }
+        /* Mobile sidebar - actually moved to globals.css */
       `}</style>
     </div>
   )

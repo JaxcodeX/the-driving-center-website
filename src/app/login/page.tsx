@@ -582,10 +582,6 @@ export default function LoginPage() {
             opacity: 0;
           }
         }
-        @media (max-width: 640px) {
-          .login-modal-mobile { padding: 24px 16px !important; max-width: 100% !important; margin: 0 8px !important; border-radius: 16px !important; }
-          .login-bg div[style*='padding: 24px'] { padding: 12px !important; }
-        }
       `}</style>
     </div>
   )

@@ -338,6 +338,48 @@ function SchoolContent() {
           Powered by <span style={{ color: '#4ADE80' }}>The Driving Center</span>
         </footer>
       </div>
+
+      <style>{`
+        .btn-glow {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 14px 28px;
+          background: linear-gradient(135deg, #4ADE80, #22C55E);
+          color: #000000;
+          font-weight: 700;
+          font-size: 14px;
+          border-radius: 999px;
+          text-decoration: none;
+          border: none;
+          cursor: pointer;
+          transition: transform 0.2s, box-shadow 0.2s;
+          font-family: 'Inter', sans-serif;
+        }
+        .btn-glow:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 32px rgba(74,222,128,0.35);
+        }
+        @media (max-width: 640px) {
+          .btn-glow { width: 100% !important; justify-content: center !important; }
+          section div[class*="glass-card"] { padding: 24px 20px !important; }
+          .max-w-3xl.px-6 { padding-left: 16px !important; padding-right: 16px !important; }
+        }
+        .bg-circle {
+          position: absolute;
+          border-radius: 50%;
+          pointer-events: none;
+        }
+        .glass-card {
+          background: var(--glass-bg, rgba(255,255,255,0.03));
+          backdrop-filter: var(--glass-blur, blur(24px));
+          -webkit-backdrop-filter: var(--glass-blur, blur(24px));
+          border: 1px solid var(--glass-border, rgba(255,255,255,0.06));
+          border-radius: 24px;
+          padding: 24px;
+          box-shadow: var(--glass-shadow, 0 4px 24px rgba(0,0,0,0.4));
+        }
+      `}</style>
     </div>
   )
 }
