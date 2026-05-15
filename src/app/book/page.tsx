@@ -92,7 +92,7 @@ function StepIndicator({ current }: { current: number }) {
           Step {current + 1} of {STEPS.length} — <span className="font-semibold" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>{STEP_LABELS[current]}</span>
         </span>
       </div>
-      <div style={{ ...glassCard, padding: '14px 16px' }}>
+      <div className="book-step-indicator" style={{ ...glassCard, padding: '14px 16px' }}>
         <div className="flex gap-1.5">
           {STEPS.map((_, i) => (
             <div key={i} className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
@@ -139,6 +139,7 @@ function ServiceSelection({ sessionTypes, selectedType, onSelect, loading }: {
             const sel = selectedType?.id === type.id
             return (
               <button key={type.id} onClick={() => onSelect(type)}
+                className="mobile-card-padding"
                 style={{
                   ...glassCard,
                   background: sel ? ACCENT_DIM : GLASS_BG,
@@ -217,7 +218,7 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
       <p className="text-sm mb-6" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>{selectedType.duration_minutes} min · {fp(selectedType.price_cents)}</p>
 
       {/* Calendar strip */}
-      <div style={{ ...glassCard, padding: '16px', marginBottom: '20px' }}>
+      <div className="book-calendar-strip" style={{ ...glassCard, padding: '16px', marginBottom: '20px' }}>
         <div className="flex gap-2 overflow-x-auto pb-1">
           {days.map(({ dateStr, label, dayNum, month, isToday }) => {
             const hasSlots = !!slotsByDate[dateStr]; const sel = selectedDate === dateStr
@@ -306,7 +307,7 @@ function StudentDetails({ selectedType, selectedSlot, studentName, setStudentNam
       </button>
 
       {/* Session summary */}
-      <div style={{ ...glassCard, padding: '16px 20px', marginBottom: '24px' }}>
+      <div className="book-summary-card" style={{ ...glassCard, padding: '16px 20px', marginBottom: '24px' }}>
         <div className="flex items-start justify-between gap-2">
           <div>
             <div className="font-semibold text-sm" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>{selectedType.name}</div>
@@ -326,28 +327,28 @@ function StudentDetails({ selectedType, selectedSlot, studentName, setStudentNam
           <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif' }}>
             <User className="w-3.5 h-3.5 inline mr-1.5" />Full Name *
           </label>
-          <input type="text" value={studentName} onChange={e => setStudentName(e.target.value)} placeholder="Jane Smith"
+          <input className="mobile-input-52" type="text" value={studentName} onChange={e => setStudentName(e.target.value)} placeholder="Jane Smith"
             required style={inputBase} />
         </div>
         <div>
           <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif' }}>
             <Mail className="w-3.5 h-3.5 inline mr-1.5" />Email *
           </label>
-          <input type="email" value={studentEmail} onChange={e => setStudentEmail(e.target.value)} placeholder="jane@example.com"
+          <input className="mobile-input-52" type="email" value={studentEmail} onChange={e => setStudentEmail(e.target.value)} placeholder="jane@example.com"
             required style={inputBase} />
         </div>
         <div>
           <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif' }}>
             <Phone className="w-3.5 h-3.5 inline mr-1.5" />Phone
           </label>
-          <input type="tel" value={studentPhone} onChange={e => setStudentPhone(e.target.value)} placeholder="(555) 867-5309"
+          <input className="mobile-input-52" type="tel" value={studentPhone} onChange={e => setStudentPhone(e.target.value)} placeholder="(555) 867-5309"
             style={inputBase} />
         </div>
         <div>
           <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif' }}>
             <Hash className="w-3.5 h-3.5 inline mr-1.5" />Permit / License Number
           </label>
-          <input type="text" value={permitNumber} onChange={e => setPermitNumber(e.target.value)} placeholder="Optional"
+          <input className="mobile-input-52" type="text" value={permitNumber} onChange={e => setPermitNumber(e.target.value)} placeholder="Optional"
             style={inputBase} />
         </div>
 
@@ -358,8 +359,9 @@ function StudentDetails({ selectedType, selectedSlot, studentName, setStudentNam
         )}
 
         <button type="submit" disabled={submitting}
+          className="disabled:opacity-50 mobile-button-52 book-primary-cta"
           style={{ background: submitting ? 'rgba(74,222,128,0.5)' : SUCCESS, color: '#000', padding: '16px 28px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', fontSize: '16px', marginTop: '8px', fontFamily: 'Outfit, sans-serif' }}
-          className="disabled:opacity-50">
+        >
           {submitting ? '⏳ Processing...' : selectedType.deposit_cents > 0 ? `Pay ${fp(selectedType.deposit_cents)} Deposit` : 'Confirm Booking'}
         </button>
 
@@ -403,8 +405,9 @@ function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, b
           <div className="h-full rounded-full" style={{ background: `linear-gradient(90deg, ${ACCENT}, #FF6B1E)`, animation: 'shrinkBar 2s linear forwards' }} />
         </div>
         <a href={checkoutUrl}
+          className="hover:opacity-90 transition-opacity book-primary-cta mobile-button-52"
           style={{ background: SUCCESS, color: '#000', padding: '16px 32px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '16px', textDecoration: 'none', fontFamily: 'Outfit, sans-serif' }}
-          className="hover:opacity-90 transition-opacity">
+        >
           Pay Now <ArrowRight className="w-4 h-4" />
         </a>
         <p className="text-xs mt-4" style={{ color: 'rgba(255,255,255,0.25)' }}>Or <a href={checkoutUrl} className="underline hover:text-white" style={{ color: ACCENT }}>click here if not redirected</a></p>
@@ -423,7 +426,7 @@ function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, b
       {selectedSlot && <p className="mb-1" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>{ffd(selectedSlot.session_date)} at {ft(selectedSlot.start_time)}</p>}
       <p className="mb-8" style={{ color: 'rgba(255,255,255,0.3)' }}>with {selectedSlot.instructor_name}</p>
 
-      <div style={{ ...glassCard, padding: '20px', textAlign: 'left' as const, maxWidth: '360px', margin: '0 auto 20px' }}>
+      <div className="book-confirmation-card" style={{ ...glassCard, padding: '20px', textAlign: 'left' as const, maxWidth: '360px', margin: '0 auto 20px' }}>
         <div className="text-xs mb-3 uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>Booking Summary</div>
         <div className="space-y-2.5 text-sm">
           {[
@@ -445,7 +448,7 @@ function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, b
         </div>
       </div>
 
-      <div style={{ ...glassCard, padding: '16px 20px', textAlign: 'left' as const, maxWidth: '360px', margin: '0 auto' }}>
+      <div className="book-next-steps-card" style={{ ...glassCard, padding: '16px 20px', textAlign: 'left' as const, maxWidth: '360px', margin: '0 auto' }}>
         <div className="text-xs mb-2 uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>What happens next?</div>
         <ul className="space-y-2.5 text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>
           <li className="flex items-center gap-2.5"><CheckCircle className="w-4 h-4 shrink-0" style={{ color: SUCCESS }} />Confirmation email to <span style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>{studentEmail}</span></li>
@@ -505,7 +508,7 @@ function BookingSidebar({ selectedType, selectedSlot, studentName, step }: {
             )}
           </div>
         ) : (
-          <div className="rounded-xl p-6 text-center" style={glassCard}>
+          <div className="rounded-xl p-6 text-center book-empty-state" style={glassCard}>
             <BookOpen className="w-8 h-8 mx-auto mb-2" style={{ color: 'rgba(255,255,255,0.2)' }} />
             <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.3)' }}>Select a service to see your booking summary</p>
           </div>
@@ -679,8 +682,8 @@ function BookContent() {
       </div>
 
       {/* Content: 2-column on desktop */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 relative z-10">
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 relative z-10 book-shell">
+        <div className="flex flex-col lg:flex-row gap-8 items-start book-layout">
           {/* Left: form */}
           <div className="flex-1 min-w-0">
             {step < 3 && <StepIndicator current={step} />}

@@ -87,10 +87,11 @@ export default function SignupPage() {
           </div>
 
           {/* Step indicator */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: '28px', position: 'relative' }}>
+          <div className='signup-step-indicator' style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: '28px', position: 'relative' }}>
+            <div className='signup-step-track' style={{ display: 'flex', alignItems: 'center' }}>
             {STEPS.map((step, i) => (
               <div key={step} style={{ display: 'flex', alignItems: 'center' }}>
-                {i > 0 && <div style={{ width: '40px', height: '2px', margin: '0 8px', background: i <= 0 ? 'rgba(255,255,255,0.06)' : '#4ADE80' }} />}
+                {i > 0 && <div className='signup-step-connector' style={{ width: '40px', height: '2px', margin: '0 8px', background: i <= 0 ? 'rgba(255,255,255,0.06)' : '#4ADE80' }} />}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
                   <div style={{
                     width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -104,13 +105,14 @@ export default function SignupPage() {
                 </div>
               </div>
             ))}
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {/* Full name */}
             <div style={{ position: 'relative' }}>
               <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }}><User size={16} /></div>
-              <input type='text' value={form.ownerName} onChange={e => set('ownerName', e.target.value)} placeholder='Your full name' required style={{
+              <input className='mobile-input-52' type='text' value={form.ownerName} onChange={e => set('ownerName', e.target.value)} placeholder='Your full name' required style={{
                 width: '100%', height: '50px', borderRadius: '12px', background: '#0D0D0D',
                 border: '1px solid rgba(255,255,255,0.1)', color: '#FFFFFF', fontSize: '15px', fontFamily: 'Inter, sans-serif',
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none', transition: 'border-color 0.2s',
@@ -127,7 +129,7 @@ export default function SignupPage() {
                   <path d='M3 5.5V10.5L8 14V8.5H13V5.5H3Z' fill='currentColor' fillOpacity='0.7' />
                 </svg>
               </div>
-              <input type='text' value={form.schoolName} onChange={e => set('schoolName', e.target.value)} placeholder='Driving school name' required style={{
+              <input className='mobile-input-52' type='text' value={form.schoolName} onChange={e => set('schoolName', e.target.value)} placeholder='Driving school name' required style={{
                 width: '100%', height: '50px', borderRadius: '12px', background: '#0D0D0D',
                 border: '1px solid rgba(255,255,255,0.1)', color: '#FFFFFF', fontSize: '15px', fontFamily: 'Inter, sans-serif',
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none', transition: 'border-color 0.2s',
@@ -139,7 +141,7 @@ export default function SignupPage() {
             {/* Email */}
             <div style={{ position: 'relative' }}>
               <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }}><Mail size={16} /></div>
-              <input type='email' value={form.email} onChange={e => set('email', e.target.value)} placeholder='you@yourdrivingschool.com' required style={{
+              <input className='mobile-input-52' type='email' value={form.email} onChange={e => set('email', e.target.value)} placeholder='you@yourdrivingschool.com' required style={{
                 width: '100%', height: '50px', borderRadius: '12px', background: '#0D0D0D',
                 border: '1px solid rgba(255,255,255,0.1)', color: '#FFFFFF', fontSize: '15px', fontFamily: 'Inter, sans-serif',
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none', transition: 'border-color 0.2s',
@@ -151,7 +153,7 @@ export default function SignupPage() {
             {/* Password (optional) */}
             <div style={{ position: 'relative' }}>
               <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }}><Lock size={16} /></div>
-              <input type='password' value={form.password} onChange={e => set('password', e.target.value)} placeholder='Create a password (optional)' style={{
+              <input className='mobile-input-52' type='password' value={form.password} onChange={e => set('password', e.target.value)} placeholder='Create a password (optional)' style={{
                 width: '100%', height: '50px', borderRadius: '12px', background: '#0D0D0D',
                 border: '1px solid rgba(255,255,255,0.1)', color: '#FFFFFF', fontSize: '15px', fontFamily: 'Inter, sans-serif',
                 paddingLeft: '44px', paddingRight: '16px', outline: 'none', transition: 'border-color 0.2s',
@@ -167,7 +169,7 @@ export default function SignupPage() {
               </div>
             )}
 
-            <button type='submit' disabled={loading} style={{
+            <button className='mobile-button-52' type='submit' disabled={loading} style={{
               width: '100%', height: '50px', borderRadius: '12px', background: '#4ADE80', color: '#FFFFFF',
               fontSize: '14px', fontWeight: '700', fontFamily: 'Inter, sans-serif', border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', opacity: loading ? 0.6 : 1,

@@ -77,6 +77,8 @@ body {
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  font-size: 16px;
+  line-height: 1.65;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
@@ -737,4 +739,157 @@ h1, h2, h3, h4, h5, h6 {
 }
 .admin-nav-pills::-webkit-scrollbar {
   display: none;
+}
+
+/* ── Final Mobile Tokens ─────────────────────────────────────── */
+@media (max-width: 640px) {
+  body {
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .container-inner {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .section-large,
+  .section-medium,
+  .section-small {
+    padding-top: 80px !important;
+    padding-bottom: 56px !important;
+  }
+
+  .section-hero {
+    padding-top: 104px !important;
+    padding-bottom: 56px !important;
+  }
+
+  .features-grid,
+  .process-grid,
+  .testimonials-grid,
+  .pricing-grid,
+  .stats-grid,
+  .footer-grid,
+  .grid-2,
+  .grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .btn-pill,
+  .login-btn-primary,
+  .login-btn-social,
+  .mobile-button-52,
+  .mobile-input-52 {
+    min-height: 52px !important;
+  }
+
+  .mobile-card-padding {
+    padding: 20px !important;
+  }
+
+  .mobile-auth-shell {
+    align-items: flex-start !important;
+    padding: 24px 16px 40px !important;
+  }
+
+  .mobile-auth-card {
+    max-width: none !important;
+    padding: 24px 20px !important;
+    border-radius: 20px !important;
+  }
+
+  .mobile-auth-tabs {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px !important;
+    border-radius: 20px !important;
+  }
+
+  .mobile-auth-tabs[data-demo='true'] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .mobile-auth-tab {
+    min-height: 44px !important;
+    padding: 10px 8px !important;
+    font-size: 12px !important;
+  }
+
+  .mobile-auth-links {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .mobile-auth-links .auth-divider {
+    display: none !important;
+  }
+
+  .brand-wordmark {
+    font-size: 14px !important;
+  }
+
+  .signup-page {
+    align-items: flex-start !important;
+    padding: 16px !important;
+  }
+
+  .signup-split {
+    min-height: auto !important;
+    border-radius: 20px !important;
+  }
+
+  .signup-left {
+    padding: 24px 20px !important;
+  }
+
+  .signup-step-indicator {
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-right: -4px;
+  }
+
+  .signup-step-indicator::-webkit-scrollbar {
+    display: none;
+  }
+
+  .signup-step-track {
+    min-width: max-content;
+  }
+
+  .signup-step-connector {
+    width: 24px !important;
+    margin: 0 6px !important;
+  }
+
+  .book-shell {
+    padding: 24px 16px 40px !important;
+  }
+
+  .book-layout {
+    gap: 24px !important;
+  }
+
+  .book-step-indicator,
+  .book-calendar-strip,
+  .book-summary-card,
+  .book-empty-state,
+  .book-confirmation-card,
+  .book-next-steps-card {
+    padding: 20px !important;
+  }
+
+  .book-empty-state {
+    text-align: left !important;
+  }
+
+  .book-time-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .book-primary-cta {
+    width: 100% !important;
+    justify-content: center !important;
+  }
 }

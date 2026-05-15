@@ -121,7 +121,7 @@ function Navbar() {
               <path d='M3 5.5V10.5L8 14V8.5H13V5.5H3Z' fill='white' fillOpacity='0.7' />
             </svg>
           </div>
-          <span style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-0.01em', fontFamily: "'Outfit', sans-serif" }}>The Driving Center</span>
+          <span className='brand-wordmark' style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-0.01em', fontFamily: "'Outfit', sans-serif" }}>The Driving Center</span>
         </Link>
 
         {/* Desktop Nav links */}
@@ -165,7 +165,7 @@ function Navbar() {
         <div style={{
           background: 'rgba(0,0,0,0.98)', backdropFilter: 'blur(20px)',
           borderBottom: '1px solid var(--border)',
-          padding: '16px 24px 24px',
+          padding: '16px',
           display: 'flex', flexDirection: 'column', gap: '16px',
         }}>
           {['Features', 'Pricing', 'FAQ'].map(label => (

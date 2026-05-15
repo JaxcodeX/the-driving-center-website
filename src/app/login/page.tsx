@@ -116,9 +116,9 @@ export default function LoginPage() {
         padding: '24px',
         position: 'relative',
         zIndex: 1,
-      }}>
+      }} className="mobile-auth-shell">
         {/* Glassmorphic Modal */}
-        <div className="login-modal login-modal-mobile" style={{
+        <div className="login-modal login-modal-mobile mobile-auth-card" style={{
           width: '100%',
           maxWidth: '420px',
           padding: '40px',
@@ -189,7 +189,7 @@ export default function LoginPage() {
               background: 'rgba(255,255,255,0.05)', borderRadius: '999px',
               padding: '4px',
               position: 'relative',
-            }}>
+            }} className="mobile-auth-tabs" data-demo={isDemoMode ? 'true' : 'false'}>
               <div style={{
                 position: 'absolute',
                 top: '4px',
@@ -217,6 +217,7 @@ export default function LoginPage() {
                     transition: 'color 0.2s',
                     position: 'relative', zIndex: 1,
                   }}
+                  className="mobile-auth-tab"
                 >
                   {tab === 'magic' ? 'Magic Link' : tab === 'password' ? 'Password' : 'Demo Login'}
                 </button>
@@ -529,7 +530,7 @@ export default function LoginPage() {
             alignItems: 'center',
             justifyContent: 'center',
             gap: '16px',
-          }}>
+          }} className="mobile-auth-links">
             <Link href='/forgot-password' style={{
               fontSize: '13px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif',
               textDecoration: 'none', transition: 'color 0.15s',
@@ -538,7 +539,7 @@ export default function LoginPage() {
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#9CA3AF' }}>
               Forgot password?
             </Link>
-            <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: '13px' }}>•</span>
+            <span className="auth-divider" style={{ color: 'rgba(255,255,255,0.15)', fontSize: '13px' }}>•</span>
             <Link href='/signup' style={{
               fontSize: '13px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif',
               textDecoration: 'none', transition: 'color 0.15s',
