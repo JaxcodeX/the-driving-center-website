@@ -19,9 +19,9 @@ import {
 
 // ─── Shared Layout Helpers ──────────────────────────────────────────
 
-function Container({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+function Container({ children, style, className = '' }: { children: React.ReactNode; style?: React.CSSProperties; className?: string }) {
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', ...style }}>
+    <div className={`container-inner ${className}`} style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 clamp(16px, 4vw, 24px)', ...style }}>
       {children}
     </div>
   )
@@ -33,15 +33,17 @@ function Section({
   pb = 140,
   children,
   style,
+  className = '',
 }: {
   id?: string
   pt?: number
   pb?: number
   children: React.ReactNode
   style?: React.CSSProperties
+  className?: string
 }) {
   return (
-    <section id={id} style={{ padding: `${pt}px 0 ${pb}px`, ...style }}>
+    <section id={id} className={className} style={{ padding: `${pt}px 0 ${pb}px`, ...style }}>
       <Container>{children}</Container>
     </section>
   )
@@ -191,7 +193,7 @@ function Navbar() {
 
 function Hero() {
   return (
-    <section style={{
+    <section className='section-large section-hero' style={{
       padding: '140px 0 120px', position: 'relative', overflow: 'hidden',
       background: 'var(--bg-base)',
     }}>
@@ -199,14 +201,7 @@ function Hero() {
       <div className='hero-gradient' style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
 
       <Container style={{ position: 'relative', zIndex: 1 }}>
-        <div className='hero-grid' style={{
-          display: 'grid',
-          gridTemplateColumns: '55% 1fr',
-          gap: '64px',
-          alignItems: 'center',
-          maxWidth: '1200px',
-          margin: '0 auto',
-        }}>
+        <div className='hero-grid'>
           {/* Left: text content */}
           <div>
             {/* Eyebrow badge */}
@@ -223,7 +218,7 @@ function Hero() {
 
             {/* Headline */}
             <h1 style={{
-              fontSize: 'clamp(48px, 7vw, 88px)', fontFamily: "'Inter', sans-serif", fontWeight: '800',
+              fontSize: 'clamp(36px, 7vw, 88px)', fontFamily: "'Inter', sans-serif", fontWeight: '800',
               lineHeight: '1.0', letterSpacing: '-0.03em',
               color: 'var(--text-primary)', margin: '0 0 28px',
             }}>
@@ -370,7 +365,7 @@ function LogoStrip() {
   ]
 
   return (
-    <section style={{ padding: '80px 0', background: 'var(--bg-base)' }}>
+    <section className='section-small section-logostrip' style={{ padding: '80px 0', background: 'var(--bg-base)' }}>
       <Container>
         <p style={{
           textAlign: 'center', fontSize: '11px', fontWeight: '600',
@@ -381,7 +376,7 @@ function LogoStrip() {
         </p>
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          gap: '56px', flexWrap: 'wrap',
+          gap: 'clamp(24px, 4vw, 56px)', flexWrap: 'wrap',
         }}>
           {schools.map(name => (
             <span key={name} style={{
@@ -439,14 +434,14 @@ const features = [
 
 function Features() {
   return (
-    <Section id='features' pt={120} pb={120} style={{ background: 'var(--bg-base)' }}>
+    <Section id='features' pt={120} pb={120} className='section-medium' style={{ background: 'var(--bg-base)' }}>
       <div style={{ textAlign: 'center', marginBottom: '64px' }}>
         <Eyebrow>Features</Eyebrow>
         <SectionHeadline mb='8px'>Everything your school needs to grow</SectionHeadline>
         <SectionSub mb='0' ta='center'>From booking to billing — run your entire school from one dashboard.</SectionSub>
       </div>
 
-      <div className='features-grid' style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+      <div className='features-grid'>
         {features.map((f, i) => (
           <div key={f.title} data-animate style={{
             animationDelay: `${i * 100}ms`,
@@ -519,14 +514,14 @@ const processSteps = [
 
 function Process() {
   return (
-    <Section pt={120} pb={120} style={{ background: 'var(--bg-surface)' }}>
+    <Section pt={120} pb={120} className='section-medium' style={{ background: 'var(--bg-surface)' }}>
       <div style={{ textAlign: 'center', marginBottom: '72px' }}>
         <Eyebrow>How It Works</Eyebrow>
         <SectionHeadline mb='8px'>The automation that pays for itself</SectionHeadline>
         <SectionSub mb='0' ta='center'>Every feature built around the problems that actually cost you time and money.</SectionSub>
       </div>
 
-      <div className='process-grid' style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', maxWidth: '960px', margin: '0 auto' }}>
+      <div className='process-grid'>
         {processSteps.map((step, i) => (
           <div key={step.num} data-animate style={{
             animationDelay: `${i * 120}ms`,
@@ -611,14 +606,14 @@ const testimonials = [
 
 function Testimonials() {
   return (
-    <Section pt={120} pb={120} id='testimonials' style={{ background: 'var(--bg-base)' }}>
+    <Section pt={120} pb={120} id='testimonials' className='section-medium' style={{ background: 'var(--bg-base)' }}>
       <div style={{ textAlign: 'center', marginBottom: '64px' }}>
         <Eyebrow>Testimonials</Eyebrow>
         <SectionHeadline mb='8px'>Loved by driving schools</SectionHeadline>
         <SectionSub mb='0' ta='center'>Don&apos;t take our word for it. Here&apos;s what school owners have to say.</SectionSub>
       </div>
 
-      <div className='testimonials-grid' style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', maxWidth: '900px', margin: '0 auto' }}>
+      <div className='testimonials-grid'>
         {testimonials.map((t, i) => (
           <div key={t.name} data-animate style={{
             animationDelay: `${i * 100}ms`,
@@ -679,9 +674,9 @@ function StatsBar() {
   ]
 
   return (
-    <section style={{ padding: '80px 0', background: 'var(--bg-surface)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
+    <section className='section-small section-stats' style={{ padding: '80px 0', background: 'var(--bg-surface)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
       <Container>
-        <div className='stats-grid' style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0' }}>
+        <div className='stats-grid'>
           {stats.map((stat, i) => (
             <div key={stat.label} style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
@@ -747,14 +742,14 @@ const plans = [
 
 function Pricing() {
   return (
-    <Section id='pricing' pt={120} pb={120} style={{ background: 'var(--bg-base)' }}>
+    <Section id='pricing' pt={120} pb={120} className='section-medium' style={{ background: 'var(--bg-base)' }}>
       <div style={{ textAlign: 'center', marginBottom: '64px' }}>
         <Eyebrow>Pricing</Eyebrow>
         <SectionHeadline mb='8px'>Simple, transparent pricing</SectionHeadline>
         <SectionSub mb='0' ta='center'>No setup fees. No per-seat surprises. Cancel anytime.</SectionSub>
       </div>
 
-      <div className='pricing-grid' style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', alignItems: 'start' }}>
+      <div className='pricing-grid'>
         {plans.map((p, i) => (
           <div key={p.name} data-animate style={{
             animationDelay: `${i * 100}ms`,
@@ -881,7 +876,7 @@ function FAQ() {
   ]
 
   return (
-    <Section id='faq' pt={120} pb={120} style={{ background: 'var(--bg-base)' }}>
+    <Section id='faq' pt={120} pb={120} className='section-medium' style={{ background: 'var(--bg-base)' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '56px' }}>
           <Eyebrow>FAQ</Eyebrow>
@@ -897,7 +892,7 @@ function FAQ() {
 
 function CTASection() {
   return (
-    <Section pt={120} pb={120} style={{ background: 'var(--bg-surface)', position: 'relative', overflow: 'hidden' }}>
+    <Section pt={120} pb={120} className='section-medium' style={{ background: 'var(--bg-surface)', position: 'relative', overflow: 'hidden' }}>
       {/* Mesh subtle bg */}
       <div className='mesh-subtle' style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
 
@@ -925,9 +920,9 @@ function CTASection() {
 
 function Footer() {
   return (
-    <footer style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-base)', padding: '64px 0 32px' }}>
+    <footer className='footer-wrapper' style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-base)', padding: '64px 0 32px' }}>
       <Container>
-        <div className='footer-grid' style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '40px', marginBottom: '48px' }}>
+        <div className='footer-grid'>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
               <div style={{
@@ -1032,6 +1027,8 @@ export default function HomePage() {
         [data-animate].visible {
           animation: fadeInUp 0.6s ease-out forwards;
         }
+
+        /* ── Responsive Nav ────────────────────── */
         @media (max-width: 768px) {
           .desktop-nav { display: none !important; }
           .mobile-menu-btn { display: block !important; }
@@ -1039,22 +1036,119 @@ export default function HomePage() {
         @media (min-width: 769px) {
           .mobile-menu-btn { display: none !important; }
         }
+
+        /* ── Hero Grid ─────────────────────────── */
+        .hero-grid {
+          display: grid;
+          grid-template-columns: 55% 1fr;
+          gap: 64px;
+          align-items: center;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
         @media (max-width: 900px) {
-          .hero-grid { grid-template-columns: 1fr !important; }
+          .hero-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
         }
         @media (max-width: 640px) {
           .hero-preview-card { display: none !important; }
           .hero-grid { gap: 0 !important; }
+        }
+
+        /* ── Features Grid ─────────────────────── */
+        .features-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+        }
+        @media (max-width: 640px) {
           .features-grid { grid-template-columns: 1fr !important; }
-          .pricing-grid { grid-template-columns: 1fr !important; }
+        }
+
+        /* ── Process Grid ──────────────────────── */
+        .process-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+          max-width: 960px;
+          margin: 0 auto;
+        }
+        @media (max-width: 640px) {
           .process-grid { grid-template-columns: 1fr !important; }
+        }
+
+        /* ── Testimonials Grid ─────────────────── */
+        .testimonials-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 20px;
+          max-width: 900px;
+          margin: 0 auto;
+        }
+        @media (max-width: 640px) {
           .testimonials-grid { grid-template-columns: 1fr !important; }
+        }
+
+        /* ── Stats Grid ────────────────────────── */
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 0;
+        }
+        @media (max-width: 640px) {
           .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+
+        /* ── Pricing Grid ──────────────────────── */
+        .pricing-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+          align-items: start;
+        }
+        @media (max-width: 640px) {
+          .pricing-grid { grid-template-columns: 1fr !important; }
+        }
+
+        /* ── Footer Grid ───────────────────────── */
+        .footer-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 40px;
+          margin-bottom: 48px;
+        }
+        @media (max-width: 640px) {
           .footer-grid { grid-template-columns: 1fr !important; }
-          section[style*='padding: 140px 0 120px'] { padding: 80px 0 60px !important; }
-          section[style*='padding: 120px 0'] { padding: 60px 0 60px !important; }
-          section[style*='padding: 80px 0'] { padding: 48px 0 !important; }
-          div[style*='padding: 64px 0 32px'] { padding: 40px 0 24px !important; }
+        }
+
+        /* ── Section Padding Overrides ─────────── */
+        .section-large {
+          padding: 140px 0 120px;
+        }
+        .section-medium {
+          padding: 120px 0;
+        }
+        .section-small {
+          padding: 80px 0;
+        }
+        @media (max-width: 640px) {
+          .section-large { padding: 80px 0 60px !important; }
+          .section-medium { padding: 60px 0 !important; }
+          .section-small { padding: 48px 0 !important; }
+        }
+
+        /* ── Footer padding override ──────────── */
+        .footer-wrapper {
+          padding: 64px 0 32px;
+        }
+        @media (max-width: 640px) {
+          .footer-wrapper { padding: 40px 0 24px !important; }
+        }
+
+        /* ── Mobile text/button safety ────────── */
+        @media (max-width: 640px) {
+          .touch-target { min-height: 44px; min-width: 44px; }
+          .section-hero h1 { margin-bottom: 16px !important; }
+          .section-hero p { margin-bottom: 28px !important; }
         }
       `}</style>
       <Navbar />
