@@ -75,4 +75,43 @@ Future agents read this file to know:
 
 ---
 
+## Phase 5 CSS Refactor — Model: deepseek/deepseek-v4-flash — Started: 2026-05-16 11:15
+
+**Task:** Replace all hardcoded hex/rgba colors in style={} props in school-admin/page.tsx with CSS variables from globals.css
+
+**Context package:**
+- Read: WORKFLOW_LOG_HEADER.md, AGENT_RUN_LOG.md, SPEC.md, ACTUAL_SCHEMA.md, CLAUDE.md, globals.css
+- Working from: SPEC.md design tokens section
+
+**Steps:**
+1. Read all context files and design tokens — done
+2. Replaced constants block (BG, GRADIENT, GLASS_*, TEXT_*, ACCENT_*, CARD_SHADOW*) with CSS var()/color-mix() equivalents — done
+3. Replaced kpiCards accentBg values — done
+4. Replaced '#FFFFFF' → var(--admin-text) across all style props — done
+5. Replaced '#6B7280' → var(--admin-text-muted) — done
+6. Replaced '#9CA3AF' → var(--admin-text-secondary) — done
+7. Replaced '#000' → var(--admin-bg) — done
+8. Replaced '#13161F' → var(--admin-elevated) — done
+9. Replaced '#FBBF24' → var(--warning) — done
+10. Replaced statusConfig dot colors with CSS variables (--status-blue, --admin-accent, --warning, --status-cancelled) — done
+11. Replaced rgba(74,222,128,*) → color-mix(in srgb, var(--admin-accent), *) in style props — done
+12. Replaced rgba(255,140,66,*) → color-mix(in srgb, var(--accent-secondary), *) in style props — done
+13. Replaced rgba(103,232,249,*) → color-mix(in srgb, var(--status-blue), *) in style props — done
+14. Replaced rgba(167,139,250,*) → color-mix(in srgb, var(--status-purple), *) in style props — done
+15. Replaced rgba(255,255,255,0.06) → var(--admin-border) in style props — done
+16. Replaced rgba(255,255,255,0.04) → var(--glass-bg) in style props — done
+17. Replaced rgba(255,255,255,0.08) → var(--glass-border) in style props — done
+18. Replaced rgba(255,255,255,0.05) borders → var(--admin-border) in style props — done
+19. Replaced rgba(255,255,255,0.1) → var(--border-hover) in style props — done
+
+**Build:** ✅ Pass — 0 errors
+
+**Result:** ✅ Passed
+- Commit: pending
+- Duration: ~15 min
+
+**Changes:** 66 insertions, 66 deletions in school-admin/page.tsx — all hardcoded colors replaced with CSS variables
+
+---
+
 *Last updated: 2026-05-16*

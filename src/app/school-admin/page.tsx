@@ -19,20 +19,20 @@ type ModalType = 'revenue' | 'students' | 'sessions' | 'completion' | null
 
 // NAV_ITEMS removed — layout provides the sidebar
 
-// Design tokens
-const BG = '#0D0D12'
-const BG_GRADIENT = 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)'
-const GLASS_BG = 'rgba(255,255,255,0.03)'
-const GLASS_BORDER = 'rgba(255,255,255,0.06)'
-const GLASS_BLUR = 'blur(24px)'
-const TEXT_SECONDARY = '#9CA3AF'
-const ACCENT_ORANGE = '#FF8C42'
-const ACCENT_CYAN = '#67E8F9'
-const ACCENT_LAVENDER = '#A78BFA'
-const ACCENT_GREEN = '#4ADE80'
+// Design tokens — mapped to CSS variables from globals.css
+const BG = 'var(--admin-bg)'
+const BG_GRADIENT = 'radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--admin-accent) 6%, transparent) 0%, transparent 60%)'
+const GLASS_BG = 'var(--glass-bg)'
+const GLASS_BORDER = 'var(--admin-border)'
+const GLASS_BLUR = 'var(--glass-blur)'
+const TEXT_SECONDARY = 'var(--admin-text-secondary)'
+const ACCENT_ORANGE = 'var(--accent-secondary)'
+const ACCENT_CYAN = 'var(--status-blue)'
+const ACCENT_LAVENDER = 'var(--status-purple)'
+const ACCENT_GREEN = 'var(--admin-accent)'
 
-const CARD_SHADOW = '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)'
-const CARD_SHADOW_HOVER = '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(74,222,128,0.15), inset 0 1px 0 rgba(255,255,255,0.08)'
+const CARD_SHADOW = '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 color-mix(in srgb, var(--admin-text) 5%, transparent)'
+const CARD_SHADOW_HOVER = '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px color-mix(in srgb, var(--admin-accent) 15%, transparent), inset 0 1px 0 color-mix(in srgb, var(--admin-text) 8%, transparent)'
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({
@@ -192,7 +192,7 @@ export default function DashboardPage() {
       delta: stats.studentsDelta,
       icon: Users,
       accent: ACCENT_CYAN,
-      accentBg: 'rgba(103,232,249,0.1)',
+      accentBg: 'color-mix(in srgb, var(--status-blue) 10%, transparent)',
       modalKey: 'students' as ModalType,
     },
     {
@@ -201,7 +201,7 @@ export default function DashboardPage() {
       delta: stats.sessionsDelta,
       icon: Calendar,
       accent: ACCENT_LAVENDER,
-      accentBg: 'rgba(167,139,250,0.1)',
+      accentBg: 'color-mix(in srgb, var(--status-purple) 10%, transparent)',
       modalKey: 'sessions' as ModalType,
     },
     {
@@ -210,7 +210,7 @@ export default function DashboardPage() {
       delta: stats.revenueDelta,
       icon: CreditCard,
       accent: ACCENT_GREEN,
-      accentBg: 'rgba(74,222,128,0.1)',
+      accentBg: 'color-mix(in srgb, var(--admin-accent) 10%, transparent)',
       modalKey: 'revenue' as ModalType,
     },
     {
@@ -219,7 +219,7 @@ export default function DashboardPage() {
       delta: stats.completionDelta,
       icon: TrendingUp,
       accent: ACCENT_GREEN,
-      accentBg: 'rgba(74,222,128,0.1)',
+      accentBg: 'color-mix(in srgb, var(--admin-accent) 10%, transparent)',
       modalKey: 'completion' as ModalType,
     },
   ]
@@ -277,7 +277,7 @@ export default function DashboardPage() {
               fontFamily: 'Outfit, sans-serif',
               fontSize: '32px',
               fontWeight: '700',
-              color: '#FFFFFF',
+              color: 'var(--admin-text)',
               marginBottom: '4px',
               letterSpacing: '-0.01em',
             }}>
@@ -363,7 +363,7 @@ export default function DashboardPage() {
                   fontWeight: '800',
                   letterSpacing: '-0.02em',
                   lineHeight: 1,
-                  color: '#FFFFFF',
+                  color: 'var(--admin-text)',
                   marginBottom: '10px',
                 }}>
                   {value}
@@ -372,7 +372,7 @@ export default function DashboardPage() {
                   fontSize: '12px',
                   fontWeight: '600',
                   color: isPositive ? ACCENT_GREEN : TEXT_SECONDARY,
-                  background: isPositive ? 'rgba(74,222,128,0.1)' : 'rgba(156,163,175,0.08)',
+                  background: isPositive ? 'color-mix(in srgb, var(--admin-accent) 10%, transparent)' : 'color-mix(in srgb, var(--admin-text-secondary) 8%, transparent)',
                   padding: '3px 10px',
                   borderRadius: '999px',
                 }}>
@@ -415,7 +415,7 @@ export default function DashboardPage() {
                     fontSize: '11px',
                     fontWeight: '700',
                     color: ACCENT_GREEN,
-                    background: 'rgba(74,222,128,0.1)',
+                    background: 'color-mix(in srgb, var(--admin-accent) 10%, transparent)',
                     padding: '3px 10px',
                     borderRadius: '999px',
                   }}>
@@ -461,10 +461,10 @@ export default function DashboardPage() {
                   {upcomingSessions.slice(0, 5).map(session => {
                     const date = new Date(session.start_date + 'T12:00:00')
                     const statusConfig: Record<string, { dot: string }> = {
-                      scheduled: { dot: '#38BDF8' },
-                      completed: { dot: '#4ADE80' },
-                      pending: { dot: '#FBBF24' },
-                      cancelled: { dot: '#EF4444' },
+                      scheduled: { dot: 'var(--status-blue)' },
+                      completed: { dot: 'var(--admin-accent)' },
+                      pending: { dot: 'var(--warning)' },
+                      cancelled: { dot: 'var(--status-cancelled)' },
                     }
                     const sc = statusConfig[session.status] ?? { dot: TEXT_SECONDARY }
                     return (
@@ -498,7 +498,7 @@ export default function DashboardPage() {
                           boxShadow: `0 0 6px ${sc.dot}`,
                         }} />
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', marginBottom: '1px' }}>
+                          <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--admin-text)', marginBottom: '1px' }}>
                             {session.session_type?.name || 'Session'}
                           </div>
                           <div style={{ fontSize: '13px', color: TEXT_SECONDARY, fontWeight: '400' }}>
@@ -506,7 +506,7 @@ export default function DashboardPage() {
                           </div>
                         </div>
                         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                          <div style={{ fontSize: '13px', color: '#FFFFFF', fontWeight: '500' }}>
+                          <div style={{ fontSize: '13px', color: 'var(--admin-text)', fontWeight: '500' }}>
                             {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                           </div>
                           <div style={{ fontSize: '12px', color: TEXT_SECONDARY }}>
@@ -566,7 +566,7 @@ export default function DashboardPage() {
                       {item.initials}
                     </div>
                     <div style={{ flex: 1 }}>
-                      <span style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF' }}>{item.name}</span>
+                      <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--admin-text)' }}>{item.name}</span>
                       <span style={{ fontSize: '14px', color: TEXT_SECONDARY }}> {item.action} </span>
                       <span style={{ fontSize: '14px', fontWeight: '500', color: TEXT_SECONDARY }}>{item.item}</span>
                     </div>
@@ -612,8 +612,8 @@ export default function DashboardPage() {
                       gap: '6px',
                       padding: '10px 14px',
                       height: '36px',
-                      background: primary ? 'rgba(255,140,66,0.12)' : 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${primary ? 'rgba(255,140,66,0.25)' : GLASS_BORDER}`,
+                      background: primary ? 'color-mix(in srgb, var(--accent-secondary) 12%, transparent)' : 'var(--glass-bg)',
+                      border: `1px solid ${primary ? 'color-mix(in srgb, var(--accent-secondary) 25%, transparent)' : GLASS_BORDER}`,
                       borderRadius: '16px',
                       textDecoration: 'none',
                       transition: 'background 0.15s, border-color 0.15s',
@@ -631,7 +631,7 @@ export default function DashboardPage() {
                     }}
                   >
                     <QIcon className="w-4 h-4" style={{ color: primary ? ACCENT_GREEN : TEXT_SECONDARY }} />
-                    <span style={{ fontSize: '13px', fontWeight: '600', color: primary ? ACCENT_GREEN : '#FFFFFF' }}>{label}</span>
+                    <span style={{ fontSize: '13px', fontWeight: '600', color: primary ? ACCENT_GREEN : 'var(--admin-text)' }}>{label}</span>
                   </Link>
                 ))}
               </div>
@@ -682,13 +682,13 @@ export default function DashboardPage() {
                         background: accent,
                         boxShadow: `0 0 6px ${accent}`,
                       }} />
-                      <span style={{ fontSize: '13px', fontWeight: '500', color: '#FFFFFF' }}>{label}</span>
+                      <span style={{ fontSize: '13px', fontWeight: '500', color: 'var(--admin-text)' }}>{label}</span>
                     </div>
                     <span style={{
                       fontFamily: 'Outfit, sans-serif',
                       fontSize: '20px',
                       fontWeight: '800',
-                      color: '#FFFFFF',
+                      color: 'var(--admin-text)',
                       letterSpacing: '-0.01em',
                     }}>
                       {value}
@@ -723,13 +723,13 @@ export default function DashboardPage() {
           <div
             onClick={e => e.stopPropagation()}
             style={{
-              background: '#13161F',
-              border: '1px solid rgba(74,222,128,0.15)',
+              background: 'var(--admin-elevated)',
+              border: '1px solid color-mix(in srgb, var(--admin-accent) 15%, transparent)',
               borderRadius: '28px',
               padding: '36px',
               maxWidth: '440px',
               width: '100%',
-              boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(74,222,128,0.05)',
+              boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px color-mix(in srgb, var(--admin-accent) 5%, transparent)',
               position: 'relative',
             }}
           >
@@ -739,8 +739,8 @@ export default function DashboardPage() {
               style={{
                 position: 'absolute', top: '20px', right: '20px',
                 width: '32px', height: '32px', borderRadius: '50%',
-                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-                color: '#9CA3AF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'var(--admin-border)', border: '1px solid var(--border-hover)',
+                color: 'var(--admin-text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'background 0.15s',
               }}
               onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
@@ -751,25 +751,25 @@ export default function DashboardPage() {
 
             {activeModal === 'revenue' && (
               <>
-                <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(255,140,66,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'color-mix(in srgb, var(--accent-secondary) 12%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
                   <CreditCard className="w-5 h-5" style={{ color: ACCENT_ORANGE }} />
                 </div>
-                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '22px', fontWeight: '700', color: '#FFFFFF', marginBottom: '4px' }}>Monthly Revenue</h3>
-                <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '28px' }}>Revenue breakdown for {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '22px', fontWeight: '700', color: 'var(--admin-text)', marginBottom: '4px' }}>Monthly Revenue</h3>
+                <p style={{ fontSize: '13px', color: 'var(--admin-text-muted)', marginBottom: '28px' }}>Revenue breakdown for {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {[
                     { label: 'Confirmed Payments', value: `$${(stats.monthlyRevenue * 0.75).toLocaleString()}`, color: ACCENT_GREEN, pct: '75%' },
-                    { label: 'Pending Payments', value: `$${(stats.monthlyRevenue * 0.25).toLocaleString()}`, color: '#FBBF24', pct: '25%' },
-                    { label: 'Total Revenue', value: `$${stats.monthlyRevenue.toLocaleString()}`, color: '#FFFFFF', pct: '100%' },
+                    { label: 'Pending Payments', value: `$${(stats.monthlyRevenue * 0.25).toLocaleString()}`, color: 'var(--warning)', pct: '25%' },
+                    { label: 'Total Revenue', value: `$${stats.monthlyRevenue.toLocaleString()}`, color: 'var(--admin-text)', pct: '100%' },
                   ].map(item => (
-                    <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', background: 'rgba(0,0,0,0.3)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', background: 'rgba(0,0,0,0.3)', borderRadius: '16px', border: '1px solid var(--admin-border)' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.color, boxShadow: `0 0 6px ${item.color}` }} />
-                        <span style={{ fontSize: '13px', color: '#9CA3AF' }}>{item.label}</span>
+                        <span style={{ fontSize: '13px', color: 'var(--admin-text-secondary)' }}>{item.label}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '18px', fontWeight: '700', color: item.color }}>{item.value}</span>
-                        <span style={{ fontSize: '11px', color: '#6B7280', fontWeight: '600' }}>{item.pct}</span>
+                        <span style={{ fontSize: '11px', color: 'var(--admin-text-muted)', fontWeight: '600' }}>{item.pct}</span>
                       </div>
                     </div>
                   ))}
@@ -779,23 +779,23 @@ export default function DashboardPage() {
 
             {activeModal === 'students' && (
               <>
-                <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(103,232,249,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'color-mix(in srgb, var(--status-blue) 12%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
                   <Users className="w-5 h-5" style={{ color: ACCENT_CYAN }} />
                 </div>
-                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '22px', fontWeight: '700', color: '#FFFFFF', marginBottom: '4px' }}>Student Breakdown</h3>
-                <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '28px' }}>Enrollment status for all {stats.totalStudents} students</p>
+                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '22px', fontWeight: '700', color: 'var(--admin-text)', marginBottom: '4px' }}>Student Breakdown</h3>
+                <p style={{ fontSize: '13px', color: 'var(--admin-text-muted)', marginBottom: '28px' }}>Enrollment status for all {stats.totalStudents} students</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {[
                     { label: 'Active Now', value: Math.round(stats.totalStudents * 0.7), color: ACCENT_GREEN },
                     { label: 'Enrolled', value: Math.round(stats.totalStudents * 0.15), color: ACCENT_LAVENDER },
                     { label: 'Completed', value: stats.totalStudents - Math.round(stats.totalStudents * 0.7) - Math.round(stats.totalStudents * 0.15), color: ACCENT_CYAN },
                   ].map(item => (
-                    <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', background: 'rgba(0,0,0,0.3)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', background: 'rgba(0,0,0,0.3)', borderRadius: '16px', border: '1px solid var(--admin-border)' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.color, boxShadow: `0 0 6px ${item.color}` }} />
-                        <span style={{ fontSize: '13px', color: '#9CA3AF' }}>{item.label}</span>
+                        <span style={{ fontSize: '13px', color: 'var(--admin-text-secondary)' }}>{item.label}</span>
                       </div>
-                      <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '20px', fontWeight: '700', color: '#FFFFFF' }}>{item.value}</span>
+                      <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '20px', fontWeight: '700', color: 'var(--admin-text)' }}>{item.value}</span>
                     </div>
                   ))}
                 </div>
@@ -804,19 +804,19 @@ export default function DashboardPage() {
 
             {activeModal === 'sessions' && (
               <>
-                <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(167,139,250,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'color-mix(in srgb, var(--status-purple) 12%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
                   <Calendar className="w-5 h-5" style={{ color: ACCENT_LAVENDER }} />
                 </div>
-                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '22px', fontWeight: '700', color: '#FFFFFF', marginBottom: '4px' }}>Upcoming Sessions</h3>
-                <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '28px' }}>Next sessions on your schedule</p>
+                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '22px', fontWeight: '700', color: 'var(--admin-text)', marginBottom: '4px' }}>Upcoming Sessions</h3>
+                <p style={{ fontSize: '13px', color: 'var(--admin-text-muted)', marginBottom: '28px' }}>Next sessions on your schedule</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {upcomingSessions.slice(0, 4).map((session) => {
                     const date = new Date(session.start_date + 'T12:00:00')
                     return (
-                      <div key={session.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: 'rgba(0,0,0,0.3)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <div key={session.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: 'rgba(0,0,0,0.3)', borderRadius: '16px', border: '1px solid var(--admin-border)' }}>
                         <div>
-                          <div style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', marginBottom: '2px' }}>{session.session_type?.name || 'Session'}</div>
-                          <div style={{ fontSize: '12px', color: '#6B7280' }}>{session.instructor?.name || 'No instructor'} · {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                          <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--admin-text)', marginBottom: '2px' }}>{session.session_type?.name || 'Session'}</div>
+                          <div style={{ fontSize: '12px', color: 'var(--admin-text-muted)' }}>{session.instructor?.name || 'No instructor'} · {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
                         </div>
                         <span style={{ fontSize: '13px', color: ACCENT_LAVENDER, fontWeight: '600' }}>{date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
                       </div>
@@ -828,12 +828,12 @@ export default function DashboardPage() {
 
             {activeModal === 'completion' && (
               <>
-                <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(74,222,128,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'color-mix(in srgb, var(--admin-accent) 12%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
                   <TrendingUp className="w-5 h-5" style={{ color: ACCENT_GREEN }} />
                 </div>
-                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '22px', fontWeight: '700', color: '#FFFFFF', marginBottom: '4px' }}>Completion Rate</h3>
-                <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '28px' }}>Session completion performance</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '24px', padding: '24px', background: 'rgba(0,0,0,0.3)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '20px' }}>
+                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '22px', fontWeight: '700', color: 'var(--admin-text)', marginBottom: '4px' }}>Completion Rate</h3>
+                <p style={{ fontSize: '13px', color: 'var(--admin-text-muted)', marginBottom: '28px' }}>Session completion performance</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '24px', padding: '24px', background: 'rgba(0,0,0,0.3)', borderRadius: '20px', border: '1px solid var(--admin-border)', marginBottom: '20px' }}>
                   {/* Progress ring */}
                   <div style={{ position: 'relative', width: '80px', height: '80px', flexShrink: 0 }}>
                     <svg width="80" height="80" viewBox="0 0 80 80" style={{ transform: 'rotate(-90deg)' }}>
@@ -847,11 +847,11 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '14px', color: '#9CA3AF', marginBottom: '4px' }}>On-time completion rate</div>
-                    <div style={{ fontSize: '12px', color: '#6B7280' }}>Based on total scheduled sessions</div>
+                    <div style={{ fontSize: '14px', color: 'var(--admin-text-secondary)', marginBottom: '4px' }}>On-time completion rate</div>
+                    <div style={{ fontSize: '12px', color: 'var(--admin-text-muted)' }}>Based on total scheduled sessions</div>
                   </div>
                 </div>
-                <p style={{ fontSize: '13px', color: '#6B7280', textAlign: 'center' }}>↑ Higher than last month — great work!</p>
+                <p style={{ fontSize: '13px', color: 'var(--admin-text-muted)', textAlign: 'center' }}>↑ Higher than last month — great work!</p>
               </>
             )}
           </div>

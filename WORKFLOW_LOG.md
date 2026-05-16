@@ -472,3 +472,22 @@ Recommendation: Next FSO session or deep work window should finish the remaining
 - mission-control exact palette mapped: `--mc-bg: #0F0F0F`, `--mc-surface: #1A1A1A`
 - Build: ✅ 0 errors
 
+---
+
+## [CSS Refactor: school-admin/page.tsx hardcoded colors] — [2026-05-16]
+
+**Task:** Replace 66+ hardcoded hex/rgba color values in style={} props with CSS variables from globals.css
+
+**What I did:**
+- Read context files (WORKFLOW_LOG_HEADER, AGENT_RUN_LOG, SPEC, ACTUAL_SCHEMA, CLAUDE, globals.css)
+- Replaced 12 design-token constants with CSS var() references
+- Replaced all inline hardcoded colors (hex + rgba) in style={} props with equivalent CSS variables
+- Used color-mix() for opacity variants of CSS variables
+- Ran npm run build — passed with 0 errors
+
+**Result:** ✅ Passed
+
+---
+
+*Last updated: 2026-05-16*
+
