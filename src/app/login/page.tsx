@@ -141,7 +141,7 @@ export default function LoginPage() {
                 </svg>
               </div>
               <span style={{
-                fontSize: '17px', fontWeight: '700', color: '#FFFFFF', fontFamily: 'Outfit, sans-serif',
+                fontSize: '17px', fontWeight: '700', color: 'var(--text-primary)', fontFamily: 'Outfit, sans-serif',
               }}>
                 The Driving Center
               </span>
@@ -154,15 +154,15 @@ export default function LoginPage() {
               marginBottom: '20px',
               padding: '12px 16px',
               borderRadius: '12px',
-              background: 'rgba(74,222,128,0.10)',
-              border: '1px solid rgba(74,222,128,0.25)',
+              background: 'color-mix(in srgb, var(--success), transparent 90%)',
+              border: '1px solid color-mix(in srgb, var(--success), transparent 75%)',
               textAlign: 'center',
             }}>
-              <CheckCircle size="20" style={{ color: '#4ADE80', marginBottom: '6px' }} />
-              <p style={{ fontSize: '13px', fontWeight: '600', color: '#4ADE80', marginBottom: '2px', fontFamily: 'Inter, sans-serif' }}>
+              <CheckCircle size="20" style={{ color: 'var(--success)', marginBottom: '6px' }} />
+              <p style={{ fontSize: '13px', fontWeight: '600', color: 'var(--success)', marginBottom: '2px', fontFamily: 'Inter, sans-serif' }}>
                 Account created successfully!
               </p>
-              <p style={{ fontSize: '12px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif' }}>
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'Inter, sans-serif' }}>
                 {typeof signupSuccess === 'string' && signupSuccess.includes('@')
                   ? `Enter the magic link sent to ${signupSuccess}`
                   : 'Check your email for a sign-in link.'}
@@ -174,11 +174,11 @@ export default function LoginPage() {
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
             <h1 style={{
               fontSize: '26px', fontFamily: 'Inter, sans-serif', fontWeight: '700',
-              color: '#FFFFFF', letterSpacing: '-0.02em', marginBottom: '6px',
+              color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '6px',
             }}>
               Welcome back
             </h1>
-            <p style={{ fontSize: '14px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif' }}>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', fontFamily: 'Inter, sans-serif' }}>
               Sign in to your school dashboard
             </p>
           </div>
@@ -186,7 +186,8 @@ export default function LoginPage() {
           {/* Tabs */}
           <div style={{
               display: 'flex', gap: '0', marginBottom: '24px',
-              background: 'rgba(255,255,255,0.05)', borderRadius: '999px',
+              background: 'color-mix(in srgb, var(--text-primary), transparent 95%)',
+              borderRadius: '999px',
               padding: '4px',
               position: 'relative',
             }} className="mobile-auth-tabs" data-demo={isDemoMode ? 'true' : 'false'}>
@@ -201,8 +202,8 @@ export default function LoginPage() {
                 width: isDemoMode ? 'calc(33.33% - 4px)' : 'calc(50% - 4px)',
                 height: 'calc(100% - 8px)',
                 borderRadius: '999px',
-                background: 'rgba(255,255,255,0.10)',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                background: 'color-mix(in srgb, var(--text-primary), transparent 90%)',
+                boxShadow: '0 1px 3px color-mix(in srgb, var(--bg-base), transparent 90%)',
                 transition: 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
               }} />
               {(isDemoMode ? ['magic', 'password', 'demo'] : ['magic', 'password']).map(tab => (
@@ -213,7 +214,7 @@ export default function LoginPage() {
                     flex: 1, padding: '8px 12px', borderRadius: '999px', border: 'none',
                     fontSize: '13px', fontWeight: '600', fontFamily: 'Inter, sans-serif', cursor: 'pointer',
                     background: 'transparent',
-                    color: activeTab === tab ? '#FFFFFF' : '#9CA3AF',
+                    color: activeTab === tab ? 'var(--text-primary)' : 'var(--text-secondary)',
                     transition: 'color 0.2s',
                     position: 'relative', zIndex: 1,
                   }}
@@ -232,7 +233,7 @@ export default function LoginPage() {
                 <Mail size='15' style={{
                   position: 'absolute', left: '16px', top: '50%',
                   transform: 'translateY(-50%)',
-                  color: emailFocused ? 'var(--accent)' : '#9CA3AF',
+                  color: emailFocused ? 'var(--accent)' : 'var(--text-secondary)',
                   pointerEvents: 'none',
                   transition: 'color 0.2s',
                   zIndex: 1,
@@ -252,7 +253,7 @@ export default function LoginPage() {
                     paddingRight: '16px',
                     height: '52px',
                     borderRadius: '999px',
-                    border: emailFocused ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.06)',
+                    border: emailFocused ? '1px solid var(--accent)' : '1px solid var(--border)',
                     boxShadow: emailFocused ? '0 0 0 3px var(--accent-glow)' : 'none',
                     transition: 'border-color 0.2s, box-shadow 0.2s',
                     fontSize: '14px',
@@ -261,7 +262,7 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <p style={{ fontSize: '13px', color: '#EF4444', textAlign: 'center', fontFamily: 'Inter, sans-serif' }}>{error}</p>
+                <p style={{ fontSize: '13px', color: 'var(--danger)', textAlign: 'center', fontFamily: 'Inter, sans-serif' }}>{error}</p>
               )}
 
               <button
@@ -285,28 +286,28 @@ export default function LoginPage() {
             <div style={{ textAlign: 'center', padding: '20px 0' }}>
               <div style={{
                 width: '64px', height: '64px', borderRadius: '50%',
-                background: 'rgba(74,222,128,0.10)',
-                border: '1px solid rgba(74,222,128,0.20)',
+                background: 'color-mix(in srgb, var(--success), transparent 90%)',
+                border: '1px solid color-mix(in srgb, var(--success), transparent 80%)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 margin: '0 auto 20px',
                 position: 'relative',
               }}>
-                <CheckCircle size='30' style={{ color: '#4ADE80' }} />
+                <CheckCircle size='30' style={{ color: 'var(--success)' }} />
                 <div style={{
                   position: 'absolute', inset: '-4px', borderRadius: '50%',
-                  border: '1px solid rgba(74,222,128,0.20)',
+                  border: '1px solid color-mix(in srgb, var(--success), transparent 80%)',
                   animation: 'ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
                 }} />
               </div>
               <h2 style={{
                 fontSize: '20px', fontFamily: 'Outfit, sans-serif', fontWeight: '600',
-                color: '#FFFFFF', marginBottom: '10px',
+                color: 'var(--text-primary)', marginBottom: '10px',
               }}>
                 Check your inbox
               </h2>
-              <p style={{ fontSize: '14px', color: '#9CA3AF', lineHeight: '1.6', fontFamily: 'Inter, sans-serif' }}>
+              <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: '1.6', fontFamily: 'Inter, sans-serif' }}>
                 We sent a magic link to{' '}
-                <span style={{ color: '#FFFFFF', fontWeight: '600' }}>{email}</span>
+                <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>{email}</span>
                 <br />Click it to sign in.
               </p>
             </div>
@@ -320,7 +321,7 @@ export default function LoginPage() {
                 <Mail size='15' style={{
                   position: 'absolute', left: '16px', top: '50%',
                   transform: 'translateY(-50%)',
-                  color: emailFocused ? 'var(--accent)' : '#9CA3AF',
+                  color: emailFocused ? 'var(--accent)' : 'var(--text-secondary)',
                   pointerEvents: 'none',
                   transition: 'color 0.2s',
                   zIndex: 1,
@@ -340,7 +341,7 @@ export default function LoginPage() {
                     paddingRight: '16px',
                     height: '52px',
                     borderRadius: '999px',
-                    border: emailFocused ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.06)',
+                    border: emailFocused ? '1px solid var(--accent)' : '1px solid var(--border)',
                     boxShadow: emailFocused ? '0 0 0 3px var(--accent-glow)' : 'none',
                     transition: 'border-color 0.2s, box-shadow 0.2s',
                     fontSize: '14px',
@@ -365,7 +366,7 @@ export default function LoginPage() {
                     paddingRight: '48px',
                     height: '52px',
                     borderRadius: '999px',
-                    border: passwordFocused ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.06)',
+                    border: passwordFocused ? '1px solid var(--accent)' : '1px solid var(--border)',
                     boxShadow: passwordFocused ? '0 0 0 3px var(--accent-glow)' : 'none',
                     transition: 'border-color 0.2s, box-shadow 0.2s',
                     fontSize: '14px',
@@ -378,7 +379,7 @@ export default function LoginPage() {
                     position: 'absolute', right: '16px', top: '50%',
                     transform: 'translateY(-50%)', background: 'none',
                     border: 'none', cursor: 'pointer',
-                    color: passwordFocused ? 'var(--accent)' : '#9CA3AF',
+                    color: passwordFocused ? 'var(--accent)' : 'var(--text-secondary)',
                     padding: '4px',
                     transition: 'color 0.2s',
                   }}
@@ -388,7 +389,7 @@ export default function LoginPage() {
               </div>
 
               {passwordError && (
-                <p style={{ fontSize: '13px', color: '#EF4444', textAlign: 'center', fontFamily: 'Inter, sans-serif' }}>{passwordError}</p>
+                <p style={{ fontSize: '13px', color: 'var(--danger)', textAlign: 'center', fontFamily: 'Inter, sans-serif' }}>{passwordError}</p>
               )}
 
               <button
@@ -419,7 +420,7 @@ export default function LoginPage() {
                     transform: demoEmailFocused || demoEmail ? 'none' : 'translateY(-50%)',
                     fontSize: demoEmailFocused || demoEmail ? '11px' : '14px',
                     fontWeight: demoEmailFocused || demoEmail ? '600' : '400',
-                    color: demoEmailFocused ? 'var(--accent)' : '#9CA3AF',
+                    color: demoEmailFocused ? 'var(--accent)' : 'var(--text-secondary)',
                     fontFamily: 'Inter, sans-serif',
                     pointerEvents: 'none',
                     transition: 'all 0.2s',
@@ -431,7 +432,7 @@ export default function LoginPage() {
                   <Mail size='15' style={{
                     position: 'absolute', left: '16px', top: demoEmailFocused || demoEmail ? '14px' : '50%',
                     transform: demoEmailFocused || demoEmail ? 'none' : 'translateY(-50%)',
-                    color: demoEmailFocused ? 'var(--accent)' : '#9CA3AF',
+                    color: demoEmailFocused ? 'var(--accent)' : 'var(--text-secondary)',
                     pointerEvents: 'none',
                     transition: 'all 0.2s',
                   }} />
@@ -445,8 +446,8 @@ export default function LoginPage() {
                     style={{
                       width: '100%', height: '52px', borderRadius: '999px',
                       background: 'var(--bg-elevated)',
-                      border: `1px solid ${demoEmailFocused ? 'var(--accent)' : 'rgba(255,255,255,0.06)'}`,
-                      color: '#FFFFFF', fontSize: '14px', fontFamily: 'Inter, sans-serif',
+                      border: `1px solid ${demoEmailFocused ? 'var(--accent)' : 'var(--border)'}`,
+                      color: 'var(--text-primary)', fontSize: '14px', fontFamily: 'Inter, sans-serif',
                       paddingLeft: '44px', paddingRight: '16px', outline: 'none',
                       boxShadow: demoEmailFocused ? '0 0 0 3px var(--accent-glow)' : 'none',
                       transition: 'border-color 0.2s, box-shadow 0.2s',
@@ -462,7 +463,7 @@ export default function LoginPage() {
                     top: demoPin ? '10px' : '50%',
                     transform: demoPin ? 'none' : 'translateY(-50%)',
                     fontSize: '11px', fontWeight: '600',
-                    color: '#9CA3AF', fontFamily: 'Inter, sans-serif',
+                    color: 'var(--text-secondary)', fontFamily: 'Inter, sans-serif',
                     pointerEvents: 'none',
                     transition: 'all 0.2s',
                     background: demoPin ? 'var(--bg-surface)' : 'transparent',
@@ -479,8 +480,8 @@ export default function LoginPage() {
                     style={{
                       width: '100%', height: '52px', borderRadius: '999px',
                       background: 'var(--bg-elevated)',
-                      border: '1px solid rgba(255,255,255,0.06)',
-                      color: '#FFFFFF', fontSize: '16px', fontWeight: '600', fontFamily: 'Inter, sans-serif',
+                      border: '1px solid var(--border)',
+                      color: 'var(--text-primary)', fontSize: '16px', fontWeight: '600', fontFamily: 'Inter, sans-serif',
                       textAlign: 'center', letterSpacing: '0.3em',
                       paddingLeft: '16px', paddingRight: '48px', outline: 'none',
                       transition: 'border-color 0.2s',
@@ -494,7 +495,7 @@ export default function LoginPage() {
                       position: 'absolute', right: '16px', top: '50%',
                       transform: 'translateY(-50%)', background: 'none',
                       border: 'none', cursor: 'pointer',
-                      color: '#9CA3AF',
+                      color: 'var(--text-secondary)',
                       padding: '4px',
                     }}
                   >
@@ -503,7 +504,7 @@ export default function LoginPage() {
                 </div>
 
                 {demoError && (
-                  <p style={{ fontSize: '13px', color: '#EF4444', textAlign: 'center', fontFamily: 'Inter, sans-serif' }}>{demoError}</p>
+                  <p style={{ fontSize: '13px', color: 'var(--danger)', textAlign: 'center', fontFamily: 'Inter, sans-serif' }}>{demoError}</p>
                 )}
 
                 <button
@@ -532,20 +533,20 @@ export default function LoginPage() {
             gap: '16px',
           }} className="mobile-auth-links">
             <Link href='/forgot-password' style={{
-              fontSize: '13px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif',
+              fontSize: '13px', color: 'var(--text-secondary)', fontFamily: 'Inter, sans-serif',
               textDecoration: 'none', transition: 'color 0.15s',
             }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#FFFFFF' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#9CA3AF' }}>
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)' }}>
               Forgot password?
             </Link>
-            <span className="auth-divider" style={{ color: 'rgba(255,255,255,0.15)', fontSize: '13px' }}>•</span>
+            <span className="auth-divider" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 85%)', fontSize: '13px' }}>•</span>
             <Link href='/signup' style={{
-              fontSize: '13px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif',
+              fontSize: '13px', color: 'var(--text-secondary)', fontFamily: 'Inter, sans-serif',
               textDecoration: 'none', transition: 'color 0.15s',
             }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#FFFFFF' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#9CA3AF' }}>
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)' }}>
               Create account
             </Link>
           </div>
@@ -554,16 +555,16 @@ export default function LoginPage() {
           <div style={{
             marginTop: '20px',
             padding: '14px 16px', borderRadius: '999px',
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.06)',
+            background: 'color-mix(in srgb, var(--text-primary), transparent 97%)',
+            border: '1px solid var(--border)',
             textAlign: 'center',
           }}>
             <p style={{
-              fontSize: '13px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif',
+              fontSize: '13px', color: 'var(--text-secondary)', fontFamily: 'Inter, sans-serif',
             }}>
               Don&apos;t have an account?{' '}
               <Link href='/signup' style={{ color: 'var(--success)', fontWeight: '600', textDecoration: 'none', transition: 'text-shadow 0.15s' }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.textShadow = '0 0 12px rgba(74,222,128,0.6)'; el.style.textDecorationLine = 'underline' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.textShadow = '0 0 12px color-mix(in srgb, var(--success), transparent 40%)'; el.style.textDecorationLine = 'underline' }}
               onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.textShadow = 'none'; el.style.textDecorationLine = 'none' }}>
                 Sign up
               </Link>
