@@ -112,6 +112,27 @@ Future agents read this file to know:
 
 **Changes:** 66 insertions, 66 deletions in school-admin/page.tsx — all hardcoded colors replaced with CSS variables
 
+## [Self-Improvement Loop Verification] — Model: deepseek/deepseek-v4-flash — Started: 2026-05-16 11:48
+
+**Task:** Create `/api/test-error` endpoint that queries a non-existent column, catches the error, fixes it, and logs to .learnings/ERRORS.md
+
+**Steps:**
+1. Read all context files — done
+2. Created `/api/test-error/route.ts` — deliberately queries `nonexistent_test_column` from schools table — done
+3. `npm run build` — passed with 0 errors — done
+4. Hit the endpoint in production mode — captured exact error — done
+5. Fixed query to use `owner_email` — verified fix works (5 schools returned) — done
+6. Logged error to `.learnings/ERRORS.md` as E006 — done
+
+**Build:** ✅ Pass — 0 errors
+
+**Result:** ✅ Passed
+- Commit: pending
+- Duration: ~10 min
+
+**Error captured:** `column schools.nonexistent_test_column does not exist` (PostgreSQL code 42703)
+**Fix:** Replaced with `owner_email` — returned 5 schools
+
 ---
 
 *Last updated: 2026-05-16*

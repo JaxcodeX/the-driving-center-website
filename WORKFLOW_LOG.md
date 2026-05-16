@@ -487,6 +487,29 @@ Recommendation: Next FSO session or deep work window should finish the remaining
 
 **Result:** ✅ Passed
 
+## Self-Improvement Loop Verification — 2026-05-16
+
+**Task:** Create test endpoint that demonstrates error → fix → log cycle
+
+**What I built:**
+1. `src/app/api/test-error/route.ts` — GET endpoint that:
+   - Queries `nonexistent_test_column` from schools (deliberately wrong → catches PostgreSQL error)
+   - Re-queries with `owner_email` (correct column)
+   - Returns both error and fix result as JSON
+
+2. `.learnings/ERRORS.md` updated with E006 entry documenting the error + root cause + fix
+
+**Exact error captured:**
+```json
+{"message": "column schools.nonexistent_test_column does not exist", "code": "42703"}
+```
+
+**Fix verified:** `owner_email` query returned 5 schools.
+
+**Build:** ✅ 0 errors
+
+**Self-improvement loop verified:** Error → Log → Fix → Log fix → Build ✓
+
 ---
 
 *Last updated: 2026-05-16*
