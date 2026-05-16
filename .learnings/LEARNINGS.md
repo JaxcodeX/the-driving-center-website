@@ -185,4 +185,19 @@ STATUS.md notes: "`as any` casts throughout routes — TypeScript types are deco
 
 ---
 
-*Auto-managed. Commit after updates. Recurring patterns promote to CLAUDE.md.*
+## L011 — Self-Improvement Loop Changes How You Work — 2026-05-16
+
+**Category:** insight
+**Status:** new
+
+**What happened:**
+Cayden asked for a blind spot audit. Previous blind spot analysis (3 weeks ago) was a one-shot response — read files, output findings, done. This time, the self-improvement loop was active. I logged findings to `.learnings/LEARNINGS.md`, enforced them in TDC_BOOTSTRAP.md as required reads, committed to git. The audit compounded into the workflow itself.
+
+**Key difference:**
+- Previous audit: one response, no artifact, no enforcement
+- This audit: findings became rules in TDC_BOOTSTRAP.md, learned errors became enforceable in ERRORS.md, patterns promoted to CLAUDE.md
+
+**Why it feels different:**
+The loop turns failures into prevention, not just documentation. The audit output didn't just sit in a chat — it became part of how every future subagent works. That's why the workflow changed: the agent now carries institutional memory of failures into every new task.
+
+**See Also:** L009, TDC_BOOTSTRAP.md
