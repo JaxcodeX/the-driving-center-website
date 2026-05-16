@@ -90,10 +90,10 @@ Future agents read this file to know:
 **Build:** ✅ Pass — 0 errors
 
 **Result:** ✅ Passed
-- Commit: pending
+- Commit: `7efb119`
 - Duration: ~3 min
 
-**Changes:** All hardcoded colors replaced with CSS variables/color-mix in billing/page.tsx
+**Changes:** 34 insertions, 6 deletions — all hardcoded colors replaced with CSS variables/color-mix in billing/page.tsx
 
 ---
 
@@ -235,6 +235,39 @@ Future agents read this file to know:
 
 **Error captured:** `column schools.nonexistent_test_column does not exist` (PostgreSQL code 42703)
 **Fix:** Replaced with `owner_email` — returned 5 schools
+
+---
+
+## Phase 5 CSS Refactor (instructors) — Model: deepseek/deepseek-v4-flash — Started: 2026-05-16 14:03
+
+**Task:** Replace all hardcoded hex/rgba colors in style={} props in school-admin/instructors/page.tsx with CSS variables from globals.css
+
+**Context package:**
+- Read: AGENT_RUN_LOG.md, workspace ERRORS.md/LEARNINGS.md, project ERRORS.md, SPEC.md, globals.css, frontend-design-pro SKILL.md
+- Working from: SPEC.md design tokens section
+
+**Steps:**
+1. Read all context files — done
+2. Replaced inputStyle constant colors with CSS variables/color-mix — done
+3. Replaced modal overlay background — done
+4. Replaced modal inner background, border, boxShadow — done
+5. Replaced h2, close button, label colors — done
+6. Replaced onFocus/onBlur inline border colors — done
+7. Replaced cancel/submit button colors — done
+8. Replaced h1 and header button colors — done
+9. Replaced skeleton loader backgrounds — done
+10. Replaced empty state button color — done
+11. Replaced instructor card avatar, status badge, name colors — done
+12. Replaced "Awaiting response" badge colors — done
+13. Replaced schedule link hover background — done
+14. Replaced CARD_SHADOW_HOVER rgba values with color-mix — done
+15. Verified no remaining hardcoded hex/rgba — done
+
+**Build:** ✅ Pass — 0 errors
+
+**Result:** ✅ Passed
+- Commit: pending
+- Duration: ~5 min
 
 ---
 
