@@ -69,6 +69,34 @@ Future agents read this file to know:
 
 ---
 
+## Phase 5 CSS Refactor (billing) — Model: deepseek/deepseek-v4-flash — Started: 2026-05-16 14:03
+
+**Task:** Replace all hardcoded hex/rgba colors in style={} props in school-admin/billing/page.tsx with CSS variables from globals.css
+
+**Context package:**
+- Read: AGENT_RUN_LOG.md, workspace ERRORS.md/LEARNINGS.md, project ERRORS.md, SPEC.md, globals.css, frontend-design-pro SKILL.md, billing/page.tsx
+- Working from: SPEC.md design tokens section
+
+**Steps:**
+1. Read all context files — done
+2. Replaced `rgba(74,222,128,0.06)` in BG_GRADIENT with `color-mix(in srgb, var(--admin-accent), transparent 94%)` — done
+3. Replaced `rgba(74,222,128,0.15)` in statusBg with `color-mix(in srgb, var(--admin-accent), transparent 85%)` — done
+4. Replaced `rgba(249,115,22,0.15)` in statusBg with `color-mix(in srgb, var(--accent-secondary), transparent 85%)` — done
+5. Replaced `rgba(103,232,249,0.15)` in statusBg with `color-mix(in srgb, var(--status-blue), transparent 85%)` — done
+6. Replaced `rgba(0,0,0,0.5)` in CARD_SHADOW_HOVER with `color-mix(in srgb, var(--bg-base), transparent 50%)` — done
+7. Replaced `rgba(255,255,255,0.08)` in CARD_SHADOW_HOVER with `var(--glass-border)` — done
+8. Replaced onMouseEnter `rgba(255,255,255,0.04)` with `color-mix(in srgb, var(--text-primary), transparent 96%)` — done
+
+**Build:** ✅ Pass — 0 errors
+
+**Result:** ✅ Passed
+- Commit: pending
+- Duration: ~3 min
+
+**Changes:** All hardcoded colors replaced with CSS variables/color-mix in billing/page.tsx
+
+---
+
 ## Phase 5 CSS Refactor (signup) — Model: deepseek/deepseek-v4-flash — Started: 2026-05-16 14:01
 
 **Task:** Replace all hardcoded hex/rgba colors in style={} props in signup/page.tsx with CSS variables from globals.css
@@ -102,10 +130,10 @@ Future agents read this file to know:
 **Build:** ✅ Pass — 0 errors
 
 **Result:** ✅ Passed
-- Commit: pending
+- Commit: `e0510e5`
 - Duration: ~5 min
 
-**Changes:** ~55 insertions, ~55 deletions in signup/page.tsx — all hardcoded colors replaced with CSS variables/color-mix
+**Changes:** 140 insertions, 65 deletions — all hardcoded colors replaced with CSS variables/color-mix
 
 ---
 

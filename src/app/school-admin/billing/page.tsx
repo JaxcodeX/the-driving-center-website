@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 // NAV_ITEMS removed — layout provides the sidebar
 
 const BG = 'var(--bg-base)'
-const BG_GRADIENT = 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)'
+const BG_GRADIENT = 'radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--admin-accent), transparent 94%) 0%, transparent 60%)'
 const GLASS_BG = 'var(--glass-bg)'
 const GLASS_BORDER = 'var(--glass-border)'
 const GLASS_BLUR = 'var(--glass-blur)'
@@ -17,7 +17,7 @@ const TEXT_MUTED = 'var(--text-muted)'
 const ACCENT_CYAN = 'var(--accent-secondary)'
 const ACCENT_GREEN = 'var(--accent)'
 const CARD_SHADOW = 'var(--glass-shadow)'
-const CARD_SHADOW_HOVER = '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(74,222,128,0.15), inset 0 1px 0 rgba(255,255,255,0.08)'
+const CARD_SHADOW_HOVER = '0 8px 32px color-mix(in srgb, var(--bg-base), transparent 50%), 0 0 0 1px color-mix(in srgb, var(--admin-accent), transparent 85%), inset 0 1px 0 var(--glass-border)'
 
 export default function BillingPage() {
   const [subscription, setSubscription] = useState<any>(null)
@@ -57,7 +57,7 @@ export default function BillingPage() {
   }
 
   const status = subscription?.subscription_status || 'trial'
-  const statusBg = status === 'active' ? 'rgba(74,222,128,0.15)' : status === 'past_due' ? 'rgba(249,115,22,0.15)' : 'rgba(103,232,249,0.15)'
+  const statusBg = status === 'active' ? 'color-mix(in srgb, var(--admin-accent), transparent 85%)' : status === 'past_due' ? 'color-mix(in srgb, var(--accent-secondary), transparent 85%)' : 'color-mix(in srgb, var(--status-blue), transparent 85%)'
   const statusColor = status === 'active' ? 'var(--accent)' : status === 'past_due' ? 'var(--accent-secondary)' : 'var(--accent-secondary)'
   const statusIcon = status === 'active' ? <CheckCircle className="w-5 h-5" style={{ color: 'var(--accent)' }} /> : status === 'past_due' ? <AlertCircle className="w-5 h-5" style={{ color: 'var(--accent-secondary)' }} /> : <CreditCard className="w-5 h-5" style={{ color: 'var(--accent-secondary)' }} />
 
@@ -97,7 +97,7 @@ export default function BillingPage() {
             ))}
           </div>
           <button onClick={openBillingPortal} style={{ width: '100%', padding: '12px', background: 'transparent', border: `1px solid ${GLASS_BORDER}`, borderRadius: '12px', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.15s' }}
-          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)')}
+          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'color-mix(in srgb, var(--text-primary), transparent 96%)')}
           onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}>Manage subscription</button>
         </div>
 
