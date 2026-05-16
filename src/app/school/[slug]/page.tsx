@@ -32,14 +32,14 @@ function StarRating({ rating }: { rating: number }) {
       {[1, 2, 3, 4, 5].map(i => (
         <Star key={i} className="w-4 h-4" fill={i <= Math.round(rating) ? '#F97316' : 'none'} stroke={i <= Math.round(rating) ? '#F97316' : '#64748B'} />
       ))}
-      <span className="text-sm font-medium ml-1" style={{ color: '#ffffff' }}>{rating.toFixed(1)}</span>
+      <span className="text-sm font-medium ml-1" style={{ color: 'var(--text-primary)' }}>{rating.toFixed(1)}</span>
     </div>
   )
 }
 
 export default function SchoolPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen" style={{ background: '#080809' }} />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ background: 'var(--bg-base)' }} />}>
       <SchoolContent />
     </Suspense>
   )
@@ -70,15 +70,15 @@ function SchoolContent() {
 
   if (!slug) {
     return (
-      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)' }}>
-        <div className="bg-circle w-96 h-96 -top-20 -left-20" style={{ background: 'radial-gradient(circle, rgba(74,222,128,0.1) 0%, transparent 70%)' }} />
-        <div className="bg-circle w-64 h-64 bottom-20 -right-10" style={{ background: 'radial-gradient(circle, rgba(112,123,255,0.2) 0%, transparent 70%)' }} />
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ background: 'var(--bg-surface)', backgroundImage: 'radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--success), transparent 94%) 0%, transparent 60%)' }}>
+        <div className="bg-circle w-96 h-96 -top-20 -left-20" style={{ background: 'radial-gradient(circle, color-mix(in srgb, var(--success), transparent 90%) 0%, transparent 70%)' }} />
+        <div className="bg-circle w-64 h-64 bottom-20 -right-10" style={{ background: 'radial-gradient(circle, color-mix(in srgb, var(--admin-accent-secondary), transparent 80%) 0%, transparent 70%)' }} />
         <div className="text-center relative z-10">
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(126,212,253,0.12)', border: '1px solid rgba(126,212,253,0.3)' }}>
-            <Car className="w-8 h-8" style={{ color: '#7ED4FD' }} />
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'color-mix(in srgb, var(--status-blue), transparent 88%)', border: '1px solid color-mix(in srgb, var(--status-blue), transparent 70%)' }}>
+            <Car className="w-8 h-8" style={{ color: 'var(--status-blue)' }} />
           </div>
-          <h1 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>School not found</h1>
-          <p style={{ color: '#94A3B8' }}>No school with that URL exists.</p>
+          <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>School not found</h1>
+          <p style={{ color: 'var(--text-secondary)' }}>No school with that URL exists.</p>
         </div>
       </div>
     )
@@ -86,10 +86,10 @@ function SchoolContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)' }}>
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ background: 'var(--bg-surface)', backgroundImage: 'radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--success), transparent 94%) 0%, transparent 60%)' }}>
         <div className="text-center">
-          <div className="w-12 h-12 rounded-full border-2 border-t-transparent animate-spin mx-auto mb-4" style={{ borderColor: 'rgba(74,222,128,0.3)', borderTopColor: 'transparent' }} />
-          <p style={{ color: '#94A3B8' }}>Loading school...</p>
+          <div className="w-12 h-12 rounded-full border-2 border-t-transparent animate-spin mx-auto mb-4" style={{ borderColor: 'color-mix(in srgb, var(--success), transparent 70%)', borderTopColor: 'transparent' }} />
+          <p style={{ color: 'var(--text-secondary)' }}>Loading school...</p>
         </div>
       </div>
     )
@@ -97,11 +97,11 @@ function SchoolContent() {
 
   if (error || !school) {
     return (
-      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)' }}>
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ background: 'var(--bg-surface)', backgroundImage: 'radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--success), transparent 94%) 0%, transparent 60%)' }}>
         <div className="text-center">
           <div className="text-4xl mb-4">🔍</div>
-          <h1 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>School not found</h1>
-          <p style={{ color: '#94A3B8' }}>This school doesn&apos;t exist or their page is not set up yet.</p>
+          <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>School not found</h1>
+          <p style={{ color: 'var(--text-secondary)' }}>This school doesn&apos;t exist or their page is not set up yet.</p>
         </div>
       </div>
     )
@@ -119,30 +119,30 @@ function SchoolContent() {
   ]
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 60%)', color: '#ffffff' }}>
+    <div className="min-h-screen relative overflow-hidden" style={{ background: 'var(--bg-surface)', backgroundImage: 'radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--success), transparent 94%) 0%, transparent 60%)', color: 'var(--text-primary)' }}>
       {/* Background decorative circles */}
-      <div className="bg-circle w-[600px] h-[600px] -top-48 -left-48" style={{ background: 'radial-gradient(circle, rgba(74,222,128,0.08) 0%, transparent 70%)' }} />
-      <div className="bg-circle w-[400px] h-[400px] top-80 -right-32" style={{ background: 'radial-gradient(circle, rgba(74,222,128,0.05) 0%, transparent 70%)' }} />
+      <div className="bg-circle w-[600px] h-[600px] -top-48 -left-48" style={{ background: 'radial-gradient(circle, color-mix(in srgb, var(--success), transparent 92%) 0%, transparent 70%)' }} />
+      <div className="bg-circle w-[400px] h-[400px] top-80 -right-32" style={{ background: 'radial-gradient(circle, color-mix(in srgb, var(--success), transparent 95%) 0%, transparent 70%)' }} />
 
       {/* Hero Header */}
-      <div className="relative z-10 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+      <div className="relative z-10 border-b" style={{ borderColor: 'var(--glass-border)' }}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10 text-center">
           {/* Logo */}
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: 'linear-gradient(135deg, #4ADE80, #22C55E)' }}>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: 'linear-gradient(135deg, var(--success), #22C55E)' }}>
             <span className="text-white font-bold text-xl">DC</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold mb-3" style={{ color: '#ffffff' }}>{school.school.name}</h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold mb-3" style={{ color: 'var(--text-primary)' }}>{school.school.name}</h1>
           {school.profile?.tagline && (
-            <p className="text-base mb-4" style={{ color: '#94A3B8' }}>{school.profile.tagline}</p>
+            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>{school.profile.tagline}</p>
           )}
           <div className="flex items-center justify-center gap-4 text-sm flex-wrap">
             {school.profile?.city && (
-              <span className="flex items-center gap-1.5" style={{ color: '#94A3B8' }}>
+              <span className="flex items-center gap-1.5" style={{ color: 'var(--text-secondary)' }}>
                 <MapPin className="w-3.5 h-3.5" />{school.profile.city}, {school.school.state}
               </span>
             )}
             {school.school.phone && (
-              <a href={`tel:${school.school.phone}`} className="flex items-center gap-1.5 transition-colors hover:text-white" style={{ color: '#4ADE80' }}>
+              <a href={`tel:${school.school.phone}`} className="flex items-center gap-1.5 transition-colors hover:text-white" style={{ color: 'var(--success)' }}>
                 <Phone className="w-3.5 h-3.5" />{school.school.phone}
               </a>
             )}
@@ -162,12 +162,12 @@ function SchoolContent() {
         {/* About */}
         {school.profile?.about && (
           <section>
-            <h2 className="text-lg font-semibold mb-3 flex items-center gap-2" style={{ color: '#ffffff' }}>
-              <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #4ADE80, #22C55E)' }} />
+            <h2 className="text-lg font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+              <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, var(--success), #22C55E)' }} />
               About Us
             </h2>
             <div className="glass-card">
-              <p className="leading-relaxed" style={{ color: '#94A3B8' }}>{school.profile.about}</p>
+              <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{school.profile.about}</p>
             </div>
           </section>
         )}
@@ -175,40 +175,40 @@ function SchoolContent() {
         {/* Lesson Types */}
         {school.session_types && school.session_types.length > 0 && (
           <section>
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#ffffff' }}>
-              <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #4ADE80, #22C55E)' }} />
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+              <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, var(--success), #22C55E)' }} />
               Lessons & Services
             </h2>
             <div className="space-y-3">
               {school.session_types.map((type: any) => (
                 <div key={type.id} className="glass-card">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ background: 'rgba(74,222,128,0.1)', color: '#4ADE80' }}>
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ background: 'color-mix(in srgb, var(--success), transparent 90%)', color: 'var(--success)' }}>
                       {iconForName(type.name)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-semibold text-base" style={{ color: '#ffffff' }}>{type.name}</span>
+                          <span className="font-semibold text-base" style={{ color: 'var(--text-primary)' }}>{type.name}</span>
                           {type.tca_hours_credit && (
-                            <span className="text-xs px-2.5 py-0.5 rounded-full" style={{ background: 'rgba(74,222,128,0.12)', color: '#4ADE80', border: '1px solid rgba(74,222,128,0.2)' }}>
+                            <span className="text-xs px-2.5 py-0.5 rounded-full" style={{ background: 'color-mix(in srgb, var(--success), transparent 88%)', color: 'var(--success)', border: '1px solid color-mix(in srgb, var(--success), transparent 80%)' }}>
                               {type.tca_hours_credit}h TCA credit
                             </span>
                           )}
                         </div>
                         <div className="text-right shrink-0 ml-2">
-                          <div className="font-bold text-xl" style={{ color: '#ffffff' }}>{formatPrice(type.price_cents)}</div>
-                          {type.deposit_cents > 0 && <div className="text-xs" style={{ color: '#64748B' }}>{formatPrice(type.deposit_cents)} deposit</div>}
+                          <div className="font-bold text-xl" style={{ color: 'var(--text-primary)' }}>{formatPrice(type.price_cents)}</div>
+                          {type.deposit_cents > 0 && <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{formatPrice(type.deposit_cents)} deposit</div>}
                         </div>
                       </div>
-                      <p className="text-sm mb-3" style={{ color: '#94A3B8' }}>{type.description}</p>
+                      <p className="text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>{type.description}</p>
                       <div className="flex items-center justify-between">
-                        <span className="flex items-center gap-1.5 text-xs" style={{ color: '#64748B' }}>
+                        <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
                           <Clock className="w-3.5 h-3.5" />{formatDuration(type.duration_minutes)}
                         </span>
                         <Link href={`/book?school=${slug}&type=${type.id}`}
                           className="btn-pill text-sm font-semibold px-5 py-2.5"
-                          style={{ background: '#4ADE80', color: '#fff' }}>
+                          style={{ background: 'var(--success)', color: 'var(--text-primary)' }}>
                           Book Now →
                         </Link>
                       </div>
@@ -222,22 +222,22 @@ function SchoolContent() {
 
         {/* Instructors */}
         <section>
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#ffffff' }}>
-            <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #4ADE80, #22C55E)' }} />
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+            <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, var(--success), #22C55E)' }} />
             Our Instructors
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {instructors.map((inst: any) => (
               <div key={inst.name} className="glass-card flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
-                  style={{ background: 'linear-gradient(135deg, #4ADE80, #22C55E)', color: '#ffffff' }}>
+                  style={{ background: 'linear-gradient(135deg, var(--success), #22C55E)', color: 'var(--text-primary)' }}>
                   {inst.initials}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm" style={{ color: '#ffffff' }}>{inst.name}</div>
+                  <div className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{inst.name}</div>
                   <div className="flex items-center gap-2 mt-1">
                     <StarRating rating={inst.rating} />
-                    <span className="text-xs" style={{ color: '#64748B' }}>{inst.sessions} sessions</span>
+                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{inst.sessions} sessions</span>
                   </div>
                 </div>
               </div>
@@ -248,8 +248,8 @@ function SchoolContent() {
         {/* Reviews / Testimonials */}
         {reviews.length > 0 && (
           <section>
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#ffffff' }}>
-              <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #4ADE80, #22C55E)' }} />
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+              <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, var(--success), #22C55E)' }} />
               What Students Say
             </h2>
             <div className="space-y-3">
@@ -257,19 +257,19 @@ function SchoolContent() {
                 <div key={i} className="glass-card" style={{ padding: '20px' }}>
                   <div className="flex items-start gap-3">
                     <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-                      style={{ background: 'rgba(74,222,128,0.12)', color: '#4ADE80', border: '1px solid rgba(74,222,128,0.2)' }}>
+                      style={{ background: 'color-mix(in srgb, var(--success), transparent 88%)', color: 'var(--success)', border: '1px solid color-mix(in srgb, var(--success), transparent 80%)' }}>
                       {review.name.split(' ')[0][0]}{review.name.split(' ')[1]?.[0] ?? ''}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="font-semibold text-sm" style={{ color: '#ffffff' }}>{review.name}</span>
+                        <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{review.name}</span>
                         <div className="flex items-center gap-0.5">
                           {[1, 2, 3, 4, 5].map(s => (
                             <Star key={s} className="w-3 h-3" fill={s <= review.rating ? '#F97316' : 'none'} stroke={s <= review.rating ? '#F97316' : '#64748B'} />
                           ))}
                         </div>
                       </div>
-                      <p className="text-sm leading-relaxed" style={{ color: '#94A3B8' }}>&ldquo;{review.text}&rdquo;</p>
+                      <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>&ldquo;{review.text}&rdquo;</p>
                     </div>
                   </div>
                 </div>
@@ -280,15 +280,15 @@ function SchoolContent() {
 
         {/* Contact */}
         <section>
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#ffffff' }}>
-            <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #4ADE80, #22C55E)' }} />
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+            <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, var(--success), #22C55E)' }} />
             Contact Us
           </h2>
           <div className="glass-card">
             <div className="space-y-3.5">
               {school.profile?.address && (
-                <div className="flex items-center gap-3 text-sm" style={{ color: '#94A3B8' }}>
-                  <MapPin className="w-4 h-4 shrink-0" style={{ color: '#4ADE80' }} />
+                <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <MapPin className="w-4 h-4 shrink-0" style={{ color: 'var(--success)' }} />
                   <span>{school.profile.address}, {school.profile.city} {school.profile.zip}</span>
                 </div>
               )}
@@ -298,22 +298,22 @@ function SchoolContent() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 text-sm hover:text-white transition-colors"
-                  style={{ color: '#4ADE80', textDecoration: 'none' }}
+                  style={{ color: 'var(--success)', textDecoration: 'none' }}
                 >
                   <MapPin className="w-4 h-4 shrink-0" />
                   <span>View on Google Maps →</span>
                 </a>
               )}
               {school.school.phone && (
-                <div className="flex items-center gap-3 text-sm" style={{ color: '#94A3B8' }}>
-                  <Phone className="w-4 h-4 shrink-0" style={{ color: '#4ADE80' }} />
-                  <a href={`tel:${school.school.phone}`} className="hover:text-white transition-colors" style={{ color: '#7ED4FD' }}>{school.school.phone}</a>
+                <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <Phone className="w-4 h-4 shrink-0" style={{ color: 'var(--success)' }} />
+                  <a href={`tel:${school.school.phone}`} className="hover:text-white transition-colors" style={{ color: 'var(--status-blue)' }}>{school.school.phone}</a>
                 </div>
               )}
               {school.profile?.email && (
-                <div className="flex items-center gap-3 text-sm" style={{ color: '#94A3B8' }}>
-                  <Mail className="w-4 h-4 shrink-0" style={{ color: '#4ADE80' }} />
-                  <a href={`mailto:${school.profile.email}`} className="hover:text-white transition-colors" style={{ color: '#7ED4FD' }}>{school.profile.email}</a>
+                <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <Mail className="w-4 h-4 shrink-0" style={{ color: 'var(--success)' }} />
+                  <a href={`mailto:${school.profile.email}`} className="hover:text-white transition-colors" style={{ color: 'var(--status-blue)' }}>{school.profile.email}</a>
                 </div>
               )}
             </div>
@@ -324,8 +324,8 @@ function SchoolContent() {
         <section className="text-center py-6">
           <div className="glass-card py-10">
             <div className="text-3xl mb-3">🚗</div>
-            <h2 className="text-xl font-bold mb-2" style={{ color: '#ffffff' }}>Ready to get started?</h2>
-            <p className="text-sm mb-6" style={{ color: '#94A3B8' }}>Schedule your first lesson online in minutes.</p>
+            <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Ready to get started?</h2>
+            <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Schedule your first lesson online in minutes.</p>
             <Link href={`/book?school=${slug}`}
               className="btn-glow inline-flex items-center gap-2 px-8 py-4 text-base">
               Book a Lesson <ArrowRight className="w-5 h-5" />
@@ -334,8 +334,8 @@ function SchoolContent() {
         </section>
 
         {/* Footer */}
-        <footer className="text-center text-xs pt-6 border-t" style={{ color: '#64748B', borderColor: 'rgba(255,255,255,0.06)' }}>
-          Powered by <span style={{ color: '#4ADE80' }}>The Driving Center</span>
+        <footer className="text-center text-xs pt-6 border-t" style={{ color: 'var(--text-muted)', borderColor: 'var(--border)' }}>
+          Powered by <span style={{ color: 'var(--success)' }}>The Driving Center</span>
         </footer>
       </div>
 
@@ -345,7 +345,7 @@ function SchoolContent() {
           align-items: center;
           gap: 8px;
           padding: 14px 28px;
-          background: linear-gradient(135deg, #4ADE80, #22C55E);
+          background: linear-gradient(135deg, var(--success), #22C55E);
           color: #000000;
           font-weight: 700;
           font-size: 14px;

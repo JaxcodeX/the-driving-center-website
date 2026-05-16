@@ -417,19 +417,19 @@ export default function StudentsPage() {
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                   <span style={{ fontSize: '12px', color: TEXT_SECONDARY }}>Classroom Hours</span>
-                  <span style={{ fontSize: '12px', color: '#FFFFFF', fontWeight: '600' }}>{selectedStudent.classroom_hours}h / 6h</span>
+                  <span style={{ fontSize: '12px', color: 'var(--admin-text)', fontWeight: '600' }}>{selectedStudent.classroom_hours}h / 6h</span>
                 </div>
-                <div style={{ height: '6px', borderRadius: '999px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                  <div style={{ width: `${Math.min(100, (selectedStudent.classroom_hours / 6) * 100)}%`, height: '100%', borderRadius: '999px', background: 'linear-gradient(90deg, #38BDF8, #818CF8)' }} />
+                <div style={{ height: '6px', borderRadius: '999px', background: 'var(--glass-border)', overflow: 'hidden' }}>
+                  <div style={{ width: `${Math.min(100, (selectedStudent.classroom_hours / 6) * 100)}%`, height: '100%', borderRadius: '999px', background: 'linear-gradient(90deg, var(--status-blue), var(--status-purple))' }} />
                 </div>
               </div>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                   <span style={{ fontSize: '12px', color: TEXT_SECONDARY }}>Driving Hours</span>
-                  <span style={{ fontSize: '12px', color: '#FFFFFF', fontWeight: '600' }}>{selectedStudent.driving_hours}h / 6h</span>
+                  <span style={{ fontSize: '12px', color: 'var(--admin-text)', fontWeight: '600' }}>{selectedStudent.driving_hours}h / 6h</span>
                 </div>
-                <div style={{ height: '6px', borderRadius: '999px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                  <div style={{ width: `${Math.min(100, (selectedStudent.driving_hours / 6) * 100)}%`, height: '100%', borderRadius: '999px', background: 'linear-gradient(90deg, #4ADE80, #38BDF8)' }} />
+                <div style={{ height: '6px', borderRadius: '999px', background: 'var(--glass-border)', overflow: 'hidden' }}>
+                  <div style={{ width: `${Math.min(100, (selectedStudent.driving_hours / 6) * 100)}%`, height: '100%', borderRadius: '999px', background: 'linear-gradient(90deg, var(--admin-accent), var(--status-blue))' }} />
                 </div>
               </div>
             </div>
