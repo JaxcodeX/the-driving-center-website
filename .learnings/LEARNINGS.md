@@ -201,3 +201,27 @@ Cayden asked for a blind spot audit. Previous blind spot analysis (3 weeks ago) 
 The loop turns failures into prevention, not just documentation. The audit output didn't just sit in a chat — it became part of how every future subagent works. That's why the workflow changed: the agent now carries institutional memory of failures into every new task.
 
 **See Also:** L009, TDC_BOOTSTRAP.md
+
+---
+
+## L012 — SI Loop Integration Test — 2026-05-16
+
+**Category:** insight
+**Status:** resolved
+
+**What happened:**
+Ran a full self-improvement loop integration test from subagent context. Verified the loop works end-to-end across workspace + project layers:
+
+1. Read workspace `.learnings/ERRORS.md` — 3 OpenClaw-specific error patterns (OC001-OC003)
+2. Read workspace `.learnings/LEARNINGS.md` — empty template (no entries yet)
+3. Read TDC_BOOTSTRAP.md — confirmed subagent bootstrap fully enforces self-improvement loop
+4. Read TDC project `.learnings/ERRORS.md` — 6 error patterns (E001-E006), 1 recurring (E005)
+5. Read TDC project `.learnings/LEARNINGS.md` — 11 learnings (L001-L011)
+
+**Key insight:**
+The two-layer system works. Workspace learnings catch cross-project patterns (DeepSeek timeouts, schema drift, session compaction). Project learnings catch project-specific patterns (auth identity, design churn, mobile follow-ups). The TDC_BOOTSTRAP.md enforces reads in the correct order before any subagent touches code.
+
+**Verification:**
+This entry was appended live as part of the test itself. The loop is operational.
+
+**See Also:** L009, L011
