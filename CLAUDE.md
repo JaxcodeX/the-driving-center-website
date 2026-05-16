@@ -27,7 +27,7 @@
 
 ## Frontend Design
 
-**ALWAYS read `.claude/skills/frontend-design/SKILL.md` before writing any UI code.** The skill takes precedence over generic AI aesthetics.
+**ALWAYS read `~/Documents/Openclaw Zaxpointx/skills/frontend-design-pro/SKILL.md` before writing any UI code.** The skill takes precedence over generic AI aesthetics. Installed from ClawHub 2026-05-16.
 
 Design tokens are in `src/app/globals.css` as CSS variables (dark + light theme). Do not use hardcoded colors in components — reference the CSS variable.
 

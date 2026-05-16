@@ -25,6 +25,7 @@ Before touching any code, read these files in order:
 7. **`ACTUAL_SCHEMA.md`** — verified DB schema. Never assume column names.
 8. **`CLAUDE.md`** — workflow rules and architecture.
 9. **`src/app/globals.css`** — design tokens. All colors via CSS variables, not hardcoded hex.
+10. **`~/Documents/Openclaw Zaxpointx/skills/frontend-design-pro/SKILL.md`** — design rules before UI code: no Inter font, no bounce easing, oklch colors, 8px grid, proper spacing.
 
 ---
 
