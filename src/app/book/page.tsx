@@ -43,7 +43,7 @@ const glassInputBase = {
   backdropFilter: 'blur(24px)',
   WebkitBackdropFilter: 'blur(24px)',
   border: `1px solid ${GLASS_BORDER}`,
-  color: '#ffffff',
+  color: 'var(--text-primary)',
   outline: 'none',
   borderRadius: '999px',
   padding: '0 20px',
@@ -179,7 +179,7 @@ function ServiceSelection({ sessionTypes, selectedType, onSelect, loading }: {
                     </div>
                   </div>
                   <div className="shrink-0 text-right ml-2">
-                    <div className="font-bold text-xl" style={{ fontFamily: 'Outfit, sans-serif', color: sel ? ACCENT : '#ffffff' }}>{fp(type.price_cents)}</div>
+                    <div className="font-bold text-xl" style={{ fontFamily: 'Outfit, sans-serif', color: sel ? ACCENT : 'var(--text-primary)' }}>{fp(type.price_cents)}</div>
                     <div className="text-xs mt-0.5" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 70%)' }}>per session</div>
                   </div>
                 </div>
@@ -274,7 +274,7 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
                           cursor: 'pointer',
                           width: '100%',
                         }}>
-                        <div className="font-semibold text-sm" style={{ fontFamily: 'Outfit, sans-serif', color: sel ? ACCENT : '#ffffff' }}>{ft(slot.start_time)}</div>
+                        <div className="font-semibold text-sm" style={{ fontFamily: 'Outfit, sans-serif', color: sel ? ACCENT : 'var(--text-primary)' }}>{ft(slot.start_time)}</div>
                         <div className="text-xs mt-0.5" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 70%)' }}>{slot.instructor_name} · {slot.seats_available} seat{slot.seats_available !== 1 ? 's' : ''}</div>
                       </button>
                     )
@@ -474,7 +474,7 @@ function BookingSidebar({ selectedType, selectedSlot, studentName, step }: {
         {selectedType ? (
           <div className="space-y-4">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: ACCENT_DIM, border: `1px solid ${ACCENT}33` }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: ACCENT_DIM, border: '1px solid color-mix(in srgb, var(--success), transparent 80%)' }}>
                 {iconFor(selectedType.name)}
               </div>
               <div>
@@ -526,7 +526,7 @@ function BookingSidebar({ selectedType, selectedSlot, studentName, step }: {
 // ─── Main Page ───────────────────────────────────────────────────────────────
 export default function BookPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen" style={{ background: '#0D0D12' }} />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ background: 'var(--bg-surface)' }} />}>
       <BookContent />
     </Suspense>
   )
@@ -644,16 +644,16 @@ function BookContent() {
 
   if (!schoolId) {
     return (
-      <div className="min-h-screen flex items-center justify-center starfield relative" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+      <div className="min-h-screen flex items-center justify-center starfield relative" style={{ background: 'var(--bg-surface)', backgroundImage: 'radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-secondary), transparent 94%) 0%, transparent 60%)' }}>
         {/* decorative circles */}
         <div className="bg-circle w-96 h-96 -top-20 -left-20" style={{ background: `radial-gradient(circle, ${ACCENT_DIM} 0%, transparent 70%)` }} />
-        <div className="bg-circle w-64 h-64 top-40 -right-10" style={{ background: 'radial-gradient(circle, rgba(112,123,255,0.1) 0%, transparent 70%)' }} />
+        <div className="bg-circle w-64 h-64 top-40 -right-10" style={{ background: 'radial-gradient(circle, color-mix(in srgb, var(--status-blue), transparent 90%) 0%, transparent 70%)' }} />
         <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: ACCENT_DIM, border: `1px solid ${ACCENT}33` }}>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: ACCENT_DIM, border: '1px solid color-mix(in srgb, var(--success), transparent 80%)' }}>
             <Car className="w-8 h-8" style={{ color: ACCENT }} />
           </div>
-          <h1 className="text-2xl font-bold mb-2" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>No school selected</h1>
-          <p style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>Ask your school for their booking link.</p>
+          <h1 className="text-2xl font-bold mb-2" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>No school selected</h1>
+          <p style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>Ask your school for their booking link.</p>
         </div>
       </div>
     )
@@ -666,17 +666,17 @@ function BookContent() {
   }
 
   return (
-    <div className="min-h-screen starfield relative" style={{ background: '#0D0D12', backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.06) 0%, transparent 60%)' }}>
+    <div className="min-h-screen starfield relative" style={{ background: 'var(--bg-surface)', backgroundImage: 'radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-secondary), transparent 94%) 0%, transparent 60%)' }}>
       {/* decorative background circles */}
       <div className="bg-circle w-[500px] h-[500px] -top-40 -left-40" style={{ background: `radial-gradient(circle, ${ACCENT_DIM} 0%, transparent 70%)` }} />
-      <div className="bg-circle w-[400px] h-[400px] bottom-20 -right-40" style={{ background: 'radial-gradient(circle, rgba(112,123,255,0.1) 0%, transparent 70%)' }} />
+      <div className="bg-circle w-[400px] h-[400px] bottom-20 -right-40" style={{ background: 'radial-gradient(circle, color-mix(in srgb, var(--status-blue), transparent 90%) 0%, transparent 70%)' }} />
 
       {/* Header */}
       <div className="border-b relative z-10" style={{ borderColor: GLASS_BORDER }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold" style={{ background: `linear-gradient(135deg, ${ACCENT}, #FF6B1E)` }}>DC</div>
-            <span className="font-semibold text-sm" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>The Driving Center</span>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold" style={{ background: `linear-gradient(135deg, ${ACCENT}, var(--accent-secondary))` }}>DC</div>
+            <span className="font-semibold text-sm" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>The Driving Center</span>
           </Link>
         </div>
       </div>
