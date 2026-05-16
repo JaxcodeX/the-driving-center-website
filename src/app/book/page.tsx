@@ -469,7 +469,7 @@ function BookingSidebar({ selectedType, selectedSlot, studentName, step }: {
   return (
     <div className="hidden lg:block">
       <div style={{ ...glassCard, position: 'sticky', top: '96px', maxWidth: '340px' }}>
-        <div className="text-sm font-semibold mb-4 uppercase tracking-wider" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.3)' }}>Booking Summary</div>
+        <div className="text-sm font-semibold mb-4 uppercase tracking-wider" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 70%)' }}>Booking Summary</div>
 
         {selectedType ? (
           <div className="space-y-4">
@@ -478,45 +478,45 @@ function BookingSidebar({ selectedType, selectedSlot, studentName, step }: {
                 {iconFor(selectedType.name)}
               </div>
               <div>
-                <div className="font-semibold text-sm" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>{selectedType.name}</div>
-                <div className="text-xs mt-0.5" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>{selectedType.duration_minutes} min session</div>
+                <div className="font-semibold text-sm" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>{selectedType.name}</div>
+                <div className="text-xs mt-0.5" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>{selectedType.duration_minutes} min session</div>
               </div>
               <div className="ml-auto font-bold" style={{ fontFamily: 'Outfit, sans-serif', color: ACCENT }}>{fp(selectedType.price_cents)}</div>
             </div>
 
             {selectedSlot && (
               <div className="rounded-xl p-3.5" style={glassCard}>
-                <div className="text-xs mb-1.5" style={{ color: 'rgba(255,255,255,0.3)' }}>Date & Time</div>
-                <div className="text-sm font-medium" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>{ffd(selectedSlot.session_date)}</div>
-                <div className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>{ft(selectedSlot.start_time)}</div>
-                <div className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.3)' }}>with {selectedSlot.instructor_name}</div>
+                <div className="text-xs mb-1.5" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 70%)' }}>Date & Time</div>
+                <div className="text-sm font-medium" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>{ffd(selectedSlot.session_date)}</div>
+                <div className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>{ft(selectedSlot.start_time)}</div>
+                <div className="text-xs mt-1" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 70%)' }}>with {selectedSlot.instructor_name}</div>
               </div>
             )}
 
             {studentName && step >= 2 && (
               <div className="rounded-xl p-3.5" style={glassCard}>
-                <div className="text-xs mb-1.5" style={{ color: 'rgba(255,255,255,0.3)' }}>Student</div>
-                <div className="text-sm font-medium" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>{studentName}</div>
+                <div className="text-xs mb-1.5" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 70%)' }}>Student</div>
+                <div className="text-sm font-medium" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>{studentName}</div>
               </div>
             )}
 
             {selectedType.deposit_cents > 0 && (
-              <div className="flex items-center gap-2 p-3 rounded-xl" style={{ background: 'rgba(249,115,22,0.08)', border: `1px solid rgba(249,115,22,0.15)` }}>
+              <div className="flex items-center gap-2 p-3 rounded-xl" style={{ background: 'color-mix(in srgb, var(--accent-secondary), transparent 92%)', border: '1px solid color-mix(in srgb, var(--accent-secondary), transparent 85%)' }}>
                 <Shield className="w-4 h-4 shrink-0" style={{ color: ACCENT }} />
-                <span className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>{fp(selectedType.deposit_cents)} deposit secures your spot</span>
+                <span className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>{fp(selectedType.deposit_cents)} deposit secures your spot</span>
               </div>
             )}
           </div>
         ) : (
           <div className="rounded-xl p-6 text-center book-empty-state" style={glassCard}>
-            <BookOpen className="w-8 h-8 mx-auto mb-2" style={{ color: 'rgba(255,255,255,0.2)' }} />
-            <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.3)' }}>Select a service to see your booking summary</p>
+            <BookOpen className="w-8 h-8 mx-auto mb-2" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 80%)' }} />
+            <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 70%)' }}>Select a service to see your booking summary</p>
           </div>
         )}
 
         <div className="mt-5 pt-4 flex items-center gap-2" style={{ borderTop: `1px solid ${GLASS_BORDER}` }}>
           <Star className="w-4 h-4 shrink-0" style={{ color: ACCENT }} />
-          <span className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.3)' }}>Trusted by 2,400+ student drivers</span>
+          <span className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 70%)' }}>Trusted by 2,400+ student drivers</span>
         </div>
       </div>
     </div>

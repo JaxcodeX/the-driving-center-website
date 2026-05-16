@@ -2,6 +2,40 @@
 
 ---
 
+## Phase 5 CSS Refactor (demo) — Model: deepseek/deepseek-v4-flash — Started: 2026-05-16 14:16
+
+**Task:** Replace all hardcoded hex/rgba colors in style={} props in demo/page.tsx with CSS variables from globals.css
+
+**Context package:**
+- Read: AGENT_RUN_LOG.md, workspace ERRORS.md/LEARNINGS.md, project ERRORS.md, SPEC.md, globals.css, frontend-design-pro SKILL.md, demo/page.tsx
+- Working from: SPEC.md design tokens section
+
+**Steps:**
+1. Read all context files — done
+2. Replaced `#0D0D12` → `var(--bg-surface)` for root background — done
+3. Replaced `rgba(255,140,66,0.06)` → `color-mix(in srgb, var(--accent-secondary), transparent 94%)` in bg gradients — done
+4. Replaced `#FFFFFF` → `var(--text-primary)` across all style props — done
+5. Replaced `#4ADE80` → `var(--success)` across all style props — done
+6. Replaced `#FBBF24` → `var(--warning)` for amber status colors — done
+7. Replaced `#78E4FF` → `var(--status-blue)` for cyan status — done
+8. Replaced `rgba(255,255,255,0.06)` → `var(--border)` exact match — done
+9. Replaced `rgba(255,255,255,0.08)` → `var(--glass-border)` exact match — done
+10. Replaced all other `rgba(255,255,255,*)` → `color-mix(in srgb, var(--text-primary), transparent *)` — done
+11. Replaced all `rgba(255,140,66,*)` → `color-mix(in srgb, var(--accent-secondary), transparent *)` — done
+12. Replaced all `rgba(74,222,128,*)` → `color-mix(in srgb, var(--success), transparent *)` — done
+13. Replaced all `rgba(251,191,36,*)` → `color-mix(in srgb, var(--warning), transparent *)` — done
+14. Verified zero remaining hardcoded hex/rgba — done
+
+**Build:** ✅ Pass — 0 errors
+
+**Result:** ✅ Passed
+- Commit: pending
+- Duration: ~3 min
+
+**Changes:** All hardcoded colors replaced with CSS variables/color-mix in demo/page.tsx
+
+---
+
 ## Phase 5 CSS Refactor (school/[slug]) — Model: deepseek/deepseek-v4-flash — Started: 2026-05-16 14:15
 
 **Task:** Replace all hardcoded hex/rgba colors in style={} props in school/[slug]/page.tsx with CSS variables from globals.css
@@ -31,7 +65,7 @@
 **Build:** ✅ Pass — 0 errors
 
 **Result:** ✅ Passed
-- Commit: pending
+- Commit: `a48ed7d`
 - Duration: ~5 min
 
 **Changes:** 128 insertions, 128 deletions — all hardcoded colors replaced with CSS variables/color-mix in school/[slug]/page.tsx
