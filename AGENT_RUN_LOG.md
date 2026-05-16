@@ -69,6 +69,81 @@ Future agents read this file to know:
 
 ---
 
+## Phase 5 CSS Refactor (signup) — Model: deepseek/deepseek-v4-flash — Started: 2026-05-16 14:01
+
+**Task:** Replace all hardcoded hex/rgba colors in style={} props in signup/page.tsx with CSS variables from globals.css
+
+**Context package:**
+- Read: AGENT_RUN_LOG.md, workspace ERRORS.md/LEARNINGS.md, project ERRORS.md, SPEC.md, globals.css, frontend-design-pro SKILL.md
+- Working from: SPEC.md design tokens section
+
+**Steps:**
+1. Read all context files — done
+2. Replaced #0D0D12 → var(--bg-surface) — done
+3. Replaced rgba(74,222,128,0.06) → color-mix(in srgb, var(--success), transparent 94%) — done
+4. Replaced rgba(0,0,0,0.5) shadow → color-mix(in srgb, var(--bg-base), transparent 50%) — done
+5. Replaced rgba(255,255,255,0.03) → color-mix(in srgb, var(--text-primary), transparent 97%) — done
+6. Replaced rgba(255,255,255,0.06) → var(--border) where exact match — done
+7. Replaced #FFFFFF → var(--text-primary) across all style props — done
+8. Replaced #9CA3AF → var(--text-secondary) — done
+9. Replaced #4ADE80 → var(--success) — done
+10. Replaced #EF4444 → var(--danger) — done
+11. Replaced #0D0D0D → var(--bg-elevated) for input backgrounds — done
+12. Replaced rgba(255,255,255,0.1) → color-mix(in srgb, var(--text-primary), transparent 90%) — done
+13. Replaced rgba(255,255,255,0.3) → color-mix(in srgb, var(--text-primary), transparent 70%) — done
+14. Replaced #4179E8 / #1E5BD6 gradient → var(--accent) — done
+15. Replaced rgba(255,255,255,0.15/0.2/0.25) → color-mix variants — done
+16. Replaced rgba(239,68,68,0.1/0.2) → color-mix(in srgb, var(--danger), transparent 90%/80%) — done
+17. Replaced rgba(74,222,128,0.35) → color-mix(in srgb, var(--success), transparent 65%) — done
+18. Replaced rgba(255,255,255,0.04) → var(--glass-bg) — done
+19. Replaced rgba(255,255,255,0.08) → var(--glass-border) — done
+20. Replaced onMouseEnter/onMouseLeave inline JS colors — done
+
+**Build:** ✅ Pass — 0 errors
+
+**Result:** ✅ Passed
+- Commit: pending
+- Duration: ~5 min
+
+**Changes:** ~55 insertions, ~55 deletions in signup/page.tsx — all hardcoded colors replaced with CSS variables/color-mix
+
+---
+
+## Phase 5 CSS Refactor (login) — Model: deepseek/deepseek-v4-flash — Started: 2026-05-16 13:59
+
+**Task:** Replace all hardcoded hex/rgba colors in style={} props in login/page.tsx with CSS variables from globals.css
+
+**Context package:**
+- Read: AGENT_RUN_LOG.md, workspace ERRORS.md/LEARNINGS.md, project ERRORS.md, SPEC.md, globals.css, SKILL.md
+- Working from: SPEC.md design tokens section
+
+**Steps:**
+1. Read all context files — done
+2. Replaced #FFFFFF → var(--text-primary) across all style props — done
+3. Replaced #9CA3AF → var(--text-secondary) — done
+4. Replaced #4ADE80 → var(--success) — done
+5. Replaced #EF4444 → var(--danger) — done
+6. Replaced rgba(74,222,128,0.10) → color-mix(in srgb, var(--success), transparent 90%) — done
+7. Replaced rgba(74,222,128,0.25) → color-mix(in srgb, var(--success), transparent 75%) — done
+8. Replaced rgba(74,222,128,0.20) → color-mix(in srgb, var(--success), transparent 80%) — done
+9. Replaced rgba(255,255,255,0.06) → var(--border) in style props — done
+10. Replaced rgba(255,255,255,0.05) → color-mix(in srgb, var(--text-primary), transparent 95%) — done
+11. Replaced rgba(255,255,255,0.10) → color-mix(in srgb, var(--text-primary), transparent 90%) — done
+12. Replaced rgba(255,255,255,0.03) → color-mix(in srgb, var(--text-primary), transparent 97%) — done
+13. Replaced rgba(255,255,255,0.15) → color-mix(in srgb, var(--text-primary), transparent 85%) — done
+14. Replaced rgba(0,0,0,0.1) shadow → color-mix(in srgb, var(--bg-base), transparent 90%) — done
+15. Replaced onMouseEnter/onMouseLeave inline JS colors — done
+
+**Build:** ✅ Pass — 0 errors
+
+**Result:** ✅ Passed
+- Commit: `3d9b181`
+- Duration: ~5 min
+
+**Changes:** 48 insertions, 47 deletions in login/page.tsx — all hardcoded colors replaced with CSS variables/color-mix
+
+---
+
 ## Failure History (Newest First)
 
 [Append new entries at top — keep newest first for quick context]
