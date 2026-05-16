@@ -398,19 +398,19 @@ function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, b
         <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: ACCENT_DIM }}>
           <BookOpen className="w-8 h-8" style={{ color: ACCENT }} />
         </div>
-        <h1 className="text-2xl font-bold mb-2" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Redirecting to secure checkout...</h1>
-        <p className="mb-8" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>Complete your payment to confirm your booking.</p>
+        <h1 className="text-2xl font-bold mb-2" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>Redirecting to secure checkout...</h1>
+        <p className="mb-8" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>Complete your payment to confirm your booking.</p>
         {/* Countdown bar */}
-        <div className="w-full max-w-xs mx-auto h-1 rounded-full overflow-hidden mb-6" style={{ background: 'rgba(255,255,255,0.08)' }}>
-          <div className="h-full rounded-full" style={{ background: `linear-gradient(90deg, ${ACCENT}, #FF6B1E)`, animation: 'shrinkBar 2s linear forwards' }} />
+        <div className="w-full max-w-xs mx-auto h-1 rounded-full overflow-hidden mb-6" style={{ background: 'var(--glass-border)' }}>
+          <div className="h-full rounded-full" style={{ background: `linear-gradient(90deg, ${ACCENT}, var(--accent-secondary))`, animation: 'shrinkBar 2s linear forwards' }} />
         </div>
         <a href={checkoutUrl}
           className="hover:opacity-90 transition-opacity book-primary-cta mobile-button-52"
-          style={{ background: SUCCESS, color: '#000', padding: '16px 32px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '16px', textDecoration: 'none', fontFamily: 'Outfit, sans-serif' }}
+          style={{ background: SUCCESS, color: 'var(--bg-base)', padding: '16px 32px', borderRadius: '100px', fontWeight: '600', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '16px', textDecoration: 'none', fontFamily: 'Outfit, sans-serif' }}
         >
           Pay Now <ArrowRight className="w-4 h-4" />
         </a>
-        <p className="text-xs mt-4" style={{ color: 'rgba(255,255,255,0.25)' }}>Or <a href={checkoutUrl} className="underline hover:text-white" style={{ color: ACCENT }}>click here if not redirected</a></p>
+        <p className="text-xs mt-4" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 75%)' }}>Or <a href={checkoutUrl} className="underline hover:text-white" style={{ color: ACCENT }}>click here if not redirected</a></p>
       </motion.div>
     )
   }
@@ -418,16 +418,16 @@ function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, b
     <motion.div key="step-confirm" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }} className="text-center">
       <motion.div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
-        style={{ background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.2)' }} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}>
+        style={{ background: 'color-mix(in srgb, var(--success), transparent 92%)', border: '1px solid color-mix(in srgb, var(--success), transparent 80%)' }} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}>
         <CheckCircle className="w-10 h-10" style={{ color: SUCCESS }} />
       </motion.div>
-      <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Booking Confirmed!</h1>
-      <p className="mb-1" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>You're all set for <span className="font-medium" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>{selectedType.name}</span>.</p>
-      {selectedSlot && <p className="mb-1" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>{ffd(selectedSlot.session_date)} at {ft(selectedSlot.start_time)}</p>}
-      <p className="mb-8" style={{ color: 'rgba(255,255,255,0.3)' }}>with {selectedSlot.instructor_name}</p>
+      <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>Booking Confirmed!</h1>
+      <p className="mb-1" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>You're all set for <span className="font-medium" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>{selectedType.name}</span>.</p>
+      {selectedSlot && <p className="mb-1" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>{ffd(selectedSlot.session_date)} at {ft(selectedSlot.start_time)}</p>}
+      <p className="mb-8" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 70%)' }}>with {selectedSlot.instructor_name}</p>
 
       <div className="book-confirmation-card" style={{ ...glassCard, padding: '20px', textAlign: 'left' as const, maxWidth: '360px', margin: '0 auto 20px' }}>
-        <div className="text-xs mb-3 uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>Booking Summary</div>
+        <div className="text-xs mb-3 uppercase tracking-wider" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 70%)' }}>Booking Summary</div>
         <div className="space-y-2.5 text-sm">
           {[
             ['Service', selectedType.name],
@@ -437,27 +437,27 @@ function Confirmation({ selectedType, selectedSlot, studentName, studentEmail, b
             ['Student', studentName],
           ].map(([k, v]) => (
             <div key={k} className="flex justify-between">
-              <span style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>{k}</span>
-              <span style={{ fontFamily: 'Inter, sans-serif', color: '#ffffff' }}>{v}</span>
+              <span style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>{k}</span>
+              <span style={{ fontFamily: 'Inter, sans-serif', color: 'var(--text-primary)' }}>{v}</span>
             </div>
           ))}
           <div className="flex justify-between border-t pt-2.5" style={{ borderColor: GLASS_BORDER }}>
-            <span style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>Total</span>
+            <span style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>Total</span>
             <span className="font-bold" style={{ fontFamily: 'Outfit, sans-serif', color: ACCENT }}>{fp(selectedType.price_cents)}</span>
           </div>
         </div>
       </div>
 
       <div className="book-next-steps-card" style={{ ...glassCard, padding: '16px 20px', textAlign: 'left' as const, maxWidth: '360px', margin: '0 auto' }}>
-        <div className="text-xs mb-2 uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>What happens next?</div>
-        <ul className="space-y-2.5 text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>
-          <li className="flex items-center gap-2.5"><CheckCircle className="w-4 h-4 shrink-0" style={{ color: SUCCESS }} />Confirmation email to <span style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>{studentEmail}</span></li>
+        <div className="text-xs mb-2 uppercase tracking-wider" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 70%)' }}>What happens next?</div>
+        <ul className="space-y-2.5 text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>
+          <li className="flex items-center gap-2.5"><CheckCircle className="w-4 h-4 shrink-0" style={{ color: SUCCESS }} />Confirmation email to <span style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>{studentEmail}</span></li>
           <li className="flex items-center gap-2.5"><Clock className="w-4 h-4 shrink-0" style={{ color: ACCENT }} />SMS reminder 48 hours before</li>
           <li className="flex items-center gap-2.5"><Clock className="w-4 h-4 shrink-0" style={{ color: ACCENT }} />Final reminder 4 hours before</li>
         </ul>
       </div>
 
-      <p className="text-xs mt-6" style={{ color: 'rgba(255,255,255,0.25)' }}>Confirmation #{bookingId?.slice(0, 8).toUpperCase() ?? '—'}</p>
+      <p className="text-xs mt-6" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 75%)' }}>Confirmation #{bookingId?.slice(0, 8).toUpperCase() ?? '—'}</p>
     </motion.div>
   )
 }
