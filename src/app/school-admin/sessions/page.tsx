@@ -31,7 +31,7 @@ const TEXT_SECONDARY = 'var(--admin-text-secondary)'
 const ACCENT_GREEN = 'var(--admin-accent)'
 const ACCENT_LAVENDER = 'var(--status-purple)'
 const CARD_SHADOW = 'var(--glass-shadow)'
-const CARD_SHADOW_HOVER = '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px var(--admin-accent), inset 0 1px 0 rgba(255,255,255,0.08)'
+const CARD_SHADOW_HOVER = '0 8px 32px color-mix(in srgb, var(--bg-base), transparent 50%), 0 0 0 1px var(--admin-accent), inset 0 1px 0 var(--glass-border)'
 
 function borderColor(status: string): string {
   if (status === 'completed') return ACCENT_GREEN
@@ -100,7 +100,7 @@ function NewSessionModal({ onClose, onAdd, schoolId }: { onClose: () => void; on
   }
 
   const inputStyle: React.CSSProperties = {
-    background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.08)', color: '#FFFFFF',
+    background: 'color-mix(in srgb, var(--bg-base), transparent 60%)', border: '1px solid var(--glass-border)', color: 'var(--admin-text)',
     outline: 'none', borderRadius: '12px', width: '100%', padding: '12px 16px', fontSize: '14px',
   }
 
@@ -109,7 +109,7 @@ function NewSessionModal({ onClose, onAdd, schoolId }: { onClose: () => void; on
       onClick={onClose}
       style={{
         position: 'fixed', inset: 0, zIndex: 50,
-        background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
+        background: 'color-mix(in srgb, var(--bg-base), transparent 30%)', backdropFilter: 'blur(8px)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px',
       }}
     >
@@ -117,8 +117,8 @@ function NewSessionModal({ onClose, onAdd, schoolId }: { onClose: () => void; on
         onClick={e => e.stopPropagation()}
         style={{
           width: '100%', maxWidth: '480px',
-          background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255,255,255,0.1)', borderRadius: '24px',
+          background: 'color-mix(in srgb, var(--text-primary), transparent 95%)', backdropFilter: 'blur(24px)',
+          border: '1px solid color-mix(in srgb, var(--text-primary), transparent 90%)', borderRadius: '24px',
           padding: '32px', position: 'relative',
         }}
       >
@@ -127,17 +127,17 @@ function NewSessionModal({ onClose, onAdd, schoolId }: { onClose: () => void; on
           style={{
             position: 'absolute', top: '16px', right: '16px',
             width: '32px', height: '32px', borderRadius: '50%',
-            background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-            color: '#9CA3AF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'var(--border)', border: '1px solid color-mix(in srgb, var(--text-primary), transparent 90%)',
+            color: 'var(--admin-text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
           <X className="w-4 h-4" />
         </button>
 
-        <h2 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '18px', fontWeight: '600', color: '#FFFFFF', marginBottom: '24px' }}>New Session</h2>
+        <h2 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '18px', fontWeight: '600', color: 'var(--admin-text)', marginBottom: '24px' }}>New Session</h2>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Session Type</label>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--admin-text-secondary)', marginBottom: '6px' }}>Session Type</label>
             <select
               value={form.session_type_id}
               onChange={e => setForm(f => ({ ...f, session_type_id: e.target.value }))}
@@ -147,7 +147,7 @@ function NewSessionModal({ onClose, onAdd, schoolId }: { onClose: () => void; on
             </select>
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Instructor</label>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--admin-text-secondary)', marginBottom: '6px' }}>Instructor</label>
             <select
               value={form.instructor_id}
               onChange={e => setForm(f => ({ ...f, instructor_id: e.target.value }))}
@@ -158,7 +158,7 @@ function NewSessionModal({ onClose, onAdd, schoolId }: { onClose: () => void; on
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Date</label>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--admin-text-secondary)', marginBottom: '6px' }}>Date</label>
               <input
                 type="date"
                 value={form.start_date}
@@ -168,7 +168,7 @@ function NewSessionModal({ onClose, onAdd, schoolId }: { onClose: () => void; on
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Start Time</label>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--admin-text-secondary)', marginBottom: '6px' }}>Start Time</label>
               <input
                 type="time"
                 value={form.start_time}
@@ -180,7 +180,7 @@ function NewSessionModal({ onClose, onAdd, schoolId }: { onClose: () => void; on
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Max Seats</label>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--admin-text-secondary)', marginBottom: '6px' }}>Max Seats</label>
               <input
                 type="number"
                 value={form.max_seats}
@@ -191,7 +191,7 @@ function NewSessionModal({ onClose, onAdd, schoolId }: { onClose: () => void; on
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Price ($)</label>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--admin-text-secondary)', marginBottom: '6px' }}>Price ($)</label>
               <input
                 type="number"
                 value={form.price_cents / 100}
@@ -203,7 +203,7 @@ function NewSessionModal({ onClose, onAdd, schoolId }: { onClose: () => void; on
             </div>
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF', marginBottom: '6px' }}>Location</label>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--admin-text-secondary)', marginBottom: '6px' }}>Location</label>
             <input
               type="text"
               value={form.location}
@@ -212,10 +212,10 @@ function NewSessionModal({ onClose, onAdd, schoolId }: { onClose: () => void; on
               style={inputStyle}
             />
           </div>
-          {error && <p style={{ fontSize: '13px', color: '#F97316', margin: 0 }}>{error}</p>}
+          {error && <p style={{ fontSize: '13px', color: 'var(--accent-secondary)', margin: 0 }}>{error}</p>}
           <div style={{ display: 'flex', gap: '12px', paddingTop: '8px' }}>
-            <button type="button" onClick={onClose} style={{ flex: 1, padding: '12px', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#FFFFFF', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
-            <button type="submit" disabled={loading} style={{ flex: 1, padding: '12px', background: '#4ADE80', border: 'none', borderRadius: '12px', color: '#000000', fontSize: '14px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.5 : 1 }}>
+            <button type="button" onClick={onClose} style={{ flex: 1, padding: '12px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'var(--admin-text)', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+            <button type="submit" disabled={loading} style={{ flex: 1, padding: '12px', background: 'var(--admin-accent)', border: 'none', borderRadius: '12px', color: 'var(--admin-bg)', fontSize: '14px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.5 : 1 }}>
               {loading ? 'Creating...' : 'Create Session'}
             </button>
           </div>
@@ -295,12 +295,12 @@ export default function SessionsPage() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
           <div>
-            <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '32px', fontWeight: '700', color: '#FFFFFF', marginBottom: '4px', letterSpacing: '-0.01em' }}>Sessions</h1>
+            <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '32px', fontWeight: '700', color: 'var(--admin-text)', marginBottom: '4px', letterSpacing: '-0.01em' }}>Sessions</h1>
             <p style={{ fontSize: '14px', color: TEXT_SECONDARY }}>{sessions.length} total</p>
           </div>
-          <button onClick={() => setShowNewSession(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: '#4ADE80', border: 'none', borderRadius: '12px', color: '#000000', fontSize: '14px', fontWeight: '700', cursor: 'pointer', boxShadow: '0 0 16px rgba(74,222,128,0.3)', transition: 'transform 0.15s, box-shadow 0.15s' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 0 24px rgba(74,222,128,0.4)' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px rgba(74,222,128,0.3)' }}>
+          <button onClick={() => setShowNewSession(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'var(--admin-accent)', border: 'none', borderRadius: '12px', color: 'var(--admin-bg)', fontSize: '14px', fontWeight: '700', cursor: 'pointer', boxShadow: '0 0 16px color-mix(in srgb, var(--admin-accent), transparent 70%)', transition: 'transform 0.15s, box-shadow 0.15s' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 0 24px color-mix(in srgb, var(--admin-accent), transparent 60%)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px color-mix(in srgb, var(--admin-accent), transparent 70%)' }}>
             <Plus className="w-4 h-4" />
             New Session
           </button>
@@ -310,8 +310,8 @@ export default function SessionsPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
           {filterTabs.map(({ key, label }) => (
             <button key={key} onClick={() => setActiveFilter(key)} style={activeFilter === key ? {
-              padding: '8px 16px', background: 'rgba(74,222,128,0.15)', color: '#4ADE80',
-              border: '1px solid #4ADE80', borderRadius: '999px', fontSize: '13px', fontWeight: '600', cursor: 'pointer',
+              padding: '8px 16px', background: 'color-mix(in srgb, var(--admin-accent), transparent 85%)', color: 'var(--admin-accent)',
+              border: '1px solid var(--admin-accent)', borderRadius: '999px', fontSize: '13px', fontWeight: '600', cursor: 'pointer',
             } : {
               padding: '8px 16px', background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR,
               color: TEXT_SECONDARY, border: `1px solid ${GLASS_BORDER}`, borderRadius: '999px', fontSize: '13px', fontWeight: '600', cursor: 'pointer',
@@ -326,15 +326,15 @@ export default function SessionsPage() {
         {loading ? (
           <div className='sessions-table-container' style={{ background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, borderRadius: '16px', overflow: 'hidden', boxShadow: CARD_SHADOW }}>
             <div className='sessions-table-header' style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 80px', gap: '16px', padding: '12px 24px', borderBottom: `1px solid ${GLASS_BORDER}` }}>
-              {['Date', 'Session', 'Details', 'Status', ''].map((_, i) => (<div key={i} style={{ height: '12px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} />))}
+              {['Date', 'Session', 'Details', 'Status', ''].map((_, i) => (<div key={i} style={{ height: '12px', borderRadius: '6px', background: 'color-mix(in srgb, var(--text-primary), transparent 95%)' }} />))}
             </div>
             {[...Array(4)].map((_, i) => (
               <div key={i} className='sessions-table-row' style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 80px', gap: '16px', padding: '16px 24px', alignItems: 'center', borderBottom: `1px solid ${GLASS_BORDER}` }}>
-                <div><div style={{ height: '11px', width: '30px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)', marginBottom: '4px' }} /><div style={{ height: '28px', width: '30px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', marginBottom: '4px' }} /><div style={{ height: '11px', width: '30px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)' }} /></div>
-                <div><div style={{ height: '14px', width: '70%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', marginBottom: '6px' }} /><div style={{ height: '12px', width: '50%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} /></div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}><div style={{ height: '12px', width: '80%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} /><div style={{ height: '12px', width: '60%', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} /></div>
-                <div><div style={{ height: '24px', width: '80px', borderRadius: '999px', background: 'rgba(255,255,255,0.05)' }} /></div>
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}><div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }} /></div>
+                <div><div style={{ height: '11px', width: '30px', borderRadius: '4px', background: 'color-mix(in srgb, var(--text-primary), transparent 95%)', marginBottom: '4px' }} /><div style={{ height: '28px', width: '30px', borderRadius: '6px', background: 'color-mix(in srgb, var(--text-primary), transparent 95%)', marginBottom: '4px' }} /><div style={{ height: '11px', width: '30px', borderRadius: '4px', background: 'color-mix(in srgb, var(--text-primary), transparent 95%)' }} /></div>
+                <div><div style={{ height: '14px', width: '70%', borderRadius: '6px', background: 'color-mix(in srgb, var(--text-primary), transparent 95%)', marginBottom: '6px' }} /><div style={{ height: '12px', width: '50%', borderRadius: '6px', background: 'color-mix(in srgb, var(--text-primary), transparent 95%)' }} /></div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}><div style={{ height: '12px', width: '80%', borderRadius: '6px', background: 'color-mix(in srgb, var(--text-primary), transparent 95%)' }} /><div style={{ height: '12px', width: '60%', borderRadius: '6px', background: 'color-mix(in srgb, var(--text-primary), transparent 95%)' }} /></div>
+                <div><div style={{ height: '24px', width: '80px', borderRadius: '999px', background: 'color-mix(in srgb, var(--text-primary), transparent 95%)' }} /></div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}><div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'color-mix(in srgb, var(--text-primary), transparent 95%)' }} /></div>
               </div>
             ))}
           </div>
@@ -342,7 +342,7 @@ export default function SessionsPage() {
           <div style={{ background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, borderRadius: '16px', textAlign: 'center', padding: '64px', boxShadow: CARD_SHADOW }}>
             <Calendar className="w-10 h-10 mx-auto mb-3" style={{ color: TEXT_SECONDARY, opacity: 0.4 }} />
             <p style={{ fontSize: '14px', color: TEXT_SECONDARY, marginBottom: '12px' }}>{activeFilter === 'all' ? 'No sessions yet' : `No ${activeFilter} sessions`}</p>
-            {activeFilter === 'all' && <button onClick={() => setShowNewSession(true)} style={{ fontSize: '14px', fontWeight: '500', color: '#4ADE80', background: 'transparent', border: 'none', cursor: 'pointer' }}>Schedule your first session →</button>}
+            {activeFilter === 'all' && <button onClick={() => setShowNewSession(true)} style={{ fontSize: '14px', fontWeight: '500', color: 'var(--admin-accent)', background: 'transparent', border: 'none', cursor: 'pointer' }}>Schedule your first session →</button>}
           </div>
         ) : (
           <div className='sessions-table-container' style={{ background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR, border: `1px solid ${GLASS_BORDER}`, borderRadius: '16px', overflow: 'hidden', boxShadow: CARD_SHADOW }}>
@@ -354,15 +354,15 @@ export default function SessionsPage() {
               const leftColor = borderColor(session.status)
               return (
                 <div key={session.id} className='sessions-table-row' style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 80px', gap: '16px', padding: '16px 24px', alignItems: 'center', borderLeft: `3px solid ${leftColor}`, transition: 'background 0.15s' }}
-                onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.025)')}
+                onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'color-mix(in srgb, var(--text-primary), transparent 97.5%)')}
                 onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}>
                   <div className='sessions-date-col' style={{ textAlign: 'center', flexShrink: 0 }}>
                     <div style={{ fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', color: leftColor }}>{date.toLocaleDateString('en-US', { month: 'short' })}</div>
-                    <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '28px', fontWeight: '800', color: '#FFFFFF', lineHeight: 1.2 }}>{date.getDate()}</div>
+                    <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '28px', fontWeight: '800', color: 'var(--admin-text)', lineHeight: 1.2 }}>{date.getDate()}</div>
                     <div style={{ fontSize: '11px', color: TEXT_SECONDARY }}>{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
                   </div>
                   <div className='sessions-info-col'>
-                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', marginBottom: '2px' }}>{session.session_type?.name || 'Session'}</div>
+                    <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--admin-text)', marginBottom: '2px' }}>{session.session_type?.name || 'Session'}</div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: TEXT_SECONDARY }}>
                       {session.instructor?.name && <span>{session.instructor.name}</span>}
                       {session.location && <><span>·</span><span>{session.location}</span></>}
@@ -373,11 +373,11 @@ export default function SessionsPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: TEXT_SECONDARY }}><Users className="w-3 h-3" style={{ color: TEXT_SECONDARY }} />{session.seats_booked}/{session.max_seats} seats</div>
                   </div>
                   <div className='sessions-status-col'>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: '600', background: session.status === 'scheduled' ? 'rgba(74,222,128,0.15)' : session.status === 'completed' ? 'rgba(96,165,250,0.15)' : 'rgba(249,115,22,0.15)', color: session.status === 'scheduled' ? '#4ADE80' : session.status === 'completed' ? '#60A5FA' : '#F97316' }}>{session.status}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: '600', background: session.status === 'scheduled' ? 'color-mix(in srgb, var(--admin-accent), transparent 85%)' : session.status === 'completed' ? 'color-mix(in srgb, var(--status-blue), transparent 85%)' : 'color-mix(in srgb, var(--accent-secondary), transparent 85%)', color: session.status === 'scheduled' ? 'var(--admin-accent)' : session.status === 'completed' ? 'var(--status-blue)' : 'var(--accent-secondary)' }}>{session.status}</span>
                   </div>
                   <div className='sessions-actions-col' style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
                     <button onClick={() => handleStatusToggle(session.id, session.status)} style={{ padding: '8px', borderRadius: '8px', background: 'transparent', border: 'none', cursor: 'pointer', color: TEXT_SECONDARY, display: 'flex', alignItems: 'center', transition: 'background 0.15s' }}
-                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)')}
+                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'var(--glass-border)')}
                     onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')} title={session.status === 'scheduled' ? 'Cancel session' : 'Reactivate session'}>
                       {session.status === 'scheduled' ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                     </button>

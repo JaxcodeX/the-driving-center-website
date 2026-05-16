@@ -11,12 +11,12 @@ import {
 } from 'lucide-react'
 
 // Glassmorphism design standard
-const GLASS_BG = 'rgba(255,255,255,0.03)'
-const GLASS_BORDER = 'rgba(255,255,255,0.06)'
-const GLASS_SHADOW = '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)'
-const ACCENT = '#4ADE80'
-const ACCENT_DIM = 'rgba(255,140,66,0.12)'
-const SUCCESS = '#4ADE80'
+const GLASS_BG = 'var(--glass-bg)'
+const GLASS_BORDER = 'var(--border)'
+const GLASS_SHADOW = '0 4px 24px color-mix(in srgb, var(--bg-base), transparent 60%), inset 0 1px 0 color-mix(in srgb, var(--text-primary), transparent 95%)'
+const ACCENT = 'var(--success)'
+const ACCENT_DIM = 'color-mix(in srgb, var(--accent-secondary), transparent 88%)'
+const SUCCESS = 'var(--success)'
 
 function injectFonts() {
   if (typeof document === 'undefined') return
@@ -88,19 +88,19 @@ function StepIndicator({ current }: { current: number }) {
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>
-          Step {current + 1} of {STEPS.length} — <span className="font-semibold" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>{STEP_LABELS[current]}</span>
+        <span className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>
+          Step {current + 1} of {STEPS.length} — <span className="font-semibold" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>{STEP_LABELS[current]}</span>
         </span>
       </div>
       <div className="book-step-indicator" style={{ ...glassCard, padding: '14px 16px' }}>
         <div className="flex gap-1.5">
           {STEPS.map((_, i) => (
-            <div key={i} className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <div key={i} className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{
                   width: i <= current ? '100%' : '0%',
-                  background: `linear-gradient(90deg, ${ACCENT}, #FF6B1E)`,
+                  background: `linear-gradient(90deg, ${ACCENT}, var(--accent-secondary))`,
                 }}
               />
             </div>
@@ -119,8 +119,8 @@ function ServiceSelection({ sessionTypes, selectedType, onSelect, loading }: {
   return (
     <motion.div key="step-type" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3, ease: 'easeInOut' }}>
-      <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Book a Lesson</h1>
-      <p className="text-sm mb-6" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>Choose the service that fits your needs.</p>
+      <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>Book a Lesson</h1>
+      <p className="text-sm mb-6" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>Choose the service that fits your needs.</p>
 
       {loading ? (
         <div className="space-y-3">
@@ -130,8 +130,8 @@ function ServiceSelection({ sessionTypes, selectedType, onSelect, loading }: {
         </div>
       ) : sessionTypes.length === 0 ? (
         <div className="rounded-2xl p-12 text-center" style={glassCard}>
-          <CalendarIcon className="w-10 h-10 mx-auto mb-3" style={{ color: 'rgba(255,255,255,0.25)' }} />
-          <p style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>No services available right now.</p>
+          <CalendarIcon className="w-10 h-10 mx-auto mb-3" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 75%)' }} />
+          <p style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>No services available right now.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -160,27 +160,27 @@ function ServiceSelection({ sessionTypes, selectedType, onSelect, loading }: {
                 )}
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-colors"
-                    style={{ background: sel ? ACCENT_DIM : GLASS_BG, color: sel ? ACCENT : 'rgba(255,255,255,0.5)', border: `1px solid ${GLASS_BORDER}` }}>
+                    style={{ background: sel ? ACCENT_DIM : GLASS_BG, color: sel ? ACCENT : 'color-mix(in srgb, var(--text-primary), transparent 50%)', border: `1px solid ${GLASS_BORDER}` }}>
                     {iconFor(type.name)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="font-semibold" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>{type.name}</span>
+                      <span className="font-semibold" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>{type.name}</span>
                       {type.tca_hours_credit && (
-                        <span className="text-xs px-2.5 py-0.5 rounded-full" style={{ background: ACCENT_DIM, color: ACCENT, border: `1px solid ${ACCENT}33` }}>
+                        <span className="text-xs px-2.5 py-0.5 rounded-full" style={{ background: ACCENT_DIM, color: ACCENT, border: '1px solid color-mix(in srgb, var(--success), transparent 80%)' }}>
                           {type.tca_hours_credit}h TCA Credit
                         </span>
                       )}
                     </div>
-                    <p className="text-sm mb-3" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>{type.description}</p>
-                    <div className="flex items-center gap-1 text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                    <p className="text-sm mb-3" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>{type.description}</p>
+                    <div className="flex items-center gap-1 text-xs" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 70%)' }}>
                       <Clock className="w-3.5 h-3.5" />{type.duration_minutes} min
                       {type.deposit_cents > 0 && <span>· {fp(type.deposit_cents)} deposit</span>}
                     </div>
                   </div>
                   <div className="shrink-0 text-right ml-2">
                     <div className="font-bold text-xl" style={{ fontFamily: 'Outfit, sans-serif', color: sel ? ACCENT : '#ffffff' }}>{fp(type.price_cents)}</div>
-                    <div className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>per session</div>
+                    <div className="text-xs mt-0.5" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 70%)' }}>per session</div>
                   </div>
                 </div>
               </button>
@@ -211,11 +211,11 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
   return (
     <motion.div key="step-slot" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3, ease: 'easeInOut' }}>
-      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>
+      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>
         <ChevronLeft className="w-4 h-4" /> Back
       </button>
-      <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>{selectedType.name}</h1>
-      <p className="text-sm mb-6" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>{selectedType.duration_minutes} min · {fp(selectedType.price_cents)}</p>
+      <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>{selectedType.name}</h1>
+      <p className="text-sm mb-6" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>{selectedType.duration_minutes} min · {fp(selectedType.price_cents)}</p>
 
       {/* Calendar strip */}
       <div className="book-calendar-strip" style={{ ...glassCard, padding: '16px', marginBottom: '20px' }}>
@@ -228,9 +228,9 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
                 style={{
                   background: sel ? ACCENT_DIM : GLASS_BG,
                   border: `1px solid ${sel ? ACCENT : GLASS_BORDER}`,
-                  color: hasSlots ? '#ffffff' : 'rgba(255,255,255,0.3)',
+                  color: hasSlots ? 'var(--text-primary)' : 'color-mix(in srgb, var(--text-primary), transparent 70%)',
                 }}>
-                <span className="text-xs" style={{ color: isToday ? ACCENT : undefined }}>{label}</span>
+                <span className="text-xs" style={{ color: isToday ? ACCENT : 'inherit' }}>{label}</span>
                 <span className="text-lg font-bold mt-0.5" style={{ fontFamily: 'Outfit, sans-serif' }}>{dayNum}</span>
                 <span className="text-xs" style={{ opacity: 0.6 }}>{month}</span>
                 {hasSlots && !sel && <div className="w-1.5 h-1.5 rounded-full mt-1" style={{ background: ACCENT }} />}
@@ -248,8 +248,8 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
         </div>
       ) : selectedDateSlots.length === 0 ? (
         <div className="rounded-2xl p-10 text-center" style={glassCard}>
-          <CalendarIcon className="w-8 h-8 mx-auto mb-2" style={{ color: 'rgba(255,255,255,0.25)' }} />
-          <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'rgba(255,255,255,0.5)' }}>No available times{selectedDate ? ' on this day' : ''}.</p>
+          <CalendarIcon className="w-8 h-8 mx-auto mb-2" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 75%)' }} />
+          <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>No available times{selectedDate ? ' on this day' : ''}.</p>
         </div>
       ) : (
         <div className="space-y-5">
@@ -258,7 +258,7 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
             if (!ss.length) return null
             return (
               <div key={sec}>
-                <div className="text-xs font-medium mb-2 uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>{sec}</div>
+                <div className="text-xs font-medium mb-2 uppercase tracking-wider" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 70%)' }}>{sec}</div>
                 <div className="grid grid-cols-2 gap-2 book-time-grid">
                   {ss.map((slot, i) => {
                     const sel = selectedSlot?.session_date === slot.session_date && selectedSlot?.start_time === slot.start_time && selectedSlot?.instructor_id === slot.instructor_id
@@ -275,7 +275,7 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
                           width: '100%',
                         }}>
                         <div className="font-semibold text-sm" style={{ fontFamily: 'Outfit, sans-serif', color: sel ? ACCENT : '#ffffff' }}>{ft(slot.start_time)}</div>
-                        <div className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>{slot.instructor_name} · {slot.seats_available} seat{slot.seats_available !== 1 ? 's' : ''}</div>
+                        <div className="text-xs mt-0.5" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 70%)' }}>{slot.instructor_name} · {slot.seats_available} seat{slot.seats_available !== 1 ? 's' : ''}</div>
                       </button>
                     )
                   })}

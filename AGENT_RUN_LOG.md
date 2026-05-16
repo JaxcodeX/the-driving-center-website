@@ -1,5 +1,49 @@
 # AGENT_RUN_LOG.md — The Driving Center
 
+---
+
+## Phase 5 CSS Refactor (sessions) — Model: deepseek/deepseek-v4-flash — Started: 2026-05-16 14:15
+
+**Task:** Replace all hardcoded hex/rgba colors in style={} props in school-admin/sessions/page.tsx with CSS variables from globals.css
+
+**Context package:**
+- Read: AGENT_RUN_LOG.md, workspace ERRORS.md/LEARNINGS.md, project ERRORS.md, SPEC.md, globals.css, frontend-design-pro SKILL.md
+- Working from: SPEC.md design tokens section
+
+**Steps:**
+1. Read all context files — done
+2. Replaced rgba(0,0,0,0.7) modal overlay → color-mix(in srgb, var(--bg-base), transparent 30%) — done
+3. Replaced rgba(255,255,255,0.05) modal inner → color-mix(in srgb, var(--text-primary), transparent 95%) — done
+4. Replaced rgba(255,255,255,0.1) modal border → color-mix(in srgb, var(--text-primary), transparent 90%) — done
+5. Replaced rgba(255,255,255,0.06) close button → var(--border) — done
+6. Replaced #9CA3AF labels/close → var(--admin-text-secondary) — done
+7. Replaced #FFFFFF text → var(--admin-text) — done
+8. Replaced rgba(0,0,0,0.4) input bg → color-mix(in srgb, var(--bg-base), transparent 60%) — done
+9. Replaced rgba(255,255,255,0.08) input/button borders → var(--glass-border) — done
+10. Replaced #F97316 error → var(--accent-secondary) — done
+11. Replaced #4ADE80 submit button → var(--admin-accent) — done
+12. Replaced #000000 text on buttons → var(--admin-bg) — done
+13. Replaced rgba(74,222,128,0.3) box-shadow → color-mix(in srgb, var(--admin-accent), transparent 70%) — done
+14. Replaced #4ADE80 active filter tab → var(--admin-accent) — done
+15. Replaced rgba(74,222,128,0.15) filter/session-status backgrounds → color-mix(in srgb, var(--admin-accent), transparent 85%) — done
+16. Replaced rgba(96,165,250,0.15) completed status → color-mix(in srgb, var(--status-blue), transparent 85%) — done
+17. Replaced #60A5FA completed text → var(--status-blue) — done
+18. Replaced rgba(249,115,22,0.15) cancelled status → color-mix(in srgb, var(--accent-secondary), transparent 85%) — done
+19. Replaced rgba(255,255,255,0.05) skeleton → color-mix(in srgb, var(--text-primary), transparent 95%) — done
+20. Replaced rgba(255,255,255,0.025) row hover → color-mix(in srgb, var(--text-primary), transparent 97.5%) — done
+21. Replaced rgba(255,255,255,0.08) action btn hover → var(--glass-border) — done
+22. Replaced rgba(0,0,0,0.5) + rgba(255,255,255,0.08) in CARD_SHADOW_HOVER → color-mix / var(--glass-border) — done
+
+**Build:** ✅ Pass — 0 errors
+
+**Result:** ✅ Passed
+- Commit: pending
+- Duration: ~5 min
+
+**Changes:** All hardcoded colors replaced with CSS variables/color-mix in sessions/page.tsx
+
+---
+
 **Purpose:** Complete history of every autonomous agent run — what was attempted, what model was used, what failed, what succeeded, how long it took.
 **Rule:** Every subagent spawn appends to this file. Every failure is logged with root cause. Every success is logged with proof.
 
@@ -266,7 +310,7 @@ Future agents read this file to know:
 **Build:** ✅ Pass — 0 errors
 
 **Result:** ✅ Passed
-- Commit: pending
+- Commit: `bce11cf`
 - Duration: ~5 min
 
 ---
