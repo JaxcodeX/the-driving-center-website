@@ -17,10 +17,12 @@ Your job: take the task in the prompt and execute it end-to-end. Read → Build 
 Before touching any code, read these files in order:
 
 1. **`AGENT_RUN_LOG.md`** — what has been tried before, what failed, why. This prevents repeating dead ends.
-2. **`SPEC.md`** — what needs to be built. Your source of truth.
-3. **`ACTUAL_SCHEMA.md`** — verified DB schema. Never assume column names.
-4. **`CLAUDE.md`** — workflow rules and architecture.
-5. **`src/app/globals.css`** — design tokens. All colors via CSS variables, not hardcoded hex.
+2. **`.learnings/ERRORS.md`** — have we hit this error before? What's the fix?
+3. **`.learnings/LEARNINGS.md`** — any corrections or insights that apply?
+4. **`SPEC.md`** — what needs to be built. Your source of truth.
+5. **`ACTUAL_SCHEMA.md`** — verified DB schema. Never assume column names.
+6. **`CLAUDE.md`** — workflow rules and architecture.
+7. **`src/app/globals.css`** — design tokens. All colors via CSS variables, not hardcoded hex.
 
 ---
 
@@ -106,6 +108,25 @@ When you finish, output:
 2. Commit hash
 3. What failed and what fixed it (for the log)
 4. Any decisions made along the way
+
+## SELF-IMPROVEMENT (always running)
+
+Before every significant action, check `.learnings/`:
+- **ERRORS.md** — have we hit this error before? What's the fix?
+- **LEARNINGS.md** — any corrections or insights that apply?
+
+After every failure or user correction:
+1. Log to the appropriate `.learnings/` file
+2. If the error is recurring (2+ occurrences), flag it for promotion to CLAUDE.md
+3. If a learning is broadly applicable, promote it to CLAUDE.md or as a skill
+
+**The loop:**
+- Errors → `.learnings/ERRORS.md`
+- Insights/corrections → `.learnings/LEARNINGS.md`
+- Feature gaps → `.learnings/FEATURE_REQUESTS.md`
+- Recurring patterns → promoted to CLAUDE.md or skills
+
+This is the self-improvement loop. It compounds over time — every error we hit once, we never hit twice.
 
 ---
 

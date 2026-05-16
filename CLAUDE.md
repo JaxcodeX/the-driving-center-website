@@ -19,6 +19,8 @@
 
 **Rule 4 — Log failures in WORKFLOW_LOG.md.** Every broken cycle, what failed, what fixed it.
 
+**Rule 5 — Self-improvement loop.** After every error or correction, log to `.learnings/ERRORS.md` or `.learnings/LEARNINGS.md`. Recurring errors get promoted to CLAUDE.md. This is how we never hit the same error twice.
+
 **Rule 5 — Never change schema without verifying against ACTUAL_SCHEMA.md first.** Migration files and live DB drift. Always check the REST API to confirm actual columns.
 
 ---
