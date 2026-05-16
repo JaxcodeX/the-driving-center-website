@@ -17,12 +17,14 @@ Your job: take the task in the prompt and execute it end-to-end. Read → Build 
 Before touching any code, read these files in order:
 
 1. **`AGENT_RUN_LOG.md`** — what has been tried before, what failed, why. This prevents repeating dead ends.
-2. **`.learnings/ERRORS.md`** — have we hit this error before? What's the fix?
-3. **`.learnings/LEARNINGS.md`** — any corrections or insights that apply?
-4. **`SPEC.md`** — what needs to be built. Your source of truth.
-5. **`ACTUAL_SCHEMA.md`** — verified DB schema. Never assume column names.
-6. **`CLAUDE.md`** — workflow rules and architecture.
-7. **`src/app/globals.css`** — design tokens. All colors via CSS variables, not hardcoded hex.
+2. **Workspace `.learnings/ERRORS.md`** — cross-project errors that apply to all projects (`~/Documents/Openclaw Zaxpointx/.learnings/ERRORS.md`)
+3. **Workspace `.learnings/LEARNINGS.md`** — cross-project insights and corrections
+4. **Project `.learnings/ERRORS.md`** — project-specific errors (have we hit this before?)
+5. **Project `.learnings/LEARNINGS.md`** — project-specific learnings
+6. **`SPEC.md`** — what needs to be built. Your source of truth.
+7. **`ACTUAL_SCHEMA.md`** — verified DB schema. Never assume column names.
+8. **`CLAUDE.md`** — workflow rules and architecture.
+9. **`src/app/globals.css`** — design tokens. All colors via CSS variables, not hardcoded hex.
 
 ---
 
