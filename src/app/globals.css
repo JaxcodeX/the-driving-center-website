@@ -925,4 +925,58 @@ h1, h2, h3, h4, h5, h6 {
     width: 100% !important;
     justify-content: center !important;
   }
+
+  /* ── Book time grid: min touch target (44px+) for slot buttons ── */
+  .book-time-grid button {
+    min-height: 52px !important;
+  }
+
+  /* ── Calendar strip: momentum scroll for iOS ── */
+  .book-calendar-strip > div {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* ── Calendar date buttons: tappable ── */
+  .book-calendar-strip button {
+    min-height: 52px !important;
+  }
+
+  /* ── Step indicator bars: visible on mobile ── */
+  .book-step-track > div {
+    height: 6px !important;
+  }
+
+  /* ── Confirmation cards: full width on mobile ── */
+  .book-confirmation-card,
+  .book-next-steps-card {
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* ── Back button: tap target ── */
+  .book-back-btn {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* ── Service card list: generous gap ── */
+  .book-service-list {
+    gap: 16px !important;
+  }
+
+  /* ── Star ratings: bigger for mobile readability ── */
+  .star-rating svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  /* ── Inline action links (phone, email): tap target ── */
+  .action-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
 }

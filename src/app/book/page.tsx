@@ -93,7 +93,7 @@ function StepIndicator({ current }: { current: number }) {
         </span>
       </div>
       <div className="book-step-indicator" style={{ ...glassCard, padding: '14px 16px' }}>
-        <div className="flex gap-1.5">
+        <div className="flex gap-1.5 book-step-track">
           {STEPS.map((_, i) => (
             <div key={i} className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
               <div
@@ -134,7 +134,7 @@ function ServiceSelection({ sessionTypes, selectedType, onSelect, loading }: {
           <p style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>No services available right now.</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3 book-service-list">
           {sessionTypes.map(type => {
             const sel = selectedType?.id === type.id
             return (
@@ -211,7 +211,7 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
   return (
     <motion.div key="step-slot" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3, ease: 'easeInOut' }}>
-      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white min-h-[44px] px-1" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>
+      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white min-h-[44px] px-2 book-back-btn" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>
         <ChevronLeft className="w-4 h-4" /> Back
       </button>
       <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>{selectedType.name}</h1>
@@ -224,7 +224,7 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
             const hasSlots = !!slotsByDate[dateStr]; const sel = selectedDate === dateStr
             return (
               <button key={dateStr} onClick={() => setSelectedDate(sel ? null : dateStr)}
-                className="flex-shrink-0 flex flex-col items-center rounded-2xl px-3 py-3 min-w-[64px] transition-all duration-200 cursor-pointer"
+                className="flex-shrink-0 flex flex-col items-center rounded-2xl px-3 py-4 min-w-[64px] transition-all duration-200 cursor-pointer"
                 style={{
                   background: sel ? ACCENT_DIM : GLASS_BG,
                   border: `1px solid ${sel ? ACCENT : GLASS_BORDER}`,
@@ -302,7 +302,7 @@ function StudentDetails({ selectedType, selectedSlot, studentName, setStudentNam
   return (
     <motion.div key="step-details" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3, ease: 'easeInOut' }}>
-      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white min-h-[44px] px-1" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>
+      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white min-h-[44px] px-2 book-back-btn" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>
         <ChevronLeft className="w-4 h-4" /> Back
       </button>
 

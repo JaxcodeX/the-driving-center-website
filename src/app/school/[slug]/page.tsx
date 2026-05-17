@@ -28,7 +28,7 @@ function iconForName(name: string) {
 // Star rating display
 function StarRating({ rating }: { rating: number }) {
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1 star-rating">
       {[1, 2, 3, 4, 5].map(i => (
         <Star key={i} className="w-4 h-4" fill={i <= Math.round(rating) ? 'var(--accent-secondary)' : 'none'} stroke={i <= Math.round(rating) ? 'var(--accent-secondary)' : 'var(--text-muted)'} />
       ))}
@@ -142,7 +142,7 @@ function SchoolContent() {
               </span>
             )}
             {school.school.phone && (
-              <a href={`tel:${school.school.phone}`} className="flex items-center gap-1.5 transition-colors hover:text-white" style={{ color: 'var(--success)' }}>
+              <a href={`tel:${school.school.phone}`} className="flex items-center gap-1.5 transition-colors hover:text-white action-link" style={{ color: 'var(--success)' }}>
                 <Phone className="w-3.5 h-3.5" />{school.school.phone}
               </a>
             )}
@@ -157,7 +157,7 @@ function SchoolContent() {
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 py-10 relative z-10 space-y-10">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 relative z-10 space-y-10">
 
         {/* About */}
         {school.profile?.about && (
@@ -179,7 +179,7 @@ function SchoolContent() {
               <span className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, var(--success), #22C55E)' }} />
               Lessons & Services
             </h2>
-            <div className="space-y-3">
+            <div className="space-y-3 book-service-list">
               {school.session_types.map((type: any) => (
                 <div key={type.id} className="glass-card">
                   <div className="flex items-start gap-4">
@@ -207,7 +207,7 @@ function SchoolContent() {
                           <Clock className="w-3.5 h-3.5" />{formatDuration(type.duration_minutes)}
                         </span>
                         <Link href={`/book?school=${slug}&type=${type.id}`}
-                          className="btn-pill text-sm font-semibold px-5 py-2.5"
+                          className="btn-pill text-sm font-semibold px-6 py-3"
                           style={{ background: 'var(--success)', color: '#000000' }}>
                           Book Now →
                         </Link>
@@ -263,7 +263,7 @@ function SchoolContent() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{review.name}</span>
-                        <div className="flex items-center gap-0.5">
+                        <div className="flex items-center gap-0.5 star-rating">
                           {[1, 2, 3, 4, 5].map(s => (
                             <Star key={s} className="w-3 h-3" fill={s <= review.rating ? 'var(--accent-secondary)' : 'none'} stroke={s <= review.rating ? 'var(--accent-secondary)' : 'var(--text-muted)'} />
                           ))}
@@ -297,7 +297,7 @@ function SchoolContent() {
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(school.profile.address + ' ' + school.profile.city + ' ' + (school.profile.state || 'TN') + ' ' + (school.profile.zip || ''))}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 text-sm hover:text-white transition-colors"
+                  className="flex items-center gap-3 text-sm hover:text-white transition-colors action-link"
                   style={{ color: 'var(--success)', textDecoration: 'none' }}
                 >
                   <MapPin className="w-4 h-4 shrink-0" />
@@ -307,13 +307,13 @@ function SchoolContent() {
               {school.school.phone && (
                 <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
                   <Phone className="w-4 h-4 shrink-0" style={{ color: 'var(--success)' }} />
-                  <a href={`tel:${school.school.phone}`} className="hover:text-white transition-colors" style={{ color: 'var(--status-blue)' }}>{school.school.phone}</a>
+                  <a href={`tel:${school.school.phone}`} className="hover:text-white transition-colors action-link" style={{ color: 'var(--status-blue)' }}>{school.school.phone}</a>
                 </div>
               )}
               {school.profile?.email && (
                 <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
                   <Mail className="w-4 h-4 shrink-0" style={{ color: 'var(--success)' }} />
-                  <a href={`mailto:${school.profile.email}`} className="hover:text-white transition-colors" style={{ color: 'var(--status-blue)' }}>{school.profile.email}</a>
+                  <a href={`mailto:${school.profile.email}`} className="hover:text-white transition-colors action-link" style={{ color: 'var(--status-blue)' }}>{school.profile.email}</a>
                 </div>
               )}
             </div>
@@ -334,7 +334,7 @@ function SchoolContent() {
         </section>
 
         {/* Footer */}
-        <footer className="text-center text-xs pt-6 border-t" style={{ color: 'var(--text-muted)', borderColor: 'var(--border)' }}>
+        <footer className="text-center text-sm pt-6 border-t" style={{ color: 'var(--text-muted)', borderColor: 'var(--border)' }}>
           Powered by <span style={{ color: 'var(--success)' }}>The Driving Center</span>
         </footer>
       </div>
@@ -345,7 +345,7 @@ function SchoolContent() {
           align-items: center;
           gap: 8px;
           padding: 14px 28px;
-          background: linear-gradient(135deg, var(--success), color-mix(in srgb, var(--success), #000 15%));
+          background: linear-gradient(135deg, var(--success), #22C55E);
           color: #000000;
           font-weight: 700;
           font-size: 14px;
@@ -362,8 +362,7 @@ function SchoolContent() {
         }
         @media (max-width: 640px) {
           .btn-glow { width: 100% !important; justify-content: center !important; }
-          section div[class*="glass-card"] { padding: 24px 20px !important; }
-          .max-w-3xl.px-6 { padding-left: 16px !important; padding-right: 16px !important; }
+          .glass-card { padding: 24px 20px !important; }
         }
         .glass-card {
           background: var(--glass-bg, rgba(255,255,255,0.03));
