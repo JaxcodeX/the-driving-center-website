@@ -47,7 +47,7 @@ const glassInputBase = {
   outline: 'none',
   borderRadius: '999px',
   padding: '0 20px',
-  fontSize: '14px',
+  fontSize: '16px',
   width: '100%' as const,
   transition: 'border-color 0.2s',
 }
@@ -211,7 +211,7 @@ function DateAndTime({ selectedType, slots, selectedSlot, onSelectSlot, loadingS
   return (
     <motion.div key="step-slot" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3, ease: 'easeInOut' }}>
-      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>
+      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white min-h-[44px] px-1" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>
         <ChevronLeft className="w-4 h-4" /> Back
       </button>
       <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>{selectedType.name}</h1>
@@ -302,7 +302,7 @@ function StudentDetails({ selectedType, selectedSlot, studentName, setStudentNam
   return (
     <motion.div key="step-details" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3, ease: 'easeInOut' }}>
-      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>
+      <button onClick={onBack} className="text-sm mb-4 flex items-center gap-1 transition-colors hover:text-white min-h-[44px] px-1" style={{ fontFamily: 'Inter, sans-serif', color: 'color-mix(in srgb, var(--text-primary), transparent 50%)' }}>
         <ChevronLeft className="w-4 h-4" /> Back
       </button>
 
@@ -324,28 +324,28 @@ function StudentDetails({ selectedType, selectedSlot, studentName, setStudentNam
       <h1 className="text-2xl font-bold mb-6" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>Your Information</h1>
       <form onSubmit={onSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 60%)', fontFamily: 'Inter, sans-serif' }}>
+          <label className="block text-sm font-medium mb-2 uppercase tracking-wide" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 60%)', fontFamily: 'Inter, sans-serif' }}>
             <User className="w-3.5 h-3.5 inline mr-1.5" />Full Name *
           </label>
           <input className="mobile-input-52" type="text" value={studentName} onChange={e => setStudentName(e.target.value)} placeholder="Jane Smith"
             required style={inputBase} />
         </div>
         <div>
-          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 60%)', fontFamily: 'Inter, sans-serif' }}>
+          <label className="block text-sm font-medium mb-2 uppercase tracking-wide" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 60%)', fontFamily: 'Inter, sans-serif' }}>
             <Mail className="w-3.5 h-3.5 inline mr-1.5" />Email *
           </label>
           <input className="mobile-input-52" type="email" value={studentEmail} onChange={e => setStudentEmail(e.target.value)} placeholder="jane@example.com"
             required style={inputBase} />
         </div>
         <div>
-          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 60%)', fontFamily: 'Inter, sans-serif' }}>
+          <label className="block text-sm font-medium mb-2 uppercase tracking-wide" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 60%)', fontFamily: 'Inter, sans-serif' }}>
             <Phone className="w-3.5 h-3.5 inline mr-1.5" />Phone
           </label>
           <input className="mobile-input-52" type="tel" value={studentPhone} onChange={e => setStudentPhone(e.target.value)} placeholder="(555) 867-5309"
             style={inputBase} />
         </div>
         <div>
-          <label className="block text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 60%)', fontFamily: 'Inter, sans-serif' }}>
+          <label className="block text-sm font-medium mb-2 uppercase tracking-wide" style={{ color: 'color-mix(in srgb, var(--text-primary), transparent 60%)', fontFamily: 'Inter, sans-serif' }}>
             <Hash className="w-3.5 h-3.5 inline mr-1.5" />Permit / License Number
           </label>
           <input className="mobile-input-52" type="text" value={permitNumber} onChange={e => setPermitNumber(e.target.value)} placeholder="Optional"

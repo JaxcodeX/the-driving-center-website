@@ -30,7 +30,7 @@ function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex items-center gap-1">
       {[1, 2, 3, 4, 5].map(i => (
-        <Star key={i} className="w-4 h-4" fill={i <= Math.round(rating) ? '#F97316' : 'none'} stroke={i <= Math.round(rating) ? '#F97316' : '#64748B'} />
+        <Star key={i} className="w-4 h-4" fill={i <= Math.round(rating) ? 'var(--accent-secondary)' : 'none'} stroke={i <= Math.round(rating) ? 'var(--accent-secondary)' : 'var(--text-muted)'} />
       ))}
       <span className="text-sm font-medium ml-1" style={{ color: 'var(--text-primary)' }}>{rating.toFixed(1)}</span>
     </div>
@@ -208,7 +208,7 @@ function SchoolContent() {
                         </span>
                         <Link href={`/book?school=${slug}&type=${type.id}`}
                           className="btn-pill text-sm font-semibold px-5 py-2.5"
-                          style={{ background: 'var(--success)', color: 'var(--text-primary)' }}>
+                          style={{ background: 'var(--success)', color: '#000000' }}>
                           Book Now →
                         </Link>
                       </div>
@@ -265,7 +265,7 @@ function SchoolContent() {
                         <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{review.name}</span>
                         <div className="flex items-center gap-0.5">
                           {[1, 2, 3, 4, 5].map(s => (
-                            <Star key={s} className="w-3 h-3" fill={s <= review.rating ? '#F97316' : 'none'} stroke={s <= review.rating ? '#F97316' : '#64748B'} />
+                            <Star key={s} className="w-3 h-3" fill={s <= review.rating ? 'var(--accent-secondary)' : 'none'} stroke={s <= review.rating ? 'var(--accent-secondary)' : 'var(--text-muted)'} />
                           ))}
                         </div>
                       </div>
@@ -345,7 +345,7 @@ function SchoolContent() {
           align-items: center;
           gap: 8px;
           padding: 14px 28px;
-          background: linear-gradient(135deg, var(--success), #22C55E);
+          background: linear-gradient(135deg, var(--success), color-mix(in srgb, var(--success), #000 15%));
           color: #000000;
           font-weight: 700;
           font-size: 14px;
@@ -354,7 +354,7 @@ function SchoolContent() {
           border: none;
           cursor: pointer;
           transition: transform 0.2s, box-shadow 0.2s;
-          font-family: 'Inter', sans-serif;
+          font-family: 'Outfit', sans-serif;
         }
         .btn-glow:hover {
           transform: translateY(-2px);
@@ -364,11 +364,6 @@ function SchoolContent() {
           .btn-glow { width: 100% !important; justify-content: center !important; }
           section div[class*="glass-card"] { padding: 24px 20px !important; }
           .max-w-3xl.px-6 { padding-left: 16px !important; padding-right: 16px !important; }
-        }
-        .bg-circle {
-          position: absolute;
-          border-radius: 50%;
-          pointer-events: none;
         }
         .glass-card {
           background: var(--glass-bg, rgba(255,255,255,0.03));

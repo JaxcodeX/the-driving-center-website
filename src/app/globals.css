@@ -113,6 +113,18 @@ h1, h2, h3, h4, h5, h6 {
   background-clip: text;
 }
 
+/* ── Background Decor ─────────────────────────────────────── */
+.bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.starfield {
+  position: relative;
+  overflow: hidden;
+}
+
 .mesh-gradient { background: var(--mesh-gradient); }
 .mesh-subtle { background: var(--mesh-subtle); }
 
@@ -746,6 +758,27 @@ h1, h2, h3, h4, h5, h6 {
   body {
     font-size: 15px;
     line-height: 1.65;
+  }
+
+  /* Prevent iOS Safari auto-zoom on input focus */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+
+  /* Tap improvements: kill highlight flash, prevent double-tap zoom */
+  a, button, [role="button"], input, select, textarea, label {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Prevent pull-to-refresh on booking/signup flows */
+  .book-shell, .signup-page, .login-bg {
+    overscroll-behavior: contain;
+  }
+
+  /* Minimum readable text — nothing below 13px on mobile */
+  .text-xs, [class*="text-xs"] {
+    font-size: 13px !important;
   }
 
   .container-inner {
